@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:trashtrack/Hauler/login.dart';
+import 'package:trashtrack/Hauler/styles.dart';
 
 class EmailVerification extends StatelessWidget {
   const EmailVerification({super.key});
@@ -12,6 +13,8 @@ class EmailVerification extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Email Verification'),
+        backgroundColor: backgroundColor,
+        foregroundColor: Colors.white,
       ),
       body: CheckEmailScreenVerify(),
     );
@@ -76,7 +79,7 @@ class _EmailVerificationState extends State<CheckEmailScreenVerify> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF04130B),
+      backgroundColor: backgroundColor,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(

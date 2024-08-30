@@ -22,11 +22,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int num =0;
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: num == 0?'splash': '',
+      initialRoute: 'splash',
       routes: {
 
         //Hauler Routes

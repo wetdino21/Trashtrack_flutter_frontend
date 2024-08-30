@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:trashtrack/Hauler/login.dart';
+import 'package:trashtrack/Hauler/styles.dart';
 
 class ForgotPassword extends StatelessWidget {
   const ForgotPassword({super.key});
@@ -11,7 +12,9 @@ class ForgotPassword extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Forgot Password'),
+        //title: Text('Forgot Password'),
+        backgroundColor: backgroundColor,
+        foregroundColor: Colors.white,
       ),
       body: PasswordRecoveryScreen(),
     );
@@ -44,7 +47,7 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF04130B),
+      backgroundColor: backgroundColor,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -186,7 +189,12 @@ class _CheckEmailScreenState extends State<CheckEmailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF04130B),
+      appBar: AppBar(
+        //title: Text('Forgot Password'),
+        backgroundColor: backgroundColor,
+        foregroundColor: Colors.white,
+      ),
+      backgroundColor: backgroundColor,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -333,7 +341,12 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF04130B),
+      appBar: AppBar(
+        //title: Text('Forgot Password'),
+        backgroundColor: backgroundColor,
+        foregroundColor: Colors.white,
+      ),
+      backgroundColor: backgroundColor,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(

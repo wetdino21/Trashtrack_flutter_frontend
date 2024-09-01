@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:trashtrack/styles.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -25,10 +26,13 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 0, 32, 1),
+       backgroundColor: backgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 0, 32, 1),
-        iconTheme: const IconThemeData(color: Colors.white),
+        backgroundColor: backgroundColor,
+        foregroundColor: Colors.white,
+        leading: IconButton(onPressed: (){
+          Navigator.pushNamed(context, 'create_acc');
+        }, icon: Icon(Icons.arrow_back)),
       ),
       body: SingleChildScrollView(
         child: Container(

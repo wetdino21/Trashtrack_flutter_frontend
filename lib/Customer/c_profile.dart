@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:trashtrack/Hauler/bottom_nav_bar.dart';
+import 'package:trashtrack/Customer/c_bottom_nav_bar.dart';
 import 'package:trashtrack/login.dart';
 import 'package:trashtrack/styles.dart';
 

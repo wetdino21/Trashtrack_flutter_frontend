@@ -3,17 +3,17 @@ import 'package:trashtrack/Hauler/Schedule.dart';
 import 'package:trashtrack/Hauler/Vehicle.dart';
 import 'package:trashtrack/Hauler/about_us.dart';
 import 'package:trashtrack/Hauler/change_pass.dart';
-import 'package:trashtrack/Hauler/create_acc.dart';
-import 'package:trashtrack/Hauler/email_verification.dart';
-import 'package:trashtrack/Hauler/forgot_pass.dart';
+import 'package:trashtrack/create_acc.dart';
+import 'package:trashtrack/email_verification.dart';
+import 'package:trashtrack/forgot_pass.dart';
 import 'package:trashtrack/Hauler/home.dart';
-import 'package:trashtrack/Hauler/login.dart';
+import 'package:trashtrack/login.dart';
 import 'package:trashtrack/Hauler/map.dart';
 import 'package:trashtrack/Hauler/notification.dart';
-import 'package:trashtrack/Hauler/privacy_policy.dart';
+import 'package:trashtrack/privacy_policy.dart';
 import 'package:trashtrack/Hauler/profile.dart';
-import 'package:trashtrack/Hauler/splash_screen.dart';
-import 'package:trashtrack/Hauler/terms_conditions.dart';
+import 'package:trashtrack/splash_screen.dart';
+import 'package:trashtrack/terms_conditions.dart';
 
 void main() {
   runApp(const MyApp());

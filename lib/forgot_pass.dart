@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:trashtrack/Hauler/login.dart';
-import 'package:trashtrack/Hauler/styles.dart';
+import 'package:trashtrack/styles.dart';
 
 class ForgotPassword extends StatelessWidget {
   const ForgotPassword({super.key});

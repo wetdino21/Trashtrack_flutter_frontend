@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:trashtrack/Hauler/Schedule.dart';
+import 'package:trashtrack/Hauler/Vehicle.dart';
 import 'package:trashtrack/Hauler/about_us.dart';
 import 'package:trashtrack/Hauler/change_pass.dart';
 import 'package:trashtrack/Hauler/create_acc.dart';
@@ -22,12 +24,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       initialRoute: 'splash',
       routes: {
-
         //Hauler Routes
         'splash': (context) => SplashScreen(),
         'terms': (context) => const TermsAndConditions(),
@@ -40,9 +40,10 @@ class MyApp extends StatelessWidget {
         'privacy_policy': (context) => PrivacyPolicy(),
         'home': (context) => HomeScreen(),
         'map': (context) => MapScreen(),
+        'schedule': (context) => ScheduleScreen(),
+        'vehicle': (context) => VehicleScreen(),
         'notification': (context) => NotificationScreen(),
         'profile': (context) => ProfileScreen(),
-
       },
     );
   }

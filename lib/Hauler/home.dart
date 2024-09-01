@@ -1,47 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:trashtrack/Hauler/appbar.dart';
 import 'package:trashtrack/Hauler/bottom_nav_bar.dart';
-import 'package:trashtrack/Hauler/styles.dart';
+import 'package:trashtrack/Hauler/waste_history_schedule.dart';
+import 'package:trashtrack/Hauler/waste_pickup_schedule.dart';
+import 'package:trashtrack/styles.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final Color backgroundColor = Color(0xFF001E00);
-    final Color accentColor = Color(0xFF6AA920);
-    final Color buttonColor = Color(0xFF86BF3E);
 
     return Scaffold(
       backgroundColor: backgroundColor,
-      appBar: AppBar(
-        backgroundColor: backgroundColor,
-        foregroundColor: Colors.white,
-        title: Text(
-                  'Home',
-                  style: TextStyle(
-                    color: accentColor,
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: CircleAvatar(
-              backgroundImage: AssetImage('assets/anime.jpg'),
-            ),
-          ),
-        ],
-        leading: SizedBox.shrink(),
-        leadingWidth: 0,
-      ),
+      appBar: CustomAppBar(title: 'Home'),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Welcome Container
             Container(
               padding: EdgeInsets.all(16.0),
               decoration: BoxDecoration(
-                color: Color(0xFF103510),
+                color: boxColor,
                 borderRadius: BorderRadius.circular(20.0),
               ),
               child: Column(
@@ -70,7 +50,7 @@ class HomeScreen extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ScheduleScreen(),
+                            builder: (context) => PickUpSchedule(),
                           ),
                         );
                       },
@@ -95,59 +75,58 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             SizedBox(height: 20.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+            // Statistic Boxes
+            GridView.count(
+              crossAxisCount: 2,
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              crossAxisSpacing: 10.0,
+              mainAxisSpacing: 10.0,
               children: [
-                Text(
-                  'Your Waste Collection History',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold,
-                  ),
+                StatisticBox(
+                  icon: Icons.schedule,
+                  title: 'Total Pickups',
+                  value: '150',
+                  iconColor: Colors.blueAccent,
                 ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => ViewAllCollectionHistory()));
-                  },
-                  child: Text(
-                    'View all',
-                    style: TextStyle(color: accentColor),
-                  ),
+                StatisticBox(
+                  icon: Icons.delete,
+                  title: 'Total Tons of \nGarbage Pickups',
+                  value: '75',
+                  iconColor: Colors.redAccent,
+                ),
+                StatisticBox(
+                  icon: Icons.assignment,
+                  title: 'Contractual Pickups',
+                  value: '100',
+                  iconColor: Colors.greenAccent,
+                ),
+                StatisticBox(
+                  icon: Icons.assignment_late,
+                  title: 'Non-Contractual \nPickups',
+                  value: '50',
+                  iconColor: Colors.orangeAccent,
                 ),
               ],
             ),
-            SizedBox(height: 10.0),
-            WasteCollectionCard(
-              date: 'Wed Jun 20',
-              time: '8:30 AM',
-              wasteType: 'Municipal Waste',
-            ),
-            WasteCollectionCard(
-              date: 'Wed Jun 20',
-              time: '8:30 AM',
-              wasteType: 'Construction Waste',
-            ),
-            WasteCollectionCard(
-              date: 'Wed Jun 20',
-              time: '8:30 AM',
-              wasteType: 'Construction Waste',
-            ),
+
+            SizedBox(height: 20.0),
+
           ],
         ),
       ),
       bottomNavigationBar: BottomNavBar(
-        currentIndex: 0, // Set the current index to 0 for HomeScreen
+        currentIndex: 0, 
         onTap: (int index) {
           if (index == 0) {
-            //Navigator.pushNamed(context, 'home');
             return;
           } else if (index == 1) {
             Navigator.pushNamed(context, 'map');
           } else if (index == 2) {
-            Navigator.pushNamed(context, 'notification');
+            Navigator.pushNamed(context, 'schedule');
           } else if (index == 3) {
-            Navigator.pushNamed(context, 'profile');
+            Navigator.pushNamed(context, 'vehicle');
           }
         },
       ),
@@ -155,269 +134,57 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class ScheduleScreen extends StatefulWidget {
-  @override
-  _ScheduleScreenState createState() => _ScheduleScreenState();
-}
+class StatisticBox extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String value;
+  final Color iconColor;
 
-class _ScheduleScreenState extends State<ScheduleScreen> {
-  int selectedPage = 0; // 0 for Contractual, 1 for Non-Contractual
-  late PageController _pageController;
-
-  @override
-  void initState() {
-    super.initState();
-    _pageController = PageController(initialPage: selectedPage);
-  }
-
-  void onPageSelected(int pageIndex) {
-    setState(() {
-      selectedPage = pageIndex;
-    });
-    _pageController.animateToPage(
-      pageIndex,
-      duration: Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: backgroundColor,
-      appBar: AppBar(
-        backgroundColor: backgroundColor,
-        foregroundColor: Colors.white,
-        title: Text('Schedule'),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: CircleAvatar(
-              backgroundImage: AssetImage('assets/anime.jpg'),
-            ),
-          ),
-        ],
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: 20.0),
-          Center(
-            child: Text(
-              'List Of Pickup Schedules',
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: 18.0,
-              ),
-            ),
-          ),
-          SizedBox(height: 20.0),
-          Container(
-            padding: EdgeInsets.all(5.0),
-            decoration: BoxDecoration(
-              color: Color(0xFF103510),
-              borderRadius: BorderRadius.circular(30.0),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () => onPageSelected(0),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          selectedPage == 0 ? buttonColor : Color(0xFF001E00),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                      ),
-                    ),
-                    child: Text(
-                      'Contractual',
-                      style: TextStyle(
-                        color:
-                            selectedPage == 0 ? Colors.white : Colors.white70,
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () => onPageSelected(1),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          selectedPage == 1 ? buttonColor : Color(0xFF001E00),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                      ),
-                    ),
-                    child: Text(
-                      'Non-Contractual',
-                      style: TextStyle(
-                        color:
-                            selectedPage == 1 ? Colors.white : Colors.white70,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 20.0),
-          Expanded(
-            child: PageView(
-              controller: _pageController,
-              onPageChanged: onPageSelected,
-              children: [
-                // Contractual Waste Collection Cards
-                ListView(
-                  children: [
-                    WasteCollectionCard(
-                      date: 'Mon Jun 20',
-                      time: '8:30 AM',
-                      wasteType: 'Municipal Waste',
-                    ),
-                    WasteCollectionCard(
-                      date: 'Wed Jun 20',
-                      time: '8:30 AM',
-                      wasteType: 'Construction Waste',
-                    ),
-                  ],
-                ),
-                // Non-Contractual Waste Collection Cards
-                ListView(
-                  children: [
-                    WasteCollectionCard(
-                      date: 'Fri Jun 20',
-                      time: '8:30 AM',
-                      wasteType: 'Food Waste',
-                    ),
-                    WasteCollectionCard(
-                      date: 'Fri Jun 20',
-                      time: '8:30 AM',
-                      wasteType: 'Construction Waste',
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF86BF3E),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30.0),
-                    ),
-                    padding: EdgeInsets.symmetric(vertical: 16.0),
-                  ),
-                  child: Text(
-                    'Cancel',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18.0,
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(width: 10.0),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF86BF3E),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30.0),
-                    ),
-                    padding: EdgeInsets.symmetric(vertical: 16.0),
-                  ),
-                  child: Text(
-                    'Accept',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18.0,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class WasteCollectionCard extends StatelessWidget {
-  final String date;
-  final String time;
-  final String wasteType;
-
-
-  WasteCollectionCard({
-    required this.date,
-    required this.time,
-    required this.wasteType,
-
+  StatisticBox({
+    required this.icon,
+    required this.title,
+    required this.value,
+    this.iconColor = Colors.white,
   });
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-
-      },
-      splashColor: Colors.green,
-      highlightColor: Colors.green.withOpacity(0.2),
-      child: Container(
-        padding: EdgeInsets.all(10),
-        margin: EdgeInsets.all(5),
-        color: Color(0xFF103510),
-       
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.calendar_today, color: Color(0xFF6AA920)),
-                SizedBox(width: 10.0),
-                Text(
-                  date,
-                  style: TextStyle(color: Colors.white70, fontSize: 16.0),
-                ),
-                SizedBox(width: 10.0),
-                Text(
-                  time,
-                  style: TextStyle(color: Colors.white38, fontSize: 14.0),
-                ),
-              ],
-            ),
-            SizedBox(height: 10.0),
-            Text(
-              wasteType,
-              style: TextStyle(color: Colors.white, fontSize: 16.0),
-            ),
-          ],
-        ),
+    return Container(
+      decoration: BoxDecoration(
+        color: boxColor,
+        borderRadius: BorderRadius.circular(15.0),
       ),
-    );
-  }
-}
-
-class ViewAllCollectionHistory extends StatelessWidget {
-  const ViewAllCollectionHistory({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-   return Scaffold(
-      appBar: AppBar(
-        title: Text('Your Collection History'),
+      padding: EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            color: iconColor,
+            size: 30.0,
+          ),
+          SizedBox(height: 10.0),
+          Center(
+            child: Text(
+              title,
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 14.0,
+              ),
+            ),
+          ),
+          SizedBox(height: 5.0),
+          Text(
+            value,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
-      body: Container(),
     );
   }
 }

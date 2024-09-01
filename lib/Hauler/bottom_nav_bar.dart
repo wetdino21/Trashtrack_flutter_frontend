@@ -21,12 +21,12 @@ class BottomNavBar extends StatelessWidget {
           label: 'Map',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.notifications),
-          label: 'Notification',
+          icon: Icon(Icons.calendar_month),
+          label: 'Schedule',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.person),
-          label: 'Profile',
+          icon: Icon(Icons.directions_car),
+          label: 'Vehicle',
         ),
       ],
       onTap: onTap,

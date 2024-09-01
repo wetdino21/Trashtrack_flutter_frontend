@@ -73,6 +73,8 @@ flutter:
     - assets/Brands.png
     - assets/default.jpg
     - assets/anime.jpg
+    - assets/square_truck.jpg
+    - assets/truck.png
    
 
   # An image asset can refer to one or more resolution-specific "variants", see

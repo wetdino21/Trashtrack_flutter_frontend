@@ -1,35 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:trashtrack/Hauler/appbar.dart';
 import 'package:trashtrack/Hauler/bottom_nav_bar.dart';
-import 'package:trashtrack/Hauler/styles.dart';
+import 'package:trashtrack/styles.dart';
 
 class MapScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: accentColor,
-      appBar: AppBar(
-        backgroundColor: backgroundColor,
-        foregroundColor: Colors.white,
-        title:Text(
-                  'Map',
-                  style: TextStyle(
-                    color: accentColor,
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: CircleAvatar(
-              backgroundImage: AssetImage('assets/anime.jpg'),
-            ),
-          ),
-        ],
-        leading: SizedBox.shrink(),
-        leadingWidth: 0,
-      ),
+      appBar: CustomAppBar(title: 'Map'),
       body: Stack(
         children: [
           // Placeholder for the map
@@ -116,9 +96,9 @@ class MapScreen extends StatelessWidget {
             // Navigator.pushNamed(context, 'map');
             return;
           } else if (index == 2) {
-            Navigator.pushNamed(context, 'notification');
+            Navigator.pushNamed(context, 'schedule');
           } else if (index == 3) {
-            Navigator.pushNamed(context, 'profile');
+            Navigator.pushNamed(context, 'vehicle');
           }
         },
       ),

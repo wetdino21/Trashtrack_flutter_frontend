@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:trashtrack/Hauler/bottom_nav_bar.dart';
 import 'package:trashtrack/Hauler/map.dart';
-import 'package:trashtrack/Hauler/styles.dart';
+import 'package:trashtrack/styles.dart';
 
 class NotificationScreen extends StatelessWidget {
   @override
@@ -10,27 +9,13 @@ class NotificationScreen extends StatelessWidget {
       backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: backgroundColor,
-        //iconTheme: IconThemeData(color: Colors.green),
         foregroundColor: Colors.white,
         title: Text(
                   'Notification',
                   style: TextStyle(
-                    color: accentColor,
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.bold,
+                    
                   ),
                 ),
-        centerTitle: false,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: CircleAvatar(
-              backgroundImage: AssetImage('assets/anime.jpg'),
-            ),
-          )
-        ],
-        leading: SizedBox.shrink(),
-        leadingWidth: 0,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -53,21 +38,6 @@ class NotificationScreen extends StatelessWidget {
             ),
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavBar(
-        currentIndex: 2, // Set the current index to 2 for NotificationScreen
-        onTap: (int index) {
-          if (index == 0) {
-            Navigator.pushNamed(context, 'home');
-          } else if (index == 1) {
-            Navigator.pushNamed(context, 'map');
-          } else if (index == 2) {
-            //Navigator.pushNamed(context, 'notification');
-            return;
-          } else if (index == 3) {
-            Navigator.pushNamed(context, 'profile');
-          }
-        },
       ),
     );
   }
@@ -121,17 +91,17 @@ class NotificationCard extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.black,
+          color: boxColor,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
           children: [
-            Icon(Icons.circle, color: Colors.grey, size: 16),
+            Icon(Icons.circle, color: accentColor, size: 16),
             SizedBox(width: 8),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('$date  $time', style: TextStyle(color: Colors.grey)),
+                Text('$date  $time', style: TextStyle(color: Colors.grey[300])),
                 if (status.isNotEmpty)
                   Text('Status: $status', style: TextStyle(color: statusColor)),
                 Text(title,

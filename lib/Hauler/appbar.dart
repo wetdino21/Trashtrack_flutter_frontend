@@ -32,13 +32,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             width: 40, 
             height: 40,
             decoration: BoxDecoration(
-              color: Colors.green[900], // Background color
-              shape: BoxShape.circle, // Make the container circular
+              color: Colors.green[900], 
+              shape: BoxShape.circle, 
             ),
             child: Icon(
-              Icons.notifications, // Use the correct icon name
+              Icons.notifications, 
               color: Colors.white,
-              size: 30, // Size of the icon
+              size: 30, 
             ),
           ),
         ),

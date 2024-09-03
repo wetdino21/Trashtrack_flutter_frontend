@@ -7,7 +7,7 @@ class PickUpSchedule extends StatefulWidget {
 }
 
 class _PickUpScheduleState extends State<PickUpSchedule> {
-  int selectedPage = 0; // 0 for All, 1 for Contractual, 2 for Non-Contractual
+  int selectedPage = 0;
   late PageController _pageController;
 
   @override
@@ -115,7 +115,9 @@ class _PickUpScheduleState extends State<PickUpSchedule> {
             ),
           ),
           SizedBox(height: 20.0),
-          Expanded(
+          Container(
+            height: MediaQuery.of(context).size.height*.6,
+            padding: EdgeInsets.symmetric(horizontal: 10),
             child: PageView(
               controller: _pageController,
               onPageChanged: (index) {
@@ -214,10 +216,11 @@ class WasteCollectionCard extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(10),
         margin: EdgeInsets.all(5),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: boxColor,
-        ),
+        color: boxColor,
+        // decoration: BoxDecoration(
+        //   borderRadius: BorderRadius.circular(10),
+        //   color: boxColor,
+        // ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

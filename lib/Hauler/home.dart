@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:trashtrack/Hauler/appbar.dart';
 import 'package:trashtrack/Hauler/bottom_nav_bar.dart';
-import 'package:trashtrack/Hauler/waste_history_schedule.dart';
 import 'package:trashtrack/Hauler/waste_pickup_schedule.dart';
 import 'package:trashtrack/styles.dart';
 

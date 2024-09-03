@@ -5,8 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:trashtrack/login.dart';
 import 'package:trashtrack/styles.dart';
 
-class ChangePass extends StatelessWidget {
-  const ChangePass({super.key});
+class C_ChangePass extends StatelessWidget {
+  const C_ChangePass({super.key});
 
   @override
   Widget build(BuildContext context) {

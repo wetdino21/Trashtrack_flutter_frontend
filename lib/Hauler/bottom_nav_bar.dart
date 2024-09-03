@@ -2,9 +2,25 @@ import 'package:flutter/material.dart';
 
 class BottomNavBar extends StatelessWidget {
   final int currentIndex;
-  final Function(int) onTap;
 
-  BottomNavBar({required this.currentIndex, required this.onTap});
+  BottomNavBar({required this.currentIndex});
+
+  void _onItemTapped(BuildContext context, int index) {
+    switch (index) {
+      case 0:
+        Navigator.pushNamed(context, 'home');
+        break;
+      case 1:
+        Navigator.pushNamed(context, 'map');
+        break;
+      case 2:
+        Navigator.pushNamed(context, 'schedule');
+        break;
+      case 3:
+        Navigator.pushNamed(context, 'vehicle');
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,25 +29,34 @@ class BottomNavBar extends StatelessWidget {
       currentIndex: currentIndex,
       items: [
         BottomNavigationBarItem(
-          icon: Icon(Icons.home),
+          icon: currentIndex == 0
+              ? Icon(Icons.home)
+              : Icon(Icons.home_outlined),
           label: 'Home',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.map),
+          icon: currentIndex == 1
+              ? Icon(Icons.map)
+              : Icon(Icons.map_outlined),
           label: 'Map',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.calendar_month),
+          icon: currentIndex == 2
+              ? Icon(Icons.calendar_month)
+              : Icon(Icons.calendar_month_outlined),
           label: 'Schedule',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.directions_car),
+          icon: currentIndex == 3
+              ? Icon(Icons.directions_car)
+              : Icon(Icons.directions_car_filled_outlined),
           label: 'Vehicle',
         ),
       ],
-      onTap: onTap,
+      onTap: (index) => _onItemTapped(context, index),
       selectedItemColor: Colors.green,
       unselectedItemColor: Colors.white,
+      selectedIconTheme: IconThemeData(),
       type: BottomNavigationBarType.fixed,
       selectedLabelStyle: const TextStyle(fontSize: 12),
     );

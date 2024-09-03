@@ -14,7 +14,8 @@ class VehicleScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text('Your Current vehicle'),
+             SizedBox(height: 20),
+            Text('Your Assigned Vehicle', style: TextStyle(color: Colors.white, fontSize: 20),),
             SizedBox(height: 20),
             // Truck image
             Container(
@@ -50,17 +51,6 @@ class VehicleScreen extends StatelessWidget {
       ),
       bottomNavigationBar: BottomNavBar(
         currentIndex: 3,
-        onTap: (int index) {
-          if (index == 0) {
-            Navigator.pushNamed(context, 'home');
-          } else if (index == 1) {
-            Navigator.pushNamed(context, 'map');
-          } else if (index == 2) {
-            Navigator.pushNamed(context, 'schedule');
-          } else if (index == 3) {
-            return;
-          }
-        },
       ),
     );
   }

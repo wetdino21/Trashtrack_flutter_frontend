@@ -1,35 +1,59 @@
 import 'package:flutter/material.dart';
 
-class BottomNavBar extends StatelessWidget {
+class C_BottomNavBar extends StatelessWidget {
   final int currentIndex;
-  final Function(int) onTap;
 
-  BottomNavBar({required this.currentIndex, required this.onTap});
+  C_BottomNavBar({required this.currentIndex});
+
+  void _onItemTapped(BuildContext context, int index) {
+    switch (index) {
+      case 0:
+        Navigator.pushNamed(context, 'c_home');
+        break;
+      case 1:
+        Navigator.pushNamed(context, 'c_map');
+        break;
+      case 2:
+        Navigator.pushNamed(context, 'c_schedule');
+        break;
+      case 3:
+        Navigator.pushNamed(context, 'c_payment');
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
       backgroundColor: Colors.black,
       currentIndex: currentIndex,
-      items: [
+       items: [
         BottomNavigationBarItem(
-          icon: Icon(Icons.home),
+          icon: currentIndex == 0
+              ? Icon(Icons.home)
+              : Icon(Icons.home_outlined),
           label: 'Home',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.map),
+          icon: currentIndex == 1
+              ? Icon(Icons.map)
+              : Icon(Icons.map_outlined),
           label: 'Map',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.calendar_month),
+          icon: currentIndex == 2
+              ? Icon(Icons.calendar_month)
+              : Icon(Icons.calendar_month_outlined),
           label: 'Schedule',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.directions_car),
-          label: 'Vehicle',
+          icon: currentIndex == 3
+              ? Icon(Icons.payment)
+              : Icon(Icons.payment_outlined),
+          label: 'Payment',
         ),
       ],
-      onTap: onTap,
+      onTap: (index) => _onItemTapped(context, index),
       selectedItemColor: Colors.green,
       unselectedItemColor: Colors.white,
       type: BottomNavigationBarType.fixed,

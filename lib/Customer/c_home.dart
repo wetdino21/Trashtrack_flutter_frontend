@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:trashtrack/Customer/c_appbar.dart';
 import 'package:trashtrack/Customer/c_bottom_nav_bar.dart';
+import 'package:trashtrack/Customer/c_waste_info.dart';
 import 'package:trashtrack/Customer/c_waste_pickup_schedule.dart';
 import 'package:trashtrack/styles.dart';
 
-class HomeScreen extends StatelessWidget {
+class C_HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: backgroundColor,
-      appBar: CustomAppBar(title: 'Home'),
+      appBar: C_CustomAppBar(title: 'Home'),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
         child: Column(
@@ -36,10 +36,10 @@ class HomeScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 10.0),
                   Text(
-                    'Another waste collection day. Drive safe!',
+                    'Ready to keep things tidy? Schedule your garbage pickup today!',
                     style: TextStyle(
                       color: Colors.white70,
-                      fontSize: 16.0,
+                      fontSize: 14.0,
                     ),
                   ),
                   SizedBox(height: 20.0),
@@ -49,7 +49,7 @@ class HomeScreen extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => PickUpSchedule(),
+                            builder: (context) => C_PickUpSchedule(),
                           ),
                         );
                       },
@@ -62,7 +62,7 @@ class HomeScreen extends StatelessWidget {
                             vertical: 16.0, horizontal: 30.0),
                       ),
                       child: Text(
-                        'Pickup Schedule',
+                        'Request Pickup Now',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 18.0,
@@ -75,6 +75,15 @@ class HomeScreen extends StatelessWidget {
             ),
             SizedBox(height: 20.0),
 
+            Text(
+              '  Previous waste pickup',
+              style: TextStyle(
+                color: Colors.grey,
+                fontSize: 18.0,
+              ),
+            ),
+            SizedBox(height: 5.0),
+
             // Statistic Boxes
             GridView.count(
               crossAxisCount: 2,
@@ -85,49 +94,59 @@ class HomeScreen extends StatelessWidget {
               children: [
                 StatisticBox(
                   icon: Icons.schedule,
-                  title: 'Total Pickups',
+                  title: 'Total Requests',
                   value: '150',
                   iconColor: accentColor,
                 ),
                 StatisticBox(
-                  icon: Icons.delete,
-                  title: 'Total Tons of \nGarbage Pickups',
+                  icon: Icons.delete_outline,
+                  title: 'Total Tons Collected',
                   value: '75',
-                  iconColor: accentColor,
-                ),
-                StatisticBox(
-                  icon: Icons.assignment,
-                  title: 'Contractual Pickups',
-                  value: '100',
-                  iconColor: accentColor,
-                ),
-                StatisticBox(
-                  icon: Icons.assignment_late,
-                  title: 'Non-Contractual \nPickups',
-                  value: '50',
                   iconColor: accentColor,
                 ),
               ],
             ),
 
             SizedBox(height: 20.0),
+            Text(
+              '  Waste Collection Info',
+              style: TextStyle(
+                color: Colors.grey,
+                fontSize: 18.0,
+              ),
+            ),
+            SizedBox(height: 5.0),
 
+            GestureDetector(
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=> C_WasteInfo()));
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: boxColor,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: ListTile(
+                    contentPadding: EdgeInsets.all(10),
+                    leading: Image.asset(
+                      'assets/truck.png',
+                      height: 100,
+                      width: 100,
+                    ),
+                    title: Text(
+                      'Type of waste',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18.0,
+                      ),
+                    ),
+                  ),
+                )),
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavBar(
-        currentIndex: 0, 
-        onTap: (int index) {
-          if (index == 0) {
-            return;
-          } else if (index == 1) {
-            Navigator.pushNamed(context, 'map');
-          } else if (index == 2) {
-            Navigator.pushNamed(context, 'schedule');
-          } else if (index == 3) {
-            Navigator.pushNamed(context, 'vehicle');
-          }
-        },
+      bottomNavigationBar: C_BottomNavBar(
+        currentIndex: 0,
       ),
     );
   }

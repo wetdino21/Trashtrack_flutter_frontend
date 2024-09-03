@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:trashtrack/styles.dart';
 
-class PickUpSchedule extends StatefulWidget {
+class C_PickUpSchedule extends StatefulWidget {
   @override
-  _PickUpScheduleState createState() => _PickUpScheduleState();
+  _C_PickUpScheduleState createState() => _C_PickUpScheduleState();
 }
 
-class _PickUpScheduleState extends State<PickUpSchedule> {
+class _C_PickUpScheduleState extends State<C_PickUpSchedule> {
   int selectedPage = 0;
   late PageController _pageController;
 
@@ -129,22 +129,22 @@ class _PickUpScheduleState extends State<PickUpSchedule> {
                 // All Waste Collection Cards
                 ListView(
                   children: [
-                    WasteCollectionCard(
+                    C_WasteCollectionCard(
                       date: 'Mon Jun 20',
                       time: '8:30 AM',
                       wasteType: 'Municipal Waste',
                     ),
-                    WasteCollectionCard(
+                    C_WasteCollectionCard(
                       date: 'Wed Jun 20',
                       time: '8:30 AM',
                       wasteType: 'Construction Waste',
                     ),
-                    WasteCollectionCard(
+                    C_WasteCollectionCard(
                       date: 'Fri Jun 20',
                       time: '8:30 AM',
                       wasteType: 'Food Waste',
                     ),
-                    WasteCollectionCard(
+                    C_WasteCollectionCard(
                       date: 'Fri Jun 20',
                       time: '8:30 AM',
                       wasteType: 'Construction Waste',
@@ -154,12 +154,12 @@ class _PickUpScheduleState extends State<PickUpSchedule> {
                 // Contractual Waste Collection Cards
                 ListView(
                   children: [
-                    WasteCollectionCard(
+                    C_WasteCollectionCard(
                       date: 'Mon Jun 20',
                       time: '8:30 AM',
                       wasteType: 'Municipal Waste',
                     ),
-                    WasteCollectionCard(
+                    C_WasteCollectionCard(
                       date: 'Wed Jun 20',
                       time: '8:30 AM',
                       wasteType: 'Construction Waste',
@@ -169,12 +169,12 @@ class _PickUpScheduleState extends State<PickUpSchedule> {
                 // Non-Contractual Waste Collection Cards
                 ListView(
                   children: [
-                    WasteCollectionCard(
+                    C_WasteCollectionCard(
                       date: 'Fri Jun 20',
                       time: '8:30 AM',
                       wasteType: 'Food Waste',
                     ),
-                    WasteCollectionCard(
+                    C_WasteCollectionCard(
                       date: 'Fri Jun 20',
                       time: '8:30 AM',
                       wasteType: 'Construction Waste',
@@ -191,12 +191,12 @@ class _PickUpScheduleState extends State<PickUpSchedule> {
   }
 }
 
-class WasteCollectionCard extends StatelessWidget {
+class C_WasteCollectionCard extends StatelessWidget {
   final String date;
   final String time;
   final String wasteType;
 
-  WasteCollectionCard({
+  C_WasteCollectionCard({
     required this.date,
     required this.time,
     required this.wasteType,
@@ -209,7 +209,7 @@ class WasteCollectionCard extends StatelessWidget {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => WasteColScheduleDetails()));
+                builder: (context) => C_WasteColScheduleDetails()));
       },
       splashColor: Colors.green,
       highlightColor: Colors.green.withOpacity(0.2),
@@ -251,8 +251,8 @@ class WasteCollectionCard extends StatelessWidget {
   }
 }
 
-class WasteColScheduleDetails extends StatelessWidget {
-  const WasteColScheduleDetails({super.key});
+class C_WasteColScheduleDetails extends StatelessWidget {
+  const C_WasteColScheduleDetails({super.key});
 
   @override
   Widget build(BuildContext context) {

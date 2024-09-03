@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:trashtrack/login.dart';
 import 'package:trashtrack/styles.dart';
 
-class ProfileScreen extends StatelessWidget {
+class C_ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

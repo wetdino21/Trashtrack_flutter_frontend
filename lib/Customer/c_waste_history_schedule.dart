@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:trashtrack/styles.dart';
 
-class ViewAllCollectionHistory extends StatelessWidget {
-  const ViewAllCollectionHistory({super.key});
+class C_ViewAllCollectionHistory extends StatelessWidget {
+  const C_ViewAllCollectionHistory({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -15,8 +15,8 @@ class ViewAllCollectionHistory extends StatelessWidget {
   }
 }
 
-class WasteColHistoryDetails extends StatelessWidget {
-  const WasteColHistoryDetails({super.key});
+class C_WasteColHistoryDetails extends StatelessWidget {
+  const C_WasteColHistoryDetails({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -29,12 +29,12 @@ class WasteColHistoryDetails extends StatelessWidget {
   }
 }
 
-class WasteCollectionHistoryCard extends StatelessWidget {
+class C_WasteCollectionHistoryCard extends StatelessWidget {
   final String date;
   final String time;
   final String wasteType;
 
-  WasteCollectionHistoryCard({
+  C_WasteCollectionHistoryCard({
     required this.date,
     required this.time,
     required this.wasteType,
@@ -45,7 +45,7 @@ class WasteCollectionHistoryCard extends StatelessWidget {
     return InkWell(
       onTap: () {
         Navigator.push(context,
-            MaterialPageRoute(builder: (context) => WasteColHistoryDetails()));
+            MaterialPageRoute(builder: (context) => C_WasteColHistoryDetails()));
       },
       splashColor: Colors.green,
       highlightColor: Colors.green.withOpacity(0.2),

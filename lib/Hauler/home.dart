@@ -84,25 +84,25 @@ class HomeScreen extends StatelessWidget {
               mainAxisSpacing: 10.0,
               children: [
                 StatisticBox(
-                  icon: Icons.schedule,
+                  icon: Icons.schedule_outlined,
                   title: 'Total Pickups',
                   value: '150',
                   iconColor: accentColor,
                 ),
                 StatisticBox(
-                  icon: Icons.delete,
+                  icon: Icons.delete_outline,
                   title: 'Total Tons of \nGarbage Pickups',
                   value: '75',
                   iconColor: accentColor,
                 ),
                 StatisticBox(
-                  icon: Icons.assignment,
+                  icon: Icons.assignment_outlined,
                   title: 'Contractual Pickups',
                   value: '100',
                   iconColor: accentColor,
                 ),
                 StatisticBox(
-                  icon: Icons.assignment_late,
+                  icon: Icons.assignment_late_outlined,
                   title: 'Non-Contractual \nPickups',
                   value: '50',
                   iconColor: accentColor,
@@ -117,17 +117,6 @@ class HomeScreen extends StatelessWidget {
       ),
       bottomNavigationBar: BottomNavBar(
         currentIndex: 0, 
-        onTap: (int index) {
-          if (index == 0) {
-            return;
-          } else if (index == 1) {
-            Navigator.pushNamed(context, 'map');
-          } else if (index == 2) {
-            Navigator.pushNamed(context, 'schedule');
-          } else if (index == 3) {
-            Navigator.pushNamed(context, 'vehicle');
-          }
-        },
       ),
     );
   }

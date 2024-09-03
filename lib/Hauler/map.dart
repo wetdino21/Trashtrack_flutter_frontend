@@ -89,18 +89,6 @@ class MapScreen extends StatelessWidget {
       ),
       bottomNavigationBar: BottomNavBar(
         currentIndex: 1,
-        onTap: (int index) {
-          if (index == 0) {
-            Navigator.pushNamed(context, 'home');
-          } else if (index == 1) {
-            // Navigator.pushNamed(context, 'map');
-            return;
-          } else if (index == 2) {
-            Navigator.pushNamed(context, 'schedule');
-          } else if (index == 3) {
-            Navigator.pushNamed(context, 'vehicle');
-          }
-        },
       ),
     );
   }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:trashtrack/Customer/c_map.dart';
 import 'package:trashtrack/styles.dart';
 
-class NotificationScreen extends StatelessWidget {
+class C_NotificationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,7 +78,7 @@ class NotificationCard extends StatelessWidget {
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => MapScreen()),
+                      MaterialPageRoute(builder: (context) => C_MapScreen()),
                     );
                   },
                   child: Text("Proceed"),

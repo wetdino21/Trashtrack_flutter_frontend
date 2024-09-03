@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:trashtrack/styles.dart';
 
-class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+class C_CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
 
-  CustomAppBar({required this.title});
+  C_CustomAppBar({required this.title});
 
   @override
   Widget build(BuildContext context) {

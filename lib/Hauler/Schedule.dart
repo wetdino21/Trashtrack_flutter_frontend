@@ -256,17 +256,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       ),
       bottomNavigationBar: BottomNavBar(
         currentIndex: 2, // Set the current index to 2 for ScheduleScreen
-        onTap: (int index) {
-          if (index == 0) {
-            Navigator.pushNamed(context, 'home');
-          } else if (index == 1) {
-            Navigator.pushNamed(context, 'map');
-          } else if (index == 2) {
-            return;
-          } else if (index == 3) {
-            Navigator.pushNamed(context, 'vehicle');
-          }
-        },
       ),
     );
   }

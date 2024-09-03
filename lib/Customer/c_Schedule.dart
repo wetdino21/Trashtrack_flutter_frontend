@@ -5,12 +5,12 @@ import 'package:trashtrack/Customer/c_waste_history_schedule.dart';
 import 'package:trashtrack/Customer/c_waste_pickup_schedule.dart';
 import 'package:trashtrack/styles.dart';
 
-class ScheduleScreen extends StatefulWidget {
+class C_ScheduleScreen extends StatefulWidget {
   @override
-  State<ScheduleScreen> createState() => _ScheduleScreenState();
+  State<C_ScheduleScreen> createState() => _C_ScheduleScreenState();
 }
 
-class _ScheduleScreenState extends State<ScheduleScreen> {
+class _C_ScheduleScreenState extends State<C_ScheduleScreen> {
   int selectedPage = 0;
   late PageController _pageController;
 
@@ -31,7 +31,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: backgroundColor,
-      appBar: CustomAppBar(title: 'Schedule'),
+      appBar: C_CustomAppBar(title: 'Schedule'),
       body: ListView(
         children: [
           Container(
@@ -59,7 +59,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => PickUpSchedule(),
+                          builder: (context) => C_PickUpSchedule(),
                         ),
                       );
                     },
@@ -72,7 +72,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                           vertical: 16.0, horizontal: 30.0),
                     ),
                     child: Text(
-                      'Pickup Schedule',
+                      'Request Pickup Now',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 18.0,
@@ -164,62 +164,62 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                       // Current Schedule
                       ListView(
                         children: [
-                          WasteCollectionCard(
+                          C_WasteCollectionCard(
                             date: 'Mon Jun 20',
                             time: '8:30 AM',
                             wasteType: 'Municipal Waste',
                           ),
-                          WasteCollectionCard(
+                          C_WasteCollectionCard(
                             date: 'Wed Jun 20',
                             time: '8:30 AM',
                             wasteType: 'Construction Waste',
                           ),
-                          WasteCollectionCard(
+                          C_WasteCollectionCard(
                             date: 'Fri Jun 20',
                             time: '8:30 AM',
                             wasteType: 'Food Waste',
                           ),
-                          WasteCollectionCard(
+                          C_WasteCollectionCard(
                             date: 'Fri Jun 20',
                             time: '8:30 AM',
                             wasteType: 'Construction Waste',
                           ),
-                          WasteCollectionCard(
+                          C_WasteCollectionCard(
                             date: 'Mon Jun 20',
                             time: '8:30 AM',
                             wasteType: 'Municipal Waste',
                           ),
-                          WasteCollectionCard(
+                          C_WasteCollectionCard(
                             date: 'Wed Jun 20',
                             time: '8:30 AM',
                             wasteType: 'Construction Waste',
                           ),
-                          WasteCollectionCard(
+                          C_WasteCollectionCard(
                             date: 'Fri Jun 20',
                             time: '8:30 AM',
                             wasteType: 'Food Waste',
                           ),
-                          WasteCollectionCard(
+                          C_WasteCollectionCard(
                             date: 'Fri Jun 20',
                             time: '8:30 AM',
                             wasteType: 'Construction Waste',
                           ),
-                          WasteCollectionCard(
+                          C_WasteCollectionCard(
                             date: 'Mon Jun 20',
                             time: '8:30 AM',
                             wasteType: 'Municipal Waste',
                           ),
-                          WasteCollectionCard(
+                          C_WasteCollectionCard(
                             date: 'Wed Jun 20',
                             time: '8:30 AM',
                             wasteType: 'Construction Waste',
                           ),
-                          WasteCollectionCard(
+                          C_WasteCollectionCard(
                             date: 'Fri Jun 20',
                             time: '8:30 AM',
                             wasteType: 'Food Waste',
                           ),
-                          WasteCollectionCard(
+                          C_WasteCollectionCard(
                             date: 'Fri Jun 20',
                             time: '8:30 AM',
                             wasteType: 'Construction Waste',
@@ -229,17 +229,17 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                       // History Schedule
                       ListView(
                         children: [
-                          WasteCollectionHistoryCard(
+                          C_WasteCollectionHistoryCard(
                             date: 'Wed Jun 20',
                             time: '8:30 AM',
                             wasteType: 'Municipal Waste',
                           ),
-                          WasteCollectionHistoryCard(
+                          C_WasteCollectionHistoryCard(
                             date: 'Wed Jun 20',
                             time: '8:30 AM',
                             wasteType: 'Construction Waste',
                           ),
-                          WasteCollectionHistoryCard(
+                          C_WasteCollectionHistoryCard(
                             date: 'Wed Jun 20',
                             time: '8:30 AM',
                             wasteType: 'Construction Waste',
@@ -254,19 +254,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavBar(
-        currentIndex: 2, // Set the current index to 2 for ScheduleScreen
-        onTap: (int index) {
-          if (index == 0) {
-            Navigator.pushNamed(context, 'home');
-          } else if (index == 1) {
-            Navigator.pushNamed(context, 'map');
-          } else if (index == 2) {
-            return;
-          } else if (index == 3) {
-            Navigator.pushNamed(context, 'vehicle');
-          }
-        },
+      bottomNavigationBar: C_BottomNavBar(
+        currentIndex: 2,
       ),
     );
   }

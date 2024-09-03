@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class C_AboutUs extends StatelessWidget {
-  const C_AboutUs({super.key});
+class C_WasteInfo extends StatelessWidget {
+  const C_WasteInfo({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('About Us'),
+        title: Text('Waste Information'),
       ),
       body: Container(),
     );

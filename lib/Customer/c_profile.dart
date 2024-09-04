@@ -24,7 +24,7 @@ class C_ProfileScreen extends StatelessWidget {
         ],
         leading: IconButton(
           onPressed: () {
-            Navigator.pushNamed(context, 'home');
+            Navigator.pushNamed(context, 'c_home');
           },
           icon: Icon(Icons.arrow_back),
         ),
@@ -39,22 +39,22 @@ class C_ProfileScreen extends StatelessWidget {
             ),
             SizedBox(height: 10),
             Text(
-              'Hauler Kim',
+              'customer Kim',
               style: TextStyle(fontSize: 24, color: Colors.white),
             ),
             Text(
-              'hauler@gmail.com',
+              'customer@gmail.com',
               style: TextStyle(color: Colors.grey),
             ),
             SizedBox(height: 50),
-            ProfileDetailRow(label: 'First Name', value: 'Hauler'),
+            ProfileDetailRow(label: 'First Name', value: 'Customer'),
             ProfileDetailRow(label: 'Middle Name', value: ''),
             ProfileDetailRow(label: 'Last Name', value: 'Kim'),
-            ProfileDetailRow(label: 'Email', value: 'hauler@gmail.com'),
+            ProfileDetailRow(label: 'Email', value: 'customer@gmail.com'),
             ProfileDetailRow(label: 'Phone Number', value: '+63987889999'),
-            ProfileDetailRow(label: 'Address', value: '123 Hauler Street'),
+            ProfileDetailRow(label: 'Address', value: '123 customer Street'),
             ProfileDetailRow(label: 'Status', value: 'Active'),
-            ProfileDetailRow(label: 'Role', value: 'Hauler'),
+            ProfileDetailRow(label: 'Role', value: 'Customer'),
           ],
         ),
       ),
@@ -120,7 +120,7 @@ class SettingsScreen extends StatelessWidget {
         ),
         leading: IconButton(
             onPressed: () {
-              Navigator.pushNamed(context, 'profile');
+              Navigator.pushNamed(context, 'c_profile');
             },
             icon: Icon(Icons.arrow_back)),
       ),
@@ -150,7 +150,7 @@ class SettingsScreen extends StatelessWidget {
                     ),
                     SizedBox(width: 10),
                     Text(
-                      'Hauler Kim',
+                      'customer Kim',
                       style: TextStyle(color: Colors.white, fontSize: 18),
                     ),
                   ],
@@ -383,13 +383,13 @@ class EditProfileScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 10),
                 Text(
-                  'Hauler Kim',
+                  'customer Kim',
                   style: TextStyle(color: Colors.white, fontSize: 18),
                 ),
                 Divider(color: Colors.white),
                 EditProfileField(
                   label: 'First Name',
-                  initialValue: 'Hauler',
+                  initialValue: 'customer',
                 ),
                 EditProfileField(
                   label: 'Middle Name',
@@ -401,7 +401,7 @@ class EditProfileScreen extends StatelessWidget {
                 ),
                 EditProfileField(
                   label: 'Email',
-                  initialValue: 'hauler@gmail.com',
+                  initialValue: 'customer@gmail.com',
                 ),
                 EditProfileField(
                   label: 'Phone Number',
@@ -409,7 +409,7 @@ class EditProfileScreen extends StatelessWidget {
                 ),
                 EditProfileField(
                   label: 'Address',
-                  initialValue: '123 Hauler Street',
+                  initialValue: '123 customer Street',
                 ),
                 SizedBox(height: 20),
                 ElevatedButton(

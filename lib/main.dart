@@ -72,6 +72,7 @@ class MyApp extends StatelessWidget {
         'c_notification': (context) => C_NotificationScreen(),
         'c_profile': (context) => C_ProfileScreen(),
       },
+      
     );
   }
 }

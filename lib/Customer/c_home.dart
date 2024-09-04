@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:trashtrack/Customer/c_appbar.dart';
 import 'package:trashtrack/Customer/c_bottom_nav_bar.dart';
 import 'package:trashtrack/Customer/c_waste_info.dart';
-import 'package:trashtrack/Customer/c_waste_pickup_schedule.dart';
+import 'package:trashtrack/Customer/c_waste_request_pickup.dart';
 import 'package:trashtrack/styles.dart';
 
 class C_HomeScreen extends StatelessWidget {
@@ -49,7 +49,7 @@ class C_HomeScreen extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => C_PickUpSchedule(),
+                            builder: (context) => RequestPickupScreen(),
                           ),
                         );
                       },
@@ -73,8 +73,47 @@ class C_HomeScreen extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(height: 20.0),
 
+            ////
+            SizedBox(height: 20.0),
+            Text(
+              '  Waste Collection Info',
+              style: TextStyle(
+                color: Colors.grey,
+                fontSize: 18.0,
+              ),
+            ),
+            SizedBox(height: 5.0),
+
+            GestureDetector(
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => C_WasteInfo()));
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: boxColor,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: ListTile(
+                    contentPadding: EdgeInsets.all(10),
+                    leading: Image.asset(
+                      'assets/truck.png',
+                      height: 100,
+                      width: 100,
+                    ),
+                    title: Text(
+                      'Type of waste',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18.0,
+                      ),
+                    ),
+                  ),
+                )),
+
+            /////
+            SizedBox(height: 20.0),
             Text(
               '  Previous waste pickup',
               style: TextStyle(
@@ -108,40 +147,6 @@ class C_HomeScreen extends StatelessWidget {
             ),
 
             SizedBox(height: 20.0),
-            Text(
-              '  Waste Collection Info',
-              style: TextStyle(
-                color: Colors.grey,
-                fontSize: 18.0,
-              ),
-            ),
-            SizedBox(height: 5.0),
-
-            GestureDetector(
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=> C_WasteInfo()));
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: boxColor,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: ListTile(
-                    contentPadding: EdgeInsets.all(10),
-                    leading: Image.asset(
-                      'assets/truck.png',
-                      height: 100,
-                      width: 100,
-                    ),
-                    title: Text(
-                      'Type of waste',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18.0,
-                      ),
-                    ),
-                  ),
-                )),
           ],
         ),
       ),

@@ -151,13 +151,14 @@ class _LoginPageState extends State<LoginPage> {
                 ),
 
                 const SizedBox(height: 10),
+                //login button
                 Center(
                   child: ElevatedButton(
                     onPressed: () {
                       //if (_formKey.currentState?.validate() ?? false) {}
-                      Navigator.pushNamed(context, 'c_home');
+                      Navigator.pushNamed(context, 'home');
                     },
-                    child: const Text('Login'),
+                    child: const Text('Login Hauler'),
                     style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                         padding: const EdgeInsets.symmetric(
@@ -167,6 +168,27 @@ class _LoginPageState extends State<LoginPage> {
                         foregroundColor: Colors.white),
                   ),
                 ),
+                //login 2
+                const SizedBox(height: 10),
+                 Center(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      //if (_formKey.currentState?.validate() ?? false) {}
+                      Navigator.pushNamed(context, 'c_home');
+                    },
+                    child: const Text('Login Customer'),
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 100, vertical: 16),
+                        textStyle: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                        foregroundColor: Colors.white),
+                  ),
+                ),
+
+
+                ///////
                  const SizedBox(height: 10),
                 Center(child: Text('Or Sign in with', style: TextStyle(color: Colors.white),)),
                  const SizedBox(height: 10),

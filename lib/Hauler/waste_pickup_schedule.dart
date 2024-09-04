@@ -133,21 +133,25 @@ class _PickUpScheduleState extends State<PickUpSchedule> {
                       date: 'Mon Jun 20',
                       time: '8:30 AM',
                       wasteType: 'Municipal Waste',
+                      status: 'pending',
                     ),
                     WasteCollectionCard(
                       date: 'Wed Jun 20',
                       time: '8:30 AM',
                       wasteType: 'Construction Waste',
+                      status: 'pending',
                     ),
                     WasteCollectionCard(
                       date: 'Fri Jun 20',
                       time: '8:30 AM',
                       wasteType: 'Food Waste',
+                      status: 'pending',
                     ),
                     WasteCollectionCard(
                       date: 'Fri Jun 20',
                       time: '8:30 AM',
                       wasteType: 'Construction Waste',
+                      status: 'pending',
                     ),
                   ],
                 ),
@@ -158,11 +162,13 @@ class _PickUpScheduleState extends State<PickUpSchedule> {
                       date: 'Mon Jun 20',
                       time: '8:30 AM',
                       wasteType: 'Municipal Waste',
+                      status: 'pending',
                     ),
                     WasteCollectionCard(
                       date: 'Wed Jun 20',
                       time: '8:30 AM',
                       wasteType: 'Construction Waste',
+                      status: 'pending',
                     ),
                   ],
                 ),
@@ -173,11 +179,13 @@ class _PickUpScheduleState extends State<PickUpSchedule> {
                       date: 'Fri Jun 20',
                       time: '8:30 AM',
                       wasteType: 'Food Waste',
+                      status: 'pending',
                     ),
                     WasteCollectionCard(
                       date: 'Fri Jun 20',
                       time: '8:30 AM',
                       wasteType: 'Construction Waste',
+                      status: 'pending',
                     ),
                   ],
                 ),
@@ -195,11 +203,13 @@ class WasteCollectionCard extends StatelessWidget {
   final String date;
   final String time;
   final String wasteType;
+  final String status;
 
   WasteCollectionCard({
     required this.date,
     required this.time,
     required this.wasteType,
+    required this.status,
   });
 
   @override
@@ -240,9 +250,18 @@ class WasteCollectionCard extends StatelessWidget {
               ],
             ),
             SizedBox(height: 10.0),
-            Text(
-              wasteType,
-              style: TextStyle(color: Colors.white, fontSize: 16.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  wasteType,
+                  style: TextStyle(color: Colors.white, fontSize: 16.0),
+                ),
+                Text(
+                  status,
+                  style: TextStyle(color: Colors.orange, fontSize: 16.0),
+                ),
+              ],
             ),
           ],
         ),

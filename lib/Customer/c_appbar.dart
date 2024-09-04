@@ -23,7 +23,7 @@ class C_CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: [
         InkWell(
           onTap: () {
-            Navigator.pushNamed(context, 'notification');
+            Navigator.pushNamed(context, 'c_notification');
           },
           
           borderRadius: BorderRadius.circular(50),
@@ -44,7 +44,7 @@ class C_CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
          InkWell(
           onTap: () {
-            Navigator.pushNamed(context, 'profile');
+            Navigator.pushNamed(context, 'c_profile');
           },
           borderRadius: BorderRadius.circular(50),
           child: Container(

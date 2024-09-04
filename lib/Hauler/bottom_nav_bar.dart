@@ -8,15 +8,19 @@ class BottomNavBar extends StatelessWidget {
   void _onItemTapped(BuildContext context, int index) {
     switch (index) {
       case 0:
+      if(currentIndex!=0)
         Navigator.pushNamed(context, 'home');
         break;
       case 1:
+      if(currentIndex!=1)
         Navigator.pushNamed(context, 'map');
         break;
       case 2:
+      if(currentIndex!=2)
         Navigator.pushNamed(context, 'schedule');
         break;
       case 3:
+      if(currentIndex!=3)
         Navigator.pushNamed(context, 'vehicle');
         break;
     }

@@ -33,11 +33,13 @@ class WasteCollectionHistoryCard extends StatelessWidget {
   final String date;
   final String time;
   final String wasteType;
+  final String status;
 
   WasteCollectionHistoryCard({
     required this.date,
     required this.time,
     required this.wasteType,
+    required this.status,
   });
 
   @override
@@ -62,7 +64,7 @@ class WasteCollectionHistoryCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(Icons.calendar_today, color: Color(0xFF6AA920)),
+                Icon(Icons.history, color: Color(0xFF6AA920)),
                 SizedBox(width: 10.0),
                 Text(
                   date,
@@ -76,9 +78,18 @@ class WasteCollectionHistoryCard extends StatelessWidget {
               ],
             ),
             SizedBox(height: 10.0),
-            Text(
-              wasteType,
-              style: TextStyle(color: Colors.white, fontSize: 16.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  wasteType,
+                  style: TextStyle(color: Colors.white, fontSize: 16.0),
+                ),
+                Text(
+                  status,
+                  style: TextStyle(color: accentColor, fontSize: 16.0),
+                ),
+              ],
             ),
           ],
         ),

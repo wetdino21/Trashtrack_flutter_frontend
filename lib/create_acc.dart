@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:trashtrack/api_postgre_service.dart';
 import 'package:trashtrack/styles.dart';
 
 class CreateAcc extends StatefulWidget {
@@ -37,9 +38,11 @@ class _CreateAccState extends State<CreateAcc> {
       appBar: AppBar(
         backgroundColor: backgroundColor,
         foregroundColor: Colors.white,
-        leading: IconButton(onPressed: (){
-          Navigator.pushNamed(context, 'splash');
-        }, icon: Icon(Icons.arrow_back)),
+        leading: IconButton(
+            onPressed: () {
+              Navigator.pushNamed(context, 'splash');
+            },
+            icon: Icon(Icons.arrow_back)),
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -73,7 +76,7 @@ class _CreateAccState extends State<CreateAcc> {
                     return null;
                   },
                 ),
-                 const SizedBox(height: 10),
+                const SizedBox(height: 10),
                 _buildTextField(
                   controller: _lnameController,
                   hintText: 'Last Name',
@@ -204,9 +207,8 @@ class _CreateAccState extends State<CreateAcc> {
                 // const SizedBox(height: 20),
                 Center(
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState?.validate() ?? false) {
-                        Navigator.pushNamed(context, 'email_verify');
                         // if (_acceptTerms) {
                         //   // Handle account creation logic here
                         // } else {
@@ -219,6 +221,39 @@ class _CreateAccState extends State<CreateAcc> {
                         //     ),
                         //   );
                         // }
+
+                        // createCustomer(
+                        //     _fnameController.value.toString(),
+                        //     _lnameController.value.toString(),
+                        //     _emailController.value.toString(),
+                        //     _passController.value.toString());
+                        // ScaffoldMessenger.of(context).showSnackBar(
+                        //   SnackBar(
+                        //       content: Text('Account created successfully!')),
+                        // );
+
+                        String? errorMessage = await createCustomer(
+                            _fnameController.text,
+                            _lnameController.text,
+                            _emailController.text,
+                            _passController.text);
+                        // If there's an error, show it in a SnackBar
+                        if (errorMessage != null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(errorMessage),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        } else {
+                          // Navigate to the next screen if no error
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text('Account created successfully!')),
+                          );
+                          Navigator.pushNamed(context, 'email_verify');
+                        }
+                       
                       }
                     },
                     child: const Text('Continue'),

@@ -29,7 +29,7 @@ import 'package:trashtrack/login.dart';
 import 'package:trashtrack/privacy_policy.dart';
 import 'package:trashtrack/splash_screen.dart';
 import 'package:trashtrack/terms_conditions.dart';
-
+////asds
 void main() {
   runApp(const MyApp());
 }

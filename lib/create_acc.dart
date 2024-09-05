@@ -9,7 +9,8 @@ class CreateAcc extends StatefulWidget {
 }
 
 class _CreateAccState extends State<CreateAcc> {
-  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _fnameController = TextEditingController();
+  final TextEditingController _lnameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
   final TextEditingController _repassController = TextEditingController();
@@ -21,7 +22,8 @@ class _CreateAccState extends State<CreateAcc> {
 
   @override
   void dispose() {
-    _nameController.dispose();
+    _fnameController.dispose();
+    _lnameController.dispose();
     _emailController.dispose();
     _passController.dispose();
     _repassController.dispose();
@@ -48,9 +50,9 @@ class _CreateAccState extends State<CreateAcc> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Welcome to \nTRASHTRACK',
+                  'Sign Up',
                   style: TextStyle(
-                    fontSize: 35,
+                    fontSize: 40,
                     color: Colors.green,
                     fontWeight: FontWeight.bold,
                   ),
@@ -59,10 +61,22 @@ class _CreateAccState extends State<CreateAcc> {
                   'Please enter your account details below!',
                   style: TextStyle(color: Colors.grey),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 30),
                 _buildTextField(
-                  controller: _nameController,
+                  controller: _fnameController,
                   hintText: 'First Name',
+                  icon: Icons.person_outline,
+                  validator: (value) {
+                    // if (value == null || value.isEmpty) {
+                    //   return 'Please enter your name';
+                    // }
+                    return null;
+                  },
+                ),
+                 const SizedBox(height: 10),
+                _buildTextField(
+                  controller: _lnameController,
+                  hintText: 'Last Name',
                   icon: Icons.person,
                   validator: (value) {
                     // if (value == null || value.isEmpty) {
@@ -93,7 +107,7 @@ class _CreateAccState extends State<CreateAcc> {
                   controller: _passController,
                   hintText: 'Password',
                   obscureText: !_passwordVisible,
-                  icon: Icons.lock,
+                  icon: Icons.lock_outline,
                   suffixIcon: IconButton(
                     icon: Icon(
                       _passwordVisible

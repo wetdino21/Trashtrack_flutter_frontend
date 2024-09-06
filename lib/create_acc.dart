@@ -139,6 +139,9 @@ class _CreateAccState extends State<CreateAcc> {
                     if (!hasLetter || !hasNumber) {
                       return 'Password must contain both letters and numbers';
                     }
+                    // if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
+                    //   return 'Password must contain a special character';
+                    // }
                     return null;
                   },
                 ),
@@ -343,7 +346,7 @@ class _CreateAccState extends State<CreateAcc> {
         inputDecorationTheme: InputDecorationTheme(
           errorStyle: TextStyle(
               color: const Color.fromARGB(
-                  255, 255, 181, 176)), // Change error text color here
+                  255, 255, 181, 176)), // Change error text color
         ),
       ),
       child: TextFormField(

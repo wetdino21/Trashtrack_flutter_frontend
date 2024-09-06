@@ -177,15 +177,24 @@ class _LoginPageState extends State<LoginPage> {
                     onPressed: () async {
                       if (_formKey.currentState?.validate() ?? false) {
                         
-                        String? errorMessage = await loginAccount(
+                        String? dbMessage = await loginAccount(
                             _emailController.text, _passController.text);
 
                         // If there's an error, show it in a SnackBar
-                        if (errorMessage != null) {
-                          showErrorSnackBar(context, errorMessage);
+                        if (dbMessage != null) {
+                          if(dbMessage == 'customer') {
+                             Navigator.pushNamed(context, 'c_home');
+                          }
+                          else if(dbMessage == 'hauler') {
+                             Navigator.pushNamed(context, 'home');
+                          }
+                          else{
+                             showErrorSnackBar(context, dbMessage);
+                          }
+                         
                         }
                         else {
-                        Navigator.pushNamed(context, 'c_home');
+                       // Navigator.pushNamed(context, 'c_home');
                       }
                       } 
                     },

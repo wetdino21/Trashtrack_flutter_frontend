@@ -31,7 +31,7 @@ class _EmailVerificationState extends State<EmailVerification> {
   void initState() {
     super.initState();
     _generatedCode = randomCode(); // Generate the code on start
-    sendEmail(widget.email, 'Verification Code', '$_generatedCode');
+    sendEmailSignUp(widget.email, 'Verification Code', '$_generatedCode');
     print('Generated Code: $_generatedCode');
   }
 
@@ -59,6 +59,7 @@ class _EmailVerificationState extends State<EmailVerification> {
       _generatedCode = randomCode();
       print('New Code: $_generatedCode');
     });
+    sendEmailSignUp(widget.email, 'Verification Code', '$_generatedCode');
   }
 }
 
@@ -106,19 +107,21 @@ class _CheckEmailScreenVerifyState extends State<CheckEmailScreenVerify> {
   }
 
   void _startTimer() {
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+  _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+    if (mounted) { // Check if the widget is still mounted
       if (_timerSeconds > 0) {
         setState(() {
           _timerSeconds--;
         });
       } else {
         setState(() {
-          _isCodeExpired = true; // Mark code as expired
+          _isCodeExpired = true;
         });
         timer.cancel();
       }
-    });
-  }
+    }
+  });
+}
 
   // Function to restart the timer and code
   void _restartTimerAndCode() {

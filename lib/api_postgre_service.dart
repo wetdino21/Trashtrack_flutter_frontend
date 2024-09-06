@@ -28,6 +28,29 @@ Future<String?> emailCheck(String email) async {
   }
 }
 
+Future<String?> emailCheckforgotpass(String email) async {
+  final response = await http.post(
+    Uri.parse('$baseUrl/email_check_forgotpass'),
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      'email': email,
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    print('Good Existing Email');
+    return null;  // No error, return null
+  } else if (response.statusCode == 400) {
+    print('email doesn\'t exists');
+    
+    return 'No account associated with the email';  // Return the error message from the server
+  } else {
+    //print('Error response: ${response.body}');
+    print('Failed to check account email');
+    return 'error'; 
+  }
+}
+
 Future<String?> createCustomer(String fname, String lname, String email, String password) async {
   final response = await http.post(
     Uri.parse('$baseUrl/signup'),
@@ -68,7 +91,10 @@ Future<String?> loginAccount(String email, String password) async {
   
   if (response.statusCode == 200) {
     print('Login successfully');
-    return null;  // No error, return null
+    return 'customer';  // No error
+  } else if (response.statusCode == 201) {
+     print('Login successfully');
+    return 'hauler';  // No error
   } else if (response.statusCode == 404) {
     return 'Email address not found'; 
   } 
@@ -80,3 +106,30 @@ Future<String?> loginAccount(String email, String password) async {
   }
 }
 
+Future<String?> updatepassword(String email, String newPassword) async {
+  final response = await http.post(
+    Uri.parse('$baseUrl/update_password'),
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      'email': email,
+      'newPassword': newPassword,
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    print('Successfully updated password');
+    return null;  // No error, return null
+  } else if (response.statusCode == 400) {
+    print('New password cannot be the same as the old password');
+    
+    return 'New password cannot be the same as the old password';  // Return the error message from the server
+  } else if (response.statusCode == 404) {
+    print('Email not found');
+    
+    return 'Email not found';  // Return the error message from the server
+  } else {
+    //print('Error response: ${response.body}');
+    print('Database error');
+    return 'error'; 
+  }
+}

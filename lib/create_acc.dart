@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:trashtrack/api_email_service.dart';
 import 'package:trashtrack/api_postgre_service.dart';
+import 'package:trashtrack/email_verification.dart';
 import 'package:trashtrack/styles.dart';
+import 'dart:math';
 
 class CreateAcc extends StatefulWidget {
   const CreateAcc({super.key});
@@ -70,9 +73,9 @@ class _CreateAccState extends State<CreateAcc> {
                   hintText: 'First Name',
                   icon: Icons.person_outline,
                   validator: (value) {
-                    // if (value == null || value.isEmpty) {
-                    //   return 'Please enter your name';
-                    // }
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your name';
+                    }
                     return null;
                   },
                 ),
@@ -82,9 +85,9 @@ class _CreateAccState extends State<CreateAcc> {
                   hintText: 'Last Name',
                   icon: Icons.person,
                   validator: (value) {
-                    // if (value == null || value.isEmpty) {
-                    //   return 'Please enter your name';
-                    // }
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your name';
+                    }
                     return null;
                   },
                 ),
@@ -95,13 +98,13 @@ class _CreateAccState extends State<CreateAcc> {
                   keyboardType: TextInputType.emailAddress,
                   icon: Icons.email,
                   validator: (value) {
-                    // if (value == null || value.isEmpty) {
-                    //   return 'Please enter your email';
-                    // }
-                    // final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-                    // if (!emailRegex.hasMatch(value)) {
-                    //   return 'Please enter a valid email';
-                    // }
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your email';
+                    }
+                    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+                    if (!emailRegex.hasMatch(value)) {
+                      return 'Please enter a valid email';
+                    }
                     return null;
                   },
                 ),
@@ -125,17 +128,17 @@ class _CreateAccState extends State<CreateAcc> {
                     },
                   ),
                   validator: (value) {
-                    // if (value == null || value.isEmpty) {
-                    //   return 'Please enter your password';
-                    // }
-                    // if (value.length < 8) {
-                    //   return 'Password must be at least 8 characters long';
-                    // }
-                    // final hasLetter = RegExp(r'[a-zA-Z]').hasMatch(value);
-                    // final hasNumber = RegExp(r'[0-9]').hasMatch(value);
-                    // if (!hasLetter || !hasNumber) {
-                    //   return 'Password must contain both letters and numbers';
-                    // }
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your password';
+                    }
+                    if (value.length < 8) {
+                      return 'Password must be at least 8 characters long';
+                    }
+                    final hasLetter = RegExp(r'[a-zA-Z]').hasMatch(value);
+                    final hasNumber = RegExp(r'[0-9]').hasMatch(value);
+                    if (!hasLetter || !hasNumber) {
+                      return 'Password must contain both letters and numbers';
+                    }
                     return null;
                   },
                 ),
@@ -159,12 +162,12 @@ class _CreateAccState extends State<CreateAcc> {
                     },
                   ),
                   validator: (value) {
-                    // if (value == null || value.isEmpty) {
-                    //   return 'Please confirm your password';
-                    // }
-                    // if (value != _passController.text) {
-                    //   return 'Passwords do not match';
-                    // }
+                    if (value == null || value.isEmpty) {
+                      return 'Please confirm your password';
+                    }
+                    if (value != _passController.text) {
+                      return 'Passwords do not match';
+                    }
                     return null;
                   },
                 ),
@@ -209,51 +212,32 @@ class _CreateAccState extends State<CreateAcc> {
                   child: ElevatedButton(
                     onPressed: () async {
                       if (_formKey.currentState?.validate() ?? false) {
-                        // if (_acceptTerms) {
-                        //   // Handle account creation logic here
-                        // } else {
-                        //   // Show error if terms are not accepted
-                        //   ScaffoldMessenger.of(context).showSnackBar(
-                        //     const SnackBar(
-                        //       content: Text(
-                        //           'You must accept the terms and conditions'),
-                        //       backgroundColor: Colors.red,
-                        //     ),
-                        //   );
-                        // }
+                        if (_acceptTerms) {
+                          // String? errorMessage = await createCustomer(
+                          //     _fnameController.text,
+                          //     _lnameController.text,
+                          //     _emailController.text,
+                          //     _passController.text);
+                          String? errorMessage =
+                              await emailCheck(_emailController.text);
 
-                        // createCustomer(
-                        //     _fnameController.value.toString(),
-                        //     _lnameController.value.toString(),
-                        //     _emailController.value.toString(),
-                        //     _passController.value.toString());
-                        // ScaffoldMessenger.of(context).showSnackBar(
-                        //   SnackBar(
-                        //       content: Text('Account created successfully!')),
-                        // );
-
-                        String? errorMessage = await createCustomer(
-                            _fnameController.text,
-                            _lnameController.text,
-                            _emailController.text,
-                            _passController.text);
-                        // If there's an error, show it in a SnackBar
-                        if (errorMessage != null) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(errorMessage),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
+                          // If there's an error, show it in a SnackBar
+                          if (errorMessage != null) {
+                            showErrorSnackBar(context, errorMessage);
+                          } else {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => EmailVerification(
+                                        fname: _fnameController.text,
+                                        lname: _lnameController.text,
+                                        email: _emailController.text,
+                                        password: _passController.text)));
+                          }
                         } else {
-                          // Navigate to the next screen if no error
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                                content: Text('Account created successfully!')),
-                          );
-                          Navigator.pushNamed(context, 'email_verify');
+                          showErrorSnackBar(context,
+                              'You must accept the terms and conditions');
                         }
-                       
                       }
                     },
                     child: const Text('Continue'),
@@ -276,7 +260,14 @@ class _CreateAccState extends State<CreateAcc> {
                       ),
                       SizedBox(height: 10.0),
                       ElevatedButton.icon(
-                        onPressed: () {},
+                        onPressed: () {
+                          // sendEmail(
+                          //     'mikenaill45@gmail.com',
+                          //     'Trashtrack Verification Code',
+                          //     '123456');
+
+                          //Navigator.pushNamed(context, 'email_verify');
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.transparent,
                           shape: RoundedRectangleBorder(
@@ -387,37 +378,5 @@ class _CreateAccState extends State<CreateAcc> {
         },
       ),
     );
-
-    // return TextFormField(
-    //   controller: controller,
-    //   obscureText: obscureText,
-    //   keyboardType: keyboardType,
-    //   decoration: InputDecoration(
-    //     hintText: hintText,
-    //     hintStyle: TextStyle(color: Colors.grey),
-    //     prefixIcon: Icon(icon, color: Colors.grey),
-    //     suffixIcon: suffixIcon,
-    //     filled: true,
-    //     fillColor: Colors.white,
-    //     border: OutlineInputBorder(
-    //       borderRadius: BorderRadius.circular(30), // Rounded corners
-    //     ),
-    //     enabledBorder: OutlineInputBorder(
-    //       borderRadius: BorderRadius.circular(30), // Rounded corners
-    //       borderSide: const BorderSide(color: Colors.grey, width: 3.0),
-    //     ),
-    //     focusedBorder: OutlineInputBorder(
-    //       borderRadius: BorderRadius.circular(30), // Rounded corners
-    //       borderSide: const BorderSide(color: Colors.green, width: 5.0),
-    //     ),
-    //   ),
-    //   validator: validator,
-    //   onChanged: (value) {
-    //     // Trigger validation on text change
-    //     setState(() {
-    //       _formKey.currentState?.validate();
-    //     });
-    //   },
-    // );
   }
 }

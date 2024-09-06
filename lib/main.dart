@@ -47,7 +47,7 @@ class MyApp extends StatelessWidget {
         'splash': (context) => SplashScreen(),
         'terms': (context) => const TermsAndConditions(),
         'forgot_pass': (context) => const ForgotPassword(),
-        'email_verify': (context) => EmailVerification(),
+       // 'email_verify': (context) => EmailVerification(),
         'create_acc': (context) => const CreateAcc(),
         'login': (context) => const LoginPage(),
 

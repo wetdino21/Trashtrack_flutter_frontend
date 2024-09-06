@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:trashtrack/api_postgre_service.dart';
 import 'package:trashtrack/styles.dart';
 
 class LoginPage extends StatefulWidget {
@@ -11,7 +12,6 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
-  //bool _acceptTerms = false;
   bool _passwordVisible = false;
 
   final _formKey = GlobalKey<FormState>();
@@ -26,13 +26,15 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       backgroundColor: backgroundColor,
+      backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: backgroundColor,
         foregroundColor: Colors.white,
-        leading: IconButton(onPressed: (){
-          Navigator.pushNamed(context, 'create_acc');
-        }, icon: Icon(Icons.arrow_back)),
+        leading: IconButton(
+            onPressed: () {
+              Navigator.pushNamed(context, 'create_acc');
+            },
+            icon: Icon(Icons.arrow_back)),
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -62,13 +64,13 @@ class _LoginPageState extends State<LoginPage> {
                   keyboardType: TextInputType.emailAddress,
                   icon: Icons.email,
                   validator: (value) {
-                    // if (value == null || value.isEmpty) {
-                    //   return 'Please enter your email';
-                    // }
-                    // final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-                    // if (!emailRegex.hasMatch(value)) {
-                    //   return 'Please enter a valid email';
-                    // }
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your email';
+                    }
+                    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+                    if (!emailRegex.hasMatch(value)) {
+                      return 'Please enter a valid email';
+                    }
                     return null;
                   },
                 ),
@@ -92,9 +94,9 @@ class _LoginPageState extends State<LoginPage> {
                     },
                   ),
                   validator: (value) {
-                    // if (value == null || value.isEmpty) {
-                    //   return 'Please enter your password';
-                    // }
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your password';
+                    }
                     // if (value.length < 8) {
                     //   return 'Password must be at least 8 characters long';
                     // }
@@ -127,7 +129,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
 
                 //terms and conditions
-                  const SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Wrap(
                   children: [
                     Center(
@@ -170,11 +172,22 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 //login 2
                 const SizedBox(height: 10),
-                 Center(
+                Center(
                   child: ElevatedButton(
-                    onPressed: () {
-                      //if (_formKey.currentState?.validate() ?? false) {}
-                      Navigator.pushNamed(context, 'c_home');
+                    onPressed: () async {
+                      if (_formKey.currentState?.validate() ?? false) {
+                        
+                        String? errorMessage = await loginAccount(
+                            _emailController.text, _passController.text);
+
+                        // If there's an error, show it in a SnackBar
+                        if (errorMessage != null) {
+                          showErrorSnackBar(context, errorMessage);
+                        }
+                        else {
+                        Navigator.pushNamed(context, 'c_home');
+                      }
+                      } 
                     },
                     child: const Text('Login Customer'),
                     style: ElevatedButton.styleFrom(
@@ -187,11 +200,14 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
 
-
                 ///////
-                 const SizedBox(height: 10),
-                Center(child: Text('Or Sign in with', style: TextStyle(color: Colors.white),)),
-                 const SizedBox(height: 10),
+                const SizedBox(height: 10),
+                Center(
+                    child: Text(
+                  'Or Sign in with',
+                  style: TextStyle(color: Colors.white),
+                )),
+                const SizedBox(height: 10),
                 Center(
                   child: Column(
                     children: [

@@ -5,6 +5,29 @@ import 'package:http/http.dart' as http;
 
 final String baseUrl = 'http://192.168.254.187:3000/api'; 
 
+Future<String?> createCode(String email) async {
+  final response = await http.post(
+    Uri.parse('$baseUrl/email_check'),
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      'email': email,
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    print('Good Email');
+    return null;  // No error, return null
+  } else if (response.statusCode == 400) {
+    print('Customer with this email already exists');
+    
+    return 'Customer with this email already exists';  // Return the error message from the server
+  } else {
+    //print('Error response: ${response.body}');
+    print('Failed to check customer email');
+    return 'error'; 
+  }
+}
+
 Future<String?> emailCheck(String email) async {
   final response = await http.post(
     Uri.parse('$baseUrl/email_check'),

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:trashtrack/api_email_service.dart';
@@ -119,8 +118,9 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
               ElevatedButton(
                 onPressed: () async {
                   if (_formKey.currentState?.validate() == true) {
+                    showSuccessSnackBar(context, 'Loading . . .');
                     String? errorMessage =
-                        await emailCheckforgotpass(_emailController.text);
+                        await sendEmailCodeForgotPass(_emailController.text);
                     if (errorMessage != null) {
                       showErrorSnackBar(context, errorMessage);
                     } else {
@@ -162,8 +162,6 @@ class CheckEmailScreenVerify extends StatefulWidget {
     required this.email,
   });
 
-  //CheckEmailScreenVerify({required this.generatedCode, required this.onResendCode});
-
   @override
   _CheckEmailScreenVerifyState createState() => _CheckEmailScreenVerifyState();
 }
@@ -173,17 +171,12 @@ class _CheckEmailScreenVerifyState extends State<CheckEmailScreenVerify> {
       List.generate(6, (_) => TextEditingController());
   int _timerSeconds = 300;
   late Timer _timer;
-  bool _isCodeExpired = false;
-  late int _generatedCode;
   late int onResendCode;
 
   @override
   void initState() {
     super.initState();
     _startTimer();
-    _generatedCode = randomCode(); // Generate the code on start
-    sendEmailForgotPass(widget.email, 'Verification Code', '$_generatedCode');
-    print('Generated Code: $_generatedCode');
   }
 
   @override
@@ -202,38 +195,34 @@ class _CheckEmailScreenVerifyState extends State<CheckEmailScreenVerify> {
             _timerSeconds--;
           });
         } else {
-          setState(() {
-            _isCodeExpired = true;
-          });
           timer.cancel();
         }
       }
     });
   }
 
-  // Code that generates a number between 100000 and 999999
-  int randomCode() {
-    Random random = Random();
-    return 100000 + random.nextInt(900000);
-  }
-
   // Function to resend the code
-  void _resendCode() {
-    setState(() {
-      _generatedCode = randomCode();
-      print('New Code: $_generatedCode');
-    });
-    sendEmailForgotPass(widget.email, 'Verification Code', '$_generatedCode');
+  void _resendCode() async {
+    // Call your function to resend the code
+    String? errorMessage = await sendEmailCodeForgotPass(widget.email);
+    if (errorMessage != null) {
+      showErrorSnackBar(context, errorMessage);
+    } else {
+      showSuccessSnackBar(context, 'Successfully resent new code');
+      // Reset timer seconds and start a new timer
+      setState(() {
+        _timerSeconds = 300; // Reset to initial countdown value
+        _timer.cancel();
+        _startTimer();
+        _codeControllers.forEach((controller) => controller.clear());
+      });
+    }
   }
 
   // Function to restart the timer and code
   void _restartTimerAndCode() {
     setState(() {
-      _isCodeExpired = false;
-      _timerSeconds = 300;
-      _codeControllers.forEach((controller) => controller.clear());
       _resendCode(); // Resend the new code
-      _startTimer();
     });
   }
 
@@ -243,18 +232,23 @@ class _CheckEmailScreenVerifyState extends State<CheckEmailScreenVerify> {
     return '$minutes:$secs';
   }
 
+  String enteredCode = '';
+  // Function to combine the text of all controllers
+  void updateEnteredCode() {
+    setState(() {
+      enteredCode =
+          _codeControllers.map((controller) => controller.text).join();
+    });
+  }
+
+  //verify code validator
   String? _validateCode() {
     String enteredCode =
         _codeControllers.map((controller) => controller.text).join();
     if (enteredCode.length < 6) {
       return 'Please enter the full code';
     }
-    if (int.tryParse(enteredCode) == null) {
-      return 'Code must be numeric';
-    }
-    if (int.parse(enteredCode) != _generatedCode) {
-      return 'The code is incorrect';
-    }
+
     return null;
   }
 
@@ -294,7 +288,10 @@ class _CheckEmailScreenVerifyState extends State<CheckEmailScreenVerify> {
                   width: 50,
                   child: TextFormField(
                     controller: _codeControllers[index],
-                    keyboardType: TextInputType.number,
+                    keyboardType: TextInputType
+                        .text, // Accept characters instead of numbers
+                    textInputAction:
+                        TextInputAction.next, // Moves focus to next field
                     maxLength: 1,
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.white, fontSize: 24),
@@ -314,6 +311,26 @@ class _CheckEmailScreenVerifyState extends State<CheckEmailScreenVerify> {
                         borderRadius: BorderRadius.circular(10.0),
                       ),
                     ),
+                    onChanged: (value) {
+                      // Convert input to uppercase
+                      final upperCaseValue = value.toUpperCase();
+                      if (upperCaseValue.length == 1) {
+                        _codeControllers[index].text = upperCaseValue;
+                        _codeControllers[index].selection =
+                            TextSelection.fromPosition(
+                          TextPosition(offset: upperCaseValue.length),
+                        );
+
+                        // Automatically move focus to the next field
+                        if (index < 5) {
+                          FocusScope.of(context).nextFocus();
+                        } else {
+                          // Close the keyboard when the last textbox is filled
+                          FocusScope.of(context).unfocus();
+                        }
+                      }
+                      //print(enteredCode);
+                    },
                   ),
                 );
               }),
@@ -328,25 +345,49 @@ class _CheckEmailScreenVerifyState extends State<CheckEmailScreenVerify> {
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 20),
+            TextButton(
+              onPressed: () {
+                _restartTimerAndCode();
+              },
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: Text(
+                  'Resend Code?',
+                  style: TextStyle(
+                    color: Colors.blue,
+                    fontSize: 16.0,
+                    decoration: TextDecoration.underline,
+                    decorationColor: Colors.blue,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _isCodeExpired
-                  ? null
-                  : () {
-                      String? error = _validateCode();
-                      if (error == null) {
-                        //createCustomer(widget.fname, widget.lname, widget.email, widget.password);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                ResetPasswordScreen(email: widget.email),
-                          ),
-                        );
-                        _isCodeExpired = true; // code expired
-                      } else {
-                        showErrorSnackBar(context, error);
-                      }
-                    },
+              onPressed: () async {
+                String? error = _validateCode();
+                if (error == null) {
+                  updateEnteredCode(); //to update stored enteredCode
+                  print(enteredCode);
+                  String? errorMessage = await verifyEmailCodeForgotPass(
+                      widget.email, enteredCode);
+                  if (errorMessage != null) {
+                    showErrorSnackBar(context, errorMessage);
+                  } else {
+                    showSuccessSnackBar(
+                        context, 'Successful Email Verification');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            ResetPasswordScreen(email: widget.email),
+                      ),
+                    );
+                  }
+                } else {
+                  showErrorSnackBar(context, error);
+                }
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.lightGreenAccent,
                 padding: EdgeInsets.symmetric(vertical: 15),
@@ -355,27 +396,10 @@ class _CheckEmailScreenVerifyState extends State<CheckEmailScreenVerify> {
                 ),
               ),
               child: Text(
-                'Next',
+                'Verify',
                 style: TextStyle(color: Colors.black, fontSize: 18),
               ),
             ),
-            SizedBox(height: 20),
-            _isCodeExpired
-                ? ElevatedButton(
-                    onPressed: _restartTimerAndCode,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.lightGreenAccent,
-                      padding: EdgeInsets.symmetric(vertical: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: Text(
-                      'Resend Code',
-                      style: TextStyle(color: Colors.black, fontSize: 18),
-                    ),
-                  )
-                : Container(),
           ],
         ),
       ),

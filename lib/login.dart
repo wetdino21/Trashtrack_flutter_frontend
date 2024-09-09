@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:trashtrack/api_google_practice.dart';
 import 'package:trashtrack/api_postgre_service.dart';
+import 'package:trashtrack/api_google.dart';
 import 'package:trashtrack/styles.dart';
 
 class LoginPage extends StatefulWidget {
@@ -153,25 +155,6 @@ class _LoginPageState extends State<LoginPage> {
                 ),
 
                 const SizedBox(height: 10),
-                //login button
-                Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      //if (_formKey.currentState?.validate() ?? false) {}
-                      Navigator.pushNamed(context, 'home');
-                    },
-                    child: const Text('Login Hauler'),
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 100, vertical: 16),
-                        textStyle: const TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                        foregroundColor: Colors.white),
-                  ),
-                ),
-                //login 2
-                const SizedBox(height: 10),
                 Center(
                   child: ElevatedButton(
                     onPressed: () async {
@@ -188,6 +171,12 @@ class _LoginPageState extends State<LoginPage> {
                           else if(dbMessage == 'hauler') {
                              Navigator.pushNamed(context, 'home');
                           }
+                          else if(dbMessage == '202') {
+                             Navigator.pushNamed(context, 'deactivated');
+                          }
+                          else if(dbMessage == '203') {
+                             Navigator.pushNamed(context, 'suspended');
+                          }
                           else{
                              showErrorSnackBar(context, dbMessage);
                           }
@@ -198,13 +187,13 @@ class _LoginPageState extends State<LoginPage> {
                       }
                       } 
                     },
-                    child: const Text('Login Customer'),
+                    child: const Text('Login'),
                     style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 100, vertical: 16),
+                            horizontal: 100, vertical: 14),
                         textStyle: const TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
+                            fontSize: 25, fontWeight: FontWeight.bold),
                         foregroundColor: Colors.white),
                   ),
                 ),
@@ -221,7 +210,10 @@ class _LoginPageState extends State<LoginPage> {
                   child: Column(
                     children: [
                       ElevatedButton.icon(
-                        onPressed: () {},
+                        onPressed: () {
+                          //Navigator.push(context, MaterialPageRoute(builder: (context) => GoogleSignInScreen()));
+                          handleGoogleSignIn(context);
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.transparent,
                           shape: RoundedRectangleBorder(

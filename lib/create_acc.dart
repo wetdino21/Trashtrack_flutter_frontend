@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:trashtrack/Customer/c_home.dart';
 import 'package:trashtrack/api_email_service.dart';
 import 'package:trashtrack/api_postgre_service.dart';
-import 'package:trashtrack/email_verification.dart';
+import 'package:trashtrack/create_email_verify.dart';
 import 'package:trashtrack/styles.dart';
-import 'dart:math';
+
+//google
+import 'package:trashtrack/api_google.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'dart:typed_data';
+import 'package:http/http.dart' as http;
 
 class CreateAcc extends StatefulWidget {
   const CreateAcc({super.key});
@@ -13,6 +20,74 @@ class CreateAcc extends StatefulWidget {
 }
 
 class _CreateAccState extends State<CreateAcc> {
+  // google sign in
+  // final GoogleSignIn _googleSignIn = GoogleSignIn();
+
+  // Future<void> handleSignIn() async {
+  //   try {
+  //     GoogleSignInAccount? user = await _googleSignIn.signIn();
+  //     if (user != null) {
+  //       print('Signed in: ${user.displayName?.split(' ').first}}');
+  //       print('Signed in: ${user.displayName?.split(' ').last}}');
+  //       print('Signed in: ${user.email}');
+  //       print('Signed in: ${user.photoUrl}');
+
+  //       String? fullname = user.displayName;
+  //       String fname = fullname != null ? fullname.split(' ').first : '';
+  //       String lname = fullname != null ? fullname.split(' ').last : '';
+  //       String email = user.email;
+  //       String? photoUrl = user.photoUrl;
+
+  //     // Fetch the photo as bytes
+  //     Uint8List? photoBytes;
+  //     if (photoUrl != null) {
+  //       http.Response response = await http.get(Uri.parse(photoUrl));
+  //       if (response.statusCode == 200) {
+  //         photoBytes = response.bodyBytes;
+  //       }
+  //     }
+  //       //_handleSignInData(user.displayName, user.email, user.photoUrl);
+
+  //       //////check if existing email
+  //       String? dbMessage = await emailCheck(user.email);
+  //       if (dbMessage != null) {
+  //         showErrorSnackBar(context, dbMessage);
+  //       } else {
+  //         //create account from google
+
+  //         // String? createMessage =
+  //         //     await createGoogleAccount(fname, lname, email, photoBytes);
+  //         // if (createMessage != null) {
+  //         //   showErrorSnackBar(context, createMessage);
+  //         // } else {
+  //         //   showSuccessSnackBar(context, 'Successfully Created Account');
+  //         //  // Navigator.pushReplacementNamed(context, 'c_home');
+  //         //   _handleSignOut();
+  //         // }
+
+  //         createGoogleAccount(context, fname, lname, email, photoBytes);
+  //       }
+  //     } else {
+  //       print('Sign-in canceled');
+  //     }
+  //     _handleSignOut();
+  //   } catch (error) {
+  //     print('Sign-in failed: $error');
+  //   }
+  // }
+
+  // void _handleSignInData(String? displayName, String? email, String? photoUrl) {
+  //   // Handle the data here
+  //   print('Display Name: $displayName');
+  //   print('Email: $email');
+  //   print('Photo URL: $photoUrl');
+  // }
+  
+  // Future<void> _handleSignOut() async {
+  //   await _googleSignIn.signOut();
+  //   print('Signed out');
+  // }
+
   final TextEditingController _fnameController = TextEditingController();
   final TextEditingController _lnameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -216,26 +291,21 @@ class _CreateAccState extends State<CreateAcc> {
                     onPressed: () async {
                       if (_formKey.currentState?.validate() ?? false) {
                         if (_acceptTerms) {
-                          // String? errorMessage = await createCustomer(
-                          //     _fnameController.text,
-                          //     _lnameController.text,
-                          //     _emailController.text,
-                          //     _passController.text);
-                          String? errorMessage =
-                              await emailCheck(_emailController.text);
-
-                          // If there's an error, show it in a SnackBar
+                          showSuccessSnackBar(context, 'Loading . . .');
+                          String? errorMessage = await sendEmailCodeCreateAcc(
+                              _emailController.text);
                           if (errorMessage != null) {
                             showErrorSnackBar(context, errorMessage);
                           } else {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => EmailVerification(
-                                        fname: _fnameController.text,
-                                        lname: _lnameController.text,
-                                        email: _emailController.text,
-                                        password: _passController.text)));
+                                    builder: (context) =>
+                                        VerifyEmailCreateAccScreen(
+                                            fname: _fnameController.text,
+                                            lname: _lnameController.text,
+                                            email: _emailController.text,
+                                            password: _passController.text)));
                           }
                         } else {
                           showErrorSnackBar(context,
@@ -247,9 +317,9 @@ class _CreateAccState extends State<CreateAcc> {
                     style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 100, vertical: 10),
+                            horizontal: 100, vertical: 14),
                         textStyle: const TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
+                            fontSize: 25, fontWeight: FontWeight.bold),
                         foregroundColor: Colors.white),
                   ),
                 ),
@@ -263,13 +333,10 @@ class _CreateAccState extends State<CreateAcc> {
                       ),
                       SizedBox(height: 10.0),
                       ElevatedButton.icon(
-                        onPressed: () {
-                          // sendEmail(
-                          //     'mikenaill45@gmail.com',
-                          //     'Trashtrack Verification Code',
-                          //     '123456');
-
-                          //Navigator.pushNamed(context, 'email_verify');
+                        onPressed: () async {
+                          //handleSignIn(); //google sign in
+                           handleGoogleSignUp(context);
+                          //Navigator.push(context, MaterialPageRoute(builder: (context) => C_HomeScreen()));
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.transparent,

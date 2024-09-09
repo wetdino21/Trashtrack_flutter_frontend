@@ -23,11 +23,13 @@ import 'package:trashtrack/Hauler/profile.dart';
 
 //global
 import 'package:trashtrack/create_acc.dart';
-import 'package:trashtrack/email_verification.dart';
+import 'package:trashtrack/create_email_verify.dart';
+import 'package:trashtrack/deactivated.dart';
 import 'package:trashtrack/forgot_pass.dart';
 import 'package:trashtrack/login.dart';
 import 'package:trashtrack/privacy_policy.dart';
 import 'package:trashtrack/splash_screen.dart';
+import 'package:trashtrack/suspended.dart';
 import 'package:trashtrack/terms_conditions.dart';
 ////asds
 void main() {
@@ -50,6 +52,8 @@ class MyApp extends StatelessWidget {
        // 'email_verify': (context) => EmailVerification(),
         'create_acc': (context) => const CreateAcc(),
         'login': (context) => const LoginPage(),
+        'deactivated': (context) => const DeactivatedScreen(),
+        'suspended': (context) => const SuspendedScreen(),
 
         //Hauler Routes
         'home': (context) => HomeScreen(),

@@ -77,9 +77,9 @@ class NotificationCard extends StatelessWidget {
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => C_MapScreen()),
-                    );
+                    // Navigator.of(context).push(
+                    //   MaterialPageRoute(builder: (context) => C_MapScreen()),
+                    // );
                   },
                   child: Text("Proceed"),
                 ),

@@ -127,7 +127,7 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => CheckEmailScreenVerify(
+                          builder: (context) => VerifyEmailForgotPassScreen(
                               email: _emailController.text),
                         ),
                       );
@@ -155,18 +155,20 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
 }
 
 // Check Email Screen
-class CheckEmailScreenVerify extends StatefulWidget {
+class VerifyEmailForgotPassScreen extends StatefulWidget {
   final String email;
 
-  CheckEmailScreenVerify({
+  VerifyEmailForgotPassScreen({
     required this.email,
   });
 
   @override
-  _CheckEmailScreenVerifyState createState() => _CheckEmailScreenVerifyState();
+  _VerifyEmailForgotPassScreenState createState() =>
+      _VerifyEmailForgotPassScreenState();
 }
 
-class _CheckEmailScreenVerifyState extends State<CheckEmailScreenVerify> {
+class _VerifyEmailForgotPassScreenState
+    extends State<VerifyEmailForgotPassScreen> {
   final List<TextEditingController> _codeControllers =
       List.generate(6, (_) => TextEditingController());
   int _timerSeconds = 300;
@@ -211,19 +213,12 @@ class _CheckEmailScreenVerifyState extends State<CheckEmailScreenVerify> {
       showSuccessSnackBar(context, 'Successfully resent new code');
       // Reset timer seconds and start a new timer
       setState(() {
-        _timerSeconds = 300; // Reset to initial countdown value
-        _timer.cancel();
-        _startTimer();
         _codeControllers.forEach((controller) => controller.clear());
+        _timer.cancel();
+        _timerSeconds = 300; // Reset to initial countdown value
+        _startTimer();
       });
     }
-  }
-
-  // Function to restart the timer and code
-  void _restartTimerAndCode() {
-    setState(() {
-      _resendCode(); // Resend the new code
-    });
   }
 
   String _formatTimer(int seconds) {
@@ -262,6 +257,7 @@ class _CheckEmailScreenVerifyState extends State<CheckEmailScreenVerify> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            Icon(Icons.email, color: Colors.lightGreenAccent, size: 100),
             Text(
               'Check your email',
               style: TextStyle(
@@ -347,7 +343,7 @@ class _CheckEmailScreenVerifyState extends State<CheckEmailScreenVerify> {
             SizedBox(height: 20),
             TextButton(
               onPressed: () {
-                _restartTimerAndCode();
+                _resendCode();
               },
               child: Align(
                 alignment: Alignment.centerRight,
@@ -369,8 +365,8 @@ class _CheckEmailScreenVerifyState extends State<CheckEmailScreenVerify> {
                 if (error == null) {
                   updateEnteredCode(); //to update stored enteredCode
                   print(enteredCode);
-                  String? errorMessage = await verifyEmailCodeForgotPass(
-                      widget.email, enteredCode);
+                  String? errorMessage =
+                      await verifyEmailCode(widget.email, enteredCode);
                   if (errorMessage != null) {
                     showErrorSnackBar(context, errorMessage);
                   } else {

@@ -4,10 +4,13 @@ import 'package:trashtrack/Customer/c_bottom_nav_bar.dart';
 import 'package:trashtrack/Customer/c_waste_info.dart';
 import 'package:trashtrack/Customer/c_waste_request_pickup.dart';
 import 'package:trashtrack/api_postgre_service.dart';
+import 'package:trashtrack/api_token.dart';
 import 'package:trashtrack/styles.dart';
 
 import 'dart:convert';
 import 'dart:typed_data';
+
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 class C_HomeScreen extends StatefulWidget {
   // final String email;
@@ -26,16 +29,34 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
   Uint8List? imageBytes; // To store the image bytes
 
   //final email = 'mikenaill45@gmail.com';
-  final email = 'mikenaill22@gmail.com';
+  //final email = 'mikenaill22@gmail.com';
+  String email = '';
+
+  void getEmail() async {
+     final useremail = await getEmailToken();
+    if (useremail != null) {
+      setState(() {
+        email = useremail;
+      });
+      _dbData();
+    } else {
+      setState(() {
+        isLoading = false;
+        errorMessage = 'Failed to retrieve email';
+      });
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    _fetchData();
+    getEmail();
+    //_fetchData();
+    
   }
 
 // Fetch user data from the server
-  Future<void> _fetchData() async {
+  Future<void> _dbData() async {
     try {
       final data = await fetchUserData(email);
       setState(() {
@@ -56,7 +77,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
   }
 
 //////////////////////////////////
-   @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: accentColor,
@@ -75,9 +96,9 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                       Text('Last Name: ${userData!['cus_lname']}'),
 
                       // Display the image if the bytes are available
-                      if (imageBytes != null) 
+                      if (imageBytes != null)
                         Image.memory(imageBytes!, height: 100, width: 100)
-                      else 
+                      else
                         Text('No profile image available'),
 
                       // You can add more widgets to display other data
@@ -85,7 +106,6 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                   ),
                 )
               : Center(child: Text('Error: $errorMessage')),
-
 
       // SingleChildScrollView(
       //   padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),

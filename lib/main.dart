@@ -21,6 +21,8 @@ import 'package:trashtrack/Hauler/map.dart';
 import 'package:trashtrack/Hauler/notification.dart';
 import 'package:trashtrack/Hauler/profile.dart';
 
+import 'package:trashtrack/api_token.dart';
+
 //global
 import 'package:trashtrack/create_acc.dart';
 import 'package:trashtrack/create_email_verify.dart';
@@ -32,18 +34,30 @@ import 'package:trashtrack/splash_screen.dart';
 import 'package:trashtrack/suspended.dart';
 import 'package:trashtrack/terms_conditions.dart';
 ////asds
-void main() {
-  runApp(const MyApp());
+
+
+
+void main() async{
+   WidgetsFlutterBinding.ensureInitialized();
+  //bool isloggedIn = await loggedIn();
+  final route = await determineStartRoute();
+
+  runApp(MyApp(initialRoute: route));
+ // runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+   final String initialRoute;
+  //const MyApp({super.key});
+  MyApp({required this.initialRoute});
 
   @override
   Widget build(BuildContext context) {
+    //token
+    
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: 'splash',
+      initialRoute: initialRoute,
       routes: {
         
         'splash': (context) => SplashScreen(),
@@ -81,6 +95,31 @@ class MyApp extends StatelessWidget {
   }
 }
 
+Future<String> determineStartRoute() async {
+  final accessToken = await storage.read(key: 'access_token');
+  final refreshToken = await storage.read(key: 'refresh_token');
+
+  if (accessToken == null || refreshToken == null) {
+    return 'login';
+  }
+
+  // final isAccessTokenValid = await isTokenValid(accessToken);
+  // if (isAccessTokenValid) {
+  //   return 'home';
+  // }
+
+  // final isRefreshTokenValid = await refreshTokenValidity(refreshToken);
+  // if (isRefreshTokenValid) {
+  //   final newAccessToken = await refreshAccessToken(refreshToken);
+  //   if (newAccessToken != null) {
+  //     await storage.write(key: 'access_token', value: newAccessToken);
+  //     return 'home';
+  //   }
+  // }
+
+  //return 'login';
+  return 'c_home';
+}
 
 
 

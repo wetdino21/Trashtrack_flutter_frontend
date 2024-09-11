@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:trashtrack/api_token.dart';
 import 'package:trashtrack/login.dart';
 import 'package:trashtrack/styles.dart';
 
@@ -250,6 +251,7 @@ class SettingsScreen extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
+                 deleteTokens();
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => LoginPage()),

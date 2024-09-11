@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:trashtrack/api_token.dart';
 
 //final String baseUrl = 'http://localhost:3000/api';
 
@@ -129,25 +130,31 @@ Future<String?> loginAccount(String email, String password) async {
     }),
   );
 
-  if (response.statusCode == 200) {
+  if (response.statusCode == 200 || response.statusCode == 201) {
+    //store token to storage
+    final responseData = jsonDecode(response.body);
+    final String accessToken = responseData['accessToken'];
+    final String refreshToken = responseData['refreshToken'];
+    storeTokens(accessToken, refreshToken);
     print('Login successfully');
-    return 'customer'; // No error
-  } else if (response.statusCode == 201) {
-    print('Login successfully');
-    return 'hauler'; // No error
+    if (response.statusCode == 200) {
+      return 'customer'; // No error
+    } else if (response.statusCode == 201) {
+      return 'hauler'; // No error
+    }
   } else if (response.statusCode == 202) {
     print('deactivated account');
-    return response.statusCode.toString(); 
+    return response.statusCode.toString();
   } else if (response.statusCode == 203) {
     print('suspended account');
-   return response.statusCode.toString(); 
+    return response.statusCode.toString();
   } else if (response.statusCode == 404) {
     return 'No account associated with this email';
   } else if (response.statusCode == 401) {
     return 'Incorrect Password';
   } else if (response.statusCode == 402) {
     print('Error response: ${response.body}');
-    return 'Looks like this account is signed up with google. \nPlease login with google' ;
+    return 'Looks like this account is signed up with google. \nPlease login with google';
   } else {
     print('Error response: ${response.body}');
     return response.body;

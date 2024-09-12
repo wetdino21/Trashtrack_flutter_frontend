@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:trashtrack/Customer/c_map.dart';
 import 'package:trashtrack/styles.dart';
 
 class C_NotificationScreen extends StatelessWidget {

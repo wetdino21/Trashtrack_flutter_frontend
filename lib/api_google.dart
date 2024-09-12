@@ -7,8 +7,8 @@ import 'package:trashtrack/api_postgre_service.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-//final String baseUrl = 'http://localhost:3000/api';
-final String baseUrl = 'http://192.168.254.187:3000/api';
+//final String baseUrl = 'http://localhost:3000';
+final String baseUrl = 'http://192.168.254.187:3000';
 
 // Google Sign-In instance
 final GoogleSignIn _googleSignIn = GoogleSignIn();
@@ -19,10 +19,17 @@ Future<void> handleGoogleSignUp(BuildContext context) async {
     GoogleSignInAccount? user = await _googleSignIn.signIn();
 
     if (user != null) {
+      final GoogleSignInAuthentication auth = await user.authentication;
+      // Access token and other details
+      final String? accessToken = auth.accessToken;
+      final String? idToken = auth.idToken;
+
       print('Signed in: ${user.displayName}');
       print('Email: ${user.email}');
       print('Photo URL: ${user.photoUrl}');
 
+      print('Access Token: $accessToken');
+      print('ID Token: $idToken');
       // Extract user info
       String? fullname = user.displayName;
       String fname = fullname != null ? fullname.split(' ').first : '';
@@ -65,9 +72,9 @@ Future<void> _handleSignOut() async {
   print('Signed out');
 }
 
-//final String baseUrl = 'http://192.168.254.187:3000/api';
+//final String baseUrl = 'http://192.168.254.187:3000';
 
-//final String baseUrl = 'http://localhost:3000/api';
+//final String baseUrl = 'http://localhost:3000';
 
 Future<void> createGoogleAccount(BuildContext context, String fname,
     String lname, String email, Uint8List? photoBytes) async {
@@ -154,7 +161,6 @@ Future<String> loginWithGoogle(BuildContext context, String email) async {
     }),
   );
 
- 
   if (response.statusCode == 200) {
     print('Login successfully');
     return 'customer'; // No error

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-final String Url = 'http://192.168.254.187:3000/api';
+final String Url = 'http://192.168.254.187:3000';
 
 Future<void> sendEmailSignUp(String to, String subject, String code) async {
   final baseUrl = Uri.parse('$Url/send_email');

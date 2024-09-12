@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:trashtrack/api_token.dart';
+import 'package:flutter/material.dart';
+import 'package:trashtrack/styles.dart';
 
-//final String baseUrl = 'http://localhost:3000/api';
+//final String baseUrl = 'http://localhost:3000';
 
-final String baseUrl = 'http://192.168.254.187:3000/api';
+final String baseUrl = 'http://192.168.254.187:3000';
 
 Future<String?> createCode(String email) async {
   final response = await http.post(
@@ -106,6 +108,13 @@ Future<String?> createCustomer(
 
   if (response.statusCode == 201) {
     print('Successfully created an account');
+
+    //store token to storage
+    final responseData = jsonDecode(response.body);
+    final String accessToken = responseData['accessToken'];
+    final String refreshToken = responseData['refreshToken'];
+    storeTokens(accessToken, refreshToken);
+    
     return null; // No error, return null
   }
   // else if (response.statusCode == 400) {
@@ -186,5 +195,54 @@ Future<String?> updatepassword(String email, String newPassword) async {
     //print('Error response: ${response.body}');
     print('Database error');
     return 'error';
+  }
+}
+
+////////REQUESTS WITH TOKEN///////////////////////////////////////////////////////////////////////////////
+Future<void> updateProfile(
+    BuildContext context, String fname, String lname) async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+  print('$fname $lname');
+  if (accessToken == null) {
+    print('No access token available. User needs to log in.');
+    await deleteTokens(context); // Logout use
+    return;
+  }
+
+  final response = await http.post(
+    Uri.parse('$baseUrl/update_customer'),
+    headers: {
+      'Authorization': 'Bearer $accessToken',
+      'Content-Type': 'application/json',
+    },
+    body: jsonEncode({
+      'fname': fname,
+      'lname': lname,
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    print('name updated successfully');
+    showSuccessSnackBar(context, 'Updated Successfully');
+  } else {
+    if (response.statusCode == 401) {
+      // Access token might be expired, attempt to refresh it
+      print('Access token expired. Attempting to refresh...');
+      String? refreshMsg = await refreshAccessToken(context);
+      if (refreshMsg == null) {
+        await updateProfile(context, fname, lname);
+      }
+    } else if (response.statusCode == 403) {
+      // Access token is invalid. logout
+      print('Access token invalid. Attempting to logout...');
+      showErrorSnackBar(context,'Active time has been expired please login again.');
+      await deleteTokens(context); // Logout use
+      
+    } else {
+      print('Response: ${response.body}');
+    }
+
+    //showErrorSnackBar(context, response.body);
   }
 }

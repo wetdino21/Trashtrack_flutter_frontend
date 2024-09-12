@@ -39,25 +39,19 @@ import 'package:trashtrack/terms_conditions.dart';
 
 void main() async{
    WidgetsFlutterBinding.ensureInitialized();
-  //bool isloggedIn = await loggedIn();
-  final route = await determineStartRoute();
-
-  runApp(MyApp(initialRoute: route));
+  runApp(MyApp());
  // runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-   final String initialRoute;
-  //const MyApp({super.key});
-  MyApp({required this.initialRoute});
-
   @override
   Widget build(BuildContext context) {
     //token
     
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: initialRoute,
+      //initialRoute: initialRoute,
+      home: TokenCheck(),
       routes: {
         
         'splash': (context) => SplashScreen(),
@@ -95,30 +89,37 @@ class MyApp extends StatelessWidget {
   }
 }
 
-Future<String> determineStartRoute() async {
-  final accessToken = await storage.read(key: 'access_token');
-  final refreshToken = await storage.read(key: 'refresh_token');
+class TokenCheck extends StatefulWidget {
+  @override
+  _TokenCheckState createState() => _TokenCheckState();
+}
 
-  if (accessToken == null || refreshToken == null) {
-    return 'login';
+class _TokenCheckState extends State<TokenCheck> {
+  @override
+  void initState() {
+    super.initState();
+    _initializeApp();
   }
 
-  // final isAccessTokenValid = await isTokenValid(accessToken);
-  // if (isAccessTokenValid) {
-  //   return 'home';
-  // }
+  Future<void> _initializeApp() async {
+    String initialRoute = await onOpenApp(context);
 
-  // final isRefreshTokenValid = await refreshTokenValidity(refreshToken);
-  // if (isRefreshTokenValid) {
-  //   final newAccessToken = await refreshAccessToken(refreshToken);
-  //   if (newAccessToken != null) {
-  //     await storage.write(key: 'access_token', value: newAccessToken);
-  //     return 'home';
-  //   }
-  // }
+    if (initialRoute.isNotEmpty) {
+      Navigator.pushReplacementNamed(context, initialRoute);
+    } else {
+      // Fallback to login if something goes wrong
+      Navigator.pushReplacementNamed(context, 'login');
+    }
+  }
 
-  //return 'login';
-  return 'c_home';
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: CircularProgressIndicator(), // Show a loading screen while checking the token
+      ),
+    );
+  }
 }
 
 

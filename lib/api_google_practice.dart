@@ -143,7 +143,7 @@ List<String> splitName(String? fullName) {
     // The last word is the last name
     final String firstName = parts.sublist(0, parts.length - 1).join(' ');
     final String lastName = parts.last;
-    return ['asds', lastName];
+    return [firstName, lastName];
   }
 }
 

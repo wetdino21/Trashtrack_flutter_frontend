@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:trashtrack/api_network.dart';
 import 'package:trashtrack/api_token.dart';
 import 'package:flutter/material.dart';
 import 'package:trashtrack/styles.dart';
 
-//final String baseUrl = 'http://localhost:3000';
 
-final String baseUrl = 'http://192.168.254.187:3000';
+// final String baseUrl = 'http://192.168.254.187:3000';
+String baseUrl = globalUrl();
 
 Future<String?> createCode(String email) async {
   final response = await http.post(
@@ -77,21 +78,21 @@ Future<String?> emailCheckforgotpass(String email) async {
   }
 }
 
-//FETCH USER DATA
-Future<Map<String, dynamic>?> fetchUserData(String email) async {
-  final response = await http.post(
-    Uri.parse('$baseUrl/fetch_user_data'),
-    headers: {'Content-Type': 'application/json'},
-    body: jsonEncode({'email': email}),
-  );
+// //FETCH USER DATA
+// Future<Map<String, dynamic>?> fetchUserData(String email) async {
+//   final response = await http.post(
+//     Uri.parse('$baseUrl/fetch_user_data'),
+//     headers: {'Content-Type': 'application/json'},
+//     body: jsonEncode({'email': email}),
+//   );
 
-  if (response.statusCode == 200) {
-    return jsonDecode(response.body);
-  } else {
-    print('Failed to fetch user data: ${response.body}');
-    return null;
-  }
-}
+//   if (response.statusCode == 200) {
+//     return jsonDecode(response.body);
+//   } else {
+//     print('Failed to fetch user data: ${response.body}');
+//     return null;
+//   }
+// }
 
 Future<String?> createCustomer(
     String fname, String lname, String email, String password) async {

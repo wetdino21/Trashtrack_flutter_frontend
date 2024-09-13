@@ -1,16 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:trashtrack/Customer/c_home.dart';
 import 'package:trashtrack/api_email_service.dart';
-import 'package:trashtrack/api_postgre_service.dart';
 import 'package:trashtrack/create_email_verify.dart';
 import 'package:trashtrack/styles.dart';
 
 //google
 import 'package:trashtrack/api_google.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'dart:typed_data';
-import 'package:http/http.dart' as http;
 
 class CreateAcc extends StatefulWidget {
   const CreateAcc({super.key});

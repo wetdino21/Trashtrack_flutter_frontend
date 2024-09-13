@@ -1,10 +1,57 @@
 import 'package:flutter/material.dart';
+import 'package:trashtrack/Customer/c_api_userdata.dart';
 import 'package:trashtrack/api_token.dart';
 import 'package:trashtrack/styles.dart';
 
-class C_ProfileScreen extends StatelessWidget {
+import 'dart:convert';
+import 'dart:typed_data';
+
+class C_ProfileScreen extends StatefulWidget {
+  @override
+  State<C_ProfileScreen> createState() => _C_ProfileScreenState();
+}
+
+class _C_ProfileScreenState extends State<C_ProfileScreen> {
+  //user data
+  Map<String, dynamic>? userData;
+  bool isLoading = true;
+  String? errorMessage;
+  Uint8List? imageBytes; // To store the image bytes
+
+  @override
+  void initState() {
+    super.initState();
+    _dbData();
+  }
+
+// Fetch user data from the server
+  Future<void> _dbData() async {
+    try {
+      final data = await fetchCusData(context);
+      setState(() {
+        userData = data;
+        isLoading = false;
+
+        // Decode base64 image only if it exists
+        if (userData?['profileImage'] != null) {
+          imageBytes = base64Decode(userData!['profileImage']);
+        }
+      });
+    } catch (e) {
+      setState(() {
+        errorMessage = e.toString();
+        isLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    Uint8List? imageBytes;
+    if (userData != null && userData!['profileImage'] != null) {
+      imageBytes = base64Decode(userData!['profileImage']);
+    }
+
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
@@ -29,34 +76,77 @@ class C_ProfileScreen extends StatelessWidget {
           icon: Icon(Icons.arrow_back),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: AssetImage('assets/anime.jpg'),
-            ),
-            SizedBox(height: 10),
-            Text(
-              'customer Kim',
-              style: TextStyle(fontSize: 24, color: Colors.white),
-            ),
-            Text(
-              'customer@gmail.com',
-              style: TextStyle(color: Colors.grey),
-            ),
-            SizedBox(height: 50),
-            ProfileDetailRow(label: 'First Name', value: 'Customer'),
-            ProfileDetailRow(label: 'Middle Name', value: ''),
-            ProfileDetailRow(label: 'Last Name', value: 'Kim'),
-            ProfileDetailRow(label: 'Email', value: 'customer@gmail.com'),
-            ProfileDetailRow(label: 'Phone Number', value: '+63987889999'),
-            ProfileDetailRow(label: 'Address', value: '123 customer Street'),
-            ProfileDetailRow(label: 'Status', value: 'Active'),
-            ProfileDetailRow(label: 'Role', value: 'Customer'),
-          ],
-        ),
+      body: RefreshIndicator(
+        onRefresh: _dbData,
+        child: isLoading
+            ? Center(child: CircularProgressIndicator())
+            : userData != null
+                ? ListView(
+                   // padding: const EdgeInsets.all(16.0),
+                    children: [
+                      Column(
+                        children: [
+                          imageBytes != null
+                              ? Container(
+                                padding: EdgeInsets.all(7),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(80),
+                                  color: accentColor
+                                ),
+                                child: CircleAvatar(
+                                    radius: 50,
+                                    backgroundImage: MemoryImage(imageBytes),
+                                  ),
+                              )
+                              : Icon(
+                                  Icons.person,
+                                  size: 30,
+                                ),
+                          SizedBox(height: 10),
+                          // Text(
+                          //   '${userData?['cus_fname'] ?? ''} ${userData?['cus_mname'] ?? ''} ${userData?['cus_lname'] ?? ''}'
+                          //           .trim()
+                          //           .isEmpty
+                          //       ? 'Active'
+                          //       : '${userData?['cus_fname'] ?? ''} ${userData?['cus_mname'] ?? ''} ${userData?['cus_lname'] ?? ''}',
+                          //   style: TextStyle(fontSize: 24, color: accentColor),
+                          // ),
+                          // Text(
+                          //   userData?['cus_email'] ?? 'Active',
+                          //   style: TextStyle(color: Colors.white),
+                          // ),
+                          SizedBox(height: 10),
+                          Container(
+                            color: backgroundColor,
+                            child: Column(
+                              children: [
+                               SizedBox(height: 30),
+                                ProfileDetailRow(
+                                    label: 'Full Name',
+                                    value: '${userData?['cus_fname'] ?? ''} ${userData?['cus_mname'] ?? ''} ${userData?['cus_lname'] ?? ''}'),
+                                ProfileDetailRow(
+                                    label: 'Email',
+                                    value: userData?['cus_email'] ?? ''),
+                                ProfileDetailRow(
+                                    label: 'Phone Number',
+                                    value: userData?['cus_phone'] ?? ''),
+                                ProfileDetailRow(
+                                    label: 'Address',
+                                    value: userData?['cus_address'] ?? ''),
+                                ProfileDetailRow(
+                                    label: 'Status',
+                                    value: userData?['cus_status'] ?? 'Active'),
+                                ProfileDetailRow(
+                                    label: 'Type',
+                                    value: userData?['cus_type'] ?? ''),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  )
+                : Center(child: Text('Error: $errorMessage')),
       ),
     );
   }
@@ -71,31 +161,26 @@ class ProfileDetailRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
-      child: Row(
+      padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 5),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              '$label:',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16.0,
-                fontWeight: FontWeight.bold,
-              ),
+          Text(
+            label,
+            style: TextStyle(
+              color: Colors.white60,
+              fontSize: 16.0,
             ),
           ),
-          Expanded(
-            flex: 3,
-            child: Text(
-              value,
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: 16.0,
-              ),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 18.0,
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
             ),
           ),
+           Divider(),
         ],
       ),
     );
@@ -184,7 +269,7 @@ class SettingsScreen extends StatelessWidget {
                     style: TextStyle(color: Colors.white)),
                 trailing: Icon(Icons.arrow_forward_ios, color: Colors.white),
                 onTap: () {
-                 _dectivateAccount(context);
+                  _dectivateAccount(context);
                 },
               ),
               Divider(color: Colors.grey),
@@ -250,7 +335,7 @@ class SettingsScreen extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
-                 deleteTokens(context);
+                deleteTokens(context);
                 // Navigator.push(
                 //   context,
                 //   MaterialPageRoute(builder: (context) => LoginPage()),
@@ -264,7 +349,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-   //deactivation confirm
+  //deactivation confirm
   void _dectivateAccount(BuildContext context) {
     showDialog(
       context: context,
@@ -285,9 +370,9 @@ class SettingsScreen extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
-               Navigator.of(context).pop();
-               Navigator.pushNamed(context, 'login');
-               _showSuccessDeactivate(context);
+                Navigator.of(context).pop();
+                Navigator.pushNamed(context, 'login');
+                _showSuccessDeactivate(context);
               },
               child: Text('Yes', style: TextStyle(color: Colors.white)),
             ),

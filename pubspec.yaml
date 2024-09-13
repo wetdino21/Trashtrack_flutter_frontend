@@ -46,6 +46,9 @@ dependencies:
   flutter_secure_storage: ^8.0.0
   jwt_decoder: ^2.0.1
   
+  #datetime
+  intl: ^0.18.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

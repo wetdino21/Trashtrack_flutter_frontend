@@ -3,12 +3,15 @@ import 'package:http/http.dart' as http;
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:trashtrack/Customer/c_home.dart';
+import 'package:trashtrack/api_network.dart';
 import 'package:trashtrack/api_postgre_service.dart';
+import 'package:trashtrack/api_token.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-//final String baseUrl = 'http://localhost:3000';
-final String baseUrl = 'http://192.168.254.187:3000';
+
+// final String baseUrl = 'http://192.168.254.187:3000';
+String baseUrl = globalUrl();
 
 // Google Sign-In instance
 final GoogleSignIn _googleSignIn = GoogleSignIn();
@@ -90,20 +93,14 @@ Future<void> createGoogleAccount(BuildContext context, String fname,
   );
 
   if (response.statusCode == 201) {
-    // final responseData = json.decode(response.body);
-
-    // final fname = responseData['fname'];
-    // final cusProfile = responseData['cus_profile']; // Assuming this is a URL
-
-    // Navigate to HomePage and pass the first name and profile image
+    //store token to storage
+    final responseData = jsonDecode(response.body);
+    final String accessToken = responseData['accessToken'];
+    final String refreshToken = responseData['refreshToken'];
+    storeTokens(accessToken, refreshToken);
 
     showSuccessSnackBar(context, 'Successfully Created Account');
-    // Navigator.pushReplacement(
-    //   context,
-    //   MaterialPageRoute(
-    //     builder: (context) => C_HomeScreen(email: responseData['cus_email']),
-    //   ),
-    // );
+
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
@@ -161,10 +158,21 @@ Future<String> loginWithGoogle(BuildContext context, String email) async {
     }),
   );
 
-  if (response.statusCode == 200) {
-    print('Login successfully');
-    return 'customer'; // No error
-  } else if (response.statusCode == 201) {
+  if (response.statusCode == 200 || response.statusCode == 201) {
+    //store token to storage
+    final responseData = jsonDecode(response.body);
+    final String accessToken = responseData['accessToken'];
+    final String refreshToken = responseData['refreshToken'];
+    storeTokens(accessToken, refreshToken);
+
+    if (response.statusCode == 200) {
+      print('Login successfully');
+      return 'customer'; // No error
+    } 
+    // else if (response.statusCode == 201) {
+    //   print('Login successfully');
+    //   return 'hauler'; // No error
+    // }
     print('Login successfully');
     return 'hauler'; // No error
   } else if (response.statusCode == 202) {

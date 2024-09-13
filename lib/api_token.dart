@@ -3,11 +3,13 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:flutter/material.dart';
+import 'package:trashtrack/api_network.dart';
 import 'package:trashtrack/styles.dart';
 
 final storage = FlutterSecureStorage();
 
-final String baseUrl = 'http://192.168.254.187:3000';
+// final String baseUrl = 'http://192.168.254.187:3000';
+String baseUrl = globalUrl();
 
 // Store tokens in secure storage
 Future<void> storeNewUser(String newUser) async {
@@ -40,7 +42,7 @@ Future<void> storeTokens(String accessToken, String refreshToken) async {
 Future<Map<String, String?>> getTokens() async {
   String? accessToken = await storage.read(key: 'access_token');
   String? refreshToken = await storage.read(key: 'refresh_token');
-   String? newUser = await storage.read(key: 'new_user');
+  String? newUser = await storage.read(key: 'new_user');
   return {
     'access_token': accessToken,
     'refresh_token': refreshToken,
@@ -99,7 +101,8 @@ Future<void> deleteTokens(BuildContext context) async {
   await storage.delete(key: 'access_token');
   await storage.delete(key: 'refresh_token');
 
-   showErrorSnackBar(context,'Your active time has been expired. \nPlease login again.');
+  // showErrorSnackBar(
+  //     context, 'Your active time has been expired. \nPlease login again.');
   Navigator.pushNamedAndRemoveUntil(
     context,
     'login',
@@ -132,11 +135,11 @@ Future<void> makeApiRequest(BuildContext context) async {
     print('Access token expired. Attempting to refresh...');
     String? refreshMsg = await refreshAccessToken(context);
     if (refreshMsg == null) {
-        return await makeApiRequest(context);
-      } else {
-        // Refresh token is invalid or expired, logout the user
-        await deleteTokens(context); // Logout user
-      }
+      return await makeApiRequest(context);
+    } else {
+      // Refresh token is invalid or expired, logout the user
+      await deleteTokens(context); // Logout user
+    }
   } else if (response.statusCode == 403) {
     // Access token is invalid. logout
     print('Access token invalid. Attempting to logout...');
@@ -171,7 +174,7 @@ Future<String?> refreshAccessToken(BuildContext context) async {
     await storage.write(key: 'access_token', value: newAccessToken);
     print('Access token refreshed successfully');
     return null;
-  } else if (response.statusCode == 403){
+  } else if (response.statusCode == 403) {
     print('Refresh token expired or invalid. Logging out...');
     await deleteTokens(context); // Logout user if refresh token is invalid
     return 'invalid/expired token';
@@ -183,8 +186,7 @@ Future<String> onOpenApp(BuildContext context) async {
   Map<String, String?> tokens = await getTokens();
   String? accessToken = tokens['access_token'];
   String? newUser = tokens['new_user'];
-  print(tokens);
-    if (newUser == null || newUser.isEmpty) {
+  if (newUser == null || newUser.isEmpty) {
     print('New user welcome');
     await storeNewUser('true'); // new user
     return 'splash';
@@ -195,14 +197,13 @@ Future<String> onOpenApp(BuildContext context) async {
     return 'login';
   }
 
-
   final response = await http.post(
     Uri.parse('$baseUrl/onOpenApp'),
     headers: {
       'Authorization': 'Bearer $accessToken',
+      'Content-Type': 'application/json',
     },
   );
-
   if (response.statusCode == 200) {
     return 'c_home';
   } else if (response.statusCode == 201) {

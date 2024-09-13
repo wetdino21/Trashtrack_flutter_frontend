@@ -1,7 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:trashtrack/Customer/c_api_userdata.dart';
 import 'package:trashtrack/styles.dart';
+import 'package:intl/intl.dart';
 
-class C_NotificationScreen extends StatelessWidget {
+class C_NotificationScreen extends StatefulWidget {
+  @override
+  State<C_NotificationScreen> createState() => _C_NotificationScreenState();
+}
+
+class _C_NotificationScreenState extends State<C_NotificationScreen> {
+  List<Map<String, dynamic>>? notifications;
+  bool isLoading = true;
+  String? errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchNotifications();
+  }
+
+  // Fetch notifications from the server
+  Future<void> _fetchNotifications() async {
+    try {
+      final data = await fetchCusNotifications(context);
+      setState(() {
+        notifications = data;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        errorMessage = e.toString();
+        isLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -9,52 +42,73 @@ class C_NotificationScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: backgroundColor,
         foregroundColor: Colors.white,
-        title: Text(
-                  'Notification',
-                  style: TextStyle(
-                    
-                  ),
-                ),
+        title: Text('Notification'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            NotificationCard(
-              date: 'Thurs April 25',
-              time: '8:30 AM',
-              status: 'Ongoing',
-              title: 'Food Waste',
-              statusColor: Colors.red,
-            ),
-            SizedBox(height: 16),
-            NotificationCard(
-              date: 'Wed Jun 20',
-              time: '8:30 AM',
-              status: '',
-              title: 'Municipal Waste',
-              statusColor: Colors.transparent,
-            ),
-          ],
-        ),
+      body: RefreshIndicator(
+        onRefresh: _fetchNotifications,
+        child: isLoading
+            ? Center(child: CircularProgressIndicator())
+            : notifications == null
+                ? ListView(
+                    children: [
+                      Center(
+                          child: Text(
+                        'No notifications available.',
+                        style: TextStyle(color: accentColor, fontSize: 20),
+                      )),
+                    ],
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.all(5),
+                    itemCount: notifications!.length,
+                    itemBuilder: (context, index) {
+                      final notification = notifications![index];
+                      final status = notification['notif_status'] ?? '';
+                      final statusColor = status == 'delivered'
+                          ? Colors.green
+                          : status == 'seen'
+                              ? Colors.white54
+                              : Colors.transparent;
+                      final boxColor = status == 'delivered'
+                          ? Colors.green.withOpacity(0.2)
+                          : status == 'seen'
+                              ? Colors.blue.withOpacity(0.2)
+                              : Colors.green;
+
+                      return NotificationCard(
+                        dateTime:
+                            formatDateTime(notification['notif_created_at']),
+                        title: notification['notif_message'],
+                        status: status,
+                        statusColor: statusColor,
+                        boxColor: boxColor,
+                      );
+                    },
+                  ),
       ),
     );
+  }
+
+  String formatDateTime(String? dateTime) {
+    // Parse the date and format it as 'MMM dd, yyyy hh:mm a'
+    final date = DateTime.parse(dateTime ?? '').toLocal();
+    return DateFormat('MMM dd, yyyy hh:mma').format(date);
   }
 }
 
 class NotificationCard extends StatelessWidget {
-  final String date;
-  final String time;
+  final String dateTime;
   final String title;
   final String status;
   final Color statusColor;
+  final Color boxColor;
 
   NotificationCard({
-    required this.date,
-    required this.time,
+    required this.dateTime,
     required this.title,
     this.status = '',
     this.statusColor = Colors.transparent,
+    this.boxColor = Colors.transparent,
   });
 
   @override
@@ -88,24 +142,33 @@ class NotificationCard extends StatelessWidget {
         );
       },
       child: Container(
-        padding: EdgeInsets.all(16),
+        padding: EdgeInsets.all(10),
+        margin: EdgeInsets.all(5),
         decoration: BoxDecoration(
           color: boxColor,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
           children: [
-            Icon(Icons.circle, color: accentColor, size: 16),
-            SizedBox(width: 8),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('$date  $time', style: TextStyle(color: Colors.grey[300])),
-                if (status.isNotEmpty)
-                  Text('Status: $status', style: TextStyle(color: statusColor)),
-                Text(title,
-                    style: TextStyle(color: Colors.white, fontSize: 18)),
-              ],
+            Icon(Icons.circle, color: statusColor, size: 16),
+            SizedBox(width: 5),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('$dateTime', style: TextStyle(color: Colors.white60)),
+                  Text(
+                    title,
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                    softWrap: true,
+                  ),
+                  if (status.isNotEmpty)
+                    Align(
+                        alignment: Alignment.bottomRight,
+                        child: Text('$status',
+                            style: TextStyle(color: Colors.white60))),
+                ],
+              ),
             ),
           ],
         ),

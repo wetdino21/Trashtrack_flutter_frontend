@@ -25,7 +25,6 @@ import 'package:trashtrack/api_token.dart';
 
 //global
 import 'package:trashtrack/create_acc.dart';
-import 'package:trashtrack/create_email_verify.dart';
 import 'package:trashtrack/deactivated.dart';
 import 'package:trashtrack/forgot_pass.dart';
 import 'package:trashtrack/login.dart';
@@ -116,7 +115,17 @@ class _TokenCheckState extends State<TokenCheck> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: CircularProgressIndicator(), // Show a loading screen while checking the token
+        child: Column(
+          children: [
+            
+            Center(
+              child: Image.asset('assets/truck.png'),
+            ),
+             ElevatedButton(onPressed: (){
+                deleteTokens(context);
+              }, child: Text('delete token')),
+          ],
+        ), // Show a loading screen while checking the token
       ),
     );
   }

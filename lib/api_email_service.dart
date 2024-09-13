@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:trashtrack/api_network.dart';
 
-final String Url = 'http://192.168.254.187:3000';
-
+// final String Url = 'http://192.168.254.187:3000';
+String BaseUrl = globalUrl();
 Future<void> sendEmailSignUp(String to, String subject, String code) async {
-  final baseUrl = Uri.parse('$Url/send_email');
+  final baseUrl = Uri.parse('$BaseUrl/send_email');
 
   try {
     final response = await http.post(
@@ -33,7 +34,7 @@ Future<void> sendEmailSignUp(String to, String subject, String code) async {
 
 // send email code Create Acc
 Future<String?> sendEmailCodeCreateAcc(String email) async {
-  final baseUrl = Uri.parse('$Url/send_code_createacc');
+  final baseUrl = Uri.parse('$BaseUrl/send_code_createacc');
 
   final response = await http.post(
     baseUrl,
@@ -74,7 +75,7 @@ Future<String?> sendEmailCodeCreateAcc(String email) async {
 
 // send email code ForgotPass
 Future<String?> sendEmailCodeForgotPass(String email) async {
-  final baseUrl = Uri.parse('$Url/send_code_forgotpass');
+  final baseUrl = Uri.parse('$BaseUrl/send_code_forgotpass');
 
   final response = await http.post(
     baseUrl,
@@ -116,7 +117,7 @@ Future<String?> sendEmailCodeForgotPass(String email) async {
 // verify code ForgotPass
 Future<String?> verifyEmailCode(
     String email, String inputCode) async {
-  final baseUrl = Uri.parse('$Url/verify_code');
+  final baseUrl = Uri.parse('$BaseUrl/verify_code');
 
   final response = await http.post(
     baseUrl,

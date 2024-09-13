@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:trashtrack/api_google_practice.dart';
 import 'package:trashtrack/api_postgre_service.dart';
 import 'package:trashtrack/api_google.dart';
 import 'package:trashtrack/styles.dart';
@@ -159,33 +158,26 @@ class _LoginPageState extends State<LoginPage> {
                   child: ElevatedButton(
                     onPressed: () async {
                       if (_formKey.currentState?.validate() ?? false) {
-                        
                         String? dbMessage = await loginAccount(
                             _emailController.text, _passController.text);
 
                         // If there's an error, show it in a SnackBar
                         if (dbMessage != null) {
-                          if(dbMessage == 'customer') {
-                             Navigator.pushNamed(context, 'c_home');
+                          if (dbMessage == 'customer') {
+                            Navigator.pushNamed(context, 'c_home');
+                          } else if (dbMessage == 'hauler') {
+                            Navigator.pushNamed(context, 'home');
+                          } else if (dbMessage == '202') {
+                            Navigator.pushNamed(context, 'deactivated');
+                          } else if (dbMessage == '203') {
+                            Navigator.pushNamed(context, 'suspended');
+                          } else {
+                            showErrorSnackBar(context, dbMessage);
                           }
-                          else if(dbMessage == 'hauler') {
-                             Navigator.pushNamed(context, 'home');
-                          }
-                          else if(dbMessage == '202') {
-                             Navigator.pushNamed(context, 'deactivated');
-                          }
-                          else if(dbMessage == '203') {
-                             Navigator.pushNamed(context, 'suspended');
-                          }
-                          else{
-                             showErrorSnackBar(context, dbMessage);
-                          }
-                         
+                        } else {
+                          // Navigator.pushNamed(context, 'c_home');
                         }
-                        else {
-                       // Navigator.pushNamed(context, 'c_home');
                       }
-                      } 
                     },
                     child: const Text('Login'),
                     style: ElevatedButton.styleFrom(

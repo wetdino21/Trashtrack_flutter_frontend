@@ -1,20 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:trashtrack/Customer/address.dart';
+import 'package:trashtrack/Customer/c_api_userdata.dart';
 import 'package:trashtrack/Customer/c_appbar.dart';
 import 'package:trashtrack/Customer/c_bottom_nav_bar.dart';
 import 'package:trashtrack/Customer/c_waste_info.dart';
 import 'package:trashtrack/Customer/c_waste_request_pickup.dart';
 import 'package:trashtrack/api_postgre_service.dart';
-import 'package:trashtrack/api_token.dart';
 import 'package:trashtrack/styles.dart';
 
 import 'dart:convert';
 import 'dart:typed_data';
 
 class C_HomeScreen extends StatefulWidget {
-  // final String email;
-
-  // C_HomeScreen({required this.email});
-
   @override
   State<C_HomeScreen> createState() => _C_HomeScreenState();
 }
@@ -26,37 +23,16 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
   String? errorMessage;
   Uint8List? imageBytes; // To store the image bytes
 
-  //final email = 'mikenaill45@gmail.com';
-  //final email = 'mikenaill22@gmail.com';
-  String email = '';
-
-  void getEmail() async {
-     final useremail = await getEmailToken();
-    if (useremail != null) {
-      setState(() {
-        email = useremail;
-      });
-      _dbData();
-    } else {
-      setState(() {
-        isLoading = false;
-        errorMessage = 'Failed to retrieve email';
-      });
-    }
-  }
-
   @override
   void initState() {
     super.initState();
-    getEmail();
-    //_fetchData();
-    
+   _dbData();
   }
 
 // Fetch user data from the server
   Future<void> _dbData() async {
     try {
-      final data = await fetchUserData(email);
+      final data = await fetchCusData(context);
       setState(() {
         userData = data;
         isLoading = false;
@@ -87,183 +63,169 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
         onRefresh: _dbData,
         child: isLoading
             ? Center(child: CircularProgressIndicator())
-            : userData != null?
-                //  Center(
-                //     child: Column(
-                //       mainAxisAlignment: MainAxisAlignment.center,
-                //       children: [
-                //         ElevatedButton(onPressed: (){
-                //           String fname ='Zenen';
-                //           String lname ='Spacktakraw';
-                          
-                //           updateProfile(context, fname, lname);
-                //         }, child: Text('update')),
-                //         Text('First Name: ${userData!['cus_fname']}'),
-                //         Text('Last Name: ${userData!['cus_lname']}'),
-        
-                //         // Display the image if the bytes are available
-                //         if (imageBytes != null)
-                //           Image.memory(imageBytes!, height: 100, width: 100)
-                //         else
-                //           Text('No profile image available'),
-        
-                //         // You can add more widgets to display other data
-                //       ],
-                //     ),
-                //   )
-                // : Center(child: Text('Error: $errorMessage')),
-        
-        ListView(padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Welcome Container
-                        ElevatedButton(onPressed: (){
-                            String fname ='Kel';
-                            String lname ='KelKelKel';
-                            
-                            updateProfile(context, fname, lname);
-                          }, child: Text('update')),
-                Container(
-                  padding: EdgeInsets.all(16.0),
-                  decoration: BoxDecoration(
-                    color: boxColor,
-                    borderRadius: BorderRadius.circular(20.0),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            : userData != null
+                ? ListView(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
                     children: [
-                      Text(
-                        'Welcome ${userData!['cus_fname']}!',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 10.0),
-                      Text(
-                        'Ready to keep things tidy? Schedule your garbage pickup today!',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14.0,
-                        ),
-                      ),
-                      SizedBox(height: 20.0),
-                      Center(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => RequestPickupScreen(),
-                              ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: buttonColor,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30.0),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Welcome Container
+                          ElevatedButton(
+                              onPressed: () {
+                                String fname = 'Kel';
+                                String lname = 'KelKelKel';
+
+                                updateProfile(context, fname, lname);
+                              },
+                              child: Text('update')),
+                               ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => DropDownExample()));
+                              },
+                              child: Text('Address DDL')),
+                          Container(
+                            padding: EdgeInsets.all(16.0),
+                            decoration: BoxDecoration(
+                              color: boxColor,
+                              borderRadius: BorderRadius.circular(20.0),
                             ),
-                            padding: EdgeInsets.symmetric(
-                                vertical: 16.0, horizontal: 30.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Welcome ${userData!['cus_fname']}!',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 24.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: 10.0),
+                                Text(
+                                  'Ready to keep things tidy? Schedule your garbage pickup today!',
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 14.0,
+                                  ),
+                                ),
+                                SizedBox(height: 20.0),
+                                Center(
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              RequestPickupScreen(),
+                                        ),
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: buttonColor,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(30.0),
+                                      ),
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: 16.0, horizontal: 30.0),
+                                    ),
+                                    child: Text(
+                                      'Request Pickup Now',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18.0,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          child: Text(
-                            'Request Pickup Now',
+
+                          ////
+                          SizedBox(height: 20.0),
+                          Text(
+                            '  Waste Collection Info',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: Colors.grey,
                               fontSize: 18.0,
                             ),
                           ),
-                        ),
+                          SizedBox(height: 5.0),
+
+                          GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => C_WasteInfo()));
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: boxColor,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: ListTile(
+                                  contentPadding: EdgeInsets.all(10),
+                                  leading: Image.asset(
+                                    'assets/truck.png',
+                                    height: 100,
+                                    width: 100,
+                                  ),
+                                  title: Text(
+                                    'Type of waste',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18.0,
+                                    ),
+                                  ),
+                                ),
+                              )),
+
+                          /////
+                          SizedBox(height: 20.0),
+                          Text(
+                            '  Previous waste pickup',
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 18.0,
+                            ),
+                          ),
+                          SizedBox(height: 5.0),
+
+                          // Statistic Boxes
+                          GridView.count(
+                            crossAxisCount: 2,
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            crossAxisSpacing: 10.0,
+                            mainAxisSpacing: 10.0,
+                            children: [
+                              StatisticBox(
+                                icon: Icons.schedule,
+                                title: 'Total Requests',
+                                value: '150',
+                                iconColor: accentColor,
+                              ),
+                              StatisticBox(
+                                icon: Icons.delete_outline,
+                                title: 'Total Tons Collected',
+                                value: '75',
+                                iconColor: accentColor,
+                              ),
+                            ],
+                          ),
+
+                          SizedBox(height: 20.0),
+                        ],
                       ),
                     ],
-                  ),
-                ),
-                    
-                ////
-                SizedBox(height: 20.0),
-                Text(
-                  '  Waste Collection Info',
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 18.0,
-                  ),
-                ),
-                SizedBox(height: 5.0),
-                    
-                GestureDetector(
-                    onTap: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => C_WasteInfo()));
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: boxColor,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: ListTile(
-                        contentPadding: EdgeInsets.all(10),
-                        leading: Image.asset(
-                          'assets/truck.png',
-                          height: 100,
-                          width: 100,
-                        ),
-                        title: Text(
-                          'Type of waste',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18.0,
-                          ),
-                        ),
-                      ),
-                    )),
-                    
-                /////
-                SizedBox(height: 20.0),
-                Text(
-                  '  Previous waste pickup',
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 18.0,
-                  ),
-                ),
-                SizedBox(height: 5.0),
-                    
-                // Statistic Boxes
-                GridView.count(
-                  crossAxisCount: 2,
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  crossAxisSpacing: 10.0,
-                  mainAxisSpacing: 10.0,
-                  children: [
-                    StatisticBox(
-                      icon: Icons.schedule,
-                      title: 'Total Requests',
-                      value: '150',
-                      iconColor: accentColor,
-                    ),
-                    StatisticBox(
-                      icon: Icons.delete_outline,
-                      title: 'Total Tons Collected',
-                      value: '75',
-                      iconColor: accentColor,
-                    ),
-                  ],
-                ),
-                    
-                SizedBox(height: 20.0),
-              ],
-            ),
-          ],
-        )
-        ///// if error
-         : Center(child: Text('Error: $errorMessage')),
+                  )
+                ///// if error
+                : Center(child: Text('Error: $errorMessage')),
       ),
-
-
       bottomNavigationBar: C_BottomNavBar(
         currentIndex: 0,
       ),

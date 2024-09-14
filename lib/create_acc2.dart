@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:trashtrack/api_address.dart';
 
-class DropDownExample extends StatefulWidget {
+class CreateAcc2 extends StatefulWidget {
   @override
-  _DropDownExampleState createState() => _DropDownExampleState();
+  _CreateAcc2State createState() => _CreateAcc2State();
 }
 
-class _DropDownExampleState extends State<DropDownExample> {
+class _CreateAcc2State extends State<CreateAcc2> {
   List<dynamic> _provinces = [];
   List<dynamic> _citiesMunicipalities = [];
   List<dynamic> _barangays = [];
 
   String? _selectedProvince;
   String? _selectedCityMunicipality;
-  String? _selectedBarangay = 'haahaha';
+  String? _selectedBarangay;
 
   @override
   void initState() {
@@ -58,6 +58,43 @@ class _DropDownExampleState extends State<DropDownExample> {
     }
   }
 
+  Widget _buildDropdown({
+    required String? selectedValue,
+    required List<dynamic> items,
+    required String hintText,
+    required IconData icon,
+    required ValueChanged<String?> onChanged,
+  }) {
+    return DropdownButtonFormField<String>(
+      value: selectedValue,
+      hint: Text(hintText, style: TextStyle(color: Colors.grey)),
+      icon: Icon(Icons.arrow_drop_down, color: Colors.grey),
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: Colors.white,
+        prefixIcon: Icon(icon, color: Colors.grey),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: const BorderSide(color: Colors.grey, width: 3.0),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: const BorderSide(color: Colors.green, width: 5.0),
+        ),
+      ),
+      items: items.map<DropdownMenuItem<String>>((item) {
+        return DropdownMenuItem<String>(
+          value: item['code'], // Use the appropriate field for value
+          child: Text(item['name']), // Use the appropriate field for display
+        );
+      }).toList(),
+      onChanged: onChanged,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,15 +105,11 @@ class _DropDownExampleState extends State<DropDownExample> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            DropdownButton<String>(
-              value: _selectedProvince,
-              hint: Text('Select Province'),
-              items: _provinces.map<DropdownMenuItem<String>>((item) {
-                return DropdownMenuItem<String>(
-                  value: item['code'], // Province code
-                  child: Text(item['name']), // Province name
-                );
-              }).toList(),
+            _buildDropdown(
+              selectedValue: _selectedProvince,
+              items: _provinces,
+              hintText: 'Select Province',
+              icon: Icons.location_city,
               onChanged: (value) {
                 setState(() {
                   _selectedProvince = value;
@@ -85,15 +118,11 @@ class _DropDownExampleState extends State<DropDownExample> {
               },
             ),
             SizedBox(height: 16),
-            DropdownButton<String>(
-              value: _selectedCityMunicipality,
-              hint: Text('Select City/Municipality'),
-              items: _citiesMunicipalities.map<DropdownMenuItem<String>>((item) {
-                return DropdownMenuItem<String>(
-                  value: item['code'], // City/Municipality code
-                  child: Text(item['name']), // City/Municipality name
-                );
-              }).toList(),
+            _buildDropdown(
+              selectedValue: _selectedCityMunicipality,
+              items: _citiesMunicipalities,
+              hintText: 'Select City/Municipality',
+              icon: Icons.apartment,
               onChanged: (value) {
                 setState(() {
                   _selectedCityMunicipality = value;
@@ -102,25 +131,20 @@ class _DropDownExampleState extends State<DropDownExample> {
               },
             ),
             SizedBox(height: 16),
-            DropdownButton<String>(
-              value: _selectedBarangay,
-              hint: Text('Select Barangay'),
-              items: _barangays.map<DropdownMenuItem<String>>((item) {
-                return DropdownMenuItem<String>(
-                  value: item['code'], // Barangay code
-                  child: Text(item['name']), // Barangay name
-                );
-              }).toList(),
+            _buildDropdown(
+              selectedValue: _selectedBarangay,
+              items: _barangays,
+              hintText: 'Select Barangay',
+              icon: Icons.home,
               onChanged: (value) {
                 setState(() {
                   _selectedBarangay = value;
                 });
               },
             ),
-          ],
+          ],  
         ),
       ),
     );
   }
 }
-

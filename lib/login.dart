@@ -291,19 +291,19 @@ class _LoginPageState extends State<LoginPage> {
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: TextStyle(color: Colors.grey),
-          prefixIcon: Icon(icon, color: Colors.grey),
+          prefixIcon: Icon(icon, color: Colors.green[600]),
           suffixIcon: suffixIcon,
           filled: true,
           fillColor: Colors.white,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30), // Rounded corners
+            borderRadius: BorderRadius.circular(10), // Rounded corners
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30), // Rounded corners
+            borderRadius: BorderRadius.circular(10), // Rounded corners
             borderSide: const BorderSide(color: Colors.grey, width: 3.0),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30), // Rounded corners
+            borderRadius: BorderRadius.circular(10), // Rounded corners
             borderSide: const BorderSide(color: Colors.green, width: 5.0),
           ),
         ),

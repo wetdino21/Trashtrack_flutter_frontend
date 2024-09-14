@@ -57,7 +57,7 @@ class MyApp extends StatelessWidget {
         'terms': (context) => const TermsAndConditions(),
         'forgot_pass': (context) => const ForgotPassword(),
        // 'email_verify': (context) => EmailVerification(),
-        'create_acc': (context) => const CreateAcc(),
+        'create_acc': (context) =>  CreateAcc(),
         'login': (context) => const LoginPage(),
         'deactivated': (context) => const DeactivatedScreen(),
         'suspended': (context) => const SuspendedScreen(),
@@ -130,55 +130,4 @@ class _TokenCheckState extends State<TokenCheck> {
     );
   }
 }
-
-
-
-// import 'package:flutter/material.dart';
-// import 'api_postgre_service.dart'; // Import your service file
-
-// void main() {
-//   runApp(MyApp());
-// }
-
-// class MyApp extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       home: Scaffold(
-//         appBar: AppBar(title: Text('Flutter CRUD Example')),
-//         body: Center(
-//           child: Column(
-//             mainAxisAlignment: MainAxisAlignment.center,
-//             children: [
-//               ElevatedButton(
-//                 onPressed: () {
-//                   createUser('Bossing', 'Bossing.doe@example.com');
-//                 },
-//                 child: Text('Create User'),
-//               ),
-//               ElevatedButton(
-//                 onPressed: () {
-//                   fetchUsers();
-//                 },
-//                 child: Text('Fetch Users'),
-//               ),
-//               ElevatedButton(
-//                 onPressed: () {
-//                   updateUser(1, 'Ydennn', 'Ydennn.Ydennn@example.com');
-//                 },
-//                 child: Text('Update User'),
-//               ),
-//               ElevatedButton(
-//                 onPressed: () {
-//                   deleteUser(16);
-//                 },
-//                 child: Text('Delete User'),
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
 

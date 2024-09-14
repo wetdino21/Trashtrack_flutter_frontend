@@ -98,7 +98,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 ElevatedButton(
                   onPressed: () {
                     storeNewUser('false');
-                    Navigator.pushNamed(context, 'create_acc');
+                    Navigator.pushNamed(context, 'login');
                   },
                   child: Text("Get Started",
                       style: TextStyle(

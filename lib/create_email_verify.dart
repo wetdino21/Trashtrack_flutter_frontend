@@ -227,18 +227,18 @@ class _VerifyEmailCreateAccScreenState
                   } else {
                     showSuccessSnackBar(
                         context, 'Successful Email Verification');
-                    String? createMessage = await createCustomer(widget.fname,
-                        widget.lname, widget.email, widget.password);
-                    if (createMessage != null) {
-                      showErrorSnackBar(context, createMessage);
-                    } else {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SuccessVerifyEmail(),
-                        ),
-                      );
-                    }
+                    // String? createMessage = await createCustomer(widget.fname,
+                    //     widget.lname, widget.email, widget.password);
+                    // if (createMessage != null) {
+                    //   showErrorSnackBar(context, createMessage);
+                    // } else {
+                    //   Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(
+                    //       builder: (context) => SuccessVerifyEmail(),
+                    //     ),
+                    //   );
+                    // }
                   }
                 } else {
                   showErrorSnackBar(context, error);

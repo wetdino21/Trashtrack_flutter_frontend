@@ -5,7 +5,6 @@ import 'package:trashtrack/api_token.dart';
 import 'package:flutter/material.dart';
 import 'package:trashtrack/styles.dart';
 
-
 // final String baseUrl = 'http://192.168.254.187:3000';
 String baseUrl = globalUrl();
 
@@ -55,6 +54,30 @@ Future<String?> emailCheck(String email) async {
   }
 }
 
+Future<String?> contactCheck(String contact) async {
+  String contactnum = '0' + contact;
+  print(contactnum);
+  final response = await http.post(
+    Uri.parse('$baseUrl/contact_check'),
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      'contact': contactnum,
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    print('Good contact');
+    return null; // No error, return null
+  } else if (response.statusCode == 400) {
+    print('contact number is already taken');
+    return 'Contact number is already taken!';
+  } else {
+    print('Error response: ${response.body}');
+    print('Failed to check customer contact number');
+    return 'error';
+  }
+}
+
 Future<String?> emailCheckforgotpass(String email) async {
   final response = await http.post(
     Uri.parse('$baseUrl/email_check_forgotpass'),
@@ -95,15 +118,32 @@ Future<String?> emailCheckforgotpass(String email) async {
 // }
 
 Future<String?> createCustomer(
-    String fname, String lname, String email, String password) async {
+    String email,
+    String password,
+    String fname,
+    String mname,
+    String lname,
+    String contact,
+    String? province,
+    String? city,
+    String? brgy,
+    String street,
+    String postal) async {
   final response = await http.post(
     Uri.parse('$baseUrl/signup'),
     headers: {'Content-Type': 'application/json'},
     body: jsonEncode({
-      'fname': fname,
-      'lname': lname,
       'email': email,
       'password': password,
+      'fname': fname,
+      'mname': mname,
+      'lname': lname,
+      'contact': contact,
+      'province': province,
+      'city': city,
+      'brgy': brgy,
+      'street': street,
+      'postal': postal,
     }),
   );
 
@@ -115,14 +155,9 @@ Future<String?> createCustomer(
     final String accessToken = responseData['accessToken'];
     final String refreshToken = responseData['refreshToken'];
     storeTokens(accessToken, refreshToken);
-    
+
     return null; // No error, return null
   }
-  // else if (response.statusCode == 400) {
-  //   print('Customer with this email already exists');
-
-  //   return 'Customer with this email already exists';  // Return the error message from the server
-  // }
   else {
     //print('Error response: ${response.body}');
     print('Failed to create customer');
@@ -237,9 +272,9 @@ Future<void> updateProfile(
     } else if (response.statusCode == 403) {
       // Access token is invalid. logout
       print('Access token invalid. Attempting to logout...');
-      showErrorSnackBar(context,'Active time has been expired please login again.');
+      showErrorSnackBar(
+          context, 'Active time has been expired please login again.');
       await deleteTokens(context); // Logout use
-      
     } else {
       print('Response: ${response.body}');
     }

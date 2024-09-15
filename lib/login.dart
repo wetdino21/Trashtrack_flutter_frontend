@@ -33,7 +33,7 @@ class _LoginPageState extends State<LoginPage> {
         foregroundColor: Colors.white,
         leading: IconButton(
             onPressed: () {
-              Navigator.pushNamed(context, 'create_acc');
+              Navigator.pushNamed(context, 'splash');
             },
             icon: Icon(Icons.arrow_back)),
       ),
@@ -43,7 +43,7 @@ class _LoginPageState extends State<LoginPage> {
           child: Form(
             key: _formKey,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(height: 50),
                 const Text(

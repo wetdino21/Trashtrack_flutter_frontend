@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:trashtrack/Customer/address.dart';
-import 'package:trashtrack/Customer/c_api_userdata.dart';
+import 'package:trashtrack/Customer/c_api_cus_data.dart';
 import 'package:trashtrack/Customer/c_appbar.dart';
 import 'package:trashtrack/Customer/c_bottom_nav_bar.dart';
 import 'package:trashtrack/Customer/c_waste_info.dart';
 import 'package:trashtrack/Customer/c_waste_request_pickup.dart';
-import 'package:trashtrack/api_postgre_service.dart';
 import 'package:trashtrack/styles.dart';
 
 import 'dart:convert';
@@ -21,12 +19,12 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
   Map<String, dynamic>? userData;
   bool isLoading = true;
   String? errorMessage;
-  Uint8List? imageBytes; // To store the image bytes
+  //Uint8List? imageBytes; 
 
   @override
   void initState() {
     super.initState();
-   _dbData();
+    _dbData();
   }
 
 // Fetch user data from the server
@@ -37,10 +35,10 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
         userData = data;
         isLoading = false;
 
-        // Decode base64 image only if it exists
-        if (userData?['profileImage'] != null) {
-          imageBytes = base64Decode(userData!['profileImage']);
-        }
+        // // Decode base64 image only if it exists
+        // if (userData?['profileImage'] != null) {
+        //   imageBytes = base64Decode(userData!['profileImage']);
+        // }
       });
     } catch (e) {
       setState(() {
@@ -57,7 +55,6 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
       backgroundColor: backgroundColor,
       appBar: C_CustomAppBar(
         title: 'Home',
-        userData: userData,
       ),
       body: RefreshIndicator(
         onRefresh: _dbData,
@@ -72,19 +69,6 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           // Welcome Container
-                          ElevatedButton(
-                              onPressed: () {
-                                String fname = 'Kel';
-                                String lname = 'KelKelKel';
-
-                                updateProfile(context, fname, lname);
-                              },
-                              child: Text('update')),
-                               ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => DropDownExample()));
-                              },
-                              child: Text('Address DDL')),
                           Container(
                             padding: EdgeInsets.all(16.0),
                             decoration: BoxDecoration(

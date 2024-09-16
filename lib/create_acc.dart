@@ -1,19 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:trashtrack/api_postgre_service.dart';
 import 'package:trashtrack/styles.dart';
-import 'package:flutter/material.dart';
 import 'package:trashtrack/api_email_service.dart';
-import 'package:trashtrack/create_acc2.dart';
-import 'package:trashtrack/create_email_verify.dart';
-import 'package:trashtrack/styles.dart';
 import 'package:flutter/services.dart';
 import 'package:trashtrack/api_address.dart';
 import 'dart:async';
-import 'package:flutter/material.dart';
 import 'package:trashtrack/Customer/c_home.dart';
-import 'package:trashtrack/api_email_service.dart';
-import 'package:trashtrack/api_postgre_service.dart';
-import 'package:trashtrack/styles.dart';
 
 //google
 import 'package:trashtrack/api_google.dart';
@@ -65,6 +57,8 @@ class _CreateAccState extends State<CreateAcc> {
   String streetvalidator = '';
   String postalvalidator = '';
   bool emailChanged = false;
+  bool isGoogle = false;
+  GoogleAccountDetails? _accountDetails;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -339,8 +333,7 @@ class _CreateAccState extends State<CreateAcc> {
                     } else {
                       if ((_fnameController.text.isEmpty ||
                               fnamevalidator.isNotEmpty) ||
-                          (_mnameController.text.isEmpty ||
-                              mnamevalidator.isNotEmpty) ||
+                          (mnamevalidator.isNotEmpty) ||
                           (_lnameController.text.isEmpty ||
                               lnamevalidator.isNotEmpty) ||
                           (_contactController.text.isEmpty ||
@@ -422,8 +415,7 @@ class _CreateAccState extends State<CreateAcc> {
 
                   if ((_fnameController.text.isEmpty ||
                           fnamevalidator.isNotEmpty) ||
-                      (_mnameController.text.isEmpty ||
-                          mnamevalidator.isNotEmpty) ||
+                      (mnamevalidator.isNotEmpty) ||
                       (_lnameController.text.isEmpty ||
                           lnamevalidator.isNotEmpty) ||
                       (_contactController.text.isEmpty ||
@@ -858,9 +850,38 @@ class _CreateAccState extends State<CreateAcc> {
                       SizedBox(height: 10.0),
                       ElevatedButton.icon(
                         onPressed: () async {
-                          //handleSignIn(); //google sign in
-                          handleGoogleSignUp(context);
-                          //Navigator.push(context, MaterialPageRoute(builder: (context) => C_HomeScreen()));
+                          //handleGoogleSignUp(context);
+                          GoogleAccountDetails? accountDetails =
+                              await handleGoogleSignUp(context);
+                          if (accountDetails != null) {
+                            if (_emailController.text.isNotEmpty ||
+                                _passController.text.isNotEmpty ||
+                                _repassController.text.isNotEmpty ||
+                                _fnameController.text.isNotEmpty ||
+                                _mnameController.text.isNotEmpty ||
+                                _lnameController.text.isNotEmpty ||
+                                _fnameController.text.isNotEmpty ||
+                                _contactController.text.isNotEmpty ||
+                                _selectedProvinceName != null ||
+                                _selectedCityMunicipalityName != null ||
+                                _selectedBarangayName != null ||
+                                _streetController.text.isNotEmpty ||
+                                _postalController.text.isNotEmpty) {
+                              _showGoogleSignInConfirmationDialog(
+                                  context, accountDetails);
+                            } else {
+                              _currentStep++;
+                              isGoogle = true;
+                              setState(() {
+                                _accountDetails =
+                                    accountDetails; //to store the google acc details
+                                handleSignOut();
+                                print('isGoogle: {$isGoogle}');
+                                _fnameController.text = _accountDetails!.fname;
+                                _lnameController.text = _accountDetails!.lname;
+                              });
+                            }
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.transparent,
@@ -939,6 +960,89 @@ class _CreateAccState extends State<CreateAcc> {
     );
   }
 
+  void _showGoogleSignInConfirmationDialog(
+      BuildContext context, GoogleAccountDetails accountDetails) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.deepPurple,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(20.0))),
+          title: Text('Sign Up with Google',
+              style: TextStyle(color: Colors.white)),
+          content: Text('Certain data from this form will be remove!',
+              style: TextStyle(color: Colors.white)),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                await handleSignOut();
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel', style: TextStyle(color: Colors.white)),
+            ),
+            TextButton(
+              onPressed: () {
+                _currentStep++;
+                isGoogle = true;
+                setState(() {
+                  _accountDetails =
+                      accountDetails; //to store the google acc details
+                  handleSignOut();
+                  Navigator.pop(context);
+                  print('isGoogle: {$isGoogle}');
+                  _fnameController.text = _accountDetails!.fname;
+                  _lnameController.text = _accountDetails!.lname;
+                });
+              },
+              child: Text('Yes', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showBackToSignUpDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.deepPurple,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(20.0))),
+          title: Text('Cancel google Sign Up',
+              style: TextStyle(color: Colors.white)),
+          content: Text('Google Account will be remove from the form!',
+              style: TextStyle(color: Colors.white)),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel', style: TextStyle(color: Colors.white)),
+            ),
+            TextButton(
+              onPressed: () {
+                _currentStep--;
+                isGoogle = false;
+                setState(() {
+                  _accountDetails = null; //to store the google acc details
+                  handleSignOut();
+                  Navigator.pop(context);
+                  print('isGoogle: {$isGoogle}');
+                  _fnameController.text = '';
+                  _lnameController.text = '';
+                });
+              },
+              child: Text('Yes', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   ///2nd page
   Widget _buildSecondStep() {
     return Scaffold(
@@ -952,7 +1056,7 @@ class _CreateAccState extends State<CreateAcc> {
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
+                const Text(
                   'Registration',
                   style: TextStyle(
                     fontSize: 40,
@@ -960,19 +1064,21 @@ class _CreateAccState extends State<CreateAcc> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                _buildDotIndicator(),
+                isGoogle == false ? _buildDotIndicator() : const SizedBox(),
               ],
             ),
-            SizedBox(
+            const SizedBox(
               width: 0,
             ),
           ],
         ),
         leading: IconButton(
             onPressed: () {
-              setState(() {
-                _currentStep--;
-              });
+              isGoogle
+                  ? _showBackToSignUpDialog(context)
+                  : setState(() {
+                      _currentStep--;
+                    });
             },
             icon: Icon(
               Icons.arrow_back_ios,
@@ -989,7 +1095,84 @@ class _CreateAccState extends State<CreateAcc> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 10),
+                isGoogle == true
+                    ? Column(
+                        children: [
+                          Text(
+                            'with Google Authentication',
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                          InkWell(
+                            onTap: () async {
+                              //handleGoogleSignUp(context);
+                              GoogleAccountDetails? accountDetails =
+                                  await handleGoogleSignUp(context);
+                              if (accountDetails != null) {
+                                setState(() {
+                                  _accountDetails =
+                                      accountDetails; //to store the google acc details
+                                  handleSignOut();
+                                  print('isGoogle: {$isGoogle}');
+                                  _fnameController.text =
+                                      _accountDetails!.fname;
+                                  _lnameController.text =
+                                      _accountDetails!.lname;
+                                });
+                              }
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color:
+                                    Colors.deepPurpleAccent, // Background color
+                                borderRadius: BorderRadius.circular(
+                                    10.0), // Border radius
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.2),
+                                    spreadRadius: 2,
+                                    blurRadius: 5,
+                                    offset: Offset(0, 3), // Shadow position
+                                  ),
+                                ],
+                              ),
+                              child: ListTile(
+                                contentPadding: EdgeInsets.all(
+                                    8.0), // Padding inside the container
+                                leading: _accountDetails != null
+                                    ? (_accountDetails!.photoBytes != null
+                                        ? ClipOval(
+                                            child: Image.memory(
+                                              _accountDetails!.photoBytes!,
+                                            ),
+                                          )
+                                        : ClipOval(
+                                            child: Container(
+                                                padding: EdgeInsets.all(8),
+                                                color: Colors.white,
+                                                child: Icon(Icons.person,
+                                                    size: 40))))
+                                    : SizedBox(),
+                                title: _accountDetails != null
+                                    ? Text(
+                                        _accountDetails!.email,
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold),
+                                      )
+                                    : Text('No email available'),
+                                trailing: Icon(
+                                  Icons.file_upload_outlined,
+                                  color: Colors.white,
+                                  size: 30,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : SizedBox(),
+
+                const SizedBox(height: 20),
                 Center(
                     child: Text(
                   'Personal Information',
@@ -1178,8 +1361,7 @@ class _CreateAccState extends State<CreateAcc> {
                     onPressed: () async {
                       if ((_fnameController.text.isEmpty ||
                               fnamevalidator.isNotEmpty) ||
-                          (_mnameController.text.isEmpty ||
-                              mnamevalidator.isNotEmpty) ||
+                          (mnamevalidator.isNotEmpty) ||
                           (_lnameController.text.isEmpty ||
                               lnamevalidator.isNotEmpty) ||
                           (_contactController.text.isEmpty ||
@@ -1225,13 +1407,21 @@ class _CreateAccState extends State<CreateAcc> {
                           // If no errors, proceed with incrementing the step
                           if (_currentStep < 3) {
                             if (_acceptTerms) {
-                              setState(() {
+                              if(isGoogle) {
+                                await createGoogleAccount(context, _accountDetails?.email??'',  _accountDetails?.photoBytes != null ? _accountDetails!.photoBytes! : null, 
+                                _fnameController.text, _mnameController.text, _lnameController.text,('0' + _contactController.text),
+                                 _selectedProvinceName!, _selectedCityMunicipalityName!, _selectedBarangayName!, _streetController.text, _postalController.text);
+                              }
+                              else{
+                                 setState(() {
                                 _currentStep++;
                                 if (emailChanged == true) {
                                   emailChanged = false;
                                   _resendCode();
                                 }
                               });
+                              }
+                             
                             } else {
                               showErrorSnackBar(context,
                                   'You must accept the terms and conditions');
@@ -1240,7 +1430,7 @@ class _CreateAccState extends State<CreateAcc> {
                         }
                       }
                     },
-                    child: const Text('Next'),
+                    child: Text(isGoogle ? 'Done' : 'Next'),
                     style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                         padding: const EdgeInsets.symmetric(
@@ -1521,8 +1711,12 @@ class _CreateAccState extends State<CreateAcc> {
         obscureText: obscureText,
         keyboardType: keyboardType,
         decoration: InputDecoration(
-          hintText: hintText,
-          hintStyle: TextStyle(color: Colors.grey),
+          labelText:
+              hintText, // This will move the hint text to the upper left when focused
+          floatingLabelBehavior: FloatingLabelBehavior.auto,
+          labelStyle: TextStyle(color: Colors.grey),
+          //hintText: hintText,
+          //hintStyle: TextStyle(color: Colors.green),
           prefixIcon: Icon(icon, color: Colors.green),
           suffixIcon: suffixIcon,
           filled: true,
@@ -1688,7 +1882,7 @@ class SuccessVerifyEmail extends StatelessWidget {
                   color: Colors.lightGreenAccent, size: 100),
               SizedBox(height: 20),
               Text(
-                'Account Registration Successful!',
+                'Successful Account Registration!',
                 style: TextStyle(
                   fontSize: 28,
                   color: Colors.lightGreenAccent,
@@ -1698,7 +1892,7 @@ class SuccessVerifyEmail extends StatelessWidget {
               ),
               SizedBox(height: 20),
               Text(
-                'Your email has been successfully verified.',
+                'Your email has been verified successfully.',
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.white,
@@ -1736,6 +1930,70 @@ class SuccessVerifyEmail extends StatelessWidget {
   }
 }
 
+// Success Screen
+class SuccessfulGoogleRegistration extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Color(0xFF04130B),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Icon(Icons.check_circle,
+                  color: Colors.lightGreenAccent, size: 100),
+              SizedBox(height: 20),
+              Text(
+                'Successful Account Registration !',
+                style: TextStyle(
+                  fontSize: 28,
+                  color: Colors.lightGreenAccent,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 20),
+              Text(
+                'Thank You for signing up with TrashTrack.',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.white,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => C_HomeScreen(),
+                    ),
+                    (route) => false,
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.lightGreenAccent,
+                  padding: EdgeInsets.symmetric(vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: Text(
+                  'Okay',
+                  style: TextStyle(color: Colors.black, fontSize: 18),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
 // Custom Text Field with Active Border Color Change
 class CustomTextField extends StatefulWidget {
   final String labelText;
@@ -1794,12 +2052,12 @@ void _showSignInConfirmationDialog(BuildContext context) {
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        backgroundColor: Colors.green[900],
+        backgroundColor: Colors.deepPurple,
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(20.0))),
         title: Text('Sign In', style: TextStyle(color: Colors.white)),
         content: Text(
-            'Are you sure to sign in now? Any data changes will be deleted!',
+            'Back to sign in now? Any data from this form will be removed!',
             style: TextStyle(color: Colors.white)),
         actions: [
           TextButton(
@@ -1820,581 +2078,6 @@ void _showSignInConfirmationDialog(BuildContext context) {
   );
 }
 
-// import 'package:flutter/material.dart';
-// import 'package:trashtrack/api_email_service.dart';
-// import 'package:trashtrack/create_acc2.dart';
-// import 'package:trashtrack/create_email_verify.dart';
-// import 'package:trashtrack/styles.dart';
 
-// //google
-// import 'package:trashtrack/api_google.dart';
 
-// class CreateAcc extends StatefulWidget {
-//   const CreateAcc({super.key});
-
-//   @override
-//   State<CreateAcc> createState() => _CreateAccState();
-// }
-
-// class _CreateAccState extends State<CreateAcc> {
-
-//   final TextEditingController _fnameController = TextEditingController();
-//   final TextEditingController _lnameController = TextEditingController();
-//   final TextEditingController _emailController = TextEditingController();
-//   final TextEditingController _passController = TextEditingController();
-//   final TextEditingController _repassController = TextEditingController();
-//   bool _acceptTerms = false;
-//   bool _passwordVisible = false;
-//   bool _confirmPasswordVisible = false;
-
-//   final _formKey = GlobalKey<FormState>();
-
-//   @override
-//   void dispose() {
-//     _fnameController.dispose();
-//     _lnameController.dispose();
-//     _emailController.dispose();
-//     _passController.dispose();
-//     _repassController.dispose();
-//     super.dispose();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: backgroundColor,
-//       appBar: AppBar(
-//         backgroundColor: backgroundColor,
-//         foregroundColor: Colors.white,
-//         title: const Text(
-//                   'Sign Up',
-//                   style: TextStyle(
-//                     fontSize: 40,
-//                     color: Colors.green,
-//                     fontWeight: FontWeight.bold,
-//                   ),
-//                 ),
-//         leading: IconButton(
-//             onPressed: () {
-//               Navigator.pushNamed(context, 'splash');
-//             },
-//             icon: Icon(Icons.arrow_back)),
-//       ),
-//       body: SingleChildScrollView(
-//         child: Container(
-//           padding: const EdgeInsets.all(20),
-//           child: Form(
-//             key: _formKey,
-//             child: Column(
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: [
-//                 // const Text(
-//                 //   'Sign Up',
-//                 //   style: TextStyle(
-//                 //     fontSize: 40,
-//                 //     color: Colors.green,
-//                 //     fontWeight: FontWeight.bold,
-//                 //   ),
-//                 // ),
-//                 const Text(
-//                   'Please enter your account details below!',
-//                   style: TextStyle(color: Colors.grey),
-//                 ),
-//                 const SizedBox(height: 30),
-//                 _buildTextField(
-//                   controller: _fnameController,
-//                   hintText: 'First Name',
-//                   icon: Icons.person_outline,
-//                   validator: (value) {
-//                     if (value == null || value.isEmpty) {
-//                       return 'Please enter your name';
-//                     }
-//                     return null;
-//                   },
-//                 ),
-//                 const SizedBox(height: 10),
-//                 _buildTextField(
-//                   controller: _lnameController,
-//                   hintText: 'Last Name',
-//                   icon: Icons.person,
-//                   validator: (value) {
-//                     if (value == null || value.isEmpty) {
-//                       return 'Please enter your name';
-//                     }
-//                     return null;
-//                   },
-//                 ),
-//                 const SizedBox(height: 10),
-//                 _buildTextField(
-//                   controller: _emailController,
-//                   hintText: 'Email',
-//                   keyboardType: TextInputType.emailAddress,
-//                   icon: Icons.email,
-//                   validator: (value) {
-//                     if (value == null || value.isEmpty) {
-//                       return 'Please enter your email';
-//                     }
-//                     final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-//                     if (!emailRegex.hasMatch(value)) {
-//                       return 'Please enter a valid email';
-//                     }
-//                     return null;
-//                   },
-//                 ),
-//                 const SizedBox(height: 10),
-//                 _buildTextField(
-//                   controller: _passController,
-//                   hintText: 'Password',
-//                   obscureText: !_passwordVisible,
-//                   icon: Icons.lock_outline,
-//                   suffixIcon: IconButton(
-//                     icon: Icon(
-//                       _passwordVisible
-//                           ? Icons.visibility
-//                           : Icons.visibility_off,
-//                       color: Colors.grey,
-//                     ),
-//                     onPressed: () {
-//                       setState(() {
-//                         _passwordVisible = !_passwordVisible;
-//                       });
-//                     },
-//                   ),
-//                   validator: (value) {
-//                     if (value == null || value.isEmpty) {
-//                       return 'Please enter your password';
-//                     }
-//                     if (value.length < 8) {
-//                       return 'Password must be at least 8 characters long';
-//                     }
-//                     final hasLetter = RegExp(r'[a-zA-Z]').hasMatch(value);
-//                     final hasNumber = RegExp(r'[0-9]').hasMatch(value);
-//                     if (!hasLetter || !hasNumber) {
-//                       return 'Password must contain both letters and numbers';
-//                     }
-//                     // if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
-//                     //   return 'Password must contain a special character';
-//                     // }
-//                     return null;
-//                   },
-//                 ),
-//                 const SizedBox(height: 10),
-//                 _buildTextField(
-//                   controller: _repassController,
-//                   hintText: 'Confirm Password',
-//                   obscureText: !_confirmPasswordVisible,
-//                   icon: Icons.lock,
-//                   suffixIcon: IconButton(
-//                     icon: Icon(
-//                       _confirmPasswordVisible
-//                           ? Icons.visibility
-//                           : Icons.visibility_off,
-//                       color: Colors.grey,
-//                     ),
-//                     onPressed: () {
-//                       setState(() {
-//                         _confirmPasswordVisible = !_confirmPasswordVisible;
-//                       });
-//                     },
-//                   ),
-//                   validator: (value) {
-//                     if (value == null || value.isEmpty) {
-//                       return 'Please confirm your password';
-//                     }
-//                     if (value != _passController.text) {
-//                       return 'Passwords do not match';
-//                     }
-//                     return null;
-//                   },
-//                 ),
-//                 //const SizedBox(height: 20),
-
-//                 // Checkbox terms
-//                 Row(
-//                   children: [
-//                     Checkbox(
-//                       value: _acceptTerms,
-//                       activeColor: Colors.green,
-//                       onChanged: (bool? newValue) {
-//                         setState(() {
-//                           _acceptTerms = newValue ?? false;
-//                         });
-//                       },
-//                     ),
-//                     Text(
-//                       'I accept the ',
-//                       style: TextStyle(color: Colors.grey),
-//                     ),
-//                     TextButton(
-//                       onPressed: () {
-//                         Navigator.pushNamed(context, 'terms');
-//                       },
-//                       style: TextButton.styleFrom(
-//                         padding: EdgeInsets.zero,
-//                       ),
-//                       child: Text(
-//                         'terms and conditions.',
-//                         style: TextStyle(
-//                           color: Colors.green,
-//                           decoration: TextDecoration.underline,
-//                           decorationColor: Colors.green,
-//                         ),
-//                       ),
-//                     )
-//                   ],
-//                 ),
-//                 // const SizedBox(height: 20),
-//                 Center(
-//                   child: ElevatedButton(
-//                     onPressed: () async {
-//                       if (_formKey.currentState?.validate() ?? false) {
-//                         if (_acceptTerms) {
-//                           showSuccessSnackBar(context, 'Loading . . .');
-//                           String? errorMessage = await sendEmailCodeCreateAcc(
-//                               _emailController.text);
-//                           if (errorMessage != null) {
-//                             showErrorSnackBar(context, errorMessage);
-//                           } else {
-//                             Navigator.push(
-//                                 context,
-//                                 MaterialPageRoute(
-//                                     builder: (context) =>
-//                                         VerifyEmailCreateAccScreen(
-//                                             fname: _fnameController.text,
-//                                             lname: _lnameController.text,
-//                                             email: _emailController.text,
-//                                             password: _passController.text)));
-//                           }
-//                         } else {
-//                           showErrorSnackBar(context,
-//                               'You must accept the terms and conditions');
-//                         }
-//                       }
-//                     },
-//                     child: const Text('Continue'),
-//                     style: ElevatedButton.styleFrom(
-//                         backgroundColor: Colors.green,
-//                         padding: const EdgeInsets.symmetric(
-//                             horizontal: 100, vertical: 14),
-//                         textStyle: const TextStyle(
-//                             fontSize: 25, fontWeight: FontWeight.bold),
-//                         foregroundColor: Colors.white),
-//                   ),
-//                 ),
-//                 ElevatedButton(onPressed: (){
-//                   Navigator.push(context, MaterialPageRoute(builder: (context) => CreateAcc2()));
-//                 }, child: Text('Create2')),
-//                 Center(
-//                   child: Column(
-//                     children: [
-//                       SizedBox(height: 10.0),
-//                       Text(
-//                         'Or continue with',
-//                         style: TextStyle(color: Colors.white70, fontSize: 16.0),
-//                       ),
-//                       SizedBox(height: 10.0),
-//                       ElevatedButton.icon(
-//                         onPressed: () async {
-//                           //handleSignIn(); //google sign in
-//                            handleGoogleSignUp(context);
-//                           //Navigator.push(context, MaterialPageRoute(builder: (context) => C_HomeScreen()));
-//                         },
-//                         style: ElevatedButton.styleFrom(
-//                           backgroundColor: Colors.transparent,
-//                           shape: RoundedRectangleBorder(
-//                             borderRadius: BorderRadius.circular(30.0),
-//                             side: BorderSide(color: Colors.white54, width: 2.0),
-//                           ),
-//                           padding: EdgeInsets.symmetric(
-//                               vertical: 10.0, horizontal: 35.0),
-//                         ),
-//                         icon: Image.asset(
-//                           'assets/Brands.png',
-//                           height: 24.0,
-//                         ),
-//                         label: Text(
-//                           'Google',
-//                           style:
-//                               TextStyle(color: Colors.white70, fontSize: 18.0),
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                 ),
-//                 const SizedBox(height: 20),
-//                 Center(
-//                   child: Row(
-//                     mainAxisSize: MainAxisSize.min,
-//                     mainAxisAlignment: MainAxisAlignment.center,
-//                     children: [
-//                       Text(
-//                         'Already have an account?',
-//                         style: TextStyle(color: Colors.grey, fontSize: 16),
-//                       ),
-//                       TextButton(
-//                         onPressed: () {
-//                           Navigator.pushNamed(context, 'login');
-//                         },
-//                         style: TextButton.styleFrom(
-//                           padding: EdgeInsets.zero,
-//                         ),
-//                         child: const Text(
-//                           'Sign in',
-//                           style: TextStyle(
-//                             color: Colors.green,
-//                             fontSize: 16,
-//                             fontStyle: FontStyle.italic,
-//                             decoration: TextDecoration.underline,
-//                             decorationColor: Colors.green,
-//                           ),
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                 ),
-//               ],
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-
-//   Widget _buildTextField({
-//     required TextEditingController controller,
-//     required String hintText,
-//     bool obscureText = false,
-//     TextInputType keyboardType = TextInputType.text,
-//     required IconData icon,
-//     required FormFieldValidator<String> validator,
-//     Widget? suffixIcon,
-//   }) {
-//     return Theme(
-//       data: Theme.of(context).copyWith(
-//         inputDecorationTheme: InputDecorationTheme(
-//           errorStyle: TextStyle(
-//               color: const Color.fromARGB(
-//                   255, 255, 181, 176)), // Change error text color
-//         ),
-//       ),
-//       child: TextFormField(
-//         controller: controller,
-//         obscureText: obscureText,
-//         keyboardType: keyboardType,
-//         decoration: InputDecoration(
-//           hintText: hintText,
-//           hintStyle: TextStyle(color: Colors.grey),
-//           prefixIcon: Icon(icon, color: Colors.grey),
-//           suffixIcon: suffixIcon,
-//           filled: true,
-//           fillColor: Colors.white,
-//           border: OutlineInputBorder(
-//             borderRadius: BorderRadius.circular(30), // Rounded corners
-//           ),
-//           enabledBorder: OutlineInputBorder(
-//             borderRadius: BorderRadius.circular(30), // Rounded corners
-//             borderSide: const BorderSide(color: Colors.grey, width: 3.0),
-//           ),
-//           focusedBorder: OutlineInputBorder(
-//             borderRadius: BorderRadius.circular(30), // Rounded corners
-//             borderSide: const BorderSide(color: Colors.green, width: 5.0),
-//           ),
-//         ),
-//         validator: validator,
-//         onChanged: (value) {
-//           // Trigger validation on text change
-//           setState(() {
-//             _formKey.currentState?.validate();
-//           });
-//         },
-//       ),
-//     );
-//   }
-// }
-
-// import 'package:flutter/material.dart';
-
-// class CreateAcc extends StatefulWidget {
-//   @override
-//   _CreateAccState createState() => _CreateAccState();
-// }
-
-// class _CreateAccState extends State<CreateAcc> {
-//   PageController _pageController = PageController(initialPage: 0);
-
-//   // Form Data
-//   String? fname;
-//   String? lname;
-//   String? address;
-//   String? contact;
-//   String? email;
-//   String? password;
-//   String? confirmPassword;
-
-//   int _currentPage = 0;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text("Signup Flow"),
-//       ),
-//       body: Column(
-//         children: [
-//           _buildDotIndicator(),  // 3-dot Indicator
-//           Expanded(
-//             child: PageView(
-//               controller: _pageController,
-//               onPageChanged: (index) {
-//                 setState(() {
-//                   _currentPage = index;
-//                 });
-//               },
-//               children: [
-//                 _buildFirstPage(context),
-//                 _buildSecondPage(context),
-//                 _buildThirdPage(context),
-//               ],
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-
-//   // Dot indicator below AppBar
-//   Widget _buildDotIndicator() {
-//     return Row(
-//       mainAxisAlignment: MainAxisAlignment.center,
-//       children: List.generate(3, (index) {
-//         return Row(
-//           children: [
-//             Icon(
-//               Icons.circle,
-//               size: 10,
-//               color: _currentPage >= index ? Colors.green : Colors.grey,
-//             ),
-//             if (index != 2)
-//               Container(
-//                 width: 30,
-//                 height: 2,
-//                 color: _currentPage > index ? Colors.green : Colors.grey,
-//               ),
-//           ],
-//         );
-//       }),
-//     );
-//   }
-
-//   // First Page (Personal Details)
-//   Widget _buildFirstPage(BuildContext context) {
-//     return Padding(
-//       padding: const EdgeInsets.all(16.0),
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.stretch,
-//         children: [
-//           Text("Personal Details", style: TextStyle(fontSize: 24)),
-//           TextField(
-//             decoration: InputDecoration(labelText: "First Name"),
-//             onChanged: (value) => fname = value,
-//           ),
-//           TextField(
-//             decoration: InputDecoration(labelText: "Last Name"),
-//             onChanged: (value) => lname = value,
-//           ),
-//           TextField(
-//             decoration: InputDecoration(labelText: "Address"),
-//             onChanged: (value) => address = value,
-//           ),
-//           TextField(
-//             decoration: InputDecoration(labelText: "Contact Number"),
-//             keyboardType: TextInputType.phone,
-//             onChanged: (value) => contact = value,
-//           ),
-//           SizedBox(height: 20),
-//           ElevatedButton(
-//             onPressed: () {
-//               _pageController.nextPage(
-//                 duration: Duration(milliseconds: 300),
-//                 curve: Curves.ease,
-//               );
-//             },
-//             child: Text("Next"),
-//           ),
-//           SizedBox(height: 20),
-//           TextButton(
-//             onPressed: () {
-//               // Google Sign-In function
-//             },
-//             child: Text("Continue with Google"),
-//           ),
-//           TextButton(
-//             onPressed: () {
-//               // Navigate to Sign In
-//             },
-//             child: Text("Already have an account? Sign in"),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-
-//   // Second Page (Account Details)
-//   Widget _buildSecondPage(BuildContext context) {
-//     return Padding(
-//       padding: const EdgeInsets.all(16.0),
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.stretch,
-//         children: [
-//           Text("Account Details", style: TextStyle(fontSize: 24)),
-//           TextField(
-//             decoration: InputDecoration(labelText: "Email"),
-//             onChanged: (value) => email = value,
-//           ),
-//           TextField(
-//             decoration: InputDecoration(labelText: "Password"),
-//             obscureText: true,
-//             onChanged: (value) => password = value,
-//           ),
-//           TextField(
-//             decoration: InputDecoration(labelText: "Confirm Password"),
-//             obscureText: true,
-//             onChanged: (value) => confirmPassword = value,
-//           ),
-//           SizedBox(height: 20),
-//           ElevatedButton(
-//             onPressed: () {
-//               _pageController.nextPage(
-//                 duration: Duration(milliseconds: 300),
-//                 curve: Curves.ease,
-//               );
-//             },
-//             child: Text("Next"),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-
-//   // Third Page (Email Verification)
-//   Widget _buildThirdPage(BuildContext context) {
-//     return Padding(
-//       padding: const EdgeInsets.all(16.0),
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.stretch,
-//         children: [
-//           Text("Verify Email", style: TextStyle(fontSize: 24)),
-//           Text("We sent a code to your email."),
-//           // Add your verification code input here
-//           SizedBox(height: 20),
-//           ElevatedButton(
-//             onPressed: () {
-//               // Perform verification and move forward
-//             },
-//             child: Text("Verify"),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
+//1815

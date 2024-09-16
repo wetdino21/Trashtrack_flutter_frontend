@@ -10,7 +10,6 @@ import 'package:trashtrack/Customer/c_notification.dart';
 import 'package:trashtrack/Customer/c_payment.dart';
 import 'package:trashtrack/Customer/c_profile.dart';
 
-
 //hauler library
 import 'package:trashtrack/Hauler/Schedule.dart';
 import 'package:trashtrack/Hauler/Vehicle.dart';
@@ -33,31 +32,30 @@ import 'package:trashtrack/splash_screen.dart';
 import 'package:trashtrack/suspended.dart';
 import 'package:trashtrack/terms_conditions.dart';
 ////asds
+import 'package:hive_flutter/hive_flutter.dart';
 
-
-
-void main() async{
-   WidgetsFlutterBinding.ensureInitialized();
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
   runApp(MyApp());
- // runApp(const MyApp());
+  // runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     //token
-    
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       //initialRoute: initialRoute,
       home: TokenCheck(),
       routes: {
-        
         'splash': (context) => SplashScreen(),
         'terms': (context) => const TermsAndConditions(),
         'forgot_pass': (context) => const ForgotPassword(),
-       // 'email_verify': (context) => EmailVerification(),
-        'create_acc': (context) =>  CreateAcc(),
+        // 'email_verify': (context) => EmailVerification(),
+        'create_acc': (context) => CreateAcc(),
         'login': (context) => const LoginPage(),
         'deactivated': (context) => const DeactivatedScreen(),
         'suspended': (context) => const SuspendedScreen(),
@@ -83,7 +81,6 @@ class MyApp extends StatelessWidget {
         'c_notification': (context) => C_NotificationScreen(),
         'c_profile': (context) => C_ProfileScreen(),
       },
-      
     );
   }
 }
@@ -117,17 +114,17 @@ class _TokenCheckState extends State<TokenCheck> {
       body: Center(
         child: Column(
           children: [
-            
             Center(
               child: Image.asset('assets/truck.png'),
             ),
-             ElevatedButton(onPressed: (){
-                deleteTokens(context);
-              }, child: Text('delete token')),
+            ElevatedButton(
+                onPressed: () {
+                  deleteTokens(context);
+                },
+                child: Text('delete token')),
           ],
         ), // Show a loading screen while checking the token
       ),
     );
   }
 }
-

@@ -164,9 +164,9 @@ class _LoginPageState extends State<LoginPage> {
                         // If there's an error, show it in a SnackBar
                         if (dbMessage != null) {
                           if (dbMessage == 'customer') {
-                            Navigator.pushNamed(context, 'c_home');
+                            Navigator.pushReplacementNamed(context, 'c_home');
                           } else if (dbMessage == 'hauler') {
-                            Navigator.pushNamed(context, 'home');
+                            Navigator.pushReplacementNamed(context, 'home');
                           } else if (dbMessage == '202') {
                             Navigator.pushNamed(context, 'deactivated');
                           } else if (dbMessage == '203') {

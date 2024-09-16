@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:trashtrack/Customer/c_api_userdata.dart';
+import 'package:trashtrack/Customer/c_api_cus_data.dart';
 import 'package:trashtrack/api_token.dart';
 import 'package:trashtrack/styles.dart';
 
@@ -28,11 +28,10 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
   Future<void> _dbData() async {
     try {
       final data = await fetchCusData(context);
-      setState(() {
-        userData = data;
-        isLoading = false;
+      userData = data;
+      isLoading = false;
 
-        // Decode base64 image only if it exists
+      setState(() {
         if (userData?['profileImage'] != null) {
           imageBytes = base64Decode(userData!['profileImage']);
         }
@@ -47,10 +46,10 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Uint8List? imageBytes;
-    if (userData != null && userData!['profileImage'] != null) {
-      imageBytes = base64Decode(userData!['profileImage']);
-    }
+    // Uint8List? imageBytes;
+    // if (userData != null && userData!['profileImage'] != null) {
+    //   imageBytes = base64Decode(userData!['profileImage']);
+    // }
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -82,26 +81,33 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
             ? Center(child: CircularProgressIndicator())
             : userData != null
                 ? ListView(
-                   // padding: const EdgeInsets.all(16.0),
+                    // padding: const EdgeInsets.all(16.0),
                     children: [
                       Column(
                         children: [
                           imageBytes != null
                               ? Container(
-                                padding: EdgeInsets.all(7),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(80),
-                                  color: accentColor
-                                ),
-                                child: CircleAvatar(
+                                  padding: EdgeInsets.all(7),
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(80),
+                                      color: Colors.deepPurple),
+                                  child: CircleAvatar(
                                     radius: 50,
-                                    backgroundImage: MemoryImage(imageBytes),
+                                    backgroundImage: MemoryImage(imageBytes!),
                                   ),
-                              )
-                              : Icon(
-                                  Icons.person,
-                                  size: 30,
+                                )
+                              : Container(
+                                  padding: EdgeInsets.all(7),
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(80),
+                                      color: Colors.deepPurple),
+                                  child: Icon(
+                                    Icons.person,
+                                    size: 100,
+                                    color: Colors.white,
+                                  ),
                                 ),
+
                           SizedBox(height: 10),
                           // Text(
                           //   '${userData?['cus_fname'] ?? ''} ${userData?['cus_mname'] ?? ''} ${userData?['cus_lname'] ?? ''}'
@@ -120,10 +126,11 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                             color: backgroundColor,
                             child: Column(
                               children: [
-                               SizedBox(height: 30),
+                                SizedBox(height: 30),
                                 ProfileDetailRow(
                                     label: 'Full Name',
-                                    value: '${userData?['cus_fname'] ?? ''} ${userData?['cus_mname'] ?? ''} ${userData?['cus_lname'] ?? ''}'),
+                                    value:
+                                        '${userData?['cus_fname'] ?? ''} ${userData?['cus_mname'] ?? ''} ${userData?['cus_lname'] ?? ''}'),
                                 ProfileDetailRow(
                                     label: 'Email',
                                     value: userData?['cus_email'] ?? ''),
@@ -180,7 +187,7 @@ class ProfileDetailRow extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-           Divider(),
+          Divider(),
         ],
       ),
     );

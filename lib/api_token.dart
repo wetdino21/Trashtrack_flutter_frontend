@@ -5,6 +5,7 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:flutter/material.dart';
 import 'package:trashtrack/api_network.dart';
 import 'package:trashtrack/styles.dart';
+import 'package:hive/hive.dart';
 
 final storage = FlutterSecureStorage();
 
@@ -101,6 +102,8 @@ Future<void> deleteTokens(BuildContext context) async {
   await storage.delete(key: 'access_token');
   await storage.delete(key: 'refresh_token');
 
+  //delete hive boxe
+  await Hive.deleteBoxFromDisk('myBox');
   // showErrorSnackBar(
   //     context, 'Your active time has been expired. \nPlease login again.');
   Navigator.pushNamedAndRemoveUntil(

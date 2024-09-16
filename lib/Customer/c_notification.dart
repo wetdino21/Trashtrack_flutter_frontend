@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:trashtrack/Customer/c_api_userdata.dart';
+import 'package:trashtrack/Customer/c_api_cus_data.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:intl/intl.dart';
 
@@ -49,15 +49,11 @@ class _C_NotificationScreenState extends State<C_NotificationScreen> {
         child: isLoading
             ? Center(child: CircularProgressIndicator())
             : notifications == null
-                ? ListView(
-                    children: [
-                      Center(
-                          child: Text(
-                        'No notifications available.',
-                        style: TextStyle(color: accentColor, fontSize: 20),
-                      )),
-                    ],
-                  )
+                ? Center(
+                    child: Text(
+                  'No available notification.\n\n\n\n',
+                  style: TextStyle(color: accentColor, fontSize: 20),
+                ))
                 : ListView.builder(
                     padding: const EdgeInsets.all(5),
                     itemCount: notifications!.length,

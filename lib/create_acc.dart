@@ -1407,21 +1407,31 @@ class _CreateAccState extends State<CreateAcc> {
                           // If no errors, proceed with incrementing the step
                           if (_currentStep < 3) {
                             if (_acceptTerms) {
-                              if(isGoogle) {
-                                await createGoogleAccount(context, _accountDetails?.email??'',  _accountDetails?.photoBytes != null ? _accountDetails!.photoBytes! : null, 
-                                _fnameController.text, _mnameController.text, _lnameController.text,('0' + _contactController.text),
-                                 _selectedProvinceName!, _selectedCityMunicipalityName!, _selectedBarangayName!, _streetController.text, _postalController.text);
+                              if (isGoogle) {
+                                await createGoogleAccount(
+                                    context,
+                                    _accountDetails?.email ?? '',
+                                    _accountDetails?.photoBytes != null
+                                        ? _accountDetails!.photoBytes!
+                                        : null,
+                                    _fnameController.text,
+                                    _mnameController.text,
+                                    _lnameController.text,
+                                    ('0' + _contactController.text),
+                                    _selectedProvinceName!,
+                                    _selectedCityMunicipalityName!,
+                                    _selectedBarangayName!,
+                                    _streetController.text,
+                                    _postalController.text);
+                              } else {
+                                setState(() {
+                                  _currentStep++;
+                                  if (emailChanged == true) {
+                                    emailChanged = false;
+                                    _resendCode();
+                                  }
+                                });
                               }
-                              else{
-                                 setState(() {
-                                _currentStep++;
-                                if (emailChanged == true) {
-                                  emailChanged = false;
-                                  _resendCode();
-                                }
-                              });
-                              }
-                             
                             } else {
                               showErrorSnackBar(context,
                                   'You must accept the terms and conditions');
@@ -1641,6 +1651,7 @@ class _CreateAccState extends State<CreateAcc> {
                         // showSuccessSnackBar(
                         //     context, 'Successful Email Verification');
                         String? createMessage = await createCustomer(
+                            context,
                             _emailController.text,
                             _passController.text,
                             _fnameController.text,
@@ -1994,6 +2005,7 @@ class SuccessfulGoogleRegistration extends StatelessWidget {
     );
   }
 }
+
 // Custom Text Field with Active Border Color Change
 class CustomTextField extends StatefulWidget {
   final String labelText;

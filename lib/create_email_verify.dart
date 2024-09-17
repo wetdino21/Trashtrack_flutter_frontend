@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:trashtrack/Customer/c_home.dart';
 import 'package:trashtrack/api_email_service.dart';
-import 'package:trashtrack/api_postgre_service.dart';
 import 'package:trashtrack/styles.dart';
 
 class VerifyEmailCreateAccScreen extends StatefulWidget {

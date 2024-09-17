@@ -8,6 +8,7 @@ import 'package:trashtrack/api_token.dart';
 import 'package:trashtrack/create_acc.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:trashtrack/user_date.dart';
 
 // final String baseUrl = 'http://192.168.254.187:3000';
 String baseUrl = globalUrl();
@@ -15,8 +16,7 @@ String baseUrl = globalUrl();
 // Google Sign-In instance
 final GoogleSignIn _googleSignIn = GoogleSignIn();
 
-
-//store the fetch google data 
+//store the fetch google data
 class GoogleAccountDetails {
   final String fname;
   final String lname;
@@ -41,11 +41,44 @@ Future<GoogleAccountDetails?> handleGoogleSignUp(BuildContext context) async {
       // final String? idToken = auth.idToken;
 
       // Extract user info
-      String? fullname = user.displayName;
-      String fname = fullname != null ? fullname.split(' ').first : '';
-      String lname = fullname != null ? fullname.split(' ').last : '';
+      String fullname = user.displayName == null ? '' : user.displayName!;
+      // String fname = fullname != null ? fullname.split(' ').first : '';
+      // String lname = fullname != null ? fullname.split(' ').last : '';
       String email = user.email;
       String? photoUrl = user.photoUrl;
+
+      List<String> nameParts = fullname.trim().split(RegExp(r'\s+'));
+
+      String? fname;
+      String? lname;
+
+      // Handle based on the number of words
+      switch (nameParts.length) {
+        case 1:
+          // If only one word, it's the first name, last name is null
+          fname = nameParts[0];
+          lname = null;
+          break;
+        case 2:
+          // If two words, first word is first name, second word is last name
+          fname = nameParts[0];
+          lname = nameParts[1];
+          break;
+        case 3:
+          // If three words, first two words are first name, last word is last name
+          fname = '${nameParts[0]} ${nameParts[1]}';
+          lname = nameParts[2];
+          break;
+        case 4:
+          // If four words, first two words are first name, last two are last name
+          fname = '${nameParts[0]} ${nameParts[1]}';
+          lname = '${nameParts[2]} ${nameParts[3]}';
+          break;
+        default:
+          // If five or more words, first three are first name, the rest are last name
+          fname = '${nameParts[0]} ${nameParts[1]} ${nameParts[2]}';
+          lname = nameParts.sublist(3).join(' ');
+      }
 
       //// Fetch Google profile photo
       // Uint8List? photoBytes;
@@ -82,7 +115,7 @@ Future<GoogleAccountDetails?> handleGoogleSignUp(BuildContext context) async {
         // If successful, return GoogleAccountDetails
         return GoogleAccountDetails(
           fname: fname,
-          lname: lname,
+          lname: lname == null ? '' : lname,
           email: email,
           photoBytes: photoBytes,
         );
@@ -104,85 +137,26 @@ Future<GoogleAccountDetails?> handleGoogleSignUp(BuildContext context) async {
   return null;
 }
 
-// void onPressedSignUp(BuildContext context) async {
-//   GoogleAccountDetails? accountDetails = await handleGoogleSignUp(context);
-
-//   if (accountDetails != null) {
-//     // If the sign-up was successful, navigate to the next page
-//     Navigator.push(
-//       context,
-//       MaterialPageRoute(
-//         builder: (context) => NextPage(accountDetails: accountDetails),
-//       ),
-//     );
-//   } else {
-//     // Stay on the page if there's an error
-//     print('Error occurred during sign-up, staying on the same page');
-//   }
-// }
-
-// // Method to handle Google Sign-In
-// Future<void> handleGoogleSignUp(BuildContext context) async {
-//   try {
-//     GoogleSignInAccount? user = await _googleSignIn.signIn();
-
-//     if (user != null) {
-//       final GoogleSignInAuthentication auth = await user.authentication;
-//       // Access token and other details
-//       final String? accessToken = auth.accessToken;
-//       final String? idToken = auth.idToken;
-
-//       print('Signed in: ${user.displayName}');
-//       print('Email: ${user.email}');
-//       print('Photo URL: ${user.photoUrl}');
-
-//       print('Access Token: $accessToken');
-//       print('ID Token: $idToken');
-//       // Extract user info
-//       String? fullname = user.displayName;
-//       String fname = fullname != null ? fullname.split(' ').first : '';
-//       String lname = fullname != null ? fullname.split(' ').last : '';
-//       String email = user.email;
-//       String? photoUrl = user.photoUrl;
-
-//       // Fetch Google profile photo
-//       Uint8List? photoBytes;
-//       if (photoUrl != null) {
-//         http.Response response = await http.get(Uri.parse(photoUrl));
-//         if (response.statusCode == 200) {
-//           photoBytes = response.bodyBytes;
-//         }
-//       }
-
-//       // Check if email already exists in the database
-//       String? dbMessage = await emailCheck(email);
-//       if (dbMessage != null) {
-//         showErrorSnackBar(context, dbMessage); // Show error if email exists
-//       } else {
-//         // If email doesn't exist, create a new Google account
-//        await createGoogleAccount(context, fname, lname, email, photoBytes);
-//          // If successful, return GoogleAccountDetails
-//       }
-//     } else {
-//       print('Sign-in canceled');
-//     }
-
-//     // Sign out from Google after creating the account or checking the email
-//     await _handleSignOut();
-//   } catch (error) {
-//     print('Sign-in failed: $error');
-//     showErrorSnackBar(context, 'Sign-in failed: $error');
-//   }
-// }
-
 // Sign-out from Google
 Future<void> _handleSignOut() async {
   await _googleSignIn.signOut();
   print('Signed out');
 }
 
-Future<void> createGoogleAccount(BuildContext context,  String email, Uint8List? photoBytes, String fname, String mname,
-    String lname, String contact, String province, String city, String brgy, String street, String postal,) async {
+Future<void> createGoogleAccount(
+  BuildContext context,
+  String email,
+  Uint8List? photoBytes,
+  String fname,
+  String mname,
+  String lname,
+  String contact,
+  String province,
+  String city,
+  String brgy,
+  String street,
+  String postal,
+) async {
   final response = await http.post(
     Uri.parse('$baseUrl/signup_google'),
     headers: {'Content-Type': 'application/json'},
@@ -198,7 +172,6 @@ Future<void> createGoogleAccount(BuildContext context,  String email, Uint8List?
       'brgy': brgy,
       'street': street,
       'postal': postal,
-      
     }),
   );
 
@@ -208,21 +181,14 @@ Future<void> createGoogleAccount(BuildContext context,  String email, Uint8List?
     final String accessToken = responseData['accessToken'];
     final String refreshToken = responseData['refreshToken'];
     storeTokens(accessToken, refreshToken);
+    storeDataInHive(context); // store data to local
 
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) =>  SuccessfulGoogleRegistration(),
+        builder: (context) => SuccessfulGoogleRegistration(),
       ),
     );
-    // showSuccessSnackBar(context, 'Successfully Created Account');
-
-    // Navigator.pushReplacement(
-    //   context,
-    //   MaterialPageRoute(
-    //     builder: (context) => C_HomeScreen(),
-    //   ),
-    // );
   } else {
     showSuccessSnackBar(context, response.body);
     print('Failed to create account');
@@ -234,39 +200,6 @@ Future<void> handleSignOut() async {
   await _googleSignIn.signOut();
   print('Signed out');
 }
-
-// Future<void> createGoogleAccount(BuildContext context, String fname,
-//     String lname, String email, Uint8List? photoBytes) async {
-//   final response = await http.post(
-//     Uri.parse('$baseUrl/signup_google'),
-//     headers: {'Content-Type': 'application/json'},
-//     body: jsonEncode({
-//       'fname': fname,
-//       'lname': lname,
-//       'email': email,
-//       'photo': photoBytes != null ? base64Encode(photoBytes) : null,
-//     }),
-//   );
-
-//   if (response.statusCode == 201) {
-//     //store token to storage
-//     final responseData = jsonDecode(response.body);
-//     final String accessToken = responseData['accessToken'];
-//     final String refreshToken = responseData['refreshToken'];
-//     storeTokens(accessToken, refreshToken);
-
-//     showSuccessSnackBar(context, 'Successfully Created Account');
-
-//     Navigator.pushReplacement(
-//       context,
-//       MaterialPageRoute(
-//         builder: (context) => C_HomeScreen(),
-//       ),
-//     );
-//   } else {
-//     print('Failed to create account');
-//   }
-// }
 
 //////handle GOOGLE login
 Future<void> handleGoogleSignIn(BuildContext context) async {
@@ -320,6 +253,7 @@ Future<String> loginWithGoogle(BuildContext context, String email) async {
     final String accessToken = responseData['accessToken'];
     final String refreshToken = responseData['refreshToken'];
     storeTokens(accessToken, refreshToken);
+    storeDataInHive(context); // store data to local
 
     if (response.statusCode == 200) {
       print('Login successfully');

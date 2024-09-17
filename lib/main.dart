@@ -52,7 +52,7 @@ class MyApp extends StatelessWidget {
       home: TokenCheck(),
       routes: {
         'splash': (context) => SplashScreen(),
-        'terms': (context) => const TermsAndConditions(),
+        'terms': (context) => TermsAndConditions(),
         'forgot_pass': (context) => const ForgotPassword(),
         // 'email_verify': (context) => EmailVerification(),
         'create_acc': (context) => CreateAcc(),

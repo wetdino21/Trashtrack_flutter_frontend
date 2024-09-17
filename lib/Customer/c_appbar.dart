@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:trashtrack/Customer/c_api_cus_data.dart';
 import 'package:trashtrack/styles.dart';
-import 'dart:convert'; // for base64 decoding
 import 'dart:typed_data'; // for Uint8List
+import 'package:trashtrack/user_date.dart';
 
 class C_CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final String title;
@@ -25,14 +24,20 @@ class _C_CustomAppBarState extends State<C_CustomAppBar> {
     _loadProfileImage();
   }
 
-
   Future<void> _loadProfileImage() async {
-     String? base64Image = await fetchProfile(context);
-      if (base64Image != null) {
-        setState(() {
-          imageBytes = base64Decode(base64Image);
-        });
-      }
+    final data = await userDataFromHive();
+    setState(() {
+       imageBytes = data['profile'];
+    });
+   
+    //  String? base64Image = await fetchProfile(context);
+    //   if (base64Image != null) {
+    //     setState(() {
+    //       imageBytes = base64Decode(base64Image);
+    //     });
+    //   }
+
+   // await box.close();
   }
 
   @override

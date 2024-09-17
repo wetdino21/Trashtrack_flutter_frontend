@@ -14,6 +14,8 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
   bool _passwordVisible = false;
+  String emailvalidator = '';
+  String passvalidator = '';
 
   final _formKey = GlobalKey<FormState>();
 
@@ -59,28 +61,40 @@ class _LoginPageState extends State<LoginPage> {
                   style: TextStyle(color: Colors.grey),
                 ),
                 const SizedBox(height: 50),
+                // _buildTextField(
+                //   controller: _emailController,
+                //   hintText: 'Email',
+                //   keyboardType: TextInputType.emailAddress,
+                //   icon: Icons.email,
+                //   validator: (value) {
+                //     if (value == null || value.isEmpty) {
+                //       return 'Please enter your email';
+                //     }
+                //     final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+                //     if (!emailRegex.hasMatch(value)) {
+                //       return 'Please enter a valid email';
+                //     }
+                //     return null;
+                //   },
+                // ),
                 _buildTextField(
                   controller: _emailController,
                   hintText: 'Email',
                   keyboardType: TextInputType.emailAddress,
                   icon: Icons.email,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
-                    }
-                    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-                    if (!emailRegex.hasMatch(value)) {
-                      return 'Please enter a valid email';
-                    }
-                    return null;
+                  onChanged: (value) {
+                    setState(() {
+                      emailvalidator = _validateEmail(value);
+                    });
                   },
                 ),
+                _validator(emailvalidator),
                 const SizedBox(height: 30),
                 _buildTextField(
                   controller: _passController,
                   hintText: 'Password',
                   obscureText: !_passwordVisible,
-                  icon: Icons.lock,
+                  icon: Icons.lock_outline,
                   suffixIcon: IconButton(
                     icon: Icon(
                       _passwordVisible
@@ -94,21 +108,47 @@ class _LoginPageState extends State<LoginPage> {
                       });
                     },
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your password';
-                    }
-                    // if (value.length < 8) {
-                    //   return 'Password must be at least 8 characters long';
-                    // }
-                    // final hasLetter = RegExp(r'[a-zA-Z]').hasMatch(value);
-                    // final hasNumber = RegExp(r'[0-9]').hasMatch(value);
-                    // if (!hasLetter || !hasNumber) {
-                    //   return 'Password must contain both letters and numbers';
-                    // }
-                    return null;
+                  onChanged: (value) {
+                    setState(() {
+                      passvalidator = _validatePassword(
+                          value); // Trigger validation on text change
+                    });
                   },
                 ),
+                _validator(passvalidator),
+                // _buildTextField(
+                //   controller: _passController,
+                //   hintText: 'Password',
+                //   obscureText: !_passwordVisible,
+                //   icon: Icons.lock,
+                //   suffixIcon: IconButton(
+                //     icon: Icon(
+                //       _passwordVisible
+                //           ? Icons.visibility
+                //           : Icons.visibility_off,
+                //       color: Colors.grey,
+                //     ),
+                //     onPressed: () {
+                //       setState(() {
+                //         _passwordVisible = !_passwordVisible;
+                //       });
+                //     },
+                //   ),
+                //   validator: (value) {
+                //     if (value == null || value.isEmpty) {
+                //       return 'Please enter your password';
+                //     }
+                //     // if (value.length < 8) {
+                //     //   return 'Password must be at least 8 characters long';
+                //     // }
+                //     // final hasLetter = RegExp(r'[a-zA-Z]').hasMatch(value);
+                //     // final hasNumber = RegExp(r'[0-9]').hasMatch(value);
+                //     // if (!hasLetter || !hasNumber) {
+                //     //   return 'Password must contain both letters and numbers';
+                //     // }
+                //     return null;
+                //   },
+                // ),
 
                 const SizedBox(height: 10),
                 Align(
@@ -157,15 +197,28 @@ class _LoginPageState extends State<LoginPage> {
                 Center(
                   child: ElevatedButton(
                     onPressed: () async {
-                      if (_formKey.currentState?.validate() ?? false) {
-                        String? dbMessage = await loginAccount(
+                      if ((_emailController.text.isEmpty ||
+                              emailvalidator.isNotEmpty) ||
+                          (_passController.text.isEmpty ||
+                              passvalidator.isNotEmpty)) {
+                        setState(() {
+                          emailvalidator =
+                              _validateEmail(_emailController.text);
+                          passvalidator =
+                              _validatePassword(_passController.text);
+                        });
+                        // Show any existing error message
+                      } else {
+                        String? dbMessage = await loginAccount(context,
                             _emailController.text, _passController.text);
 
                         // If there's an error, show it in a SnackBar
                         if (dbMessage != null) {
                           if (dbMessage == 'customer') {
+                            ScaffoldMessenger.of(context).clearSnackBars();
                             Navigator.pushReplacementNamed(context, 'c_home');
                           } else if (dbMessage == 'hauler') {
+                            ScaffoldMessenger.of(context).clearSnackBars();
                             Navigator.pushReplacementNamed(context, 'home');
                           } else if (dbMessage == '202') {
                             Navigator.pushNamed(context, 'deactivated');
@@ -178,6 +231,28 @@ class _LoginPageState extends State<LoginPage> {
                           // Navigator.pushNamed(context, 'c_home');
                         }
                       }
+
+                      // if (_formKey.currentState?.validate() ?? false) {
+                      //   String? dbMessage = await loginAccount(
+                      //       _emailController.text, _passController.text);
+
+                      //   // If there's an error, show it in a SnackBar
+                      //   if (dbMessage != null) {
+                      //     if (dbMessage == 'customer') {
+                      //       Navigator.pushReplacementNamed(context, 'c_home');
+                      //     } else if (dbMessage == 'hauler') {
+                      //       Navigator.pushReplacementNamed(context, 'home');
+                      //     } else if (dbMessage == '202') {
+                      //       Navigator.pushNamed(context, 'deactivated');
+                      //     } else if (dbMessage == '203') {
+                      //       Navigator.pushNamed(context, 'suspended');
+                      //     } else {
+                      //       showErrorSnackBar(context, dbMessage);
+                      //     }
+                      //   } else {
+                      //     // Navigator.pushNamed(context, 'c_home');
+                      //   }
+                      // }
                     },
                     child: const Text('Login'),
                     style: ElevatedButton.styleFrom(
@@ -267,13 +342,52 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  // Validator All
+  _validator(String showValidator) {
+    return showValidator != ''
+        ? Text(
+            showValidator,
+            style: TextStyle(color: Colors.redAccent[100]),
+          )
+        : SizedBox();
+  }
+
+  // Validator for email
+  String _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter your email';
+    }
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    if (!emailRegex.hasMatch(value)) {
+      return 'Please enter a valid email';
+    }
+    return '';
+  }
+
+// Validator for password
+  String _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter your password';
+    }
+    // if (value.length < 8) {
+    //   return 'Password must be at least 8 characters long';
+    // }
+    // final hasLetter = RegExp(r'[a-zA-Z]').hasMatch(value);
+    // final hasNumber = RegExp(r'[0-9]').hasMatch(value);
+    // if (!hasLetter || !hasNumber) {
+    //   return 'Password must contain both letters and numbers';
+    // }
+    return '';
+  }
+
   Widget _buildTextField({
     required TextEditingController controller,
     required String hintText,
     bool obscureText = false,
     TextInputType keyboardType = TextInputType.text,
     required IconData icon,
-    required FormFieldValidator<String> validator,
+    //required FormFieldValidator<String> validator,
+    required ValueChanged<String?> onChanged,
     Widget? suffixIcon,
   }) {
     return Theme(
@@ -281,7 +395,7 @@ class _LoginPageState extends State<LoginPage> {
         inputDecorationTheme: InputDecorationTheme(
           errorStyle: TextStyle(
               color: const Color.fromARGB(
-                  255, 255, 181, 176)), // Change error text color here
+                  255, 255, 181, 176)), // Change error text color
         ),
       ),
       child: TextFormField(
@@ -289,9 +403,13 @@ class _LoginPageState extends State<LoginPage> {
         obscureText: obscureText,
         keyboardType: keyboardType,
         decoration: InputDecoration(
-          hintText: hintText,
-          hintStyle: TextStyle(color: Colors.grey),
-          prefixIcon: Icon(icon, color: Colors.green[600]),
+          labelText:
+              hintText, // This will move the hint text to the upper left when focused
+          floatingLabelBehavior: FloatingLabelBehavior.auto,
+          labelStyle: TextStyle(color: Colors.grey),
+          //hintText: hintText,
+          //hintStyle: TextStyle(color: Colors.green),
+          prefixIcon: Icon(icon, color: Colors.green),
           suffixIcon: suffixIcon,
           filled: true,
           fillColor: Colors.white,
@@ -307,14 +425,67 @@ class _LoginPageState extends State<LoginPage> {
             borderSide: const BorderSide(color: Colors.green, width: 5.0),
           ),
         ),
-        validator: validator,
-        onChanged: (value) {
-          // Trigger validation on text change
-          setState(() {
-            _formKey.currentState?.validate();
-          });
-        },
+        //validator: validator,
+        onChanged: onChanged,
+        // onChanged: (value) {
+        //   // Trigger validation on text change
+        //   setState(() {
+        //     _formKey.currentState?.validate();
+        //   });
+        // },
       ),
     );
   }
 }
+
+//   Widget _buildTextField({
+//     required TextEditingController controller,
+//     required String hintText,
+//     bool obscureText = false,
+//     TextInputType keyboardType = TextInputType.text,
+//     required IconData icon,
+//     required FormFieldValidator<String> validator,
+//     Widget? suffixIcon,
+//   }) {
+//     return Theme(
+//       data: Theme.of(context).copyWith(
+//         inputDecorationTheme: InputDecorationTheme(
+//           errorStyle: TextStyle(
+//               color: const Color.fromARGB(
+//                   255, 255, 181, 176)), // Change error text color here
+//         ),
+//       ),
+//       child: TextFormField(
+//         controller: controller,
+//         obscureText: obscureText,
+//         keyboardType: keyboardType,
+//         decoration: InputDecoration(
+//           hintText: hintText,
+//           hintStyle: TextStyle(color: Colors.grey),
+//           prefixIcon: Icon(icon, color: Colors.green[600]),
+//           suffixIcon: suffixIcon,
+//           filled: true,
+//           fillColor: Colors.white,
+//           border: OutlineInputBorder(
+//             borderRadius: BorderRadius.circular(10), // Rounded corners
+//           ),
+//           enabledBorder: OutlineInputBorder(
+//             borderRadius: BorderRadius.circular(10), // Rounded corners
+//             borderSide: const BorderSide(color: Colors.grey, width: 3.0),
+//           ),
+//           focusedBorder: OutlineInputBorder(
+//             borderRadius: BorderRadius.circular(10), // Rounded corners
+//             borderSide: const BorderSide(color: Colors.green, width: 5.0),
+//           ),
+//         ),
+//         validator: validator,
+//         onChanged: (value) {
+//           // Trigger validation on text change
+//           setState(() {
+//             _formKey.currentState?.validate();
+//           });
+//         },
+//       ),
+//     );
+//   }
+// }

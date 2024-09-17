@@ -4,6 +4,7 @@ import 'package:trashtrack/api_network.dart';
 import 'package:trashtrack/api_token.dart';
 import 'package:flutter/material.dart';
 import 'package:trashtrack/styles.dart';
+import 'package:trashtrack/user_date.dart';
 
 // final String baseUrl = 'http://192.168.254.187:3000';
 String baseUrl = globalUrl();
@@ -118,6 +119,7 @@ Future<String?> emailCheckforgotpass(String email) async {
 // }
 
 Future<String?> createCustomer(
+    BuildContext context,
     String email,
     String password,
     String fname,
@@ -155,17 +157,18 @@ Future<String?> createCustomer(
     final String accessToken = responseData['accessToken'];
     final String refreshToken = responseData['refreshToken'];
     storeTokens(accessToken, refreshToken);
+    storeDataInHive(context); // store data to local
 
     return null; // No error, return null
-  }
-  else {
+  } else {
     //print('Error response: ${response.body}');
     print('Failed to create customer');
     return 'error';
   }
 }
 
-Future<String?> loginAccount(String email, String password) async {
+Future<String?> loginAccount(
+    BuildContext context, String email, String password) async {
   final response = await http.post(
     Uri.parse('$baseUrl/login'),
     headers: {'Content-Type': 'application/json'},
@@ -181,6 +184,8 @@ Future<String?> loginAccount(String email, String password) async {
     final String accessToken = responseData['accessToken'];
     final String refreshToken = responseData['refreshToken'];
     storeTokens(accessToken, refreshToken);
+    storeDataInHive(context); // store data to local
+
     print('Login successfully');
     if (response.statusCode == 200) {
       return 'customer'; // No error
@@ -204,6 +209,7 @@ Future<String?> loginAccount(String email, String password) async {
     print('Error response: ${response.body}');
     return response.body;
   }
+  return response.body;
 }
 
 Future<String?> updatepassword(String email, String newPassword) async {

@@ -103,7 +103,7 @@ Future<void> deleteTokens(BuildContext context) async {
   await storage.delete(key: 'refresh_token');
 
   //delete hive boxe
-  await Hive.deleteBoxFromDisk('myBox');
+  await Hive.deleteBoxFromDisk('mybox');
   // showErrorSnackBar(
   //     context, 'Your active time has been expired. \nPlease login again.');
   Navigator.pushNamedAndRemoveUntil(
@@ -182,6 +182,7 @@ Future<String?> refreshAccessToken(BuildContext context) async {
     await deleteTokens(context); // Logout user if refresh token is invalid
     return 'invalid/expired token';
   }
+  return response.body;
 }
 
 // On open App stay login?
@@ -277,3 +278,34 @@ Future<String> onOpenApp(BuildContext context) async {
 //   }
 // }
 
+
+  void showLogoutConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.red,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(15.0))),
+          title: Text('Logout', style: TextStyle(color: Colors.white)),
+          content: Text('Are you sure you want to log out?',
+              style: TextStyle(color: Colors.white)),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            ),
+            TextButton(
+              onPressed: () {
+                deleteTokens(context);
+                Navigator.of(context).pop();
+              },
+              child: Text('Yes', style: TextStyle(color: Colors.white,  fontWeight: FontWeight.bold)),
+            ),
+          ],
+        );
+      },
+    );
+  }

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:trashtrack/Customer/c_api_cus_data.dart';
 import 'package:trashtrack/api_token.dart';
 import 'package:trashtrack/styles.dart';
-
-import 'dart:convert';
 import 'dart:typed_data';
+
+import 'package:trashtrack/user_date.dart';
 
 class C_ProfileScreen extends StatefulWidget {
   @override
@@ -27,15 +26,21 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
 // Fetch user data from the server
   Future<void> _dbData() async {
     try {
-      final data = await fetchCusData(context);
-      userData = data;
-      isLoading = false;
-
+      final data = await userDataFromHive();
       setState(() {
-        if (userData?['profileImage'] != null) {
-          imageBytes = base64Decode(userData!['profileImage']);
-        }
+        userData = data;
+        isLoading = false;
+        imageBytes = userData!['profile'];
       });
+      // final data = await fetchCusData(context);
+      // userData = data;
+      // isLoading = false;
+
+      // setState(() {
+      //   if (userData?['profileImage'] != null) {
+      //     imageBytes = base64Decode(userData!['profileImage']);
+      //   }
+      // });
     } catch (e) {
       setState(() {
         errorMessage = e.toString();
@@ -123,29 +128,34 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                           // ),
                           SizedBox(height: 10),
                           Container(
-                            color: backgroundColor,
+                            margin: EdgeInsets.all(20),
+                            padding: EdgeInsets.only(bottom: 30),
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(15)),
                             child: Column(
                               children: [
                                 SizedBox(height: 30),
                                 ProfileDetailRow(
                                     label: 'Full Name',
                                     value:
-                                        '${userData?['cus_fname'] ?? ''} ${userData?['cus_mname'] ?? ''} ${userData?['cus_lname'] ?? ''}'),
+                                        '${userData?['fname'] ?? ''} ${userData?['mname'] ?? ''} ${userData?['lname'] ?? ''}'),
                                 ProfileDetailRow(
                                     label: 'Email',
-                                    value: userData?['cus_email'] ?? ''),
+                                    value: userData?['email'] ?? ''),
                                 ProfileDetailRow(
                                     label: 'Phone Number',
-                                    value: userData?['cus_phone'] ?? ''),
+                                    value: userData?['contact'] ?? ''),
                                 ProfileDetailRow(
                                     label: 'Address',
-                                    value: userData?['cus_address'] ?? ''),
+                                    value:
+                                        '${userData?['street'] ?? ''}, ${userData?['brgy'] ?? ''}, ${userData?['city'] ?? ''}, ${userData?['province'] ?? ''}, ${userData?['postal'] ?? ''}'),
                                 ProfileDetailRow(
                                     label: 'Status',
-                                    value: userData?['cus_status'] ?? 'Active'),
+                                    value: userData?['status'] ?? ''),
                                 ProfileDetailRow(
                                     label: 'Type',
-                                    value: userData?['cus_type'] ?? ''),
+                                    value: userData?['type'] ?? ''),
                               ],
                             ),
                           ),
@@ -168,14 +178,14 @@ class ProfileDetailRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             label,
             style: TextStyle(
-              color: Colors.white60,
+              color: Colors.grey,
               fontSize: 16.0,
             ),
           ),
@@ -183,11 +193,12 @@ class ProfileDetailRow extends StatelessWidget {
             value,
             style: TextStyle(
               fontSize: 18.0,
-              color: Colors.white,
               fontWeight: FontWeight.bold,
             ),
           ),
-          Divider(),
+          Divider(
+            color: Colors.deepPurple,
+          ),
         ],
       ),
     );
@@ -312,47 +323,13 @@ class SettingsScreen extends StatelessWidget {
                 trailing: Icon(Icons.arrow_forward_ios, color: Colors.white),
                 onTap: () {
                   // Handle Logout
-                  _showLogoutConfirmationDialog(context);
+                  showLogoutConfirmationDialog(context);
                 },
               ),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  void _showLogoutConfirmationDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.green[900],
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(20.0))),
-          title: Text('Logout', style: TextStyle(color: Colors.white)),
-          content: Text('Are you sure you want to log out?',
-              style: TextStyle(color: Colors.white)),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancel', style: TextStyle(color: Colors.white)),
-            ),
-            TextButton(
-              onPressed: () {
-                deleteTokens(context);
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(builder: (context) => LoginPage()),
-                // );
-              },
-              child: Text('Yes', style: TextStyle(color: Colors.white)),
-            ),
-          ],
-        );
-      },
     );
   }
 

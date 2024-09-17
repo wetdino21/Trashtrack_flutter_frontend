@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:trashtrack/Customer/c_api_cus_data.dart';
 import 'package:trashtrack/styles.dart';
+import 'dart:async';
 
 class RequestPickupScreen extends StatefulWidget {
   @override
   _RequestPickupScreenState createState() => _RequestPickupScreenState();
 }
 
-class _RequestPickupScreenState extends State<RequestPickupScreen> {
+class _RequestPickupScreenState extends State<RequestPickupScreen>
+    with SingleTickerProviderStateMixin {
   int _currentStep = 0;
 
   // Controllers for the input fields
@@ -18,14 +22,63 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> {
   DateTime? _selectedDate;
   String? _selectedPaymentMethod;
 
+  Map<String, dynamic>? userData;
+
+  late AnimationController _controller;
+  late Animation<Color?> _colorTween;
+  bool isLoading = true;
+  @override
+  void initState() {
+    super.initState();
+    _dbData();
+
+    // Initialize the animation controller
+    _controller = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    )..repeat(reverse: true); // The animation will repeat back and forth
+
+    // Define a color tween animation that transitions between two colors
+    _colorTween = ColorTween(
+      begin: Colors.white30,
+      end: Colors.grey,
+    ).animate(_controller);
+  }
+
   @override
   void dispose() {
     // implement dispose
-    super.dispose();
+    
     _addressController.dispose();
     _cityController.dispose();
     _stateController.dispose();
     _postalCodeController.dispose();
+    TickerCanceled;
+    _controller.dispose();
+    super.dispose();
+  }
+
+// Fetch user data from the server
+  Future<void> _dbData() async {
+    try {
+      //final data = await userDataFromHive();
+      final data = await fetchCusData(context);
+      setState(() {
+        userData = data;
+        //isLoading = false;
+
+        // // Decode base64 image only if it exists
+        // if (userData?['profileImage'] != null) {
+        //   imageBytes = base64Decode(userData!['profileImage']);
+        // }
+      });
+      //await data.close();
+    } catch (e) {
+      // setState(() {
+      //   errorMessage = e.toString();
+      //   isLoading = false;
+      // });
+    }
   }
 
   // List of waste types
@@ -76,8 +129,8 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> {
                       setState(() {
                         _currentStep++;
                       });
-                    } else if(_currentStep == 1){
-                     Navigator.pushNamed(context, 'c_schedule');
+                    } else if (_currentStep == 1) {
+                      Navigator.pushNamed(context, 'c_schedule');
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -129,6 +182,121 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> {
                     fontWeight: FontWeight.bold)),
             //ddl
             SizedBox(height: 16.0),
+            isLoading
+                ? AnimatedBuilder(
+                    animation: _controller,
+                    builder: (context, child) {
+                      return Container(
+                        height: 100,
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          //color: Colors.white.withOpacity(.6),
+                          color: _colorTween.value,
+                        ),
+                        child: Row(
+                          // mainAxisAlignment: MainAxisAlignment.start,
+                          // crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                                flex: 1,
+                                child: Container(
+                                  alignment: Alignment.centerLeft,
+                                  child: Container(
+                                    height: 30,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(50),
+                                      //color: Colors.white.withOpacity(.6),
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                )),
+                            Expanded(
+                                flex: 10,
+                                child: Container(
+                                    alignment: Alignment.centerLeft,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Expanded(
+                                            flex: 1,
+                                            child: Container(
+                                                width: 100,
+                                                margin: EdgeInsets.all(3),
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  //color: Colors.white.withOpacity(.6),
+                                                  color: Colors.white,
+                                                ),
+                                                child: Text(''))),
+                                        Expanded(
+                                            flex: 2,
+                                            child: Container(
+                                                width: 250,
+                                                margin: EdgeInsets.all(3),
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  //color: Colors.white.withOpacity(.6),
+                                                  color: Colors.white,
+                                                ),
+                                                child: Text(''))),
+                                        Expanded(
+                                            flex: 1,
+                                            child: Container(
+                                                width: 150,
+                                                margin: EdgeInsets.all(3),
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  //color: Colors.white.withOpacity(.6),
+                                                  color: Colors.white,
+                                                ),
+                                                child: Text(''))),
+                                      ],
+                                    ))),
+                          ],
+                        ),
+                      );
+                    })
+                : Container(
+                    height: 100,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      //color: Colors.white.withOpacity(.6),
+                      color: _colorTween.value,
+                    ),
+                    child: Row(
+                      // mainAxisAlignment: MainAxisAlignment.start,
+                      // crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                            flex: 1,
+                            child: Container(
+                                alignment: Alignment.centerLeft,
+                                child: Icon(
+                                  Icons.pin_drop,
+                                  size: 30,
+                                ))),
+                        Expanded(
+                            flex: 10,
+                            child: Container(
+                                alignment: Alignment.centerLeft,
+                                child: Column(
+                                  children: [
+                                    Expanded(flex: 1, child: Text('datssa')),
+                                    Expanded(flex: 2, child: Text('data')),
+                                    Expanded(flex: 1, child: Text('data')),
+                                  ],
+                                ))),
+                      ],
+                    ),
+                  ),
+
             _buildDropDownList('Type of Waste'),
 
             //textbox
@@ -181,8 +349,9 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> {
               SizedBox(height: 16.0),
               RadioListTile<String>(
                 activeColor: Color(0xFF86BF3E),
-                title:
-                    Text('Credit Card',),
+                title: Text(
+                  'Credit Card',
+                ),
                 value: 'Credit Card',
                 groupValue: _selectedPaymentMethod,
                 onChanged: (value) {
@@ -193,8 +362,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> {
               ),
               RadioListTile<String>(
                 activeColor: Color(0xFF86BF3E),
-                title:
-                    Text('Debit Card'),
+                title: Text('Debit Card'),
                 value: 'Debit Card',
                 groupValue: _selectedPaymentMethod,
                 onChanged: (value) {

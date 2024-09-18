@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:trashtrack/Customer/c_api_cus_data.dart';
+import 'package:trashtrack/api_postgre_service.dart';
 import 'package:trashtrack/styles.dart';
 import 'dart:async';
 
@@ -14,7 +15,6 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
   int _currentStep = 0;
 
   // Controllers for the input fields
-  String? _selectedWasteType;
   final _addressController = TextEditingController();
   final _cityController = TextEditingController();
   final _stateController = TextEditingController();
@@ -27,10 +27,20 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
   late AnimationController _controller;
   late Animation<Color?> _colorTween;
   bool isLoading = true;
+
+  String fullname = '';
+  String contact = '';
+  String address = '';
+  String street = '';
+
+  List<String> _wasteTypes = [];
+  String? _selectedWasteType;
+
   @override
   void initState() {
     super.initState();
     _dbData();
+    _loadWasteCategories();
 
     // Initialize the animation controller
     _controller = AnimationController(
@@ -48,7 +58,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
   @override
   void dispose() {
     // implement dispose
-    
+
     _addressController.dispose();
     _cityController.dispose();
     _stateController.dispose();
@@ -63,30 +73,55 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
     try {
       //final data = await userDataFromHive();
       final data = await fetchCusData(context);
+
       setState(() {
         userData = data;
-        //isLoading = false;
 
-        // // Decode base64 image only if it exists
-        // if (userData?['profileImage'] != null) {
-        //   imageBytes = base64Decode(userData!['profileImage']);
-        // }
+        fullname = (userData!['cus_fname'] ?? '') +
+            ' ' +
+            (userData!['cus_mname'] ?? '') +
+            ' ' +
+            (userData!['cus_lname'] ?? '');
+        contact = userData!['cus_contact'] ?? '';
+        street = (userData!['cus_street'] ?? '');
+        address = (userData!['cus_brgy'] ?? '') +
+            ', ' +
+            (userData!['cus_city'] ?? '') +
+            ', ' +
+            (userData!['cus_province'] ?? '') +
+            ', ' +
+            (userData!['cus_postal'] ?? '');
+        isLoading = false;
       });
       //await data.close();
     } catch (e) {
-      // setState(() {
-      //   errorMessage = e.toString();
-      //   isLoading = false;
-      // });
+      isLoading = false;
+      print(e);
+      setState(() {
+        //errorMessage = e.toString();
+        isLoading = false;
+      });
     }
   }
 
-  // List of waste types
-  final List<String> _wasteTypes = [
-    'Municipal Waste',
-    'Construction Waste',
-    'Food Waste'
-  ];
+  // Function to load waste categories and update the state
+  Future<void> _loadWasteCategories() async {
+    List<String>? categories = await fetchWasteCategory();
+    if (categories != null) {
+      setState(() {
+        _wasteTypes = categories;
+        isLoading = false;
+      });
+    } else {
+      // Handle the case where fetching categories failed
+      setState(() {
+        isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to load waste categories')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -265,10 +300,11 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                     })
                 : Container(
                     height: 100,
+                    padding: EdgeInsets.all(5),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
                       //color: Colors.white.withOpacity(.6),
-                      color: _colorTween.value,
+                      color: Colors.white,
                     ),
                     child: Row(
                       // mainAxisAlignment: MainAxisAlignment.start,
@@ -277,39 +313,97 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                         Expanded(
                             flex: 1,
                             child: Container(
+                                height: 35,
+                                width: 30,
+                                padding: EdgeInsets.only(left: 2),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(50),
+                                  //color: Colors.white.withOpacity(.6),
+                                  color: Colors.grey[300],
+                                ),
                                 alignment: Alignment.centerLeft,
                                 child: Icon(
                                   Icons.pin_drop,
                                   size: 30,
+                                  color: Colors.redAccent,
                                 ))),
                         Expanded(
                             flex: 10,
                             child: Container(
+                                padding: EdgeInsets.only(left: 10),
                                 alignment: Alignment.centerLeft,
                                 child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Expanded(flex: 1, child: Text('datssa')),
-                                    Expanded(flex: 2, child: Text('data')),
-                                    Expanded(flex: 1, child: Text('data')),
+                                    Expanded(
+                                        flex: 1,
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              fullname,
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 17),
+                                            ),
+                                            Text('   | +(63)${contact}',
+                                                style: TextStyle(
+                                                  color: Colors.grey,
+                                                )),
+                                          ],
+                                        )),
+                                    Expanded(
+                                        flex: 2,
+                                        child: Text(
+                                          '${street} \n${address}',
+                                        )),
+                                    Expanded(
+                                        flex: 1,
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              padding: EdgeInsets.all(2),
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(3),
+                                                //color: Colors.white.withOpacity(.6),
+                                                border: Border.all(
+                                                    color: Colors.red),
+                                              ),
+                                              child: Text(
+                                                'Default',
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.red[300]),
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: 5,
+                                            ),
+                                            Container(
+                                              padding: EdgeInsets.all(2),
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(3),
+                                                //color: Colors.white.withOpacity(.6),
+                                                border: Border.all(
+                                                    color: Colors.grey),
+                                              ),
+                                              child: Text(
+                                                'Pickup Address',
+                                                style: TextStyle(
+                                                    color: Colors.black54),
+                                              ),
+                                            ),
+                                          ],
+                                        )),
                                   ],
                                 ))),
                       ],
                     ),
                   ),
-
+            SizedBox(height: 16.0),
+            isLoading? Container():
             _buildDropDownList('Type of Waste'),
-
-            //textbox
-            SizedBox(height: 5.0),
-            _buildTextboxField(
-                _addressController, 'Address', 'Type your address'),
-            SizedBox(height: 5.0),
-            _buildTextboxField(_cityController, 'City', 'Type your City'),
-            SizedBox(height: 5.0),
-            _buildTextboxField(_stateController, 'State', 'Type your State'),
-            SizedBox(height: 5.0),
-            _buildTextboxField(
-                _postalCodeController, 'Postal Code', 'Type your Postal Code'),
             SizedBox(height: 5.0),
             _buildDatePicker('Date', 'Select Date'),
             SizedBox(height: 20.0),
@@ -421,7 +515,6 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                 value: value,
                 child: Text(
                   value,
-                  //style: TextStyle(backgroundColor: Colors.white),
                 ),
               );
             }).toList(),

@@ -240,6 +240,22 @@ Future<String?> updatepassword(String email, String newPassword) async {
   }
 }
 
+//waste category
+// Function to fetch waste categories from API
+Future<List<String>?> fetchWasteCategory() async {
+  final response = await http.get(Uri.parse('$baseUrl/waste_category'));
+
+  if (response.statusCode == 200) {
+    List<dynamic> data = jsonDecode(response.body);
+    // Extracting category names as a list of strings
+    return data.map<String>((item) => item['wc_name'].toString()).toList();
+  } else {
+    print(response.body);
+    return null;
+  }
+}
+
+
 ////////REQUESTS WITH TOKEN///////////////////////////////////////////////////////////////////////////////
 Future<void> updateProfile(
     BuildContext context, String fname, String lname) async {

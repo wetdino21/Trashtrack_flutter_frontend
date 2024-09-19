@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:trashtrack/Customer/c_api_cus_data.dart';
+import 'package:trashtrack/api_paymongo.dart';
 import 'package:trashtrack/api_postgre_service.dart';
 import 'package:trashtrack/styles.dart';
 import 'dart:async';
@@ -402,8 +403,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                     ),
                   ),
             SizedBox(height: 16.0),
-            isLoading? Container():
-            _buildDropDownList('Type of Waste'),
+            isLoading ? Container() : _buildDropDownList('Type of Waste'),
             SizedBox(height: 5.0),
             _buildDatePicker('Date', 'Select Date'),
             SizedBox(height: 20.0),
@@ -427,57 +427,108 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
-        child: Container(
-          padding: EdgeInsets.all(16.0),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Select Payment Method',
-                style: TextStyle(color: Colors.grey, fontSize: 16.0),
+        child: Column(
+          children: [
+            Container(
+              padding: EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
               ),
-              SizedBox(height: 16.0),
-              RadioListTile<String>(
-                activeColor: Color(0xFF86BF3E),
-                title: Text(
-                  'Credit Card',
-                ),
-                value: 'Credit Card',
-                groupValue: _selectedPaymentMethod,
-                onChanged: (value) {
-                  setState(() {
-                    _selectedPaymentMethod = value;
-                  });
-                },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Text(
+                  //   'Select Payment Method',
+                  //   style: TextStyle(color: Colors.grey, fontSize: 16.0),
+                  // ),
+                  // SizedBox(height: 16.0),
+                  // RadioListTile<String>(
+                  //   activeColor: Color(0xFF86BF3E),
+                  //   title: Text(
+                  //     'Credit Card',
+                  //   ),
+                  //   value: 'Credit Card',
+                  //   groupValue: _selectedPaymentMethod,
+                  //   onChanged: (value) {
+                  //     setState(() {
+                  //       _selectedPaymentMethod = value;
+                  //     });
+                  //   },
+                  // ),
+                  // RadioListTile<String>(
+                  //   activeColor: Color(0xFF86BF3E),
+                  //   title: Text('Debit Card'),
+                  //   value: 'Debit Card',
+                  //   groupValue: _selectedPaymentMethod,
+                  //   onChanged: (value) {
+                  //     setState(() {
+                  //       _selectedPaymentMethod = value;
+                  //     });
+                  //   },
+                  // ),
+                  // RadioListTile<String>(
+                  //   activeColor: Color(0xFF86BF3E),
+                  //   title: Text('GCash'),
+                  //   value: 'GCash',
+                  //   groupValue: _selectedPaymentMethod,
+                  //   onChanged: (value) {
+                  //     setState(() {
+                  //       _selectedPaymentMethod = value;
+                  //     });
+                  //   },
+                  // ),
+            
+                  // ElevatedButton(onPressed: (){
+                  //   Navigator.push(context, MaterialPageRoute(builder: (context) => PaymentScreen()));
+                  // }, child: Text('select')),
+            
+                  Center(
+                    child: Text(
+                      'Pay with',
+                      style: TextStyle(color: Colors.grey, fontSize: 16.0),
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () {
+                      launchPaymentLink(context);
+                    },
+                    child: Container(
+                      child: Image.asset('assets/paymongo.png'),
+                    ),
+                  )
+                ],
               ),
-              RadioListTile<String>(
-                activeColor: Color(0xFF86BF3E),
-                title: Text('Debit Card'),
-                value: 'Debit Card',
-                groupValue: _selectedPaymentMethod,
-                onChanged: (value) {
-                  setState(() {
-                    _selectedPaymentMethod = value;
-                  });
-                },
+            ),
+            SizedBox(height: 20,),
+            Container(
+              padding: EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
               ),
-              RadioListTile<String>(
-                activeColor: Color(0xFF86BF3E),
-                title: Text('GCash'),
-                value: 'GCash',
-                groupValue: _selectedPaymentMethod,
-                onChanged: (value) {
-                  setState(() {
-                    _selectedPaymentMethod = value;
-                  });
-                },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+            
+                  Center(
+                    child: Text(
+                      'Pay with',
+                      style: TextStyle(color: Colors.grey, fontSize: 16.0),
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () {
+                      launchPaymentLink2(context);
+                    },
+                    child: Container(
+                      child: Image.asset('assets/truck.png'),
+                    ),
+                  )
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

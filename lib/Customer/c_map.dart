@@ -1,10 +1,45 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:trashtrack/Customer/c_appbar.dart';
 import 'package:trashtrack/Customer/c_bottom_nav_bar.dart';
 import 'package:trashtrack/styles.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
-class C_MapScreen extends StatelessWidget {
+class C_MapScreen extends StatefulWidget {
+  @override
+  _C_MapScreenState createState() => _C_MapScreenState();
+}
+
+class _C_MapScreenState extends State<C_MapScreen> {
+  final MapController _mapController = MapController();
+  LatLng _currentLocation = LatLng(10.3157, 123.8854); // Cebu coordinates
+
+  final List<Map<String, dynamic>> _locations = [
+    {
+      'name': 'Inayawan Sunshine Village',
+      'coords': LatLng(10.262550, 123.856429),
+    },
+    {
+      'name': 'Bacayan Villa Leyson',
+      'coords': LatLng(10.384937, 123.915956),
+    },
+    {
+      'name': 'San Miguel Lorega',
+      'coords': LatLng(10.306606, 123.904336),
+    },
+  ];
+
+  void _updateLocation(LatLng newLocation) {
+    setState(() {
+      _currentLocation = newLocation;
+    });
+    _mapController.move(
+        newLocation, _mapController.zoom); // Animate to the new location
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -12,14 +47,41 @@ class C_MapScreen extends StatelessWidget {
       appBar: C_CustomAppBar(title: 'Map'),
       body: Stack(
         children: [
-          // Placeholder for the map
           Container(
             color: Colors.grey[300],
-            child: Center(
-              child: Text(
-                'Map goes here',
-                style: TextStyle(color: Colors.black54, fontSize: 18),
+            child: FlutterMap(
+              mapController: _mapController,
+              options: MapOptions(
+                center: _currentLocation,
+                zoom: 13.0,
+                minZoom: 1.0,
+                maxZoom:
+                    19.0, // Set the maximum zoom level (19 is typically max for OSM)
+                onPositionChanged: (position, hasGesture) {
+                  if (position.zoom != null && position.zoom! > 18.0) {
+                    _mapController.move(
+                        _mapController.center, 18.0); // Enforce max zoom
+                  }
+                },
               ),
+              children: [
+                TileLayer(
+                  urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                  maxZoom: 19, // Tile layer max zoom
+                ),
+                MarkerLayer(
+                  markers: [
+                    Marker(
+                      point: _currentLocation,
+                      builder: (context) => Icon(
+                        Icons.location_pin,
+                        color: Colors.red,
+                        size: 40,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
           SlidingUpPanel(
@@ -47,40 +109,35 @@ class C_MapScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    'Nearest Route',
+                    'Choose Location',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 8),
-                  RouteCard(
-                    title: 'Bacayan De Oro',
-                    arrivalTime: '10:30',
-                    isHighlighted: true,
-                  ),
-                  RouteCard(
-                    title: 'Bacayan Del Norte',
-                    arrivalTime: '10:35',
-                  ),
-                  RouteCard(
-                    title: 'Norman ATM',
-                    arrivalTime: '11:00',
-                  ),
+                  ..._locations.map((location) => GestureDetector(
+                        onTap: () => _updateLocation(location['coords']),
+                        child: RouteCard(
+                          title: location['name'],
+                          arrivalTime:
+                              'N/A', // Update this if you have arrival times
+                          isHighlighted: false,
+                        ),
+                      )),
                   SizedBox(height: 8),
-                  Center(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        // Handle Okay button press
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green[900],
-                        padding:
-                            EdgeInsets.symmetric(vertical: 12, horizontal: 32),
-                      ),
-                      child: Text(
-                        'Okay',
-                        style: TextStyle(color: Colors.white, fontSize: 18),
-                      ),
-                    ),
-                  ),
+                  // Center(
+                  //   child: ElevatedButton(
+                  //     onPressed: () {
+                  //       // Handle Okay button press
+                  //     },
+                  //     style: ElevatedButton.styleFrom(
+                  //       backgroundColor: Colors.green[900],
+                  //       padding: EdgeInsets.symmetric(vertical: 12, horizontal: 32),
+                  //     ),
+                  //     child: Text(
+                  //       'Okay',
+                  //       style: TextStyle(color: Colors.white, fontSize: 18),
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
             ),
@@ -147,3 +204,5 @@ class RouteCard extends StatelessWidget {
     );
   }
 }
+
+

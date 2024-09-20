@@ -491,7 +491,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                   ),
                   InkWell(
                     onTap: () {
-                      launchPaymentLink(context);
+                      launchPaymentLink2(context);
                     },
                     child: Container(
                       child: Image.asset('assets/paymongo.png'),
@@ -519,7 +519,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                   ),
                   InkWell(
                     onTap: () {
-                      launchPaymentLink2(context);
+                      launchPaymentLink(context);
                     },
                     child: Container(
                       child: Image.asset('assets/truck.png'),

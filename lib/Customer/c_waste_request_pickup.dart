@@ -21,8 +21,6 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
   final _stateController = TextEditingController();
   final _postalCodeController = TextEditingController();
   DateTime? _selectedDate;
-  String? _selectedPaymentMethod;
-
   Map<String, dynamic>? userData;
 
   late AnimationController _controller;
@@ -438,51 +436,6 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Text(
-                  //   'Select Payment Method',
-                  //   style: TextStyle(color: Colors.grey, fontSize: 16.0),
-                  // ),
-                  // SizedBox(height: 16.0),
-                  // RadioListTile<String>(
-                  //   activeColor: Color(0xFF86BF3E),
-                  //   title: Text(
-                  //     'Credit Card',
-                  //   ),
-                  //   value: 'Credit Card',
-                  //   groupValue: _selectedPaymentMethod,
-                  //   onChanged: (value) {
-                  //     setState(() {
-                  //       _selectedPaymentMethod = value;
-                  //     });
-                  //   },
-                  // ),
-                  // RadioListTile<String>(
-                  //   activeColor: Color(0xFF86BF3E),
-                  //   title: Text('Debit Card'),
-                  //   value: 'Debit Card',
-                  //   groupValue: _selectedPaymentMethod,
-                  //   onChanged: (value) {
-                  //     setState(() {
-                  //       _selectedPaymentMethod = value;
-                  //     });
-                  //   },
-                  // ),
-                  // RadioListTile<String>(
-                  //   activeColor: Color(0xFF86BF3E),
-                  //   title: Text('GCash'),
-                  //   value: 'GCash',
-                  //   groupValue: _selectedPaymentMethod,
-                  //   onChanged: (value) {
-                  //     setState(() {
-                  //       _selectedPaymentMethod = value;
-                  //     });
-                  //   },
-                  // ),
-            
-                  // ElevatedButton(onPressed: (){
-                  //   Navigator.push(context, MaterialPageRoute(builder: (context) => PaymentScreen()));
-                  // }, child: Text('select')),
-            
                   Center(
                     child: Text(
                       'Pay with',

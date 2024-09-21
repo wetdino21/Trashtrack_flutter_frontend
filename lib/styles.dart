@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 
-    final Color backgroundColor = Color(0xFF001E00);
-   // final Color accentColor = Color(0xFF6AA920);
-    final Color buttonColor = Color(0xFF86BF3E);
-    final Color boxColor =  Color(0xFF103510);
-    final Color accentColor = Colors.greenAccent;
-    final Color iconBoxColor = Color(0xFF001E03);
-
+final Color backgroundColor = Color(0xFF001E00);
+// final Color accentColor = Color(0xFF6AA920);
+final Color buttonColor = Color(0xFF86BF3E);
+final Color boxColor = Color(0xFF103510);
+final Color accentColor = Colors.greenAccent;
+final Color iconBoxColor = Color(0xFF001E03);
+final List<BoxShadow> shadowColor = [
+  BoxShadow(
+    color: Colors.grey.withOpacity(0.5), // Adjust opacity as needed
+    blurRadius: 4.0,
+    spreadRadius: 0.5,
+    offset: Offset(0, 2), // Position of the shadow
+  ),
+];
 
 //snackbar
 void showErrorSnackBar(BuildContext context, String errorMessage) {
@@ -29,10 +36,7 @@ void showSuccessSnackBar(BuildContext context, String successMessage) {
   );
 }
 
-
-
-
-  class CustomOverlay extends StatelessWidget {
+class CustomOverlay extends StatelessWidget {
   final String message;
   final Color backgroundColor;
 
@@ -74,8 +78,3 @@ void showCustomSnackBar(BuildContext context, String message) {
     overlayEntry.remove();
   });
 }
-
-
-
-
-    

@@ -7,6 +7,7 @@ import 'package:trashtrack/Customer/c_appbar.dart';
 import 'package:trashtrack/Customer/c_bottom_nav_bar.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:geolocator/geolocator.dart';
+import 'dart:async';
 
 class C_MapScreen extends StatefulWidget {
   @override
@@ -23,7 +24,7 @@ class _C_MapScreenState extends State<C_MapScreen> {
   List<List<LatLng>> routes = [];
   bool isSelectingDirections = false;
 
-  // Add two lists to store distance and duration
+  // two lists to store distance and duration
   List<double> routeDistances = [];
   List<double> routeDurations = [];
 
@@ -32,13 +33,60 @@ class _C_MapScreenState extends State<C_MapScreen> {
   String? startName;
   String? destinationName;
 
-  // String? nearestDistance;
-  // String? nearestTime;
+  String? nearestDistance;
+  String? nearestDuration;
 
-  double nearestDistance = 0; // To store the nearest distance
-  double nearestDuration = 0; // To store the nearest duration
+  bool failGetRoute = false;
+  bool failGetPlaceName = false;
+  bool isLoading = false;
+  bool currentLocStreaming = false;
+  StreamSubscription<Position>? _positionStream;
 
-  double currentLocBtn = 150;
+  //bool isLocationOn = false;
+  //Timer? _locationCheckTimer;
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   startRealTimeLocationCheck();
+  // }
+
+  @override
+  void dispose() {
+    _stopLocationUpdates(); // Stop location updates when the widget is disposed
+    _mapController.dispose();
+    super.dispose();
+  }
+
+  void _stopLocationUpdates() {
+    setState(() {
+      isLoading = true;
+    });
+    print('Real time location is now off');
+    _positionStream?.cancel(); // Cancel the subscription to stop the stream
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  // void startRealTimeLocationCheck() {
+  //   print('checkinggggg locationnnnnn');
+  //   _locationCheckTimer =
+  //       Timer.periodic(Duration(milliseconds: 1), (timer) async {
+  //     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+
+  //     if (!serviceEnabled) {
+  //       setState(() {
+  //         isLocationOn = false;
+  //       });
+
+  //     } else {
+  //       setState(() {
+  //         isLocationOn = true;
+  //       });
+  //     }
+  //   });
+  // }
 
   // Utility function to format distance
   String formatDistance(double distance) {
@@ -51,12 +99,19 @@ class _C_MapScreenState extends State<C_MapScreen> {
 
   // Utility function to format duration
   String formatDuration(double duration) {
+    // int totalSeconds = duration.toInt();
+    // int hours = totalSeconds ~/ 3600;
+    // int minutes = (totalSeconds % 3600) ~/ 60;
+    // int seconds = totalSeconds % 60;
     int totalSeconds = duration.toInt();
-    int hours = totalSeconds ~/ 3600;
+    int days = totalSeconds ~/ 86400; // 86400 seconds in a day
+    int hours = (totalSeconds % 86400) ~/ 3600;
     int minutes = (totalSeconds % 3600) ~/ 60;
     int seconds = totalSeconds % 60;
 
-    if (hours > 0) {
+    if (days > 0) {
+      return '$days d $hours h';
+    } else if (hours > 0) {
       return '$hours h $minutes min';
     } else if (minutes > 0) {
       return '$minutes min';
@@ -66,57 +121,91 @@ class _C_MapScreenState extends State<C_MapScreen> {
   }
 
   Future<void> fetchRoutes(LatLng start, LatLng destination) async {
-    final url = Uri.parse(
-      'http://router.project-osrm.org/route/v1/driving/'
-      '${start.longitude},${start.latitude};${destination.longitude},${destination.latitude}'
-      '?alternatives=true&geometries=geojson',
-    );
+    setState(() {
+      isLoading = true;
+    });
 
-    final response = await http.get(url);
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      final List routesData = data['routes'];
+    try {
+      final url = Uri.parse(
+        'http://router.project-osrm.org/route/v1/driving/'
+        '${start.longitude},${start.latitude};${destination.longitude},${destination.latitude}'
+        '?alternatives=true&geometries=geojson',
+      );
 
-      print('Number of routes returned: ${routesData.length}');
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final List routesData = data['routes'];
 
-      setState(() {
-        routes = routesData.map<List<LatLng>>((route) {
-          final List coordinates = route['geometry']['coordinates'];
-          return coordinates.map<LatLng>((coord) {
-            return LatLng(coord[1], coord[0]); // reverse longitude/latitude
+        print('Number of routes returned: ${routesData.length}');
+
+        setState(() {
+          routes = routesData.map<List<LatLng>>((route) {
+            final List coordinates = route['geometry']['coordinates'];
+            return coordinates.map<LatLng>((coord) {
+              return LatLng(coord[1], coord[0]); // reverse longitude/latitude
+            }).toList();
           }).toList();
-        }).toList();
 
-        // Store distance and duration for each route
-        routeDistances = routesData
-            .map<double>((route) => (route['distance'] as num).toDouble())
-            .toList();
-        routeDurations = routesData
-            .map<double>((route) => (route['duration'] as num).toDouble())
-            .toList();
+          // Store distance and duration for each route
+          routeDistances = routesData
+              .map<double>((route) => (route['distance'] as num).toDouble())
+              .toList();
+          routeDurations = routesData
+              .map<double>((route) => (route['duration'] as num).toDouble())
+              .toList();
+
+          if (routesData.length == 1) {
+            nearestDuration = formatDuration(routeDurations[0]);
+            nearestDistance = formatDistance(routeDistances[0]);
+          } else {
+            if (routeDurations[0] < routeDurations[1]) {
+              nearestDuration = formatDuration(routeDurations[0]);
+              nearestDistance = formatDistance(routeDistances[0]);
+            } else {
+              nearestDuration = formatDuration(routeDurations[1]);
+              nearestDistance = formatDistance(routeDistances[1]);
+            }
+          }
+        });
+      } else {
+        setState(() {
+          nearestDuration = 'No available route/s';
+          nearestDistance = '';
+        });
+        print('Failed to load routes');
+      }
+    } catch (e) {
+      print('Failed to load routes: ${e}');
+    } finally {
+      setState(() {
+        isLoading = false;
       });
-    } else {
-      //throw Exception('Failed to load routes');
-      print('Failed to load routes');
     }
   }
 
   void resetSelection() {
     setState(() {
+      _currentLocation = null; // current location
+      currentLocStreaming = false;
+      _stopLocationUpdates();
+
       selectedPoint = null;
       startPoint = null;
       destinationPoint = null;
       routes.clear();
       isSelectingDirections = false;
-      currentLocBtn = 150;
       selectedCurrentName = null;
 
       selectedPlaceName = null;
       startName = null;
       destinationName = null;
 
-      nearestDistance = 0;
-      nearestDuration = 0;
+      nearestDistance = null;
+      nearestDuration = null;
+
+      failGetRoute = false;
+      failGetPlaceName = false;
     });
   }
 
@@ -146,24 +235,39 @@ class _C_MapScreenState extends State<C_MapScreen> {
   }
 
   Future<String?> getPlaceName(double lat, double lng) async {
-    final url = Uri.parse(
-        'https://nominatim.openstreetmap.org/reverse?format=json&lat=$lat&lon=$lng&zoom=18&addressdetails=1');
+    if (!currentLocStreaming)
+      setState(() {
+        isLoading = true;
+      });
+    try {
+      final url = Uri.parse(
+          'https://nominatim.openstreetmap.org/reverse?format=json&lat=$lat&lon=$lng&zoom=18&addressdetails=1');
 
-    final response = await http.get(url, headers: {
-      'User-Agent':
-          'MyApp/1.0 (krazyclips101@gmail.com)' // Required by Nominatim
-    });
+      final response = await http.get(url, headers: {
+        'User-Agent':
+            'Testing/1.0 (krazyclips101@gmail.com)' // Required by Nominatim
+      });
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
 
-      if (data.containsKey('address')) {
-        // final address = data['address'];
-        final displayName = data['display_name'];
-        return displayName;
+        if (data.containsKey('address')) {
+          // final address = data['address'];
+          final displayName = data['display_name'];
+          return displayName;
+        }
       }
+      setState(() {
+        failGetPlaceName = true;
+      });
+    } catch (e) {
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
-    return null;
+
+    return 'No location name found';
   }
 
   //   void fetchCurrentName() async {
@@ -204,28 +308,83 @@ class _C_MapScreenState extends State<C_MapScreen> {
     });
   }
 
+  //LOCATION PERMISSION
   Future<void> _getCurrentLocation() async {
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission != LocationPermission.whileInUse &&
-          permission != LocationPermission.always) {
-        return; // Location services are not enabled
+    try {
+      if (!currentLocStreaming)
+        setState(() {
+          isLoading = true;
+        });
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission != LocationPermission.whileInUse &&
+            permission != LocationPermission.always) {
+          return; // Location services are not enabled
+        }
       }
+
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        await Geolocator.openAppSettings();
+        return;
+      }
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        // Optionally, open the location settings:
+        await Geolocator.openLocationSettings();
+        return;
+      }
+
+      //////real time current position
+      _positionStream = Geolocator.getPositionStream().listen(
+        (Position position) async {
+          String? getCurrentName =
+              await getPlaceName(position.latitude, position.longitude);
+          setState(() {
+            _currentLocation = LatLng(position.latitude, position.longitude);
+            selectedCurrentName = getCurrentName;
+
+            // Move the map to the new location
+            _mapController.move(_currentLocation!, _mapController.zoom);
+          });
+          currentLocStreaming = true;
+        },
+        onError: (error) async {
+          print('Error occurred in location stream: $error');
+
+          //bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+          // if (!isLocationOn) {
+          //   _stopLocationUpdates();
+          //   setState(() {
+          //     currentLocStreaming = false;
+          //   });
+
+          //   //await Geolocator.openLocationSettings();
+          // }
+        },
+      );
+
+      // ///current pstion
+      // Position position = await Geolocator.getCurrentPosition(
+      //     desiredAccuracy: LocationAccuracy.high);
+      // String? getCurrentName =
+      //     await getPlaceName(position.latitude, position.longitude);
+
+      // setState(() {
+      //   _currentLocation = LatLng(position.latitude, position.longitude);
+      //   _mapController.move(
+      //       _currentLocation!, 13.0); // Move to current location
+
+      //   selectedCurrentName = getCurrentName;
+      // });
+    } catch (e) {
+      print('fail to get current location!');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
-
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    String? getCurrentName =
-        await getPlaceName(position.latitude, position.longitude);
-
-    setState(() {
-      _currentLocation = LatLng(position.latitude, position.longitude);
-      _mapController.move(_currentLocation!, 13.0); // Move to current location
-
-      selectedCurrentName = getCurrentName;
-      currentLocBtn = 200;
-    });
   }
 
   @override
@@ -338,7 +497,13 @@ class _C_MapScreenState extends State<C_MapScreen> {
                         markers: [
                           Marker(
                               rotate: true,
-                              width: 100,
+                              width: routeDurations[i] > 360000
+                                  ? 140
+                                  : routeDurations[i] > 36000
+                                      ? 130
+                                      : routeDurations[i] > 3600
+                                          ? 120
+                                          : 100,
                               height: 100,
                               point: LatLng(
                                 calculateMidpoint(
@@ -350,18 +515,6 @@ class _C_MapScreenState extends State<C_MapScreen> {
                                     .longitude,
                               ),
                               builder: (ctx) {
-                                double currentDistance = routeDistances[i];
-                                double currentDuration = routeDurations[i];
-
-                                if (nearestDistance == 0) {
-                                  nearestDistance = currentDistance;
-                                  nearestDuration = currentDuration;
-                                }
-                                if (currentDistance < nearestDistance) {
-                                  nearestDistance = currentDistance;
-                                  nearestDuration = currentDuration;
-                                }
-
                                 return Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
@@ -382,6 +535,27 @@ class _C_MapScreenState extends State<C_MapScreen> {
                       ),
             ],
           ),
+          // if (!isLocationOn)
+          //   Container(
+          //     color: Colors.red,
+          //     height: 30,
+          //     child: Center(
+          //       child: Text(
+          //         'Your location is off',
+          //         style: TextStyle(
+          //             color: Colors.white, fontWeight: FontWeight.bold),
+          //       ),
+          //     ),
+          //   ),
+          if (isLoading)
+            Center(
+              child: CircularProgressIndicator(
+                color: Colors.green,
+                strokeWidth: 10,
+                strokeAlign: 2,
+                backgroundColor: Colors.deepPurple,
+              ),
+            ),
           isSelectingDirections
               ? Positioned(
                   top: 0,
@@ -404,47 +578,55 @@ class _C_MapScreenState extends State<C_MapScreen> {
                         ),
                         Row(
                           children: [
-                            Icon(Icons.location_on,
-                                color: Colors.green), // Icon for starting point
-                            SizedBox(
-                                width: 8), // Add space between icon and text
+                            Icon(Icons.location_on, color: Colors.green),
+                            SizedBox(width: 3),
                             Expanded(
-                              // Makes the text wrap within the available space
-                              child: Text(
-                                startName == null
-                                    ? 'Select Starting Point'
-                                    : startName!,
-                                style: TextStyle(
-                                    color: Colors.green,
-                                    fontWeight: FontWeight.bold),
-                                softWrap:
-                                    true, // Allow wrapping to the next line
-                                overflow: TextOverflow
-                                    .visible, // Prevent clipping, allow text to expand
+                              child: Container(
+                                padding: EdgeInsets.only(left: 3),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(
+                                        width: 2, color: Colors.green)),
+                                child: Text(
+                                  startName == null
+                                      ? 'Select Starting Point'
+                                      : startName!,
+                                  style: TextStyle(
+                                      color: Colors.black54,
+                                      fontWeight: FontWeight.bold),
+                                  softWrap:
+                                      true, // Allow wrapping to the next line
+                                  overflow: TextOverflow
+                                      .visible, // Prevent clipping, allow text to expand
+                                ),
                               ),
                             ),
                           ],
                         ),
+                        SizedBox(height: 3),
                         Row(
                           children: [
-                            Icon(Icons.flag,
-                                color:
-                                    Colors.red), // Icon for destination point
-                            SizedBox(
-                                width: 8), // Add space between icon and text
+                            Icon(Icons.flag, color: Colors.red),
+                            SizedBox(width: 3),
                             Expanded(
-                              // Makes the text wrap within the available space
-                              child: Text(
-                                destinationName == null
-                                    ? 'Select Destination Point'
-                                    : destinationName!,
-                                style: TextStyle(
-                                    color: Colors.red,
-                                    fontWeight: FontWeight.bold),
-                                softWrap:
-                                    true, // Allow wrapping to the next line
-                                overflow: TextOverflow
-                                    .visible, // Prevent clipping, allow text to expand
+                              child: Container(
+                                padding: EdgeInsets.only(left: 3),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(
+                                        width: 2, color: Colors.red)),
+                                child: Text(
+                                  destinationName == null
+                                      ? 'Select Destination Point'
+                                      : destinationName!,
+                                  style: TextStyle(
+                                      color: Colors.black54,
+                                      fontWeight: FontWeight.bold),
+                                  softWrap:
+                                      true, // Allow wrapping to the next line
+                                  overflow: TextOverflow
+                                      .visible, // Prevent clipping, allow text to expand
+                                ),
                               ),
                             ),
                           ],
@@ -457,66 +639,117 @@ class _C_MapScreenState extends State<C_MapScreen> {
                   ),
                 )
               : Container(),
+
+          //floating 2 btns
           Positioned(
-            bottom: selectedPoint != null ? 200 : currentLocBtn,
+            bottom: 200,
             right: 0,
-            child: Container(
-                margin: EdgeInsets.all(15),
-                padding: EdgeInsets.all(14.0),
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow: shadowColor),
-                child: InkWell(
-                  onTap: () {
-                    if (selectedCurrentName != null) {
-                      resetSelection();
-                    } else {
-                      resetSelection();
-                      _getCurrentLocation();
-                    }
-                  },
-                  child: Icon(
-                    selectedCurrentName != null
-                        ? Icons.close
-                        : Icons.my_location,
-                    color: Colors.red,
-                    size: 30,
-                  ),
-                )),
+            child: Column(
+              children: [
+                //current location btn
+                Container(
+                    padding: EdgeInsets.all(14.0),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: shadowColor),
+                    child: InkWell(
+                      onTap: () {
+                        if (!isLoading) {
+                          if (selectedCurrentName != null) {
+                            resetSelection();
+                          } else {
+                            resetSelection();
+                            _getCurrentLocation();
+                          }
+                        }
+                      },
+                      child: Icon(
+                        selectedCurrentName != null
+                            ? Icons.close
+                            : Icons.my_location,
+                        color: Colors.red,
+                        size: 30,
+                      ),
+                    )),
+
+                //direction btn
+                Container(
+                    margin: EdgeInsets.all(15),
+                    padding: EdgeInsets.all(14.0),
+                    decoration: BoxDecoration(
+                        color: Colors.green,
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: shadowColor),
+                    child: InkWell(
+                      onTap: () {
+                        if (!isLoading) {
+                          if (isSelectingDirections) {
+                            resetSelection(); // Reset when closing direction selection
+                            print(nearestDuration);
+                          } else {
+                            resetSelection(); // Optional: reset for fresh start
+                            print(nearestDuration);
+                            setState(() {
+                              isSelectingDirections =
+                                  true; // Switch to directions mode
+                            });
+                          }
+                        }
+                      },
+                      child: Icon(
+                        isSelectingDirections ? Icons.close : Icons.directions,
+                        color: Colors.white,
+                        size: 30,
+                      ),
+                    )),
+              ],
+            ),
           )
         ],
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 80.0),
-        child: FloatingActionButton(
-          backgroundColor: Colors.green,
-          child: Icon(
-            isSelectingDirections || selectedPoint != null
-                ? Icons.close
-                : Icons.directions,
-            color: Colors.white,
-            size: 40,
-          ),
-          onPressed: () {
-            if (isSelectingDirections || selectedPoint != null) {
-              resetSelection(); // Reset when closing direction selection
-            } else {
-              resetSelection(); // Optional: reset for fresh start
-              setState(() {
-                isSelectingDirections = true; // Switch to directions mode
-              });
-            }
-          },
-        ),
-      ),
-      bottomSheet: selectedPoint != null
+      // floatingActionButton: FloatingActionButton(
+      //   backgroundColor: Colors.green,
+      //   child: Icon(
+      //     isSelectingDirections || selectedPoint != null
+      //         ? Icons.close
+      //         : Icons.directions,
+      //     color: Colors.white,
+      //     size: 40,
+      //   ),
+      //   onPressed: () {
+      //     if (isSelectingDirections || selectedPoint != null) {
+      //       resetSelection(); // Reset when closing direction selection
+      //       print(nearestDuration);
+      //     } else {
+      //       resetSelection(); // Optional: reset for fresh start
+      //       print(nearestDuration);
+      //       setState(() {
+      //         isSelectingDirections = true; // Switch to directions mode
+      //       });
+      //     }
+      //   },
+      // ),
+      bottomSheet: selectedPoint != null && !isLoading
           ? Container(
               padding: EdgeInsets.all(16.0),
-              color: Colors.white,
+              decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.8),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+                  boxShadow: shadowColor),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: InkWell(
+                      onTap: () => resetSelection(),
+                      child: Icon(
+                        Icons.close,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
                   Text(
                     'Location',
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
@@ -549,7 +782,8 @@ class _C_MapScreenState extends State<C_MapScreen> {
                 ],
               ),
             )
-          : nearestDistance > 0 && nearestDistance > 0
+          // : nearestDistance > 0 || nearestDistance > 0
+          : nearestDuration != null && !isLoading
               ? Container(
                   padding: EdgeInsets.all(16.0),
                   decoration: BoxDecoration(
@@ -563,14 +797,16 @@ class _C_MapScreenState extends State<C_MapScreen> {
                       Row(
                         children: [
                           Text(
-                            formatDuration(nearestDuration) + ' ',
+                            '${nearestDuration} ',
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 20,
-                                color: Colors.green),
+                                color: nearestDistance == ''
+                                    ? Colors.red
+                                    : Colors.green),
                           ),
                           Text(
-                            ' (${formatDistance(nearestDistance)})',
+                            '(${nearestDistance})',
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 20,
@@ -590,15 +826,19 @@ class _C_MapScreenState extends State<C_MapScreen> {
                     ],
                   ),
                 )
-              : selectedCurrentName != null
+              : selectedCurrentName != null && !isLoading
                   ? Container(
                       padding: EdgeInsets.all(16.0),
-                      color: Colors.white,
+                      decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.8),
+                          borderRadius:
+                              BorderRadius.vertical(top: Radius.circular(15)),
+                          boxShadow: shadowColor),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'Location',
+                            'Current Location',
                             style: TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 20),
                           ),
@@ -639,6 +879,42 @@ class _C_MapScreenState extends State<C_MapScreen> {
       ),
     );
   }
+
+  // Widget routeMarker({required String duration, required String distance}) {
+  //   return Container(
+  //     padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       borderRadius: BorderRadius.circular(10.0),
+  //       boxShadow: [
+  //         BoxShadow(
+  //           color: Colors.black26,
+  //           offset: Offset(0, 2),
+  //           blurRadius: 6.0,
+  //         ),
+  //       ],
+  //     ),
+  //     child: Column(
+  //       children: [
+  //         Text(
+  //           distance,
+  //           style: TextStyle(
+  //             fontWeight: FontWeight.bold,
+  //             fontSize: 16.0,
+  //             color: Colors.black,
+  //           ),
+  //         ),
+  //         Text(
+  //           duration,
+  //           style: TextStyle(
+  //             fontSize: 14.0,
+  //             color: Colors.grey[600],
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 }
 
 // Custom Marker Widget
@@ -646,19 +922,17 @@ class RouteMarker extends StatelessWidget {
   final String duration;
   final String distance;
 
-  const RouteMarker({Key? key, required this.duration, required this.distance})
-      : super(key: key);
+  const RouteMarker({
+    Key? key,
+    required this.duration,
+    required this.distance,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Triangular Pin
-        Container(
-          width: 0,
-          height: 0,
-        ),
         Container(
           padding: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
           decoration: BoxDecoration(
@@ -695,71 +969,70 @@ class RouteMarker extends StatelessWidget {
   }
 }
 
-
-  // @override
-  // Widget arrowButtomBox() {
-  //   return Row(
-  //     mainAxisAlignment: MainAxisAlignment.center,
-  //     children: [
-  //       // First Box: Diagonal Gradient (transparent to black)
-  //       Container(
-  //         width: 40,
-  //         height: 40,
-  //         decoration: BoxDecoration(
-  //           gradient: LinearGradient(
-  //             colors: [
-  //               Colors.transparent,
-  //               Colors.transparent,
-  //               Colors.transparent,
-  //               Colors.transparent,
-  //               Colors.transparent,
-  //               Colors.transparent,
-  //               Colors.transparent,
-  //               Colors.transparent,
-  //               Colors.white,
-  //               Colors.white,
-  //               Colors.white,
-  //               Colors.white,
-  //               Colors.white,
-  //               Colors.white,
-  //               Colors.white,
-  //               Colors.white,
-  //               Colors.white,
-  //             ],
-  //             begin: Alignment.bottomLeft,
-  //             end: Alignment.topRight,
-  //           ),
-  //         ),
-  //       ),
-  //       Container(
-  //         width: 40,
-  //         height: 40,
-  //         decoration: BoxDecoration(
-  //           gradient: LinearGradient(
-  //             colors: [
-  //               Colors.white,
-  //               Colors.white,
-  //               Colors.white,
-  //               Colors.white,
-  //               Colors.white,
-  //               Colors.white,
-  //               Colors.white,
-  //               Colors.white,
-  //               Colors.white,
-  //               Colors.transparent,
-  //               Colors.transparent,
-  //               Colors.transparent,
-  //               Colors.transparent,
-  //               Colors.transparent,
-  //               Colors.transparent,
-  //               Colors.transparent,
-  //               Colors.transparent,
-  //             ],
-  //             begin: Alignment.topLeft,
-  //             end: Alignment.bottomRight,
-  //           ),
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
+// @override
+// Widget arrowButtomBox() {
+//   return Row(
+//     mainAxisAlignment: MainAxisAlignment.center,
+//     children: [
+//       // First Box: Diagonal Gradient (transparent to black)
+//       Container(
+//         width: 40,
+//         height: 40,
+//         decoration: BoxDecoration(
+//           gradient: LinearGradient(
+//             colors: [
+//               Colors.transparent,
+//               Colors.transparent,
+//               Colors.transparent,
+//               Colors.transparent,
+//               Colors.transparent,
+//               Colors.transparent,
+//               Colors.transparent,
+//               Colors.transparent,
+//               Colors.white,
+//               Colors.white,
+//               Colors.white,
+//               Colors.white,
+//               Colors.white,
+//               Colors.white,
+//               Colors.white,
+//               Colors.white,
+//               Colors.white,
+//             ],
+//             begin: Alignment.bottomLeft,
+//             end: Alignment.topRight,
+//           ),
+//         ),
+//       ),
+//       Container(
+//         width: 40,
+//         height: 40,
+//         decoration: BoxDecoration(
+//           gradient: LinearGradient(
+//             colors: [
+//               Colors.white,
+//               Colors.white,
+//               Colors.white,
+//               Colors.white,
+//               Colors.white,
+//               Colors.white,
+//               Colors.white,
+//               Colors.white,
+//               Colors.white,
+//               Colors.transparent,
+//               Colors.transparent,
+//               Colors.transparent,
+//               Colors.transparent,
+//               Colors.transparent,
+//               Colors.transparent,
+//               Colors.transparent,
+//               Colors.transparent,
+//             ],
+//             begin: Alignment.topLeft,
+//             end: Alignment.bottomRight,
+//           ),
+//         ),
+//       ),
+//     ],
+//   );
+// }

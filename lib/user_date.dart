@@ -99,7 +99,7 @@ Future<Map<String, dynamic>> userDataFromHive() async {
     'profile': box.get('profile'),
   };
   // Optionally, print a message or handle UI updates
-  print('Data has been retrieved from Hive.');
+  //print('Data has been retrieved from Hive.');
 
   //await box.close();
   return data;

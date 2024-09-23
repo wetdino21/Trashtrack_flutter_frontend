@@ -42,6 +42,17 @@ class _C_MapScreenState extends State<C_MapScreen> {
   bool currentLocStreaming = false;
   StreamSubscription<Position>? _positionStream;
 
+  final TextEditingController _startController = TextEditingController();
+  final FocusNode _startFocusNode = FocusNode();
+  final TextEditingController _destinationController = TextEditingController();
+  final FocusNode _destinationFocusNode = FocusNode();
+  //List<String> _foundPlaces = [];
+  List<Map<String, dynamic>> _foundPlaces = [];
+
+  bool startfound = true;
+  bool destinationfound = true;
+  bool startIsSearching = false;
+  bool destinationIsSearching = false;
   //bool isLocationOn = false;
   //Timer? _locationCheckTimer;
 
@@ -55,18 +66,15 @@ class _C_MapScreenState extends State<C_MapScreen> {
   void dispose() {
     _stopLocationUpdates(); // Stop location updates when the widget is disposed
     _mapController.dispose();
+    _startFocusNode.dispose();
     super.dispose();
   }
 
   void _stopLocationUpdates() {
-    setState(() {
-      isLoading = true;
-    });
-    print('Real time location is now off');
-    _positionStream?.cancel(); // Cancel the subscription to stop the stream
-    setState(() {
-      isLoading = false;
-    });
+    if (_positionStream != null) {
+      _positionStream?.cancel();
+      _positionStream = null;
+    }
   }
 
   // void startRealTimeLocationCheck() {
@@ -87,6 +95,58 @@ class _C_MapScreenState extends State<C_MapScreen> {
   //     }
   //   });
   // }
+
+  // Fetch places using the OpenStreetMap Nominatim API
+  Future<void> _searchPlaces(String query) async {
+    if (query.isEmpty) {
+      setState(() {
+        _foundPlaces = [];
+      });
+      return;
+    }
+
+    final url = Uri.parse(
+        'https://nominatim.openstreetmap.org/search?q=$query, Philippines&format=json&addressdetails=1&limit=5');
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final response = await http.get(
+        url,
+        // headers: {
+        //   'Accept-Language': 'tl' // Set the preferred language to Filipino
+        // },
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> placesData = json.decode(response.body);
+        setState(() {
+          _foundPlaces = placesData.map((place) {
+            return {
+              'name': place['display_name'] as String,
+              'lat': place['lat'] as String,
+              'lon': place['lon'] as String,
+            };
+          }).toList();
+        });
+      } else {
+        setState(() {
+          _foundPlaces = [];
+        });
+      }
+    } catch (error) {
+      print('Error fetching places: $error');
+      setState(() {
+        _foundPlaces = [];
+      });
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  }
 
   // Utility function to format distance
   String formatDistance(double distance) {
@@ -190,6 +250,8 @@ class _C_MapScreenState extends State<C_MapScreen> {
       currentLocStreaming = false;
       _stopLocationUpdates();
 
+      _startController.text = '';
+
       selectedPoint = null;
       startPoint = null;
       destinationPoint = null;
@@ -206,6 +268,13 @@ class _C_MapScreenState extends State<C_MapScreen> {
 
       failGetRoute = false;
       failGetPlaceName = false;
+
+      startfound = true;
+      destinationfound = true;
+      startIsSearching = false;
+      destinationIsSearching = false;
+      _startController.text = '';
+      _destinationController.text = '';
     });
   }
 
@@ -217,15 +286,21 @@ class _C_MapScreenState extends State<C_MapScreen> {
   }
 
   void handleDirections(LatLng point) {
+    print('111111');
     setState(() {
       if (startPoint == null) {
         startPoint = point; // Set start point
         fetchStartPlaceName();
       } else if (destinationPoint == null) {
         destinationPoint = point; // Set destination point
-        fetchRoutes(startPoint!, destinationPoint!); // Fetch routes
+        //fetchRoutes(startPoint!, destinationPoint!); // Fetch routes
         fetchDestinationPlaceName();
       }
+
+      if(startPoint != null && destinationPoint != null){
+         fetchRoutes(startPoint!, destinationPoint!); // Fetch routes
+      }
+      
     });
   }
 
@@ -293,7 +368,7 @@ class _C_MapScreenState extends State<C_MapScreen> {
   void fetchStartPlaceName() async {
     String? startPlace =
         await getPlaceName(startPoint!.latitude, startPoint!.longitude);
-
+    _startController.text = startPlace!;
     setState(() {
       startName = startPlace;
     });
@@ -302,7 +377,7 @@ class _C_MapScreenState extends State<C_MapScreen> {
   void fetchDestinationPlaceName() async {
     String? destinationPlace = await getPlaceName(
         destinationPoint!.latitude, destinationPoint!.longitude);
-
+    _destinationController.text = destinationPlace!;
     setState(() {
       destinationName = destinationPlace;
     });
@@ -311,10 +386,10 @@ class _C_MapScreenState extends State<C_MapScreen> {
   //LOCATION PERMISSION
   Future<void> _getCurrentLocation() async {
     try {
-      if (!currentLocStreaming)
-        setState(() {
-          isLoading = true;
-        });
+      //if (!currentLocStreaming)
+      // setState(() {
+      //   isLoading = true;
+      // });
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
@@ -336,6 +411,35 @@ class _C_MapScreenState extends State<C_MapScreen> {
         return;
       }
 
+      // LocationSettings locationSettings = LocationSettings(
+      //   accuracy: LocationAccuracy.high, // Specify accuracy
+      //   distanceFilter: 10, // Update when the user moves 10 meters
+      // );
+
+      // _positionStream = Geolocator.getPositionStream(
+      //   locationSettings: locationSettings,
+      // ).listen((Position position) async {
+      //   String? currentLocationName = await getPlaceName(
+      //     position.latitude,
+      //     position.longitude,
+      //   );
+
+      //   setState(() {
+      //     _currentLocation = LatLng(position.latitude, position.longitude);
+      //     selectedCurrentName = currentLocationName;
+
+      //     // Move map to current location
+      //     _mapController.move(_currentLocation!, _mapController.zoom);
+
+      //     // Redraw the route to the static destination
+      //     //_drawRoute(_currentLocation!, _staticDestination);
+      //   });
+      // });
+
+      LocationSettings locationSettings = LocationSettings(
+        accuracy: LocationAccuracy.high, // Specify accuracy
+        distanceFilter: 10, // Update when the user moves 10 meters
+      );
       //////real time current position
       _positionStream = Geolocator.getPositionStream().listen(
         (Position position) async {
@@ -347,21 +451,16 @@ class _C_MapScreenState extends State<C_MapScreen> {
 
             // Move the map to the new location
             _mapController.move(_currentLocation!, _mapController.zoom);
+
+            // Fetch routes with the updated current location and static destination
+            if (destinationPoint != null) {
+              fetchRoutes(_currentLocation!, destinationPoint!);
+            }
           });
           currentLocStreaming = true;
         },
         onError: (error) async {
           print('Error occurred in location stream: $error');
-
-          //bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-          // if (!isLocationOn) {
-          //   _stopLocationUpdates();
-          //   setState(() {
-          //     currentLocStreaming = false;
-          //   });
-
-          //   //await Geolocator.openLocationSettings();
-          // }
         },
       );
 
@@ -535,18 +634,6 @@ class _C_MapScreenState extends State<C_MapScreen> {
                       ),
             ],
           ),
-          // if (!isLocationOn)
-          //   Container(
-          //     color: Colors.red,
-          //     height: 30,
-          //     child: Center(
-          //       child: Text(
-          //         'Your location is off',
-          //         style: TextStyle(
-          //             color: Colors.white, fontWeight: FontWeight.bold),
-          //       ),
-          //     ),
-          //   ),
           if (isLoading)
             Center(
               child: CircularProgressIndicator(
@@ -556,6 +643,8 @@ class _C_MapScreenState extends State<C_MapScreen> {
                 backgroundColor: Colors.deepPurple,
               ),
             ),
+
+          //top layer
           isSelectingDirections
               ? Positioned(
                   top: 0,
@@ -576,6 +665,9 @@ class _C_MapScreenState extends State<C_MapScreen> {
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 20),
                         ),
+
+                        (!startIsSearching && !destinationIsSearching) ||
+                        startIsSearching || !destinationIsSearching?
                         Row(
                           children: [
                             Icon(Icons.location_on, color: Colors.green),
@@ -587,23 +679,32 @@ class _C_MapScreenState extends State<C_MapScreen> {
                                     borderRadius: BorderRadius.circular(5),
                                     border: Border.all(
                                         width: 2, color: Colors.green)),
-                                child: Text(
-                                  startName == null
-                                      ? 'Select Starting Point'
-                                      : startName!,
+                                child: TextField(
+                                  controller: _startController,
+                                  focusNode: _startFocusNode,
+                                  onChanged: (value) {
+                                    startIsSearching = true;
+                                    destinationIsSearching = false;
+                                    startfound = false;
+                                    _searchPlaces(
+                                        value); // Call the search function
+                                  },
+                                  decoration: InputDecoration(
+                                    hintText: 'Select Starting Point',
+                                    border: InputBorder.none,
+                                  ),
                                   style: TextStyle(
                                       color: Colors.black54,
                                       fontWeight: FontWeight.bold),
-                                  softWrap:
-                                      true, // Allow wrapping to the next line
-                                  overflow: TextOverflow
-                                      .visible, // Prevent clipping, allow text to expand
                                 ),
                               ),
                             ),
                           ],
-                        ),
+                        ):SizedBox(),
                         SizedBox(height: 3),
+
+                        (!startIsSearching && !destinationIsSearching) ||
+                        destinationIsSearching || !startIsSearching?
                         Row(
                           children: [
                             Icon(Icons.flag, color: Colors.red),
@@ -615,22 +716,180 @@ class _C_MapScreenState extends State<C_MapScreen> {
                                     borderRadius: BorderRadius.circular(5),
                                     border: Border.all(
                                         width: 2, color: Colors.red)),
-                                child: Text(
-                                  destinationName == null
-                                      ? 'Select Destination Point'
-                                      : destinationName!,
+                                child: TextField(
+                                  controller: _destinationController,
+                                  focusNode: _destinationFocusNode,
+                                  onChanged: (value) {
+                                    destinationIsSearching = true;
+                                    startIsSearching = false;
+                                    destinationfound = false;
+                                    _searchPlaces(
+                                        value); // Call the search function
+                                  },
+                                  decoration: InputDecoration(
+                                    hintText: 'Select Destination Point',
+                                    border: InputBorder.none,
+                                  ),
                                   style: TextStyle(
                                       color: Colors.black54,
                                       fontWeight: FontWeight.bold),
-                                  softWrap:
-                                      true, // Allow wrapping to the next line
-                                  overflow: TextOverflow
-                                      .visible, // Prevent clipping, allow text to expand
                                 ),
                               ),
                             ),
                           ],
-                        ),
+                        ):SizedBox(),
+                        startIsSearching
+                            ? Container(
+                                //height: _foundPlaces.isEmpty && _startController.text.isEmpty? 10 : _foundPlaces.isEmpty && _startController.text.isNotEmpty? 100: 500,
+                                child: _startController.text.isEmpty ||
+                                        startfound
+                                    ? SizedBox(
+                                        height: 10,
+                                      )
+                                    : _foundPlaces.isEmpty &&
+                                            _startController.text.isNotEmpty &&
+                                            !startfound
+                                        ? Center(
+                                            child: ListTile(
+                                              title: Text(
+                                                  '      No Location found'),
+                                            ),
+                                          )
+                                        : Container(
+                                            height: 500,
+                                            child: ListView.builder(
+                                              itemCount: _foundPlaces.length,
+                                              itemBuilder: (context, index) {
+                                                final place =
+                                                    _foundPlaces[index];
+                                                return Column(
+                                                  children: [
+                                                    ListTile(
+                                                      title:
+                                                          Text(place['name']),
+                                                      onTap: () {
+                                                        setState(() {
+                                                           _foundPlaces = [];
+                                                          startIsSearching =
+                                                              false;
+                                                          startfound = true;
+                                                          _startController
+                                                                  .text =
+                                                              place['name'];
+                                                          // _foundPlaces =
+                                                          //     []; // Clear the results after selection
+                                                          print(place['lat']);
+                                                          print(place['lon']);
+                                                          startPoint = LatLng(
+                                                              double.parse(
+                                                                  place['lat']),
+                                                              double.parse(
+                                                                  place[
+                                                                      'lon']));
+                                                          routes.clear();
+                                                          if (startPoint !=
+                                                                  null &&
+                                                              destinationPoint !=
+                                                                  null) {
+                                                            fetchRoutes(
+                                                                startPoint!,
+                                                                destinationPoint!);
+                                                          }
+                                                          _mapController.move(
+                                                              startPoint!,
+                                                              _mapController
+                                                                  .zoom);
+                                                          _startFocusNode
+                                                              .unfocus();
+                                                        });
+                                                      },
+                                                    ),
+                                                    Divider(
+                                                      height: 0,
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            ),
+                                          ),
+                              )
+                            : SizedBox(),
+                        destinationIsSearching
+                            ? Container(
+                                //height: _foundPlaces.isEmpty && _startController.text.isEmpty? 10 : _foundPlaces.isEmpty && _startController.text.isNotEmpty? 100: 500,
+                                child: _destinationController.text.isEmpty ||
+                                        destinationfound
+                                    ? SizedBox(
+                                        height: 10,
+                                      )
+                                    : _foundPlaces.isEmpty &&
+                                            _destinationController.text.isNotEmpty &&
+                                            !destinationfound
+                                        ? Center(
+                                            child: ListTile(
+                                              title: Text(
+                                                  '      No Location found'),
+                                            ),
+                                          )
+                                        : Container(
+                                            height: 500,
+                                            child: ListView.builder(
+                                              itemCount: _foundPlaces.length,
+                                              itemBuilder: (context, index) {
+                                                final place =
+                                                    _foundPlaces[index];
+                                                return Column(
+                                                  children: [
+                                                    ListTile(
+                                                      title:
+                                                          Text(place['name']),
+                                                      onTap: () {
+                                                        setState(() {
+                                                          _foundPlaces = [];
+                                                            destinationIsSearching =
+                                                              false;
+                                                          destinationfound = true;
+                                                          _destinationController
+                                                                  .text =
+                                                              place['name'];
+                                                          // _foundPlaces =
+                                                          //     []; // Clear the results after selection
+                                                          print(place['lat']);
+                                                          print(place['lon']);
+                                                          destinationPoint = LatLng(
+                                                              double.parse(
+                                                                  place['lat']),
+                                                              double.parse(
+                                                                  place[
+                                                                      'lon']));
+                                                          routes.clear();
+                                                          if (destinationPoint !=
+                                                                  null &&
+                                                              startPoint !=
+                                                                  null) {
+                                                            fetchRoutes(
+                                                                startPoint!,
+                                                                destinationPoint!);
+                                                          }
+                                                          _mapController.move(
+                                                              destinationPoint!,
+                                                              _mapController
+                                                                  .zoom);
+                                                          _destinationFocusNode
+                                                              .unfocus();
+                                                        });
+                                                      },
+                                                    ),
+                                                    Divider(
+                                                      height: 0,
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            ),
+                                          ),
+                              )
+                            : SizedBox(),
                         SizedBox(
                           height: 10,
                         )
@@ -708,28 +967,6 @@ class _C_MapScreenState extends State<C_MapScreen> {
           )
         ],
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   backgroundColor: Colors.green,
-      //   child: Icon(
-      //     isSelectingDirections || selectedPoint != null
-      //         ? Icons.close
-      //         : Icons.directions,
-      //     color: Colors.white,
-      //     size: 40,
-      //   ),
-      //   onPressed: () {
-      //     if (isSelectingDirections || selectedPoint != null) {
-      //       resetSelection(); // Reset when closing direction selection
-      //       print(nearestDuration);
-      //     } else {
-      //       resetSelection(); // Optional: reset for fresh start
-      //       print(nearestDuration);
-      //       setState(() {
-      //         isSelectingDirections = true; // Switch to directions mode
-      //       });
-      //     }
-      //   },
-      // ),
       bottomSheet: selectedPoint != null && !isLoading
           ? Container(
               padding: EdgeInsets.all(16.0),
@@ -879,42 +1116,6 @@ class _C_MapScreenState extends State<C_MapScreen> {
       ),
     );
   }
-
-  // Widget routeMarker({required String duration, required String distance}) {
-  //   return Container(
-  //     padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-  //     decoration: BoxDecoration(
-  //       color: Colors.white,
-  //       borderRadius: BorderRadius.circular(10.0),
-  //       boxShadow: [
-  //         BoxShadow(
-  //           color: Colors.black26,
-  //           offset: Offset(0, 2),
-  //           blurRadius: 6.0,
-  //         ),
-  //       ],
-  //     ),
-  //     child: Column(
-  //       children: [
-  //         Text(
-  //           distance,
-  //           style: TextStyle(
-  //             fontWeight: FontWeight.bold,
-  //             fontSize: 16.0,
-  //             color: Colors.black,
-  //           ),
-  //         ),
-  //         Text(
-  //           duration,
-  //           style: TextStyle(
-  //             fontSize: 14.0,
-  //             color: Colors.grey[600],
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 }
 
 // Custom Marker Widget
@@ -968,71 +1169,3 @@ class RouteMarker extends StatelessWidget {
     );
   }
 }
-
-// @override
-// Widget arrowButtomBox() {
-//   return Row(
-//     mainAxisAlignment: MainAxisAlignment.center,
-//     children: [
-//       // First Box: Diagonal Gradient (transparent to black)
-//       Container(
-//         width: 40,
-//         height: 40,
-//         decoration: BoxDecoration(
-//           gradient: LinearGradient(
-//             colors: [
-//               Colors.transparent,
-//               Colors.transparent,
-//               Colors.transparent,
-//               Colors.transparent,
-//               Colors.transparent,
-//               Colors.transparent,
-//               Colors.transparent,
-//               Colors.transparent,
-//               Colors.white,
-//               Colors.white,
-//               Colors.white,
-//               Colors.white,
-//               Colors.white,
-//               Colors.white,
-//               Colors.white,
-//               Colors.white,
-//               Colors.white,
-//             ],
-//             begin: Alignment.bottomLeft,
-//             end: Alignment.topRight,
-//           ),
-//         ),
-//       ),
-//       Container(
-//         width: 40,
-//         height: 40,
-//         decoration: BoxDecoration(
-//           gradient: LinearGradient(
-//             colors: [
-//               Colors.white,
-//               Colors.white,
-//               Colors.white,
-//               Colors.white,
-//               Colors.white,
-//               Colors.white,
-//               Colors.white,
-//               Colors.white,
-//               Colors.white,
-//               Colors.transparent,
-//               Colors.transparent,
-//               Colors.transparent,
-//               Colors.transparent,
-//               Colors.transparent,
-//               Colors.transparent,
-//               Colors.transparent,
-//               Colors.transparent,
-//             ],
-//             begin: Alignment.topLeft,
-//             end: Alignment.bottomRight,
-//           ),
-//         ),
-//       ),
-//     ],
-//   );
-// }

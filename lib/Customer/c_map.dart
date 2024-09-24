@@ -10,11 +10,16 @@ import 'package:geolocator/geolocator.dart';
 import 'dart:async';
 
 class C_MapScreen extends StatefulWidget {
+  final LatLng? pickupPoint;
+
+  C_MapScreen({this.pickupPoint});
+
   @override
   _C_MapScreenState createState() => _C_MapScreenState();
 }
 
 class _C_MapScreenState extends State<C_MapScreen> {
+  bool hideScreen = false;
   final MapController _mapController = MapController();
   LatLng? _currentLocation;
 
@@ -35,17 +40,20 @@ class _C_MapScreenState extends State<C_MapScreen> {
 
   String? nearestDistance;
   String? nearestDuration;
+  int? nearestRoute;
 
   bool failGetRoute = false;
   bool failGetPlaceName = false;
   bool isLoading = false;
   bool currentLocStreaming = false;
+  bool startLocStreaming = false;
   StreamSubscription<Position>? _positionStream;
 
   final TextEditingController _startController = TextEditingController();
   final FocusNode _startFocusNode = FocusNode();
   final TextEditingController _destinationController = TextEditingController();
   final FocusNode _destinationFocusNode = FocusNode();
+  StreamSubscription<Position>? _startPositionStream;
   //List<String> _foundPlaces = [];
   List<Map<String, dynamic>> _foundPlaces = [];
 
@@ -53,27 +61,109 @@ class _C_MapScreenState extends State<C_MapScreen> {
   bool destinationfound = true;
   bool startIsSearching = false;
   bool destinationIsSearching = false;
+
   //bool isLocationOn = false;
   //Timer? _locationCheckTimer;
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   startRealTimeLocationCheck();
-  // }
+  @override
+  void initState() {
+    super.initState();
+    if (widget.pickupPoint != null) {
+      pickUpDirection();
+    }
+
+    //startRealTimeLocationCheck();
+  }
 
   @override
   void dispose() {
     _stopLocationUpdates(); // Stop location updates when the widget is disposed
     _mapController.dispose();
+    _startController.dispose();
+    _destinationController.dispose();
     _startFocusNode.dispose();
+    _destinationFocusNode.dispose();
     super.dispose();
+  }
+
+//LOCATION PERMISSION
+  Future<void> pickUpDirection() async {
+    try {
+        LocationPermission permission = await Geolocator.checkPermission();
+        if (permission == LocationPermission.denied) {
+          permission = await Geolocator.requestPermission();
+          if (permission != LocationPermission.whileInUse &&
+              permission != LocationPermission.always) {
+            return; // Location services are not enabled
+          }
+        }
+
+        if (permission == LocationPermission.denied ||
+            permission == LocationPermission.deniedForever) {
+          await Geolocator.openAppSettings();
+          return;
+        }
+        bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+        if (!serviceEnabled) {
+          // Optionally, open the location settings:
+          await Geolocator.openLocationSettings();
+          return;
+        }
+
+        LocationSettings locationSettings = LocationSettings(
+          accuracy: LocationAccuracy.high, // Specify accuracy
+          distanceFilter: 10, // Update when the user moves 10 meters
+        );
+        //////real time current position
+        _startPositionStream = Geolocator.getPositionStream(
+          locationSettings: locationSettings,
+        ).listen(
+          (Position position) async {
+            String? getCurrentName =
+                await getPlaceName(position.latitude, position.longitude);
+            String? getDestiantionName = await getPlaceName(
+                widget.pickupPoint!.latitude, widget.pickupPoint!.longitude);
+            setState(() {
+              _startController.text = getCurrentName!;
+              startPoint = LatLng(position.latitude, position.longitude);
+              if (!startLocStreaming)
+                _mapController.move(startPoint!, _mapController.zoom);
+
+              startLocStreaming = true;
+              destinationPoint = widget.pickupPoint;
+              fetchRoutes(startPoint!, destinationPoint!);
+              // if (destinationPoint != null) {
+              //   fetchRoutes(startPoint!, destinationPoint!);
+              // }
+              _startController.text = getCurrentName;
+              _destinationController.text = getDestiantionName!;
+              isSelectingDirections = true;
+              startLocStreaming = true;
+            });
+          },
+          onError: (error) async {
+            print('Error occurred in location stream: $error');
+          },
+        );
+    } catch (e) {
+      print('fail to get current location!');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   void _stopLocationUpdates() {
     if (_positionStream != null) {
       _positionStream?.cancel();
       _positionStream = null;
+      print('Single Current Stream is now off!');
+    }
+    if (_startPositionStream != null) {
+      _startPositionStream?.cancel();
+      _startPositionStream = null;
+      print('Direction Current Stream is now off!');
     }
   }
 
@@ -181,9 +271,10 @@ class _C_MapScreenState extends State<C_MapScreen> {
   }
 
   Future<void> fetchRoutes(LatLng start, LatLng destination) async {
-    setState(() {
-      isLoading = true;
-    });
+    if (!startLocStreaming)
+      setState(() {
+        isLoading = true;
+      });
 
     try {
       final url = Uri.parse(
@@ -218,13 +309,16 @@ class _C_MapScreenState extends State<C_MapScreen> {
           if (routesData.length == 1) {
             nearestDuration = formatDuration(routeDurations[0]);
             nearestDistance = formatDistance(routeDistances[0]);
+            nearestRoute = 1;
           } else {
             if (routeDurations[0] < routeDurations[1]) {
               nearestDuration = formatDuration(routeDurations[0]);
               nearestDistance = formatDistance(routeDistances[0]);
+              nearestRoute = 1;
             } else {
               nearestDuration = formatDuration(routeDurations[1]);
               nearestDistance = formatDistance(routeDistances[1]);
+              nearestRoute = 2;
             }
           }
         });
@@ -246,8 +340,11 @@ class _C_MapScreenState extends State<C_MapScreen> {
 
   void resetSelection() {
     setState(() {
+      //foundRoute = false;
+      hideScreen = false;
       _currentLocation = null; // current location
       currentLocStreaming = false;
+      startLocStreaming = false;
       _stopLocationUpdates();
 
       _startController.text = '';
@@ -286,21 +383,25 @@ class _C_MapScreenState extends State<C_MapScreen> {
   }
 
   void handleDirections(LatLng point) {
-    print('111111');
     setState(() {
       if (startPoint == null) {
         startPoint = point; // Set start point
         fetchStartPlaceName();
+        if (startPoint != null && destinationPoint != null) {
+          fetchRoutes(startPoint!, destinationPoint!); // Fetch routes
+        }
       } else if (destinationPoint == null) {
         destinationPoint = point; // Set destination point
         //fetchRoutes(startPoint!, destinationPoint!); // Fetch routes
         fetchDestinationPlaceName();
+        if (startPoint != null && destinationPoint != null) {
+          fetchRoutes(startPoint!, destinationPoint!); // Fetch routes
+        }
       }
 
-      if(startPoint != null && destinationPoint != null){
-         fetchRoutes(startPoint!, destinationPoint!); // Fetch routes
-      }
-      
+      // if (startPoint != null && destinationPoint != null) {
+      //   fetchRoutes(startPoint!, destinationPoint!); // Fetch routes
+      // }
     });
   }
 
@@ -310,7 +411,7 @@ class _C_MapScreenState extends State<C_MapScreen> {
   }
 
   Future<String?> getPlaceName(double lat, double lng) async {
-    if (!currentLocStreaming)
+    if (!currentLocStreaming && !startLocStreaming)
       setState(() {
         isLoading = true;
       });
@@ -398,7 +499,7 @@ class _C_MapScreenState extends State<C_MapScreen> {
           return; // Location services are not enabled
         }
       }
-
+      print('1111111111');
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
         await Geolocator.openAppSettings();
@@ -435,16 +536,19 @@ class _C_MapScreenState extends State<C_MapScreen> {
       //     //_drawRoute(_currentLocation!, _staticDestination);
       //   });
       // });
-
+      print('2222222');
       LocationSettings locationSettings = LocationSettings(
         accuracy: LocationAccuracy.high, // Specify accuracy
         distanceFilter: 10, // Update when the user moves 10 meters
       );
       //////real time current position
-      _positionStream = Geolocator.getPositionStream().listen(
+      _positionStream = Geolocator.getPositionStream(
+        locationSettings: locationSettings,
+      ).listen(
         (Position position) async {
           String? getCurrentName =
               await getPlaceName(position.latitude, position.longitude);
+          print('33333');
           setState(() {
             _currentLocation = LatLng(position.latitude, position.longitude);
             selectedCurrentName = getCurrentName;
@@ -452,12 +556,13 @@ class _C_MapScreenState extends State<C_MapScreen> {
             // Move the map to the new location
             _mapController.move(_currentLocation!, _mapController.zoom);
 
-            // Fetch routes with the updated current location and static destination
-            if (destinationPoint != null) {
-              fetchRoutes(_currentLocation!, destinationPoint!);
-            }
+            // // Fetch routes with the updated current location and static destination
+            // if (destinationPoint != null) {
+            //   fetchRoutes(_currentLocation!, destinationPoint!);
+            // }
           });
           currentLocStreaming = true;
+          print('Single Current Stream is now ON!');
         },
         onError: (error) async {
           print('Error occurred in location stream: $error');
@@ -486,6 +591,77 @@ class _C_MapScreenState extends State<C_MapScreen> {
     }
   }
 
+  //LOCATION PERMISSION
+  Future<void> _startCurrentLocation() async {
+    try {
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission != LocationPermission.whileInUse &&
+            permission != LocationPermission.always) {
+          return; // Location services are not enabled
+        }
+      }
+
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        await Geolocator.openAppSettings();
+        return;
+      }
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        // Optionally, open the location settings:
+        await Geolocator.openLocationSettings();
+        return;
+      }
+
+      LocationSettings locationSettings = LocationSettings(
+        accuracy: LocationAccuracy.high, // Specify accuracy
+        distanceFilter: 10, // Update when the user moves 10 meters
+      );
+      //////real time current position
+      _startPositionStream = Geolocator.getPositionStream(
+        locationSettings: locationSettings,
+      ).listen(
+        (Position position) async {
+          String? getCurrentName =
+              await getPlaceName(position.latitude, position.longitude);
+          setState(() {
+            _startController.text = getCurrentName!;
+            startPoint = LatLng(position.latitude, position.longitude);
+            if (!startLocStreaming)
+              _mapController.move(startPoint!, _mapController.zoom);
+
+            startLocStreaming = true;
+            if (destinationPoint != null) {
+              fetchRoutes(startPoint!, destinationPoint!);
+            }
+          });
+          print('Direction Current Stream is now ON!');
+        },
+        onError: (error) async {
+          print('Error occurred in location stream: $error');
+        },
+      );
+    } catch (e) {
+      print('fail to get current location!');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  void onhideScreen() {
+    setState(() {
+      if (hideScreen == true) {
+        hideScreen = false;
+      } else {
+        hideScreen = true;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -500,9 +676,13 @@ class _C_MapScreenState extends State<C_MapScreen> {
               //maxZoom: 19,
               maxZoom: 19, // Maximum zoom in level
               minZoom: 5, // Minimum zoom out level
-              onTap: (tapPosition, point) => isSelectingDirections
-                  ? handleDirections(point)
-                  : handleOnePoint(point),
+              onTap: (tapPosition, point) => currentLocStreaming
+                  ? null
+                 : routes.isNotEmpty || routes.isNotEmpty
+                      ? onhideScreen()
+                      : isSelectingDirections
+                          ? handleDirections(point)
+                          : handleOnePoint(point),
             ),
             children: [
               TileLayer(
@@ -521,11 +701,8 @@ class _C_MapScreenState extends State<C_MapScreen> {
                       Polyline(
                         points: routes[i],
                         strokeWidth: 4.0,
-                        color: i == 0
-                            ? Colors.blue
-                            : i == 1
-                                ? Colors.orange
-                                : Colors.purple,
+                        color:
+                            i + 1 == nearestRoute ? Colors.blue : Colors.orange,
                       ),
                   ],
                 ),
@@ -624,6 +801,9 @@ class _C_MapScreenState extends State<C_MapScreen> {
                                             formatDuration(routeDurations[i]),
                                         distance:
                                             formatDistance(routeDistances[i]),
+                                        route: i + 1, // Indexing the route
+                                        nearestRoute:
+                                            nearestRoute!, // Pass nearestRoute
                                       ),
                                     ),
                                     //arrowButtomBox(),
@@ -645,7 +825,7 @@ class _C_MapScreenState extends State<C_MapScreen> {
             ),
 
           //top layer
-          isSelectingDirections
+          isSelectingDirections && !hideScreen
               ? Positioned(
                   top: 0,
                   left: 0,
@@ -653,165 +833,260 @@ class _C_MapScreenState extends State<C_MapScreen> {
                   child: Container(
                     padding: EdgeInsets.all(5.0),
                     decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.8),
+                        color: Colors.white,
                         borderRadius:
                             BorderRadius.vertical(bottom: Radius.circular(15)),
                         boxShadow: shadowColor),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          'Directions',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 20),
+                        SizedBox(
+                          height: 10,
                         ),
-
                         (!startIsSearching && !destinationIsSearching) ||
-                        startIsSearching || !destinationIsSearching?
-                        Row(
-                          children: [
-                            Icon(Icons.location_on, color: Colors.green),
-                            SizedBox(width: 3),
-                            Expanded(
-                              child: Container(
-                                padding: EdgeInsets.only(left: 3),
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(5),
-                                    border: Border.all(
-                                        width: 2, color: Colors.green)),
-                                child: TextField(
-                                  controller: _startController,
-                                  focusNode: _startFocusNode,
-                                  onChanged: (value) {
-                                    startIsSearching = true;
-                                    destinationIsSearching = false;
-                                    startfound = false;
-                                    _searchPlaces(
-                                        value); // Call the search function
-                                  },
-                                  decoration: InputDecoration(
-                                    hintText: 'Select Starting Point',
-                                    border: InputBorder.none,
+                                startIsSearching ||
+                                !destinationIsSearching
+                            ? Row(
+                                children: [
+                                  Icon(Icons.location_on, color: Colors.green),
+                                  SizedBox(width: 3),
+                                  Expanded(
+                                    child: Container(
+                                      padding: EdgeInsets.only(left: 3),
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          border: Border.all(width: 1)),
+                                      child: TextField(
+                                        controller: _startController,
+                                        focusNode: _startFocusNode,
+                                        onChanged: (value) {
+                                          startIsSearching = true;
+                                          destinationIsSearching = false;
+                                          startfound = false;
+                                          _searchPlaces(
+                                              value); // Call the search function
+                                        },
+                                        decoration: InputDecoration(
+                                          hintText: 'Select Starting Point',
+                                          hintStyle: TextStyle(
+                                              fontWeight: FontWeight.normal),
+                                          border: InputBorder.none,
+                                        ),
+                                        style: TextStyle(
+                                          color: Colors.black54,
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                  style: TextStyle(
-                                      color: Colors.black54,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ):SizedBox(),
+                                  startIsSearching
+                                      ? IconButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              startIsSearching = false;
+                                              _startFocusNode.unfocus();
+                                            });
+                                          },
+                                          icon: Icon(Icons.close))
+                                      : SizedBox(
+                                          width: 10,
+                                        ),
+                                ],
+                              )
+                            : SizedBox(),
                         SizedBox(height: 3),
-
                         (!startIsSearching && !destinationIsSearching) ||
-                        destinationIsSearching || !startIsSearching?
-                        Row(
-                          children: [
-                            Icon(Icons.flag, color: Colors.red),
-                            SizedBox(width: 3),
-                            Expanded(
-                              child: Container(
-                                padding: EdgeInsets.only(left: 3),
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(5),
-                                    border: Border.all(
-                                        width: 2, color: Colors.red)),
-                                child: TextField(
-                                  controller: _destinationController,
-                                  focusNode: _destinationFocusNode,
-                                  onChanged: (value) {
-                                    destinationIsSearching = true;
-                                    startIsSearching = false;
-                                    destinationfound = false;
-                                    _searchPlaces(
-                                        value); // Call the search function
-                                  },
-                                  decoration: InputDecoration(
-                                    hintText: 'Select Destination Point',
-                                    border: InputBorder.none,
+                                destinationIsSearching ||
+                                !startIsSearching
+                            ? Row(
+                                children: [
+                                  Icon(Icons.location_on, color: Colors.red),
+                                  SizedBox(width: 3),
+                                  Expanded(
+                                    child: Container(
+                                      padding: EdgeInsets.only(left: 3),
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          border: Border.all(width: 1)),
+                                      child: TextField(
+                                        controller: _destinationController,
+                                        focusNode: _destinationFocusNode,
+                                        onChanged: (value) {
+                                          destinationIsSearching = true;
+                                          startIsSearching = false;
+                                          destinationfound = false;
+                                          _searchPlaces(
+                                              value); // Call the search function
+                                        },
+                                        decoration: InputDecoration(
+                                          hintText: 'Select Destination Point',
+                                          hintStyle: TextStyle(
+                                              fontWeight: FontWeight.normal),
+                                          border: InputBorder.none,
+                                        ),
+                                        style: TextStyle(
+                                          color: Colors.black54,
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                  style: TextStyle(
-                                      color: Colors.black54,
-                                      fontWeight: FontWeight.bold),
+                                  destinationIsSearching
+                                      ? IconButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              destinationIsSearching = false;
+                                              _destinationFocusNode.unfocus();
+                                            });
+                                          },
+                                          icon: Icon(Icons.close))
+                                      : SizedBox(
+                                          width: 10,
+                                        ),
+                                ],
+                              )
+                            : SizedBox(),
+                        (!startIsSearching && !destinationIsSearching) &&
+                                _startController.text.isEmpty
+                            ? InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    isLoading = true;
+                                  });
+                                  _startCurrentLocation();
+                                },
+                                child: ListTile(
+                                  leading: Icon(
+                                    Icons.my_location,
+                                    size: 20,
+                                    color: Colors.red,
+                                  ),
+                                  title: Text('Your Location'),
                                 ),
-                              ),
-                            ),
-                          ],
-                        ):SizedBox(),
+                              )
+                            : SizedBox(),
                         startIsSearching
-                            ? Container(
-                                //height: _foundPlaces.isEmpty && _startController.text.isEmpty? 10 : _foundPlaces.isEmpty && _startController.text.isNotEmpty? 100: 500,
-                                child: _startController.text.isEmpty ||
-                                        startfound
-                                    ? SizedBox(
-                                        height: 10,
-                                      )
-                                    : _foundPlaces.isEmpty &&
-                                            _startController.text.isNotEmpty &&
-                                            !startfound
-                                        ? Center(
-                                            child: ListTile(
-                                              title: Text(
-                                                  '      No Location found'),
+                            ? Column(
+                                children: [
+                                  _startFocusNode.hasFocus &&
+                                          _startController.text.isEmpty &&
+                                          !startLocStreaming
+                                      ? Column(
+                                          children: [
+                                            SizedBox(
+                                              height: 10,
                                             ),
-                                          )
-                                        : Container(
-                                            height: 500,
-                                            child: ListView.builder(
-                                              itemCount: _foundPlaces.length,
-                                              itemBuilder: (context, index) {
-                                                final place =
-                                                    _foundPlaces[index];
-                                                return Column(
-                                                  children: [
-                                                    ListTile(
-                                                      title:
-                                                          Text(place['name']),
-                                                      onTap: () {
-                                                        setState(() {
-                                                           _foundPlaces = [];
-                                                          startIsSearching =
-                                                              false;
-                                                          startfound = true;
-                                                          _startController
-                                                                  .text =
-                                                              place['name'];
-                                                          // _foundPlaces =
-                                                          //     []; // Clear the results after selection
-                                                          print(place['lat']);
-                                                          print(place['lon']);
-                                                          startPoint = LatLng(
-                                                              double.parse(
-                                                                  place['lat']),
-                                                              double.parse(
-                                                                  place[
-                                                                      'lon']));
-                                                          routes.clear();
-                                                          if (startPoint !=
-                                                                  null &&
-                                                              destinationPoint !=
-                                                                  null) {
-                                                            fetchRoutes(
-                                                                startPoint!,
-                                                                destinationPoint!);
-                                                          }
-                                                          _mapController.move(
-                                                              startPoint!,
-                                                              _mapController
-                                                                  .zoom);
-                                                          _startFocusNode
-                                                              .unfocus();
-                                                        });
-                                                      },
-                                                    ),
-                                                    Divider(
-                                                      height: 0,
-                                                    ),
-                                                  ],
-                                                );
+                                            InkWell(
+                                              onTap: () {
+                                                _startFocusNode.unfocus();
+                                                setState(() {
+                                                  isLoading = true;
+                                                });
+                                                _startCurrentLocation();
                                               },
+                                              child: ListTile(
+                                                leading: Icon(
+                                                  Icons.my_location,
+                                                  size: 20,
+                                                  color: Colors.red,
+                                                ),
+                                                title: Text('Your Location'),
+                                              ),
                                             ),
-                                          ),
+                                            //Divider(height: 0,)
+                                          ],
+                                        )
+                                      : SizedBox(),
+                                  _startController.text.isEmpty || startfound
+                                      ? Row(
+                                          children: [
+                                            SizedBox(
+                                              height: 10,
+                                            ),
+                                          ],
+                                        )
+                                      : _foundPlaces.isEmpty &&
+                                              _startController
+                                                  .text.isNotEmpty &&
+                                              !startfound
+                                          ? Center(
+                                              child: ListTile(
+                                                leading: Icon(
+                                                  Icons.location_on_outlined,
+                                                  size: 20,
+                                                ),
+                                                title:
+                                                    Text('No Location found'),
+                                              ),
+                                            )
+                                          : Container(
+                                              height: 500,
+                                              child: ListView.builder(
+                                                itemCount: _foundPlaces.length,
+                                                itemBuilder: (context, index) {
+                                                  final place =
+                                                      _foundPlaces[index];
+                                                  return Column(
+                                                    children: [
+                                                      ListTile(
+                                                        leading: Icon(
+                                                          Icons
+                                                              .location_on_outlined,
+                                                          size: 20,
+                                                        ),
+                                                        minLeadingWidth: .5,
+                                                        title: Text(
+                                                          place['name'],
+                                                          style: TextStyle(
+                                                              fontSize: 14),
+                                                        ),
+                                                        onTap: () {
+                                                          setState(() {
+                                                            _foundPlaces = [];
+                                                            startIsSearching =
+                                                                false;
+                                                            startfound = true;
+                                                            _startController
+                                                                    .text =
+                                                                place['name'];
+                                                            // _foundPlaces =
+                                                            //     []; // Clear the results after selection
+                                                            print(place['lat']);
+                                                            print(place['lon']);
+                                                            startPoint = LatLng(
+                                                                double.parse(
+                                                                    place[
+                                                                        'lat']),
+                                                                double.parse(
+                                                                    place[
+                                                                        'lon']));
+                                                            routes.clear();
+                                                            if (startPoint !=
+                                                                    null &&
+                                                                destinationPoint !=
+                                                                    null) {
+                                                              fetchRoutes(
+                                                                  startPoint!,
+                                                                  destinationPoint!);
+                                                            }
+                                                            _mapController.move(
+                                                                startPoint!,
+                                                                _mapController
+                                                                    .zoom);
+                                                            _startFocusNode
+                                                                .unfocus();
+                                                          });
+                                                        },
+                                                      ),
+                                                      Divider(
+                                                        height: 0,
+                                                      ),
+                                                    ],
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                ],
                               )
                             : SizedBox(),
                         destinationIsSearching
@@ -823,12 +1098,16 @@ class _C_MapScreenState extends State<C_MapScreen> {
                                         height: 10,
                                       )
                                     : _foundPlaces.isEmpty &&
-                                            _destinationController.text.isNotEmpty &&
+                                            _destinationController
+                                                .text.isNotEmpty &&
                                             !destinationfound
                                         ? Center(
                                             child: ListTile(
-                                              title: Text(
-                                                  '      No Location found'),
+                                              leading: Icon(
+                                                Icons.location_on_outlined,
+                                                size: 20,
+                                              ),
+                                              title: Text('No Location found'),
                                             ),
                                           )
                                         : Container(
@@ -841,14 +1120,23 @@ class _C_MapScreenState extends State<C_MapScreen> {
                                                 return Column(
                                                   children: [
                                                     ListTile(
-                                                      title:
-                                                          Text(place['name']),
+                                                      leading: Icon(
+                                                        Icons
+                                                            .location_on_outlined,
+                                                        size: 20,
+                                                      ),
+                                                      title: Text(
+                                                        place['name'],
+                                                        style: TextStyle(
+                                                            fontSize: 14),
+                                                      ),
                                                       onTap: () {
                                                         setState(() {
                                                           _foundPlaces = [];
-                                                            destinationIsSearching =
+                                                          destinationIsSearching =
                                                               false;
-                                                          destinationfound = true;
+                                                          destinationfound =
+                                                              true;
                                                           _destinationController
                                                                   .text =
                                                               place['name'];
@@ -900,78 +1188,83 @@ class _C_MapScreenState extends State<C_MapScreen> {
               : Container(),
 
           //floating 2 btns
-          Positioned(
-            bottom: 200,
-            right: 0,
-            child: Column(
-              children: [
-                //current location btn
-                Container(
-                    padding: EdgeInsets.all(14.0),
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15),
-                        boxShadow: shadowColor),
-                    child: InkWell(
-                      onTap: () {
-                        if (!isLoading) {
-                          if (selectedCurrentName != null) {
-                            resetSelection();
-                          } else {
-                            resetSelection();
-                            _getCurrentLocation();
-                          }
-                        }
-                      },
-                      child: Icon(
-                        selectedCurrentName != null
-                            ? Icons.close
-                            : Icons.my_location,
-                        color: Colors.red,
-                        size: 30,
-                      ),
-                    )),
+          !hideScreen
+              ? Positioned(
+                  bottom: 200,
+                  right: 0,
+                  child: Column(
+                    children: [
+                      //current location btn
+                      Container(
+                          padding: EdgeInsets.all(14.0),
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                              boxShadow: shadowColor),
+                          child: InkWell(
+                            onTap: () {
+                              if (!isLoading) {
+                                if (selectedCurrentName != null) {
+                                  resetSelection();
+                                } else {
+                                  isLoading = true;
+                                  resetSelection();
+                                  _getCurrentLocation();
+                                }
+                              }
+                            },
+                            child: Icon(
+                              selectedCurrentName != null
+                                  ? Icons.close
+                                  : Icons.my_location,
+                              color: Colors.red,
+                              size: 30,
+                            ),
+                          )),
 
-                //direction btn
-                Container(
-                    margin: EdgeInsets.all(15),
-                    padding: EdgeInsets.all(14.0),
-                    decoration: BoxDecoration(
-                        color: Colors.green,
-                        borderRadius: BorderRadius.circular(15),
-                        boxShadow: shadowColor),
-                    child: InkWell(
-                      onTap: () {
-                        if (!isLoading) {
-                          if (isSelectingDirections) {
-                            resetSelection(); // Reset when closing direction selection
-                            print(nearestDuration);
-                          } else {
-                            resetSelection(); // Optional: reset for fresh start
-                            print(nearestDuration);
-                            setState(() {
-                              isSelectingDirections =
-                                  true; // Switch to directions mode
-                            });
-                          }
-                        }
-                      },
-                      child: Icon(
-                        isSelectingDirections ? Icons.close : Icons.directions,
-                        color: Colors.white,
-                        size: 30,
-                      ),
-                    )),
-              ],
-            ),
-          )
+                      //direction btn
+                      Container(
+                          margin: EdgeInsets.all(15),
+                          padding: EdgeInsets.all(14.0),
+                          decoration: BoxDecoration(
+                              color: Colors.green,
+                              borderRadius: BorderRadius.circular(15),
+                              boxShadow: shadowColor),
+                          child: InkWell(
+                            onTap: () {
+                              if (!isLoading) {
+                                if (isSelectingDirections) {
+                                  resetSelection(); // Reset when closing direction selection
+                                  print(nearestDuration);
+                                } else {
+                                  resetSelection(); // Optional: reset for fresh start
+                                  print(nearestDuration);
+                                  setState(() {
+                                    isSelectingDirections =
+                                        true; // Switch to directions mode
+                                  });
+                                }
+                              }
+                            },
+                            child: Icon(
+                              isSelectingDirections
+                                  ? Icons.close
+                                  : Icons.directions,
+                              color: Colors.white,
+                              size: 30,
+                            ),
+                          )),
+                    ],
+                  ),
+                )
+              : SizedBox(),
         ],
       ),
       bottomSheet: selectedPoint != null && !isLoading
           ? Container(
               padding: EdgeInsets.all(16.0),
               decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.8),
+                  color: Colors.white,
                   borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
                   boxShadow: shadowColor),
               child: Column(
@@ -1009,7 +1302,7 @@ class _C_MapScreenState extends State<C_MapScreen> {
                   ),
                   Divider(),
                   Text(
-                    '${selectedPoint?.latitude}, ${selectedPoint?.longitude}',
+                    '${selectedPoint?.latitude.toStringAsFixed(8)}, ${selectedPoint?.longitude.toStringAsFixed(8)}',
                     style: TextStyle(color: Colors.blue),
                   ),
                   Row(
@@ -1020,11 +1313,11 @@ class _C_MapScreenState extends State<C_MapScreen> {
               ),
             )
           // : nearestDistance > 0 || nearestDistance > 0
-          : nearestDuration != null && !isLoading
+          : nearestDuration != null && !isLoading && !hideScreen
               ? Container(
                   padding: EdgeInsets.all(16.0),
                   decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white,
                       borderRadius:
                           BorderRadius.vertical(top: Radius.circular(15)),
                       boxShadow: shadowColor),
@@ -1067,7 +1360,7 @@ class _C_MapScreenState extends State<C_MapScreen> {
                   ? Container(
                       padding: EdgeInsets.all(16.0),
                       decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white,
                           borderRadius:
                               BorderRadius.vertical(top: Radius.circular(15)),
                           boxShadow: shadowColor),
@@ -1122,22 +1415,31 @@ class _C_MapScreenState extends State<C_MapScreen> {
 class RouteMarker extends StatelessWidget {
   final String duration;
   final String distance;
+  final int route;
+  final int nearestRoute; // Add nearestRoute to compare
 
   const RouteMarker({
     Key? key,
     required this.duration,
     required this.distance,
+    required this.route,
+    required this.nearestRoute, // Add nearestRoute
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    // Check if this is the fastest route and apply special styling
+    final isFastestRoute = route == nearestRoute;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
           padding: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: isFastestRoute
+                ? Colors.blue
+                : Colors.white, // Highlight if fastest
             borderRadius: BorderRadius.circular(5),
             boxShadow: shadowColor,
           ),
@@ -1146,11 +1448,23 @@ class RouteMarker extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.directions_car, size: 18),
+                  Icon(
+                    Icons.directions_car,
+                    size: 18,
+                    color: isFastestRoute
+                        ? Colors.white
+                        : Colors.black, // Icon color change
+                  ),
                   SizedBox(width: 4),
                   Text(
                     duration,
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: isFastestRoute
+                          ? Colors.white
+                          : Colors.black, // Text color change
+                    ),
                   ),
                 ],
               ),
@@ -1158,7 +1472,12 @@ class RouteMarker extends StatelessWidget {
                 children: [
                   Text(
                     distance,
-                    style: TextStyle(fontSize: 12),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: isFastestRoute
+                          ? Colors.white
+                          : Colors.black, // Text color change
+                    ),
                   ),
                 ],
               ),
@@ -1168,4 +1487,36 @@ class RouteMarker extends StatelessWidget {
       ],
     );
   }
+}
+
+//CHECK LOCATION PERMISSION FROM OTHER CLASS
+Future<bool> checkLocationPermission() async {
+  try {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission != LocationPermission.whileInUse &&
+          permission != LocationPermission.always) {
+        return false; // Location services are not enabled
+      }
+    }
+
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      await Geolocator.openAppSettings();
+      return false;
+    }
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Optionally, open the location settings:
+      await Geolocator.openLocationSettings();
+      return false;
+    }
+
+    print('Location is on');
+    return true;
+  } catch (e) {
+    print('fail to get location permission');
+  }
+  return false;
 }

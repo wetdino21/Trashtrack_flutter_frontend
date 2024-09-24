@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:trashtrack/Customer/c_appbar.dart';
 import 'package:trashtrack/Customer/c_bottom_nav_bar.dart';
+import 'package:trashtrack/Customer/c_map.dart';
 import 'package:trashtrack/Customer/c_waste_info.dart';
 import 'package:trashtrack/Customer/c_waste_request_pickup.dart';
 import 'package:trashtrack/api_token.dart';
@@ -32,7 +34,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
     try {
       //final data = await Hive.openBox('mybox');
       final data = await userDataFromHive();
-     // final data = await fetchCusData(context);
+      // final data = await fetchCusData(context);
       setState(() {
         userData = data;
         isLoading = false;
@@ -79,6 +81,15 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            ElevatedButton(
+                                onPressed: () async{
+                                  bool onLocation = await checkLocationPermission();
+                                  if(onLocation)
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) =>  C_MapScreen(
+                                      pickupPoint: LatLng(10.25702151, 123.85040322))));
+                                 
+                                },
+                                child: Text('Go To Map')),
                             // Welcome Container
                             Container(
                               padding: EdgeInsets.all(16.0),
@@ -91,7 +102,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                                 children: [
                                   Text(
                                     //'Welcome ${userData!['cus_fname']}!',
-                                   'Welcome ${userData!['fname']}!',
+                                    'Welcome ${userData!['fname']}!',
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 24.0,

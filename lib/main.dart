@@ -49,7 +49,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       //initialRoute: initialRoute,
-      home: TokenCheck(),
+      // home: TokenCheck(), // final firt route
+      initialRoute: 'c_home', //for testing
       routes: {
         'splash': (context) => SplashScreen(),
         'terms': (context) => TermsAndConditions(),

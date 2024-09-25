@@ -89,62 +89,62 @@ class _C_MapScreenState extends State<C_MapScreen> {
 //LOCATION PERMISSION
   Future<void> pickUpDirection() async {
     try {
-        LocationPermission permission = await Geolocator.checkPermission();
-        if (permission == LocationPermission.denied) {
-          permission = await Geolocator.requestPermission();
-          if (permission != LocationPermission.whileInUse &&
-              permission != LocationPermission.always) {
-            return; // Location services are not enabled
-          }
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission != LocationPermission.whileInUse &&
+            permission != LocationPermission.always) {
+          return; // Location services are not enabled
         }
+      }
 
-        if (permission == LocationPermission.denied ||
-            permission == LocationPermission.deniedForever) {
-          await Geolocator.openAppSettings();
-          return;
-        }
-        bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-        if (!serviceEnabled) {
-          // Optionally, open the location settings:
-          await Geolocator.openLocationSettings();
-          return;
-        }
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        await Geolocator.openAppSettings();
+        return;
+      }
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        // Optionally, open the location settings:
+        await Geolocator.openLocationSettings();
+        return;
+      }
 
-        LocationSettings locationSettings = LocationSettings(
-          accuracy: LocationAccuracy.high, // Specify accuracy
-          distanceFilter: 10, // Update when the user moves 10 meters
-        );
-        //////real time current position
-        _startPositionStream = Geolocator.getPositionStream(
-          locationSettings: locationSettings,
-        ).listen(
-          (Position position) async {
-            String? getCurrentName =
-                await getPlaceName(position.latitude, position.longitude);
-            String? getDestiantionName = await getPlaceName(
-                widget.pickupPoint!.latitude, widget.pickupPoint!.longitude);
-            setState(() {
-              _startController.text = getCurrentName!;
-              startPoint = LatLng(position.latitude, position.longitude);
-              if (!startLocStreaming)
-                _mapController.move(startPoint!, _mapController.zoom);
+      LocationSettings locationSettings = LocationSettings(
+        accuracy: LocationAccuracy.high, // Specify accuracy
+        distanceFilter: 10, // Update when the user moves 10 meters
+      );
+      //////real time current position
+      _startPositionStream = Geolocator.getPositionStream(
+        locationSettings: locationSettings,
+      ).listen(
+        (Position position) async {
+          String? getCurrentName =
+              await getPlaceName(position.latitude, position.longitude);
+          String? getDestiantionName = await getPlaceName(
+              widget.pickupPoint!.latitude, widget.pickupPoint!.longitude);
+          setState(() {
+            _startController.text = getCurrentName!;
+            startPoint = LatLng(position.latitude, position.longitude);
+            if (!startLocStreaming)
+              _mapController.move(startPoint!, _mapController.zoom);
 
-              startLocStreaming = true;
-              destinationPoint = widget.pickupPoint;
-              fetchRoutes(startPoint!, destinationPoint!);
-              // if (destinationPoint != null) {
-              //   fetchRoutes(startPoint!, destinationPoint!);
-              // }
-              _startController.text = getCurrentName;
-              _destinationController.text = getDestiantionName!;
-              isSelectingDirections = true;
-              startLocStreaming = true;
-            });
-          },
-          onError: (error) async {
-            print('Error occurred in location stream: $error');
-          },
-        );
+            startLocStreaming = true;
+            destinationPoint = widget.pickupPoint;
+            fetchRoutes(startPoint!, destinationPoint!);
+            // if (destinationPoint != null) {
+            //   fetchRoutes(startPoint!, destinationPoint!);
+            // }
+            _startController.text = getCurrentName;
+            _destinationController.text = getDestiantionName!;
+            isSelectingDirections = true;
+            startLocStreaming = true;
+          });
+        },
+        onError: (error) async {
+          print('Error occurred in location stream: $error');
+        },
+      );
     } catch (e) {
       print('fail to get current location!');
     } finally {
@@ -249,10 +249,6 @@ class _C_MapScreenState extends State<C_MapScreen> {
 
   // Utility function to format duration
   String formatDuration(double duration) {
-    // int totalSeconds = duration.toInt();
-    // int hours = totalSeconds ~/ 3600;
-    // int minutes = (totalSeconds % 3600) ~/ 60;
-    // int seconds = totalSeconds % 60;
     int totalSeconds = duration.toInt();
     int days = totalSeconds ~/ 86400; // 86400 seconds in a day
     int hours = (totalSeconds % 86400) ~/ 3600;
@@ -499,7 +495,6 @@ class _C_MapScreenState extends State<C_MapScreen> {
           return; // Location services are not enabled
         }
       }
-      print('1111111111');
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
         await Geolocator.openAppSettings();
@@ -536,10 +531,9 @@ class _C_MapScreenState extends State<C_MapScreen> {
       //     //_drawRoute(_currentLocation!, _staticDestination);
       //   });
       // });
-      print('2222222');
       LocationSettings locationSettings = LocationSettings(
         accuracy: LocationAccuracy.high, // Specify accuracy
-        distanceFilter: 10, // Update when the user moves 10 meters
+        distanceFilter: 3, // Update when the user moves 10 meters
       );
       //////real time current position
       _positionStream = Geolocator.getPositionStream(
@@ -548,7 +542,6 @@ class _C_MapScreenState extends State<C_MapScreen> {
         (Position position) async {
           String? getCurrentName =
               await getPlaceName(position.latitude, position.longitude);
-          print('33333');
           setState(() {
             _currentLocation = LatLng(position.latitude, position.longitude);
             selectedCurrentName = getCurrentName;
@@ -617,7 +610,7 @@ class _C_MapScreenState extends State<C_MapScreen> {
 
       LocationSettings locationSettings = LocationSettings(
         accuracy: LocationAccuracy.high, // Specify accuracy
-        distanceFilter: 10, // Update when the user moves 10 meters
+        distanceFilter: 3,
       );
       //////real time current position
       _startPositionStream = Geolocator.getPositionStream(
@@ -678,7 +671,7 @@ class _C_MapScreenState extends State<C_MapScreen> {
               minZoom: 5, // Minimum zoom out level
               onTap: (tapPosition, point) => currentLocStreaming
                   ? null
-                 : routes.isNotEmpty || routes.isNotEmpty
+                  : routes.isNotEmpty || routes.isNotEmpty
                       ? onhideScreen()
                       : isSelectingDirections
                           ? handleDirections(point)
@@ -780,7 +773,7 @@ class _C_MapScreenState extends State<C_MapScreen> {
                                       : routeDurations[i] > 3600
                                           ? 120
                                           : 100,
-                              height: 100,
+                              height: 200,
                               point: LatLng(
                                 calculateMidpoint(
                                             routes[i][j], routes[i][j + 1])
@@ -1049,10 +1042,6 @@ class _C_MapScreenState extends State<C_MapScreen> {
                                                             _startController
                                                                     .text =
                                                                 place['name'];
-                                                            // _foundPlaces =
-                                                            //     []; // Clear the results after selection
-                                                            print(place['lat']);
-                                                            print(place['lon']);
                                                             startPoint = LatLng(
                                                                 double.parse(
                                                                     place[
@@ -1140,10 +1129,6 @@ class _C_MapScreenState extends State<C_MapScreen> {
                                                           _destinationController
                                                                   .text =
                                                               place['name'];
-                                                          // _foundPlaces =
-                                                          //     []; // Clear the results after selection
-                                                          print(place['lat']);
-                                                          print(place['lon']);
                                                           destinationPoint = LatLng(
                                                               double.parse(
                                                                   place['lat']),
@@ -1235,10 +1220,8 @@ class _C_MapScreenState extends State<C_MapScreen> {
                               if (!isLoading) {
                                 if (isSelectingDirections) {
                                   resetSelection(); // Reset when closing direction selection
-                                  print(nearestDuration);
                                 } else {
                                   resetSelection(); // Optional: reset for fresh start
-                                  print(nearestDuration);
                                   setState(() {
                                     isSelectingDirections =
                                         true; // Switch to directions mode
@@ -1435,6 +1418,7 @@ class RouteMarker extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
+          height: 50,
           padding: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
           decoration: BoxDecoration(
             color: isFastestRoute
@@ -1484,6 +1468,31 @@ class RouteMarker extends StatelessWidget {
             ],
           ),
         ),
+        Container(
+          height: 50,
+          child: Row(
+            children: [
+              Expanded(
+                flex: 6,
+                child: Container(),
+              ),
+              Expanded(
+                flex: 1,
+                child: Container(
+                  color: isFastestRoute
+                      ? Colors.blue
+                      : Colors.white, // Highlight if fastest
+                  // Set the width and height for the stick
+                  height: double.infinity, // Fills the parent height
+                ),
+              ),
+              Expanded(
+                flex: 6,
+                child: SizedBox(),
+              ),
+            ],
+          ),
+        )
       ],
     );
   }

@@ -133,7 +133,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                                         backgroundColor: buttonColor,
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
-                                              BorderRadius.circular(30.0),
+                                              BorderRadius.circular(15.0),
                                         ),
                                         padding: EdgeInsets.symmetric(
                                             vertical: 16.0, horizontal: 30.0),

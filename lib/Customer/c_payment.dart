@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:trashtrack/Customer/c_appbar.dart';
 import 'package:trashtrack/Customer/c_bottom_nav_bar.dart';
+import 'package:trashtrack/api_paymongo.dart';
 import 'package:trashtrack/styles.dart';
 
 class C_PaymentScreen extends StatelessWidget {
@@ -27,56 +28,56 @@ class C_PaymentScreen extends StatelessWidget {
             paymentType: 'Gcash',
             amount: '350.50',
           ),
-            C_PaymentHistory(
+          C_PaymentHistory(
             date: 'mon Jun 20',
             time: '9:30 AM',
             wasteType: 'Municipal Waste',
             paymentType: 'Debit Card',
             amount: '930.00',
           ),
-            C_PaymentHistory(
+          C_PaymentHistory(
             date: 'Fri Jun 20',
             time: '8:30 AM',
             wasteType: 'Food Waste',
             paymentType: 'Credit Card',
             amount: '450.25',
           ),
-           C_PaymentHistory(
+          C_PaymentHistory(
             date: 'Fri Jun 20',
             time: '8:30 AM',
             wasteType: 'Food Waste',
             paymentType: 'Gcash',
             amount: '350.50',
           ),
-            C_PaymentHistory(
+          C_PaymentHistory(
             date: 'mon Jun 20',
             time: '9:30 AM',
             wasteType: 'Municipal Waste',
             paymentType: 'Debit Card',
             amount: '930.00',
           ),
-            C_PaymentHistory(
+          C_PaymentHistory(
             date: 'Fri Jun 20',
             time: '8:30 AM',
             wasteType: 'Food Waste',
             paymentType: 'Gcash',
             amount: '450.25',
           ),
-           C_PaymentHistory(
+          C_PaymentHistory(
             date: 'Fri Jun 20',
             time: '8:30 AM',
             wasteType: 'Food Waste',
             paymentType: 'Gcash',
             amount: '350.50',
           ),
-            C_PaymentHistory(
+          C_PaymentHistory(
             date: 'mon Jun 20',
             time: '9:30 AM',
             wasteType: 'Municipal Waste',
             paymentType: 'Debit Card',
             amount: '930.00',
           ),
-            C_PaymentHistory(
+          C_PaymentHistory(
             date: 'Fri Jun 20',
             time: '8:30 AM',
             wasteType: 'Food Waste',
@@ -129,7 +130,7 @@ class C_PaymentHistory extends StatelessWidget {
           children: [
             Row(
               children: [
-               // Icon(Icons.history, color: Color(0xFF6AA920)),
+                // Icon(Icons.history, color: Color(0xFF6AA920)),
                 //SizedBox(width: 10.0),
                 Text(
                   date,
@@ -145,11 +146,14 @@ class C_PaymentHistory extends StatelessWidget {
             SizedBox(height: 10.0),
             Text(
               wasteType,
-              style: TextStyle(color: Colors.white, fontSize: 16.0, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10.0),
             Row(
-             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
@@ -159,7 +163,8 @@ class C_PaymentHistory extends StatelessWidget {
                     ),
                     Text(
                       '$paymentType',
-                      style: TextStyle(color: Colors.blueAccent, fontSize: 14.0),
+                      style:
+                          TextStyle(color: Colors.blueAccent, fontSize: 14.0),
                     ),
                   ],
                 ),
@@ -182,10 +187,156 @@ class C_PaymentHistoryDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: backgroundColor,
       appBar: AppBar(
-        title: Text('Payment Details'),
+        backgroundColor: backgroundColor,
+        foregroundColor: Colors.white,
+        title: Text('Payment',
+            style: TextStyle(
+                color: accentColor, fontSize: 25, fontWeight: FontWeight.bold)),
+        // leading: SizedBox(width: 0),
+        // leadingWidth: 0,
       ),
-      body: Container(),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Container(
+              padding: EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Text(
+                      'Pay with',
+                      style: TextStyle(color: Colors.grey, fontSize: 16.0),
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () {
+                      launchPaymentLink2(context);
+                    },
+                    child: Container(
+                      child: Image.asset('assets/paymongo.png'),
+                    ),
+                  )
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Container(
+              padding: EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Text(
+                      'Pay with',
+                      style: TextStyle(color: Colors.grey, fontSize: 16.0),
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () {
+                      launchPaymentLink(context);
+                    },
+                    child: Container(
+                      child: Image.asset('assets/truck.png'),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
+}
+
+/////////////////
+Widget buildSecondStep(BuildContext context) {
+  return Scaffold(
+    backgroundColor: backgroundColor,
+    appBar: AppBar(
+      backgroundColor: backgroundColor,
+      foregroundColor: Colors.white,
+      title: Text('Payment',
+          style: TextStyle(
+              color: accentColor, fontSize: 25, fontWeight: FontWeight.bold)),
+      // leading: SizedBox(width: 0),
+      // leadingWidth: 0,
+    ),
+    body: SingleChildScrollView(
+      padding: EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          Container(
+            padding: EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Text(
+                    'Pay with',
+                    style: TextStyle(color: Colors.grey, fontSize: 16.0),
+                  ),
+                ),
+                InkWell(
+                  onTap: () {
+                    launchPaymentLink2(context);
+                  },
+                  child: Container(
+                    child: Image.asset('assets/paymongo.png'),
+                  ),
+                )
+              ],
+            ),
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          Container(
+            padding: EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Text(
+                    'Pay with',
+                    style: TextStyle(color: Colors.grey, fontSize: 16.0),
+                  ),
+                ),
+                InkWell(
+                  onTap: () {
+                    launchPaymentLink(context);
+                  },
+                  child: Container(
+                    child: Image.asset('assets/truck.png'),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 }

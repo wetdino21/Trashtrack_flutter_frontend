@@ -71,7 +71,7 @@ Future<void> storeDataInHive(BuildContext context) async {
     await box.put('profile', imageBytes);
 
     // Optionally, print a message or handle UI updates
-   // print('Data has been saved to Hive.');
+    //print('Data has been saved to Hive.');
   }
 }
 

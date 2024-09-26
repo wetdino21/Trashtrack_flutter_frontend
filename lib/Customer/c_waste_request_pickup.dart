@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
+import 'package:intl/intl.dart';
+import 'package:trashtrack/Customer/c_Schedule.dart';
 import 'package:trashtrack/Customer/c_api_cus_data.dart';
-import 'package:trashtrack/api_paymongo.dart';
 import 'package:trashtrack/api_postgre_service.dart';
 import 'package:trashtrack/styles.dart';
 import 'dart:async';
+
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:geolocator/geolocator.dart';
 
 class RequestPickupScreen extends StatefulWidget {
   @override
@@ -13,8 +17,6 @@ class RequestPickupScreen extends StatefulWidget {
 
 class _RequestPickupScreenState extends State<RequestPickupScreen>
     with SingleTickerProviderStateMixin {
-  int _currentStep = 0;
-
   // Controllers for the input fields
   final _addressController = TextEditingController();
   final _cityController = TextEditingController();
@@ -25,15 +27,29 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
 
   late AnimationController _controller;
   late Animation<Color?> _colorTween;
-  bool isLoading = true;
+  bool isLoading = false;
 
   String fullname = '';
   String contact = '';
   String address = '';
   String street = '';
 
-  List<String> _wasteTypes = [];
-  String? _selectedWasteType;
+  bool _acceptTerms = false;
+
+  List<Map<String, dynamic>> _wasteTypes = [];
+  List<String> _selectedWasteTypes = [];
+
+  final MapController _mapController = MapController();
+  LatLng? selectedPoint;
+  String? selectedPlaceName;
+  bool failGetPlaceName = false;
+  bool isLoadingLoc = false;
+  bool onMap = false;
+
+  String userDataValidator = '';
+  String pinLocValidator = '';
+  String wasteCatValidator = '';
+  String dateValidator = '';
 
   @override
   void initState() {
@@ -49,9 +65,10 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
 
     // Define a color tween animation that transitions between two colors
     _colorTween = ColorTween(
-      begin: Colors.white30,
+      begin: Colors.white,
       end: Colors.grey,
     ).animate(_controller);
+   
   }
 
   @override
@@ -90,35 +107,96 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
             (userData!['cus_province'] ?? '') +
             ', ' +
             (userData!['cus_postal'] ?? '');
-        isLoading = false;
+        //isLoading = false;
       });
       //await data.close();
     } catch (e) {
-      isLoading = false;
+      isLoading = true;
       print(e);
       setState(() {
         //errorMessage = e.toString();
-        isLoading = false;
+        isLoading = true;
       });
     }
   }
 
+  void handleOnePoint(LatLng point) {
+    setState(() {
+      selectedPoint = point;
+      //_mapController.move(selectedPoint!, 16);
+      //fetchSelectedPlaceNames();
+    });
+  }
+
   // Function to load waste categories and update the state
   Future<void> _loadWasteCategories() async {
-    List<String>? categories = await fetchWasteCategory();
+    List<Map<String, dynamic>>? categories = await fetchWasteCategory();
     if (categories != null) {
       setState(() {
         _wasteTypes = categories;
-        isLoading = false;
+        // isLoading = false;
       });
     } else {
       // Handle the case where fetching categories failed
       setState(() {
-        isLoading = false;
+        //isLoading = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to load waste categories')),
       );
+    }
+  }
+
+  //LOCATION PERMISSION
+  Future<void> _getCurrentLocation() async {
+    try {
+      setState(() {
+        isLoadingLoc = true;
+      });
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission != LocationPermission.whileInUse &&
+            permission != LocationPermission.always) {
+          return; // Location services are not enabled
+        }
+      }
+
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        await Geolocator.openAppSettings();
+        return;
+      }
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        // Optionally, open the location settings:
+        await Geolocator.openLocationSettings();
+        return;
+      }
+
+      LocationSettings locationSettings = LocationSettings(
+        accuracy: LocationAccuracy.high, // Specify accuracy
+      );
+
+      ///current pstion
+      Position position = await Geolocator.getCurrentPosition(
+        locationSettings: locationSettings,
+      );
+      // String? getCurrentName =
+      //     await getPlaceName(position.latitude, position.longitude);
+
+      setState(() {
+        selectedPoint = LatLng(position.latitude, position.longitude);
+        _mapController.move(selectedPoint!, 13.0); // Move to current location
+
+        // selectedPlaceName = getCurrentName;
+      });
+    } catch (e) {
+      print('fail to get current location!');
+    } finally {
+      setState(() {
+        isLoadingLoc = false;
+      });
     }
   }
 
@@ -128,60 +206,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
       backgroundColor: backgroundColor,
       body: Column(
         children: [
-          Expanded(
-            child: _currentStep == 0 ? _buildFirstStep() : _buildSecondStep(),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                if (_currentStep > 0)
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        _currentStep--;
-                      });
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: buttonColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      padding: EdgeInsets.symmetric(horizontal: 16.0),
-                    ),
-                    child: Text(
-                      'Back',
-                      style: TextStyle(color: Colors.white, fontSize: 18.0),
-                    ),
-                  )
-                else
-                  Container(),
-                ElevatedButton(
-                  onPressed: () {
-                    if (_currentStep < 1) {
-                      setState(() {
-                        _currentStep++;
-                      });
-                    } else if (_currentStep == 1) {
-                      Navigator.pushNamed(context, 'c_schedule');
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: buttonColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    padding: EdgeInsets.symmetric(horizontal: 16.0),
-                  ),
-                  child: Text(
-                    _currentStep < 1 ? 'Next' : 'Submit',
-                    style: TextStyle(color: Colors.white, fontSize: 18.0),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          Expanded(child: _buildFirstStep()),
         ],
       ),
     );
@@ -193,376 +218,803 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
       appBar: AppBar(
         backgroundColor: backgroundColor,
         foregroundColor: Colors.white,
-        title: Text('Request Pickup'),
+        //title: Text('Request Pickup'),
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 10.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 30.0),
-            Center(
-                child: Text(
-              'Fill all the fields',
-              style: TextStyle(color: Colors.white),
-            )),
-            Divider(
-              color: accentColor,
-            ),
-            Text('Step 1/3',
-                style: TextStyle(
-                    color: accentColor,
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold)),
-            //ddl
-            SizedBox(height: 16.0),
-            isLoading
-                ? AnimatedBuilder(
-                    animation: _controller,
-                    builder: (context, child) {
-                      return Container(
-                        height: 100,
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          //color: Colors.white.withOpacity(.6),
-                          color: _colorTween.value,
-                        ),
-                        child: Row(
-                          // mainAxisAlignment: MainAxisAlignment.start,
-                          // crossAxisAlignment: CrossAxisAlignment.start,
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await _dbData();
+          await _loadWasteCategories();
+
+          if (userData != null && _wasteTypes.isNotEmpty) {
+            isLoading = false;
+          }
+        },
+        child: SingleChildScrollView(
+          physics: AlwaysScrollableScrollPhysics(),
+          padding: EdgeInsets.symmetric(horizontal: 10.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                  child: Text(
+                'Booking',
+                style: TextStyle(color: Colors.white, fontSize: 30),
+              )),
+              SizedBox(height: 16.0),
+              isLoading
+                  ? AnimatedBuilder(
+                      animation: _controller,
+                      builder: (context, child) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(
-                                flex: 1,
-                                child: Container(
-                                  alignment: Alignment.centerLeft,
+                            Container(
+                              height: 100,
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                //color: Colors.white.withOpacity(.6),
+                                color: _colorTween.value,
+                              ),
+                              child: Row(
+                                // mainAxisAlignment: MainAxisAlignment.start,
+                                // crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                      flex: 1,
+                                      child: Container(
+                                        alignment: Alignment.centerLeft,
+                                        child: Container(
+                                          height: 30,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                            //color: Colors.white.withOpacity(.6),
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      )),
+                                  Expanded(
+                                      flex: 10,
+                                      child: Container(
+                                          alignment: Alignment.centerLeft,
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Expanded(
+                                                  flex: 1,
+                                                  child: Container(
+                                                      width: 100,
+                                                      margin: EdgeInsets.all(3),
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                        //color: Colors.white.withOpacity(.6),
+                                                        color: Colors.white,
+                                                      ),
+                                                      child: Text(''))),
+                                              Expanded(
+                                                  flex: 2,
+                                                  child: Container(
+                                                      width: 250,
+                                                      margin: EdgeInsets.all(3),
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                        //color: Colors.white.withOpacity(.6),
+                                                        color: Colors.white,
+                                                      ),
+                                                      child: Text(''))),
+                                              Expanded(
+                                                  flex: 1,
+                                                  child: Container(
+                                                      width: 150,
+                                                      margin: EdgeInsets.all(3),
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                        //color: Colors.white.withOpacity(.6),
+                                                        color: Colors.white,
+                                                      ),
+                                                      child: Text(''))),
+                                            ],
+                                          ))),
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              height: 20,
+                            ),
+                            Container(
+                              height: 30,
+                              width: 300,
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                //color: Colors.white.withOpacity(.6),
+                                color: _colorTween.value,
+                              ),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Container(
+                              height: 100,
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: _colorTween.value,
+                              ),
+                            ),
+                            SizedBox(
+                              height: 20,
+                            ),
+                            Container(
+                              height: 30,
+                              width: 300,
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                //color: Colors.white.withOpacity(.6),
+                                color: _colorTween.value,
+                              ),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Container(
+                              height: 100,
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: _colorTween.value,
+                              ),
+                            ),
+                            SizedBox(
+                              height: 20,
+                            ),
+                            Container(
+                              height: 30,
+                              width: 300,
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                //color: Colors.white.withOpacity(.6),
+                                color: _colorTween.value,
+                              ),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Container(
+                              height: 100,
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: _colorTween.value,
+                              ),
+                            ),
+                          ],
+                        );
+                      })
+
+                  // onload dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+                  : Column(
+                      //crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          height: 100,
+                          padding: EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            //color: Colors.white.withOpacity(.6),
+                            color: Colors.white,
+                          ),
+                          child: Row(
+                            // mainAxisAlignment: MainAxisAlignment.start,
+                            // crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                  flex: 1,
                                   child: Container(
-                                    height: 30,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(50),
-                                      //color: Colors.white.withOpacity(.6),
-                                      color: Colors.white,
+                                      height: 35,
+                                      width: 30,
+                                      padding: EdgeInsets.only(left: 2),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(50),
+                                        //color: Colors.white.withOpacity(.6),
+                                        color: Colors.grey[300],
+                                      ),
+                                      alignment: Alignment.centerLeft,
+                                      child: Icon(
+                                        Icons.pin_drop,
+                                        size: 30,
+                                        color: Colors.redAccent,
+                                      ))),
+                              Expanded(
+                                  flex: 10,
+                                  child: Container(
+                                      padding: EdgeInsets.only(left: 10),
+                                      alignment: Alignment.centerLeft,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Expanded(
+                                              flex: 1,
+                                              child: Row(
+                                                children: [
+                                                  Text(
+                                                    fullname,
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 17),
+                                                  ),
+                                                  Text('   | +(63)${contact}',
+                                                      style: TextStyle(
+                                                        color: Colors.grey,
+                                                      )),
+                                                ],
+                                              )),
+                                          Expanded(
+                                              flex: 2,
+                                              child: Text(
+                                                '${street} \n${address}',
+                                              )),
+                                          Expanded(
+                                              flex: 1,
+                                              child: Row(
+                                                children: [
+                                                  Container(
+                                                    padding: EdgeInsets.all(2),
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              3),
+                                                      //color: Colors.white.withOpacity(.6),
+                                                      border: Border.all(
+                                                          color: Colors.red),
+                                                    ),
+                                                    child: Text(
+                                                      'Default',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color:
+                                                              Colors.red[300]),
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    width: 5,
+                                                  ),
+                                                  Container(
+                                                    padding: EdgeInsets.all(2),
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              3),
+                                                      //color: Colors.white.withOpacity(.6),
+                                                      border: Border.all(
+                                                          color: Colors.grey),
+                                                    ),
+                                                    child: Text(
+                                                      'Pickup Address',
+                                                      style: TextStyle(
+                                                          color:
+                                                              Colors.black54),
+                                                    ),
+                                                  ),
+                                                ],
+                                              )),
+                                        ],
+                                      ))),
+                            ],
+                          ),
+                        ),
+                        _labelValidator(userDataValidator),
+                        SizedBox(height: 16.0),
+
+                        //MAPPPPPPPPPPPPPP
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Pin Location',
+                            style: TextStyle(color: Colors.white, fontSize: 16),
+                          ),
+                        ),
+                        Stack(
+                          children: [
+                            Container(
+                              height: onMap ? 500 : 100,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: FlutterMap(
+                                  mapController: _mapController,
+                                  options: MapOptions(
+                                      center: LatLng(10.29411,
+                                          123.902453), // Example: Cebu City
+                                      zoom: 13.0,
+                                      //maxZoom: 19,
+                                      maxZoom: 19, // Maximum zoom in level
+                                      minZoom: 5, // Minimum zoom out level
+                                      onTap: (tapPosition, point) =>
+                                          handleOnePoint(point),
+                                      enableScrollWheel: true),
+                                  children: [
+                                    TileLayer(
+                                      urlTemplate:
+                                          'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                      subdomains: ['a', 'b', 'c'],
+                                      maxZoom: 19, // Maximum zoom in level
+                                      minZoom: 5, // Minimum zoom out level
                                     ),
-                                  ),
-                                )),
-                            Expanded(
-                                flex: 10,
-                                child: Container(
-                                    alignment: Alignment.centerLeft,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Expanded(
-                                            flex: 1,
-                                            child: Container(
-                                                width: 100,
-                                                margin: EdgeInsets.all(3),
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  //color: Colors.white.withOpacity(.6),
-                                                  color: Colors.white,
-                                                ),
-                                                child: Text(''))),
-                                        Expanded(
-                                            flex: 2,
-                                            child: Container(
-                                                width: 250,
-                                                margin: EdgeInsets.all(3),
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  //color: Colors.white.withOpacity(.6),
-                                                  color: Colors.white,
-                                                ),
-                                                child: Text(''))),
-                                        Expanded(
-                                            flex: 1,
-                                            child: Container(
-                                                width: 150,
-                                                margin: EdgeInsets.all(3),
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  //color: Colors.white.withOpacity(.6),
-                                                  color: Colors.white,
-                                                ),
-                                                child: Text(''))),
-                                      ],
-                                    ))),
+                                    if (selectedPoint != null) ...[
+                                      MarkerLayer(
+                                        markers: [
+                                          Marker(
+                                              width: 80.0,
+                                              height: 80.0,
+                                              point: selectedPoint!,
+                                              builder: (ctx) => Icon(
+                                                  Icons.location_pin,
+                                                  color: Colors.red,
+                                                  size: 40),
+                                              rotate: true),
+                                        ],
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                              ),
+                            ),
+
+                            //2 btns
+                            if (onMap)
+                              Positioned(
+                                top: 20,
+                                right: 20,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: 15, horizontal: 25),
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          color: Colors.green,
+                                          boxShadow: shadowColor),
+                                      child: InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            if (selectedPoint != null)
+                                              _mapController.move(
+                                                  selectedPoint!, 13);
+                                            onMap = false;
+                                            pinLocValidator = '';
+                                          });
+                                        },
+                                        child: Text(
+                                          'SAVE',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: 20),
+
+                                    //current loc
+                                    Container(
+                                      padding: EdgeInsets.all(15),
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                          color: Colors.white,
+                                          boxShadow: shadowColor),
+                                      child: InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            _getCurrentLocation();
+                                          });
+                                        },
+                                        child: Icon(
+                                          Icons.my_location,
+                                          color: Colors.red,
+                                          size: 30,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            if (!onMap)
+                              Positioned.fill(
+                                  child: Container(
+                                color: const Color.fromARGB(0, 163, 145, 145),
+                                child: InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      onMap = true;
+                                    });
+                                    if (selectedPoint == null)
+                                      _getCurrentLocation();
+                                  },
+                                ),
+                              )),
+
+                            isLoadingLoc
+                                ? Positioned.fill(
+                                    child: InkWell(
+                                      onTap: () {},
+                                      child: Center(
+                                        child: CircularProgressIndicator(
+                                          color: Colors.green,
+                                          strokeWidth: 10,
+                                          strokeAlign: 2,
+                                          backgroundColor: Colors.deepPurple,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                : SizedBox(),
                           ],
                         ),
-                      );
-                    })
-                : Container(
-                    height: 100,
-                    padding: EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      //color: Colors.white.withOpacity(.6),
-                      color: Colors.white,
-                    ),
-                    child: Row(
-                      // mainAxisAlignment: MainAxisAlignment.start,
-                      // crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                            flex: 1,
-                            child: Container(
-                                height: 35,
-                                width: 30,
-                                padding: EdgeInsets.only(left: 2),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(50),
-                                  //color: Colors.white.withOpacity(.6),
-                                  color: Colors.grey[300],
+                        _labelValidator(pinLocValidator),
+                        SizedBox(height: 16.0),
+                        isLoading
+                            ? Container()
+                            : Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Select Waste Type',
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 16),
+                                  ),
+                                  Container(
+                                    padding: EdgeInsets.all(5),
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                    child: _wasteCategoryList(),
+                                  ),
+                                ],
+                              ),
+                        _labelValidator(wasteCatValidator),
+                        SizedBox(height: 10.0),
+                        _buildDatePicker('Date Schedule', 'Select Date'),
+                        _labelValidator(dateValidator),
+                        SizedBox(height: 20.0),
+                        Container(
+                          padding: EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10)),
+                          child: Column(
+                            children: [
+                              Center(
+                                  child: Text(
+                                'Payment Method',
+                                style: TextStyle(color: Colors.grey),
+                              )),
+                              Image.asset('assets/paymongo.png'),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(5),
+                                    child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Container(
+                                            height: 50,
+                                            width: 50,
+                                            child: Image.asset(
+                                              'assets/visa.png',
+                                              scale: 2,
+                                            ))),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(5),
+                                    child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Container(
+                                            height: 50,
+                                            width: 50,
+                                            child: Image.asset(
+                                              'assets/gcash.png',
+                                              scale: 2,
+                                            ))),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(5),
+                                    child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Container(
+                                            height: 50,
+                                            width: 50,
+                                            child: Image.asset(
+                                              'assets/paymaya.png',
+                                              scale: 2,
+                                            ))),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(5),
+                                    child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Container(
+                                            height: 50,
+                                            width: 50,
+                                            child: Image.asset(
+                                              'assets/grabpay.png',
+                                              scale: 2,
+                                            ))),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(5),
+                                    child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Container(
+                                            height: 50,
+                                            width: 50,
+                                            child: Image.asset(
+                                              'assets/methods.png',
+                                              scale: 2,
+                                            ))),
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Checkbox(
+                              side: BorderSide(color: Colors.white),
+                              value: _acceptTerms,
+                              activeColor: Colors.green,
+                              onChanged: (bool? newValue) {
+                                setState(() {
+                                  _acceptTerms = newValue ?? false;
+                                });
+                              },
+                            ),
+                            Text(
+                              'I accept the ',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pushNamed(context, 'terms');
+                              },
+                              style: TextButton.styleFrom(
+                                padding: EdgeInsets.zero,
+                              ),
+                              child: Text(
+                                'terms and conditions.',
+                                style: TextStyle(
+                                  color: Colors.green,
+                                  decoration: TextDecoration.underline,
+                                  decorationColor: Colors.green,
                                 ),
-                                alignment: Alignment.centerLeft,
-                                child: Icon(
-                                  Icons.pin_drop,
-                                  size: 30,
-                                  color: Colors.redAccent,
-                                ))),
-                        Expanded(
-                            flex: 10,
-                            child: Container(
-                                padding: EdgeInsets.only(left: 10),
-                                alignment: Alignment.centerLeft,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                        flex: 1,
-                                        child: Row(
-                                          children: [
-                                            Text(
-                                              fullname,
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 17),
-                                            ),
-                                            Text('   | +(63)${contact}',
-                                                style: TextStyle(
-                                                  color: Colors.grey,
-                                                )),
-                                          ],
-                                        )),
-                                    Expanded(
-                                        flex: 2,
-                                        child: Text(
-                                          '${street} \n${address}',
-                                        )),
-                                    Expanded(
-                                        flex: 1,
-                                        child: Row(
-                                          children: [
-                                            Container(
-                                              padding: EdgeInsets.all(2),
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(3),
-                                                //color: Colors.white.withOpacity(.6),
-                                                border: Border.all(
-                                                    color: Colors.red),
-                                              ),
-                                              child: Text(
-                                                'Default',
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.red[300]),
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              width: 5,
-                                            ),
-                                            Container(
-                                              padding: EdgeInsets.all(2),
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(3),
-                                                //color: Colors.white.withOpacity(.6),
-                                                border: Border.all(
-                                                    color: Colors.grey),
-                                              ),
-                                              child: Text(
-                                                'Pickup Address',
-                                                style: TextStyle(
-                                                    color: Colors.black54),
-                                              ),
-                                            ),
-                                          ],
-                                        )),
-                                  ],
-                                ))),
+                              ),
+                            )
+                          ],
+                        ),
+                        SizedBox(height: 10.0),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 20),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5),
+                                color: Colors.green,
+                                boxShadow: shadowColor),
+                            child: InkWell(
+                              onTap: () {
+                                setState(() {
+                                  if (userData == null ||
+                                      selectedPoint == null ||
+                                      _selectedWasteTypes.isEmpty ||
+                                      _selectedDate == null) {
+                                    userDataValidator =
+                                        _validateUserData(userData);
+                                    pinLocValidator =
+                                        _validatePinLocl(selectedPoint);
+                                    wasteCatValidator =
+                                        _validateWaste(_selectedWasteTypes);
+                                    dateValidator =
+                                        _validateDate(_selectedDate);
+                                  } else if (!_acceptTerms) {
+                                    showErrorSnackBar(context,
+                                        'Accept the terms and condition');
+                                  } else {
+                                    //good
+                                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => C_ScheduleScreen()));
+                                  }
+                                });
+                              },
+                              child: Text(
+                                'SUBMIT',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 50),
                       ],
-                    ),
-                  ),
-            SizedBox(height: 16.0),
-            isLoading ? Container() : _buildDropDownList('Type of Waste'),
-            SizedBox(height: 5.0),
-            _buildDatePicker('Date', 'Select Date'),
-            SizedBox(height: 20.0),
-          ],
+                    )
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildSecondStep() {
-    return Scaffold(
-      backgroundColor: backgroundColor,
-      appBar: AppBar(
-        backgroundColor: backgroundColor,
-        foregroundColor: Colors.white,
-        title: Text('Step 2/3',
-            style: TextStyle(
-                color: accentColor, fontSize: 25, fontWeight: FontWeight.bold)),
-        leading: SizedBox(width: 0),
-        leadingWidth: 0,
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Container(
-              padding: EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
+  // Validator All
+  _labelValidator(String showValidator) {
+    return showValidator != ''
+        ? Text(
+            showValidator,
+            style: TextStyle(color: Colors.redAccent[100]),
+          )
+        : SizedBox();
+  }
+
+  String _validateUserData(Map<String, dynamic>? value) {
+    if (value == null || value.isEmpty) {
+      return 'User Data is Loading . . .';
+    }
+    return '';
+  }
+
+  String _validatePinLocl(LatLng? value) {
+    if (value == null) {
+      return 'Please provide pin location!';
+    }
+
+    return '';
+  }
+
+  String _validateWaste(List<String> value) {
+    if (value.isEmpty) {
+      return 'Please select atleast one waste type!';
+    }
+    return '';
+  }
+
+  String _validateDate(DateTime? value) {
+    if (value == null) {
+      return 'Please select date schedule!';
+    }
+
+    return '';
+  }
+
+  Widget _wasteCategoryList() {
+    return ListView(
+      physics: NeverScrollableScrollPhysics(), //stop scrollong
+      shrinkWrap: true, // Use shrinkWrap to make the list fit its content.
+      children: _wasteTypes.map((Map<String, dynamic> category) {
+        String type = category['name'];
+        var price = category['price'];
+        var unit = category['unit'];
+
+        return CheckboxListTile(
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('${type}'),
+              Text(
+                '\₱${price.toString()}\\${unit.toString()}',
+                style: TextStyle(color: Colors.deepOrange),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Text(
-                      'Pay with',
-                      style: TextStyle(color: Colors.grey, fontSize: 16.0),
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () {
-                      launchPaymentLink2(context);
-                    },
-                    child: Container(
-                      child: Image.asset('assets/paymongo.png'),
-                    ),
-                  )
-                ],
-              ),
-            ),
-            SizedBox(height: 20,),
-            Container(
-              padding: EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-            
-                  Center(
-                    child: Text(
-                      'Pay with',
-                      style: TextStyle(color: Colors.grey, fontSize: 16.0),
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () {
-                      launchPaymentLink(context);
-                    },
-                    child: Container(
-                      child: Image.asset('assets/truck.png'),
-                    ),
-                  )
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+            ],
+          ),
+          value: _selectedWasteTypes.contains(type),
+          onChanged: (bool? selected) {
+            setState(() {
+              if (selected == true) {
+                _selectedWasteTypes.add(type);
+              } else {
+                _selectedWasteTypes.remove(type);
+              }
+
+              //validator
+              if (_selectedWasteTypes.isEmpty) {
+                wasteCatValidator = _validateWaste(_selectedWasteTypes);
+              } else {
+                wasteCatValidator = '';
+              }
+            });
+          },
+          activeColor: Colors.blue, // Color of the checkbox when selected.
+          checkColor: Colors.white, // Color of the checkmark.
+        );
+      }).toList(),
     );
   }
 
-  Widget _buildDropDownList(String label) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: TextStyle(color: Colors.white, fontSize: 16),
-          ),
-          SizedBox(height: 5),
-          DropdownButtonFormField<String>(
-            value: _selectedWasteType,
-            dropdownColor: Colors.white,
-            decoration: InputDecoration(
-              contentPadding: EdgeInsets.symmetric(horizontal: 16),
-              //labelText: 'Select Waste Type',
-              labelStyle: TextStyle(color: accentColor),
-              hintText: 'Select Waste Type',
-              hintStyle: TextStyle(color: Colors.grey),
-              filled: true,
-              fillColor: Colors.white,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0),
-                borderSide: BorderSide.none,
-              ),
-            ),
-            items: _wasteTypes.map((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(
-                  value,
-                ),
-              );
-            }).toList(),
-            onChanged: (newValue) {
-              setState(() {
-                _selectedWasteType = newValue;
-              });
-            },
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildDropDownList() {
+  //   return DropdownButtonFormField<String>(
+  //     value: _selectedWasteType,
+  //     dropdownColor: Colors.white,
+  //     decoration: InputDecoration(
+  //       contentPadding: EdgeInsets.symmetric(horizontal: 0),
+  //       //labelText: 'Select Waste Type',
+  //       labelStyle: TextStyle(color: accentColor),
+  //       hintText: 'Select Waste Type',
+  //       hintStyle: TextStyle(color: Colors.grey),
+  //       filled: true,
+  //       fillColor: Colors.white,
+  //       border: OutlineInputBorder(
+  //         borderRadius: BorderRadius.circular(10.0),
+  //         borderSide: BorderSide.none,
+  //       ),
+  //     ),
+  //     items: _wasteTypes.map((String value) {
+  //       return DropdownMenuItem<String>(
+  //         value: value,
+  //         child: Text(
+  //           value,
+  //         ),
+  //       );
+  //     }).toList(),
+  //     onChanged: (newValue) {
+  //       setState(() {
+  //         _selectedWasteType = newValue;
+  //       });
+  //     },
+  //   );
+  // }
 
-  Widget _buildTextboxField(
-      TextEditingController controller, String label, String hint) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: TextStyle(color: Colors.white, fontSize: 16),
-          ),
-          SizedBox(height: 5),
-          TextFormField(
-            controller: controller,
-            //style: TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              contentPadding: EdgeInsets.symmetric(horizontal: 15),
-              filled: true,
-              hintText: hint,
-              hintStyle: TextStyle(color: Colors.grey),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide.none,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+///////////////////////////////////
+  // Widget _buildTextboxField(
+  //     TextEditingController controller, String label, String hint) {
+  //   return Padding(
+  //     padding: const EdgeInsets.symmetric(vertical: 10.0),
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         Text(
+  //           label,
+  //           style: TextStyle(color: Colors.white, fontSize: 16),
+  //         ),
+  //         SizedBox(height: 5),
+  //         TextFormField(
+  //           controller: controller,
+  //           //style: TextStyle(color: Colors.white),
+  //           decoration: InputDecoration(
+  //             contentPadding: EdgeInsets.symmetric(horizontal: 15),
+  //             filled: true,
+  //             hintText: hint,
+  //             hintStyle: TextStyle(color: Colors.grey),
+  //             border: OutlineInputBorder(
+  //               borderRadius: BorderRadius.circular(10),
+  //               borderSide: BorderSide.none,
+  //             ),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildDatePicker(String label, String hint) {
     return GestureDetector(
@@ -576,22 +1028,26 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
             label,
             style: TextStyle(color: Colors.white, fontSize: 16),
           ),
-          SizedBox(height: 5),
           Container(
-            padding: EdgeInsets.all(10),
+            padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
             ),
             child: Row(
               children: [
-                Icon(Icons.calendar_today, color: Color(0xFF86BF3E)),
+                Icon(Icons.calendar_today, color: Colors.green),
                 SizedBox(width: 10.0),
                 Text(
                   _selectedDate == null
                       ? hint
-                      : '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}',
-                  style: TextStyle(color: Colors.grey),
+                      // : '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}',
+                      : DateFormat('MMM d, yyyy (EEEE)')
+                          .format(_selectedDate!), // Format: Mon 1, 2024
+                  style: TextStyle(
+                      color: _selectedDate == null ? Colors.grey : null,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16),
                 ),
                 SizedBox(width: 10.0),
               ],
@@ -603,11 +1059,15 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
   }
 
   Future<void> _selectDate(BuildContext context) async {
+    final DateTime now = DateTime.now();
+    final DateTime firstDate = DateTime(now.year);
+    final DateTime lastDate = DateTime(now.year + 1, 12, 31);
+
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
+      firstDate: firstDate,
+      lastDate: lastDate, // Use the current year + 1
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
@@ -625,6 +1085,10 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
     if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;
+
+        if (_selectedDate != null) {
+          dateValidator = '';
+        }
       });
     }
   }

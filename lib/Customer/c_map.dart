@@ -272,65 +272,73 @@ class _C_MapScreenState extends State<C_MapScreen> {
         isLoading = true;
       });
 
-    try {
-      final url = Uri.parse(
-        'http://router.project-osrm.org/route/v1/driving/'
-        '${start.longitude},${start.latitude};${destination.longitude},${destination.latitude}'
-        '?alternatives=true&geometries=geojson',
-      );
+    int retryCount = 0;
+    const int maxRetries = 10;
 
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final List routesData = data['routes'];
+    while (retryCount < maxRetries) {
+      try {
+        final url = Uri.parse(
+          'http://router.project-osrm.org/route/v1/driving/'
+          '${start.longitude},${start.latitude};${destination.longitude},${destination.latitude}'
+          '?alternatives=true&geometries=geojson',
+        );
 
-        print('Number of routes returned: ${routesData.length}');
+        final response = await http.get(url);
+        if (response.statusCode == 200) {
+          retryCount = 10; //no retry
+          final data = jsonDecode(response.body);
+          final List routesData = data['routes'];
 
-        setState(() {
-          routes = routesData.map<List<LatLng>>((route) {
-            final List coordinates = route['geometry']['coordinates'];
-            return coordinates.map<LatLng>((coord) {
-              return LatLng(coord[1], coord[0]); // reverse longitude/latitude
+          print('Number of routes returned: ${routesData.length}');
+
+          setState(() {
+            routes = routesData.map<List<LatLng>>((route) {
+              final List coordinates = route['geometry']['coordinates'];
+              return coordinates.map<LatLng>((coord) {
+                return LatLng(coord[1], coord[0]); // reverse longitude/latitude
+              }).toList();
             }).toList();
-          }).toList();
 
-          // Store distance and duration for each route
-          routeDistances = routesData
-              .map<double>((route) => (route['distance'] as num).toDouble())
-              .toList();
-          routeDurations = routesData
-              .map<double>((route) => (route['duration'] as num).toDouble())
-              .toList();
+            // Store distance and duration for each route
+            routeDistances = routesData
+                .map<double>((route) => (route['distance'] as num).toDouble())
+                .toList();
+            routeDurations = routesData
+                .map<double>((route) => (route['duration'] as num).toDouble())
+                .toList();
 
-          if (routesData.length == 1) {
-            nearestDuration = formatDuration(routeDurations[0]);
-            nearestDistance = formatDistance(routeDistances[0]);
-            nearestRoute = 1;
-          } else {
-            if (routeDurations[0] < routeDurations[1]) {
+            if (routesData.length == 1) {
               nearestDuration = formatDuration(routeDurations[0]);
               nearestDistance = formatDistance(routeDistances[0]);
               nearestRoute = 1;
             } else {
-              nearestDuration = formatDuration(routeDurations[1]);
-              nearestDistance = formatDistance(routeDistances[1]);
-              nearestRoute = 2;
+              if (routeDurations[0] < routeDurations[1]) {
+                nearestDuration = formatDuration(routeDurations[0]);
+                nearestDistance = formatDistance(routeDistances[0]);
+                nearestRoute = 1;
+              } else {
+                nearestDuration = formatDuration(routeDurations[1]);
+                nearestDistance = formatDistance(routeDistances[1]);
+                nearestRoute = 2;
+              }
             }
-          }
-        });
-      } else {
+          });
+        } else {
+          retryCount++; //retry
+          setState(() {
+            nearestDuration = 'Loading . . .';
+            nearestDistance = '';
+          });
+          print('Failed to load routes');
+        }
+      } catch (e) {
+        retryCount++; //retry
+        print('Failed to load routes: ${e}');
+      } finally {
         setState(() {
-          nearestDuration = 'No available route/s';
-          nearestDistance = '';
+          isLoading = false;
         });
-        print('Failed to load routes');
       }
-    } catch (e) {
-      print('Failed to load routes: ${e}');
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
     }
   }
 
@@ -807,15 +815,15 @@ class _C_MapScreenState extends State<C_MapScreen> {
                       ),
             ],
           ),
-          if (isLoading)
-            Center(
-              child: CircularProgressIndicator(
-                color: Colors.green,
-                strokeWidth: 10,
-                strokeAlign: 2,
-                backgroundColor: Colors.deepPurple,
-              ),
-            ),
+          // if (isLoading)
+          //   Center(
+          //     child: CircularProgressIndicator(
+          //       color: Colors.green,
+          //       strokeWidth: 10,
+          //       strokeAlign: 2,
+          //       backgroundColor: Colors.deepPurple,
+          //     ),
+          //   ),
 
           //top layer
           isSelectingDirections && !hideScreen
@@ -1241,6 +1249,20 @@ class _C_MapScreenState extends State<C_MapScreen> {
                   ),
                 )
               : SizedBox(),
+          if (isLoading)
+            Positioned.fill(
+              child: InkWell(
+                onTap: () {},
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.green,
+                    strokeWidth: 10,
+                    strokeAlign: 2,
+                    backgroundColor: Colors.deepPurple,
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
       bottomSheet: selectedPoint != null && !isLoading

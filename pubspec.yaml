@@ -90,7 +90,14 @@ flutter:
     - assets/square_truck.jpg
     - assets/truck.png
     - assets/paymongo.png
-   
+
+    - assets/gcash.png
+    - assets/grabpay.png
+    - assets/paymaya.png
+    - assets/visa.png
+    - assets/methods.png
+    
+    - assets/dance.gif
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

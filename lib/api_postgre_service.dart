@@ -157,7 +157,7 @@ Future<String?> createCustomer(
     final String accessToken = responseData['accessToken'];
     final String refreshToken = responseData['refreshToken'];
     storeTokens(accessToken, refreshToken);
-    storeDataInHive(context); // store data to local
+    await storeDataInHive(context); // store data to local
 
     return null; // No error, return null
   } else {
@@ -184,7 +184,7 @@ Future<String?> loginAccount(
     final String accessToken = responseData['accessToken'];
     final String refreshToken = responseData['refreshToken'];
     storeTokens(accessToken, refreshToken);
-    storeDataInHive(context); // store data to local
+    await storeDataInHive(context); // store data to local
 
     print('Login successfully');
     if (response.statusCode == 200) {
@@ -242,19 +242,29 @@ Future<String?> updatepassword(String email, String newPassword) async {
 
 //waste category
 // Function to fetch waste categories from API
-Future<List<String>?> fetchWasteCategory() async {
-  final response = await http.get(Uri.parse('$baseUrl/waste_category'));
+Future<List<Map<String, dynamic>>?> fetchWasteCategory() async {
+  try {
+    final response = await http.get(Uri.parse('$baseUrl/waste_category'));
 
-  if (response.statusCode == 200) {
-    List<dynamic> data = jsonDecode(response.body);
-    // Extracting category names as a list of strings
-    return data.map<String>((item) => item['wc_name'].toString()).toList();
-  } else {
-    print(response.body);
+    if (response.statusCode == 200) {
+      List<dynamic> data = jsonDecode(response.body);
+      // Extracting category names and prices as a list of maps
+      return data
+          .map<Map<String, dynamic>>((item) => {
+                'name': item['wc_name'].toString(),
+                'unit': item['wc_unit'],
+                'price': item['wc_price']
+              })
+          .toList();
+    } else {
+      print(response.body);
+      return null;
+    }
+  } catch (e) {
+    print(e);
     return null;
   }
 }
-
 
 ////////REQUESTS WITH TOKEN///////////////////////////////////////////////////////////////////////////////
 Future<void> updateProfile(

@@ -130,7 +130,7 @@ Future<GoogleAccountDetails?> handleGoogleSignUp(BuildContext context) async {
   } catch (error) {
     print('Sign-in failed: $error');
     showErrorSnackBar(context, 'Sign-in failed: $error');
-    await _handleSignOut();
+     _handleSignOut();
     return null;
   }
   await _handleSignOut();
@@ -140,7 +140,7 @@ Future<GoogleAccountDetails?> handleGoogleSignUp(BuildContext context) async {
 // Sign-out from Google
 Future<void> _handleSignOut() async {
   await _googleSignIn.signOut();
-  print('Signed out');
+  print('Google Signed out');
 }
 
 Future<void> createGoogleAccount(
@@ -181,7 +181,7 @@ Future<void> createGoogleAccount(
     final String accessToken = responseData['accessToken'];
     final String refreshToken = responseData['refreshToken'];
     storeTokens(accessToken, refreshToken);
-    storeDataInHive(context); // store data to local
+    await storeDataInHive(context); // store data to local
 
     Navigator.pushReplacement(
       context,
@@ -198,7 +198,7 @@ Future<void> createGoogleAccount(
 //for global call
 Future<void> handleSignOut() async {
   await _googleSignIn.signOut();
-  print('Signed out');
+  print('Google Signed out');
 }
 
 //////handle GOOGLE login
@@ -234,6 +234,7 @@ Future<void> handleGoogleSignIn(BuildContext context) async {
   } catch (error) {
     print('Sign-in failed: $error');
     showErrorSnackBar(context, 'Sign-in failed: $error');
+    _handleSignOut();
   }
 }
 
@@ -253,7 +254,7 @@ Future<String> loginWithGoogle(BuildContext context, String email) async {
     final String accessToken = responseData['accessToken'];
     final String refreshToken = responseData['refreshToken'];
     storeTokens(accessToken, refreshToken);
-    storeDataInHive(context); // store data to local
+    await storeDataInHive(context); // store data to local
 
     if (response.statusCode == 200) {
       print('Login successfully');

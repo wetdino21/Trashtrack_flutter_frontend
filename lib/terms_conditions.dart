@@ -34,13 +34,13 @@ class _TermsAndConditionsState extends State<TermsAndConditions> with SingleTick
 
     // Initialize the animation controller
     _controller = AnimationController(
-      duration: const Duration(seconds: 3),
+      duration: const Duration(seconds: 1),
       vsync: this,
     )..repeat(reverse: true); // The animation will repeat back and forth
 
     // Define a color tween animation that transitions between two colors
     _colorTween = ColorTween(
-      begin: Colors.red,
+      begin: Colors.purple,
       end: Colors.blue,
     ).animate(_controller);
   }
@@ -55,12 +55,12 @@ class _TermsAndConditionsState extends State<TermsAndConditions> with SingleTick
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Fade Transition Example'),
+        title: Text('Terms and Conditions'),
       ),
       body: Center(
         child: Column(
           children: [
-            // First Row (Flex: 1)
+           
             Expanded(
               flex: 1,
               child: AnimatedBuilder(
@@ -69,9 +69,16 @@ class _TermsAndConditionsState extends State<TermsAndConditions> with SingleTick
                   return Container(
                     color: _colorTween.value,
                     child: Center(
-                      child: Text(
-                        'Row 1 (Flex: 1)',
-                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                           Image.asset('assets/dance.gif', height: 200,),
+                           SizedBox(height: 20,),
+                          Text(
+                            'Take a break! Do a lil dance',
+                            style: TextStyle(color: Colors.white, fontSize: 20),
+                          ),
+                        ],
                       ),
                     ),
                   );

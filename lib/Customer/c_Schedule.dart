@@ -67,7 +67,7 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: buttonColor,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0),
+                        borderRadius: BorderRadius.circular(15.0),
                       ),
                       padding: EdgeInsets.symmetric(
                           vertical: 16.0, horizontal: 30.0),

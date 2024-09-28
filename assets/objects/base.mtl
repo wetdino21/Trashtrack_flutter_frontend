@@ -1,0 +1,30 @@
+# Material for the main robot texture
+newmtl Material_shaded
+Ka 1.000 1.000 1.000
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+d 1.0
+illum 2
+map_Kd shaded.jpg
+
+# Material for the glowing parts of the robot
+newmtl Material_normal
+Ka 1.000 1.000 1.000
+Kd 1.000 1.000 1.000
+Ks 0.000 0.000 0.000
+d 1.0
+illum 2
+map_Kd normal.png
+
+# Material for the metallic parts
+newmtl Material_metallic
+Ka 0.3 0.3 0.3        # Ambient color, darker to simulate metallic
+Kd 0.6 0.6 0.6        # Diffuse color, using the same texture image
+Ks 1.0 1.0 1.0        # High specular value for shiny look
+Ns 200.0              # Higher value for more shininess
+d 1.0                 # Full opacity
+illum 2               # Illumination model: highlights and reflections
+map_Kd metallic.png   # Use the same texture for diffuse map
+map_Ks metallic.png   # Use the same texture for specular map
+
+

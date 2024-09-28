@@ -5,6 +5,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:http/http.dart' as http;
 import 'package:trashtrack/Customer/c_appbar.dart';
 import 'package:trashtrack/Customer/c_bottom_nav_bar.dart';
+import 'package:trashtrack/Customer/c_drawer.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:geolocator/geolocator.dart';
 import 'dart:async';
@@ -667,6 +668,7 @@ class _C_MapScreenState extends State<C_MapScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: C_CustomAppBar(title: 'Map'),
+      drawer: C_Drawer(),
       body: Stack(
         children: [
           FlutterMap(

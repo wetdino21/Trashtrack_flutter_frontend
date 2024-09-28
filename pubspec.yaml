@@ -56,7 +56,7 @@ dependencies:
   latlong2: ^0.8.1 #latlong2: ^0.8.1
   dio: ^5.0.0 #dio: ^5.0.0
   geolocator: ^13.0.1 #geolocator 8.0.0
-  
+  flutter_cube: 0.1.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -98,6 +98,8 @@ flutter:
     - assets/methods.png
     
     - assets/dance.gif
+
+    - assets/objects/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

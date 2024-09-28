@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:trashtrack/Customer/c_appbar.dart';
 import 'package:trashtrack/Customer/c_bottom_nav_bar.dart';
+import 'package:trashtrack/Customer/c_drawer.dart';
 import 'package:trashtrack/Customer/c_map.dart';
 import 'package:trashtrack/Customer/c_waste_info.dart';
 import 'package:trashtrack/Customer/c_waste_request_pickup.dart';
@@ -9,6 +10,8 @@ import 'package:trashtrack/api_token.dart';
 import 'package:trashtrack/styles.dart';
 
 import 'package:trashtrack/user_date.dart';
+import 'package:flutter_cube/flutter_cube.dart';
+
 
 class C_HomeScreen extends StatefulWidget {
   @override
@@ -16,16 +19,24 @@ class C_HomeScreen extends StatefulWidget {
 }
 
 class _C_HomeScreenState extends State<C_HomeScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   //user data
   Map<String, dynamic>? userData;
   //Box<dynamic>? userData;
   bool isLoading = true;
   String? errorMessage;
   //Uint8List? imageBytes;
+  late Object _obj;
 
   @override
   void initState() {
     super.initState();
+     _obj = Object(
+      scale: Vector3(12.0, 12.0, 12.0),
+      //position: Vector3(0, 0, 0),
+      rotation: Vector3(0, -90, 0), // Start sideways
+      fileName: 'assets/objects/base.obj',
+    );
     _dbData();
   }
 
@@ -59,16 +70,22 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
-        if (didPop) {
-          return;
+        if (_scaffoldKey.currentState!.isDrawerOpen) {
+          _scaffoldKey.currentState!.closeDrawer();
+        } else {
+          if (didPop) {
+            return;
+          }
+          showLogoutConfirmationDialog(context);
         }
-        showLogoutConfirmationDialog(context);
       },
       child: Scaffold(
+        key: _scaffoldKey,
         backgroundColor: backgroundColor,
         appBar: C_CustomAppBar(
           title: 'Home',
         ),
+        drawer: C_Drawer(),
         body: RefreshIndicator(
           onRefresh: _dbData,
           child: isLoading
@@ -82,21 +99,25 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             ElevatedButton(
-                                onPressed: () async{
-                                  bool onLocation = await checkLocationPermission();
-                                  if(onLocation)
-                                    Navigator.push(context, MaterialPageRoute(builder: (context) =>  C_MapScreen(
-                                      pickupPoint: LatLng(10.25702151, 123.85040322))));
-                                 
+                                onPressed: () async {
+                                  bool onLocation =
+                                      await checkLocationPermission();
+                                  if (onLocation)
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => C_MapScreen(
+                                                pickupPoint: LatLng(10.25702151,
+                                                    123.85040322))));
                                 },
                                 child: Text('Go To Map')),
                             // Welcome Container
                             Container(
                               padding: EdgeInsets.all(16.0),
                               decoration: BoxDecoration(
-                                color: boxColor,
-                                borderRadius: BorderRadius.circular(20.0),
-                              ),
+                                  color: Colors.deepPurple,
+                                  borderRadius: BorderRadius.circular(20.0),
+                                  boxShadow: shadowColor),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -117,6 +138,47 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                                       fontSize: 14.0,
                                     ),
                                   ),
+                                  Center(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.deepPurple,
+                                        borderRadius:
+                                            BorderRadius.circular(20.0),
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Icon(
+                                            Icons.arrow_left,
+                                            color: Colors.white,
+                                          ),
+                                          Container(
+                                            height: 200,
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.7,
+                                            child: Cube(
+                                              onSceneCreated: (Scene scene) {
+                                                // scene.world.add(Object(
+                                                //     scale: Vector3(
+                                                //         12.0, 12.0, 12.0),
+                                                //     position: Vector3(0, 0, 0),
+                                                //     rotation:
+                                                //         Vector3(0, -90, 0),
+                                                //     fileName:
+                                                //         'assets/objects/base.obj'));
+                                                 scene.world.add(_obj);
+                                              },
+                                            ),
+                                          ),
+                                          Icon(Icons.arrow_right,
+                                              color: Colors.white),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
                                   SizedBox(height: 20.0),
                                   Center(
                                     child: ElevatedButton(
@@ -130,7 +192,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                                         );
                                       },
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: buttonColor,
+                                        backgroundColor: Colors.green,
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(15.0),
@@ -171,15 +233,19 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                                 },
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    color: boxColor,
+                                    color: Colors.deepPurple,
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: ListTile(
                                     contentPadding: EdgeInsets.all(10),
-                                    leading: Image.asset(
-                                      'assets/truck.png',
-                                      height: 100,
-                                      width: 100,
+                                    // leading: Image.asset(
+                                    //   'assets/truck.png',
+                                    //   height: 100,
+                                    //   width: 100,
+                                    // ),
+                                    leading: Icon(
+                                      Icons.view_list,
+                                      color: accentColor,
                                     ),
                                     title: Text(
                                       'Type of waste',

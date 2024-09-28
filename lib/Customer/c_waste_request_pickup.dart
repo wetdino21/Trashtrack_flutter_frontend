@@ -68,19 +68,21 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
       begin: Colors.white,
       end: Colors.grey,
     ).animate(_controller);
-   
   }
 
   @override
   void dispose() {
     // implement dispose
-
+    TickerCanceled;
     _addressController.dispose();
     _cityController.dispose();
     _stateController.dispose();
     _postalCodeController.dispose();
-    TickerCanceled;
+
     _controller.dispose();
+
+    // _dbData();
+    // _loadWasteCategories();
     super.dispose();
   }
 
@@ -89,7 +91,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
     try {
       //final data = await userDataFromHive();
       final data = await fetchCusData(context);
-
+      if (!mounted) return;
       setState(() {
         userData = data;
 
@@ -111,6 +113,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
       });
       //await data.close();
     } catch (e) {
+      if (!mounted) return;
       isLoading = true;
       print(e);
       setState(() {
@@ -131,16 +134,13 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
   // Function to load waste categories and update the state
   Future<void> _loadWasteCategories() async {
     List<Map<String, dynamic>>? categories = await fetchWasteCategory();
+    if (!mounted) return;
     if (categories != null) {
       setState(() {
         _wasteTypes = categories;
         // isLoading = false;
       });
     } else {
-      // Handle the case where fetching categories failed
-      setState(() {
-        //isLoading = false;
-      });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to load waste categories')),
       );
@@ -843,7 +843,11 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                         'Accept the terms and condition');
                                   } else {
                                     //good
-                                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => C_ScheduleScreen()));
+                                    Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                C_ScheduleScreen()));
                                   }
                                 });
                               },

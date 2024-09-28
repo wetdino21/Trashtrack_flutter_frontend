@@ -10,8 +10,7 @@ class C_NotificationScreen extends StatefulWidget {
 
 class _C_NotificationScreenState extends State<C_NotificationScreen> {
   List<Map<String, dynamic>>? notifications;
-  bool isLoading = true;
-  String? errorMessage;
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -29,7 +28,6 @@ class _C_NotificationScreenState extends State<C_NotificationScreen> {
       });
     } catch (e) {
       setState(() {
-        errorMessage = e.toString();
         isLoading = false;
       });
     }

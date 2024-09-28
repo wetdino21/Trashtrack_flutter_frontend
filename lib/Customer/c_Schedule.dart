@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:trashtrack/Customer/c_appbar.dart';
 import 'package:trashtrack/Customer/c_bottom_nav_bar.dart';
+import 'package:trashtrack/Customer/c_drawer.dart';
 import 'package:trashtrack/Customer/c_waste_history_schedule.dart';
 import 'package:trashtrack/Customer/c_waste_pickup_schedule.dart';
 import 'package:trashtrack/Customer/c_waste_request_pickup.dart';
@@ -32,69 +33,81 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: backgroundColor,
-      appBar: C_CustomAppBar(title: ''), //Schedule
+      appBar: C_CustomAppBar(title: 'Schedule'), //Schedule
+      drawer: C_Drawer(),
       body: ListView(
         children: [
           Container(
-            padding: EdgeInsets.all(16.0),
-            margin: EdgeInsets.all(5),
-            decoration: BoxDecoration(
-              color: boxColor,
-              borderRadius: BorderRadius.circular(20.0),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+             decoration: BoxDecoration(
+                    color: Color(0xFF103510),
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+           
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(height: 10.0),
-                Text(
-                  'Ready for another waste pickup schedule?',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 16.0,
+                Container(
+                  padding: EdgeInsets.all(16.0),
+                  margin: EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    color: boxColor,
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  child: Text(
+                    'Book now?',
+                    style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold),
                   ),
                 ),
-                SizedBox(height: 20.0),
                 Center(
                   child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => RequestPickupScreen(),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => RequestPickupScreen(),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: buttonColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15.0),
                         ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: buttonColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15.0),
+                        padding: EdgeInsets.symmetric(
+                            vertical: 16.0, horizontal: 16.0),
                       ),
-                      padding: EdgeInsets.symmetric(
-                          vertical: 16.0, horizontal: 30.0),
-                    ),
-                    child: Text(
-                      'Request Pickup Now',
-                      style: TextStyle(
+                      child: Icon(
+                        Icons.keyboard_arrow_right_outlined,
                         color: Colors.white,
-                        fontSize: 18.0,
+                      )
+                      //Text(
+                      //   'Request Pickup Now',
+                      //   style: TextStyle(
+                      //     color: Colors.white,
+                      //     fontSize: 18.0,
+                      //   ),
+                      // ),
                       ),
-                    ),
-                  ),
                 ),
               ],
             ),
           ),
           SizedBox(height: 20.0),
           // Divider(color: accentColor),
-          Center(
-            child: Text(
-              'Schedule',
-              style: TextStyle(
-                color: Colors.white, fontWeight: FontWeight.bold,fontSize: 30,
-              ),
-            ),
-          ),
-         
+          // Center(
+          //   child: Text(
+          //     'Schedule',
+          //     style: TextStyle(
+          //       color: Colors.white,
+          //       fontWeight: FontWeight.bold,
+          //       fontSize: 30,
+          //     ),
+          //   ),
+          // ),
+
           SizedBox(height: 10.0),
           Column(
             children: [
@@ -111,7 +124,7 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen> {
                         onPressed: () => onPageSelected(0),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: selectedPage == 0
-                              ? buttonColor
+                              ? Colors.deepPurple
                               : Color(0xFF001E00),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(5.0),
@@ -132,7 +145,7 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen> {
                         onPressed: () => onPageSelected(1),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: selectedPage == 1
-                              ? buttonColor
+                              ? Colors.deepPurple
                               : Color(0xFF001E00),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(5.0),
@@ -166,7 +179,6 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen> {
                     // Current Schedule
                     ListView(
                       children: [
-                       
                         C_WasteCollectionCard(
                           date: 'Fri Jun 20',
                           time: '8:30 AM',
@@ -191,7 +203,6 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen> {
                           wasteType: 'Food Waste',
                           status: 'Pending',
                         ),
-                    
                       ],
                     ),
                     // History Schedule
@@ -215,7 +226,7 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen> {
                           wasteType: 'Construction Waste',
                           status: 'Complete',
                         ),
-                         C_WasteCollectionHistoryCard(
+                        C_WasteCollectionHistoryCard(
                           date: 'Wed Jun 20',
                           time: '8:30 AM',
                           wasteType: 'Municipal Waste',
@@ -233,7 +244,7 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen> {
                           wasteType: 'Construction Waste',
                           status: 'Complete',
                         ),
-                         C_WasteCollectionHistoryCard(
+                        C_WasteCollectionHistoryCard(
                           date: 'Wed Jun 20',
                           time: '8:30 AM',
                           wasteType: 'Municipal Waste',

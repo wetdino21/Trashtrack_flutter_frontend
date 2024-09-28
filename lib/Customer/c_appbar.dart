@@ -103,8 +103,8 @@ class _C_CustomAppBarState extends State<C_CustomAppBar> {
           width: 15,
         )
       ],
-      leading: SizedBox.shrink(),
-      leadingWidth: 0,
+      // leading: SizedBox.shrink(),
+      // leadingWidth: 0,
     );
   }
 }

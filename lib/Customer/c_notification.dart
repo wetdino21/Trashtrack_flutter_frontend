@@ -8,27 +8,68 @@ class C_NotificationScreen extends StatefulWidget {
   State<C_NotificationScreen> createState() => _C_NotificationScreenState();
 }
 
-class _C_NotificationScreenState extends State<C_NotificationScreen> {
+class _C_NotificationScreenState extends State<C_NotificationScreen>
+    with SingleTickerProviderStateMixin {
   List<Map<String, dynamic>>? notifications;
   bool isLoading = false;
-
+  late AnimationController _controller;
+  late Animation<Color?> _colorTween;
+  late Animation<Color?> _colorTween2;
   @override
   void initState() {
     super.initState();
     _fetchNotifications();
+    // Initialize the animation controller
+    _controller = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    )..repeat(reverse: true); // The animation will repeat back and forth
+
+    // Define a color tween animation that transitions between two colors
+    _colorTween = ColorTween(
+      begin: Colors.white,
+      end: Colors.grey,
+    ).animate(_controller);
+
+    _colorTween2 = ColorTween(
+      begin: Colors.grey,
+      end: Colors.white,
+    ).animate(_controller);
+  }
+
+  @override
+  void dispose() {
+    TickerCanceled;
+    _controller.dispose();
+    super.dispose();
   }
 
   // Fetch notifications from the server
   Future<void> _fetchNotifications() async {
+    setState(() {
+      isLoading = true;
+    });
     try {
       final data = await fetchCusNotifications(context);
-      setState(() {
-        notifications = data;
-        isLoading = false;
-      });
+      if (!mounted) {
+        return;
+      }
+      if (data != null) {
+        setState(() {
+          notifications = data;
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+      }
     } catch (e) {
+      if (!mounted) {
+        return;
+      }
       setState(() {
-        isLoading = false;
+        isLoading = true;
       });
     }
   }
@@ -45,13 +86,55 @@ class _C_NotificationScreenState extends State<C_NotificationScreen> {
       body: RefreshIndicator(
         onRefresh: _fetchNotifications,
         child: isLoading
-            ? Center(child: CircularProgressIndicator())
+            ? AnimatedBuilder(
+                animation: _controller,
+                builder: (context, child) {
+                  return ListView.builder(
+                    padding: const EdgeInsets.all(5),
+                    itemCount: 6,
+                    itemBuilder: (context, index) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Container(
+                            height: 30,
+                            width: 300,
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              //color: Colors.white.withOpacity(.6),
+                              color: index % 2 == 0
+                                  ? _colorTween.value
+                                  : _colorTween2.value,
+                            ),
+                          ),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          Container(
+                            height: 70,
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: index % 2 == 0
+                                  ? _colorTween.value
+                                  : _colorTween2.value,
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                })
             : notifications == null
                 ? Center(
                     child: Text(
-                  'No available notification.\n\n\n\n',
-                  style: TextStyle(color: accentColor, fontSize: 20),
-                ))
+                    'No available notification.\n\n\n\n',
+                    style: TextStyle(color: accentColor, fontSize: 20),
+                  ))
                 : ListView.builder(
                     padding: const EdgeInsets.all(5),
                     itemCount: notifications!.length,

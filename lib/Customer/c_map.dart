@@ -859,7 +859,7 @@ class _C_MapScreenState extends State<C_MapScreen> {
                                       decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(5),
-                                          border: Border.all(width: 1)),
+                                          border: Border.all(width: 1, color: Colors.grey)),
                                       child: TextField(
                                         controller: _startController,
                                         focusNode: _startFocusNode,
@@ -911,7 +911,7 @@ class _C_MapScreenState extends State<C_MapScreen> {
                                       decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(5),
-                                          border: Border.all(width: 1)),
+                                          border: Border.all(width: 1, color: Colors.grey)),
                                       child: TextField(
                                         controller: _destinationController,
                                         focusNode: _destinationFocusNode,
@@ -1222,7 +1222,7 @@ class _C_MapScreenState extends State<C_MapScreen> {
                           margin: EdgeInsets.all(15),
                           padding: EdgeInsets.all(14.0),
                           decoration: BoxDecoration(
-                              color: Colors.green,
+                              color: Colors.deepPurple,
                               borderRadius: BorderRadius.circular(15),
                               boxShadow: shadowColor),
                           child: InkWell(
@@ -1299,7 +1299,7 @@ class _C_MapScreenState extends State<C_MapScreen> {
                         child: Text(
                           selectedPlaceName == null ? '' : selectedPlaceName!,
                           style: TextStyle(
-                              color: Colors.red, fontWeight: FontWeight.bold),
+                              color: Colors.grey[700], fontWeight: FontWeight.bold),
                           softWrap: true,
                           overflow: TextOverflow
                               .visible, // Prevent clipping, allow text to expand
@@ -1389,7 +1389,7 @@ class _C_MapScreenState extends State<C_MapScreen> {
                                       ? ''
                                       : selectedCurrentName!,
                                   style: TextStyle(
-                                      color: Colors.red,
+                                      color: Colors.grey[700],
                                       fontWeight: FontWeight.bold),
                                   softWrap: true,
                                   overflow: TextOverflow

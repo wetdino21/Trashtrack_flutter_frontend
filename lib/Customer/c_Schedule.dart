@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:trashtrack/Customer/c_appbar.dart';
 import 'package:trashtrack/Customer/c_bottom_nav_bar.dart';
 import 'package:trashtrack/Customer/c_drawer.dart';
-import 'package:trashtrack/Customer/c_waste_history_schedule.dart';
-import 'package:trashtrack/Customer/c_waste_pickup_schedule.dart';
-import 'package:trashtrack/Customer/c_waste_request_pickup.dart';
+import 'package:trashtrack/Customer/c_schedule_history.dart';
+import 'package:trashtrack/Customer/c_schedule_current.dart';
+import 'package:trashtrack/Customer/c_booking.dart';
+import 'package:trashtrack/api_postgre_service.dart';
 import 'package:trashtrack/styles.dart';
 
 class C_ScheduleScreen extends StatefulWidget {
@@ -13,13 +15,48 @@ class C_ScheduleScreen extends StatefulWidget {
 }
 
 class _C_ScheduleScreenState extends State<C_ScheduleScreen> {
+  List<Map<String, dynamic>>? bookingList;
+  List<Map<String, dynamic>>? bookingWasteList;
+  bool isLoading = false;
   int selectedPage = 0;
   late PageController _pageController;
 
   @override
   void initState() {
     super.initState();
+    _fetchBookingData();
     _pageController = PageController(initialPage: selectedPage);
+  }
+
+  // Fetch booking from the server
+  Future<void> _fetchBookingData() async {
+    setState(() {
+      isLoading = true;
+    });
+    try {
+      final data = await fetchBookingData(context);
+      if (!mounted) {
+        return;
+      }
+      if (data != null) {
+        setState(() {
+          bookingList = data['booking'];
+          bookingWasteList = data['wasteTypes'];
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        isLoading = true;
+      });
+    }
   }
 
   void onPageSelected(int pageIndex) {
@@ -38,11 +75,10 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen> {
       body: ListView(
         children: [
           Container(
-             decoration: BoxDecoration(
-                    color: Color(0xFF103510),
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-           
+            decoration: BoxDecoration(
+              color: Color(0xFF103510),
+              borderRadius: BorderRadius.circular(10.0),
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -82,32 +118,12 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen> {
                       child: Icon(
                         Icons.keyboard_arrow_right_outlined,
                         color: Colors.white,
-                      )
-                      //Text(
-                      //   'Request Pickup Now',
-                      //   style: TextStyle(
-                      //     color: Colors.white,
-                      //     fontSize: 18.0,
-                      //   ),
-                      // ),
-                      ),
+                      )),
                 ),
               ],
             ),
           ),
           SizedBox(height: 20.0),
-          // Divider(color: accentColor),
-          // Center(
-          //   child: Text(
-          //     'Schedule',
-          //     style: TextStyle(
-          //       color: Colors.white,
-          //       fontWeight: FontWeight.bold,
-          //       fontSize: 30,
-          //     ),
-          //   ),
-          // ),
-
           SizedBox(height: 10.0),
           Column(
             children: [
@@ -166,7 +182,7 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen> {
               ),
               SizedBox(height: 20.0),
               Container(
-                height: MediaQuery.of(context).size.height * .5,
+                height: MediaQuery.of(context).size.height * .6,
                 padding: EdgeInsets.symmetric(horizontal: 10),
                 child: PageView(
                   controller: _pageController,
@@ -177,34 +193,76 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen> {
                   },
                   children: [
                     // Current Schedule
-                    ListView(
-                      children: [
-                        C_WasteCollectionCard(
-                          date: 'Fri Jun 20',
-                          time: '8:30 AM',
-                          wasteType: 'Construction Waste',
-                          status: 'Pending',
-                        ),
-                        C_WasteCollectionCard(
-                          date: 'Mon Jun 20',
-                          time: '8:30 AM',
-                          wasteType: 'Municipal Waste',
-                          status: 'Pending',
-                        ),
-                        C_WasteCollectionCard(
-                          date: 'Wed Jun 20',
-                          time: '8:30 AM',
-                          wasteType: 'Construction Waste',
-                          status: 'Pending',
-                        ),
-                        C_WasteCollectionCard(
-                          date: 'Fri Jun 20',
-                          time: '8:30 AM',
-                          wasteType: 'Food Waste',
-                          status: 'Pending',
-                        ),
-                      ],
+
+                    //isLoading?
+                    ListView.builder(
+                      itemCount: bookingList?.length ?? 0,
+                      itemBuilder: (context, index) {
+                        // Safely retrieve the booking details from bookingList
+                        final booking = bookingList?[index];
+
+                        if (booking == null) {
+                          return SizedBox.shrink();
+                        }
+
+                        int book_Id = booking['bk_id'];
+                        DateTime dbdate =
+                            DateTime.parse(booking['bk_date'] ?? '').toLocal();
+                        final String date =
+                            DateFormat('MMM dd, yyyy (EEEE)').format(dbdate);
+
+                        DateTime dbdateCreated =
+                            DateTime.parse(booking['bk_created_at'] ?? '')
+                                .toLocal();
+                        final String dateCreated =
+                            DateFormat('MMM dd, yyyy hh:mm a')
+                                .format(dbdateCreated);
+
+                        // Filter waste types for the current booking's bk_id
+                        String wasteTypes = '';
+                        if (bookingWasteList != null) {
+                          List<Map<String, dynamic>> filteredWasteList =
+                              bookingWasteList!.where((waste) {
+                            return waste['bk_id'] == booking['bk_id'];
+                          }).toList();
+
+                          // Build the waste types string
+                          int count = 0;
+                          for (var waste in filteredWasteList) {
+                            count++;
+                            wasteTypes += waste['bw_name'] + ', ';
+                            if (count == 2) break;
+                          }
+
+                          // Remove the trailing comma and space
+                          if (wasteTypes.isNotEmpty) {
+                            if (filteredWasteList.length > 2) {
+                              wasteTypes = wasteTypes + '. . .';
+                            } else {
+                              wasteTypes = wasteTypes.substring(
+                                  0, wasteTypes.length - 2);
+                            }
+                          }
+                        }
+
+                        final String status =
+                            booking['bk_status'] ?? 'No status';
+
+                        // Pass the extracted data to the C_CurrentScheduleCard widget
+                        return C_CurrentScheduleCard(
+                          bookId: book_Id,
+                          date: date,
+                          dateCreated: dateCreated,
+                          wasteType: wasteTypes,
+                          status: status,
+                        );
+                      },
                     ),
+                    // : Container(
+                    //   alignment: Alignment.center,
+                    //   child: Text('No Current Booking Available.', style: TextStyle(color: Colors.white, fontSize: 18)),
+                    // ),
+
                     // History Schedule
                     ListView(
                       children: [

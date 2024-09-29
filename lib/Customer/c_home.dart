@@ -5,7 +5,7 @@ import 'package:trashtrack/Customer/c_bottom_nav_bar.dart';
 import 'package:trashtrack/Customer/c_drawer.dart';
 import 'package:trashtrack/Customer/c_map.dart';
 import 'package:trashtrack/Customer/c_waste_info.dart';
-import 'package:trashtrack/Customer/c_waste_request_pickup.dart';
+import 'package:trashtrack/Customer/c_booking.dart';
 import 'package:trashtrack/api_token.dart';
 import 'package:trashtrack/styles.dart';
 

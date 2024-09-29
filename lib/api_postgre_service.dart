@@ -314,3 +314,139 @@ Future<void> updateProfile(
     //showErrorSnackBar(context, response.body);
   }
 }
+
+//booking
+Future<String?> booking(
+    BuildContext context,
+    int id,
+    DateTime date,
+    String province,
+    String city,
+    String brgy,
+    String street,
+    String postal,
+    double longitude,
+    double latitude,
+    List<Map<String, dynamic>> selectedWasteTypes) async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+  if (accessToken == null) {
+    print('No access token available. User needs to log in.');
+    await deleteTokens(context); // Logout use
+  }
+
+  try {
+    final response = await http.post(
+      Uri.parse('$baseUrl/booking'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'id': id,
+        'date': date.toIso8601String(),
+        'province': province,
+        'city': city,
+        'brgy': brgy,
+        'street': street,
+        'postal': postal,
+        'longitude': longitude,
+        'latitude': latitude,
+        'wasteTypes': selectedWasteTypes,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      showSuccessSnackBar(context, 'Pending booking');
+      return 'success';
+    } else {
+      if (response.statusCode == 401) {
+        // Access token might be expired, attempt to refresh it
+        print('Access token expired. Attempting to refresh...');
+        String? refreshMsg = await refreshAccessToken(context);
+        if (refreshMsg == null) {
+          await booking(context, id, date, province, city, brgy, street, postal,
+              longitude, latitude, selectedWasteTypes);
+        }
+      } else if (response.statusCode == 403) {
+        // Access token is invalid. logout
+        print('Access token invalid. Attempting to logout...');
+        showErrorSnackBar(
+            context, 'Active time has been expired please login again.');
+        await deleteTokens(context); // Logout use
+      } else {
+        print('Response: ${response.body}');
+      }
+
+      //showErrorSnackBar(context, response.body);
+    }
+    return response.body;
+  } catch (e) {
+    print(e.toString());
+  }
+  return null;
+}
+
+//fetch_booking
+Future<Map<String, List<Map<String, dynamic>>>?> fetchBookingData(
+    BuildContext context) async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+
+  if (accessToken == null) {
+    print('No access token available. User needs to log in.');
+    await deleteTokens(context);
+    return null;
+  }
+
+  try {
+    final response = await http.post(
+      Uri.parse('$baseUrl/fetch_booking'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      //print(response.body);
+      //return List<Map<String, dynamic>>.from(jsonDecode(response.body));
+      Map<String, dynamic> data = jsonDecode(response.body);
+
+      // Extract 'booking' and 'wasteTypes' from the response
+      List<Map<String, dynamic>> bookingList =
+          List<Map<String, dynamic>>.from(data['booking']);
+      List<Map<String, dynamic>> wasteTypeList =
+          List<Map<String, dynamic>>.from(data['wasteTypes']);
+
+      // Optionally: Combine them if needed or pass them individually
+      return {'booking': bookingList, 'wasteTypes': wasteTypeList};
+    } else {
+      if (response.statusCode == 401) {
+        // Access token might be expired, attempt to refresh it
+        print('Access token expired. Attempting to refresh...');
+        String? refreshMsg = await refreshAccessToken(context);
+        if (refreshMsg == null) {
+          return await fetchBookingData(context);
+        } else {
+          // Refresh token is invalid or expired, logout the user
+          await deleteTokens(context); // Logout user
+          return null;
+        }
+      } else if (response.statusCode == 403) {
+        // Access token is invalid. logout
+        print('Access token invalid. Attempting to logout...');
+        await deleteTokens(context); // Logout user
+      } else if (response.statusCode == 404) {
+        print('No booking found');
+        return null;
+      }
+
+      //showErrorSnackBar(context, response.body);
+      print('Response: ${response.body}');
+      return null;
+    }
+  } catch (e) {
+    print(e);
+  }
+  return null;
+}

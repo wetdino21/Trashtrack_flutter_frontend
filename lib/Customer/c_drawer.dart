@@ -13,34 +13,36 @@ class C_Drawer extends StatefulWidget {
 
 class _C_DrawerState extends State<C_Drawer> {
   Uint8List? imageBytes;
+  Map<String, dynamic>? userData;
 
   @override
   void initState() {
     super.initState();
-    _loadProfileImage();
+    _dbData();
   }
 
-    Future<void> _loadProfileImage() async {
-    final data = await userDataFromHive();
-    setState(() {
-       imageBytes = data['profile'];
-    });
-   
-    //  String? base64Image = await fetchProfile(context);
-    //   if (base64Image != null) {
-    //     setState(() {
-    //       imageBytes = base64Decode(base64Image);
-    //     });
-    //   }
-
-   // await box.close();
+  Future<void> _dbData() async {
+    try {
+      //final data = await Hive.openBox('mybox');
+      final data = await userDataFromHive();
+      // final data = await fetchCusData(context);
+      if (!mounted) return;
+      setState(() {
+        imageBytes = data['profile'];
+        userData = data;
+      });
+      //await data.close();
+    } catch (e) {
+      if (!mounted) return;
+      showErrorSnackBar(context, e.toString());
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-   return SafeArea(
+    return SafeArea(
       child: Drawer(
-        width:  MediaQuery.of(context).size.width * 0.85,
+        width: MediaQuery.of(context).size.width * 0.85,
         backgroundColor: Colors.white,
         child: Column(
           children: [
@@ -57,34 +59,43 @@ class _C_DrawerState extends State<C_Drawer> {
                     ),
               title: Row(
                 children: [
-                  Text('first name', style: TextStyle(fontWeight: FontWeight.bold),),
+                  Text(userData!= null?
+                    '${userData!['fname']} ${userData!['lname']}': 'Loading . . .',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   Icon(Icons.keyboard_arrow_down)
                 ],
               ),
               trailing: IconButton(
                 //padding: EdgeInsets.all(20),
-                icon: Icon(Icons.settings, size: 35,),
+                icon: Icon(
+                  Icons.settings,
+                  size: 35,
+                ),
                 onPressed: () {
-                 Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsScreen()));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => SettingsScreen()));
                 },
               ),
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => C_ProfileScreen()));
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => C_ProfileScreen()));
               },
             ),
             // Expanded List Section
             Expanded(
               child: ListView(
                 children: [
-
                   //home
                   ListTile(
                     leading: Container(
-                      padding: EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(10)),
-                      child: Icon(Icons.home)),
+                        padding: EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Icon(Icons.home)),
                     title: Text('Home'),
                     selectedColor: Colors.green,
                     tileColor: Colors.black12,
@@ -97,11 +108,11 @@ class _C_DrawerState extends State<C_Drawer> {
                   //2
                   ListTile(
                     leading: Container(
-                      padding: EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(10)),
-                      child: Icon(Icons.home)),
+                        padding: EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Icon(Icons.home)),
                     title: Text('Home2'),
                     selectedColor: Colors.green,
                     //tileColor: Colors.black12,
@@ -112,13 +123,13 @@ class _C_DrawerState extends State<C_Drawer> {
                   ),
 
                   //
-                   ListTile(
+                  ListTile(
                     leading: Container(
-                      padding: EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(10)),
-                      child: Icon(Icons.home)),
+                        padding: EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Icon(Icons.home)),
                     title: Text('Home3'),
                     selectedColor: Colors.green,
                     //tileColor: Colors.black12,
@@ -129,13 +140,13 @@ class _C_DrawerState extends State<C_Drawer> {
                   ),
 
                   //
-                   ListTile(
+                  ListTile(
                     leading: Container(
-                      padding: EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(10)),
-                      child: Icon(Icons.home)),
+                        padding: EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Icon(Icons.home)),
                     title: Text('Home4'),
                     selectedColor: Colors.green,
                     //tileColor: Colors.black12,

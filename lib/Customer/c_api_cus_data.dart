@@ -136,7 +136,7 @@ Future<List<Map<String, dynamic>>?> fetchCusNotifications(
       // Access token is invalid. logout
       print('Access token invalid. Attempting to logout...');
       await deleteTokens(context); // Logout user
-    } else {
+    } else if (response.statusCode == 404){
       print('No notification found');
       return null;
     }

@@ -62,23 +62,23 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
         backgroundColor: backgroundColor,
         foregroundColor: Colors.white,
         title: Text('Profile'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.settings, color: accentColor),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => SettingsScreen()),
-              );
-            },
-          ),
-        ],
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pushNamed(context, 'c_home');
-          },
-          icon: Icon(Icons.arrow_back),
-        ),
+        // actions: [
+        //   IconButton(
+        //     icon: Icon(Icons.settings, color: accentColor),
+        //     onPressed: () {
+        //       Navigator.push(
+        //         context,
+        //         MaterialPageRoute(builder: (context) => SettingsScreen()),
+        //       );
+        //     },
+        //   ),
+        // ],
+        // leading: IconButton(
+        //   onPressed: () {
+        //     Navigator.pushNamed(context, 'c_home');
+        //   },
+        //   icon: Icon(Icons.arrow_back),
+        // ),
       ),
       body: RefreshIndicator(
         onRefresh: _dbData,
@@ -214,18 +214,12 @@ class SettingsScreen extends StatelessWidget {
         backgroundColor: backgroundColor,
         foregroundColor: Colors.white,
         //iconTheme: IconThemeData(color: accentColor),
-        title: Row(
-          children: [
-            Icon(Icons.settings),
-            SizedBox(width: 10),
-            Text('Settings'),
-          ],
-        ),
-        leading: IconButton(
-            onPressed: () {
-              Navigator.pushNamed(context, 'c_profile');
-            },
-            icon: Icon(Icons.arrow_back)),
+        title: Text('Settings'),
+        // leading: IconButton(
+        //     onPressed: () {
+        //       Navigator.pushNamed(context, 'c_profile');
+        //     },
+        //     icon: Icon(Icons.arrow_back)),
       ),
       body: SingleChildScrollView(
         child: Container(

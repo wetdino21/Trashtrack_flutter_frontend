@@ -8,15 +8,24 @@ class C_BottomNavBar extends StatelessWidget {
   void _onItemTapped(BuildContext context, int index) {
     switch (index) {
       case 0:
+        if (ModalRoute.of(context)?.settings.name == 'c_map') {
+          Navigator.of(context).pop(); // dispose if mapscreen
+        }
         if (currentIndex != 0) Navigator.pushNamed(context, 'c_home');
         break;
       case 1:
         if (currentIndex != 1) Navigator.pushNamed(context, 'c_map');
         break;
       case 2:
+        if (ModalRoute.of(context)?.settings.name == 'c_map') {
+          Navigator.of(context).pop(); // dispose if mapscreen
+        }
         if (currentIndex != 2) Navigator.pushNamed(context, 'c_schedule');
         break;
       case 3:
+        if (ModalRoute.of(context)?.settings.name == 'c_map') {
+          Navigator.of(context).pop(); // dispose if mapscreen
+        }
         if (currentIndex != 3) Navigator.pushNamed(context, 'c_payment');
         break;
     }

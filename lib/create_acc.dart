@@ -208,6 +208,15 @@ class _CreateAccState extends State<CreateAcc> {
                     ? _buildSecondStep()
                     : _buildThirdStep(),
           ),
+          PopScope(
+              canPop: false,
+              onPopInvokedWithResult: (didPop, result) async {
+                if (didPop) {
+                  return;
+                }
+                _backToSignIn();
+              },
+              child: Container()),
           // Padding(
           //   padding: const EdgeInsets.all(16.0),
           //   child: Row(
@@ -917,23 +926,24 @@ class _CreateAccState extends State<CreateAcc> {
                       ),
                       TextButton(
                         onPressed: () {
-                          if (_emailController.text.isNotEmpty ||
-                              _passController.text.isNotEmpty ||
-                              _repassController.text.isNotEmpty ||
-                              _fnameController.text.isNotEmpty ||
-                              _mnameController.text.isNotEmpty ||
-                              _lnameController.text.isNotEmpty ||
-                              _fnameController.text.isNotEmpty ||
-                              _contactController.text.isNotEmpty ||
-                              _selectedProvinceName != null ||
-                              _selectedCityMunicipalityName != null ||
-                              _selectedBarangayName != null ||
-                              _streetController.text.isNotEmpty ||
-                              _postalController.text.isNotEmpty) {
-                            _showSignInConfirmationDialog(context);
-                          } else {
-                            Navigator.pushNamed(context, 'login');
-                          }
+                          _backToSignIn();
+                          // if (_emailController.text.isNotEmpty ||
+                          //     _passController.text.isNotEmpty ||
+                          //     _repassController.text.isNotEmpty ||
+                          //     _fnameController.text.isNotEmpty ||
+                          //     _mnameController.text.isNotEmpty ||
+                          //     _lnameController.text.isNotEmpty ||
+                          //     _fnameController.text.isNotEmpty ||
+                          //     _contactController.text.isNotEmpty ||
+                          //     _selectedProvinceName != null ||
+                          //     _selectedCityMunicipalityName != null ||
+                          //     _selectedBarangayName != null ||
+                          //     _streetController.text.isNotEmpty ||
+                          //     _postalController.text.isNotEmpty) {
+                          //   _showSignInConfirmationDialog(context);
+                          // } else {
+                          //   Navigator.pushNamed(context, 'login');
+                          // }
                         },
                         style: TextButton.styleFrom(
                           padding: EdgeInsets.zero,
@@ -958,6 +968,26 @@ class _CreateAccState extends State<CreateAcc> {
         ),
       ),
     );
+  }
+
+  void _backToSignIn() {
+    if (_emailController.text.isNotEmpty ||
+        _passController.text.isNotEmpty ||
+        _repassController.text.isNotEmpty ||
+        _fnameController.text.isNotEmpty ||
+        _mnameController.text.isNotEmpty ||
+        _lnameController.text.isNotEmpty ||
+        _fnameController.text.isNotEmpty ||
+        _contactController.text.isNotEmpty ||
+        _selectedProvinceName != null ||
+        _selectedCityMunicipalityName != null ||
+        _selectedBarangayName != null ||
+        _streetController.text.isNotEmpty ||
+        _postalController.text.isNotEmpty) {
+      _showSignInConfirmationDialog(context);
+    } else {
+      Navigator.pushNamed(context, 'login');
+    }
   }
 
   void _showGoogleSignInConfirmationDialog(
@@ -2089,6 +2119,8 @@ void _showSignInConfirmationDialog(BuildContext context) {
     },
   );
 }
+
+
 
 
 

@@ -108,7 +108,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
             (userData!['cus_mname'] ?? '') +
             ' ' +
             (userData!['cus_lname'] ?? '');
-        contact = userData!['cus_contact'] ?? '';
+        contact = userData!['cus_contact'].substring(1) ?? '';
         street = (userData!['cus_street'] ?? '');
         address = (userData!['cus_brgy'] ?? '') +
             ', ' +
@@ -236,6 +236,12 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
         backgroundColor: backgroundColor,
         foregroundColor: Colors.white,
         //title: Text('Request Pickup'),
+        leading: IconButton(
+            padding: EdgeInsets.all(15),
+            onPressed: () {
+              _backFromBooking();
+            },
+            icon: Icon(Icons.arrow_back)),
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -252,6 +258,15 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              PopScope(
+                  canPop: false,
+                  onPopInvokedWithResult: (didPop, result) async {
+                    if (didPop) {
+                      return;
+                    }
+                    _backFromBooking();
+                  },
+                  child: Container()),
               Center(
                   child: Text(
                 'Booking',
@@ -925,8 +940,8 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                     userData!['cus_brgy'],
                                     userData!['cus_street'],
                                     userData!['cus_postal'],
-                                    selectedPoint!.longitude,
                                     selectedPoint!.latitude,
+                                    selectedPoint!.longitude,
                                     _selectedWasteTypes);
                                 if (dbMessage == 'success')
                                   Navigator.pushReplacement(
@@ -955,6 +970,47 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
           ),
         ),
       ),
+    );
+  }
+
+  void _backFromBooking() {
+    if (selectedPoint != null ||
+        _selectedWasteTypes.isNotEmpty ||
+        _selectedDate != null) {
+      _showBackConfirmationDialog(context);
+    } else {
+      Navigator.of(context).pop();
+    }
+  }
+
+  void _showBackConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.deepPurple,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(20.0))),
+          title: Text('Cancel Booking?', style: TextStyle(color: Colors.white)),
+          content: Text('Any data from this form will be removed!',
+              style: TextStyle(color: Colors.white)),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel', style: TextStyle(color: Colors.white)),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop(); // Close the page
+              },
+              child: Text('Yes', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -1197,7 +1253,6 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                             .format(_selectedDate!), // Format: Mon 1, 2024
                     style: TextStyle(
                         color: _selectedDate == null ? Colors.grey : null,
-                        fontWeight: FontWeight.bold,
                         fontSize: 16),
                   ),
                   SizedBox(width: 10.0),

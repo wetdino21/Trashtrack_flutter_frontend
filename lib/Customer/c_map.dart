@@ -20,6 +20,7 @@ class C_MapScreen extends StatefulWidget {
 }
 
 class _C_MapScreenState extends State<C_MapScreen> {
+  final GlobalKey<_C_MapScreenState> _mapScreenKey = GlobalKey<_C_MapScreenState>();
   bool hideScreen = false;
   final MapController _mapController = MapController();
   LatLng? _currentLocation;
@@ -84,6 +85,8 @@ class _C_MapScreenState extends State<C_MapScreen> {
     _destinationController.dispose();
     _startFocusNode.dispose();
     _destinationFocusNode.dispose();
+
+    print('mappppp disposeeee');
     super.dispose();
   }
 
@@ -667,6 +670,7 @@ class _C_MapScreenState extends State<C_MapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _mapScreenKey,
       appBar: C_CustomAppBar(title: 'Map'),
       drawer: C_Drawer(),
       body: Stack(

@@ -57,9 +57,15 @@ dependencies:
   dio: ^5.0.0 #dio: ^5.0.0
   geolocator: ^13.0.1 #geolocator 8.0.0
   flutter_cube: 0.1.1
+  collection: ^1.18.0 #for list/map compare
+
+  
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+  flutter_launcher_icons: ^0.14.1 # for apk icon
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -72,6 +78,13 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon/trashtrack_icon.png"
+  min_sdk_android: 21 # android min sdk min:16, default 21
+  
+  
 flutter:
 
   # The following line ensures that the Material Icons font is

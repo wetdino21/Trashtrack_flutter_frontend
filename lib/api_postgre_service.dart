@@ -325,8 +325,8 @@ Future<String?> booking(
     String brgy,
     String street,
     String postal,
-    double longitude,
     double latitude,
+    double longitude,
     List<Map<String, dynamic>> selectedWasteTypes) async {
   Map<String, String?> tokens = await getTokens();
   String? accessToken = tokens['access_token'];
@@ -350,8 +350,8 @@ Future<String?> booking(
         'brgy': brgy,
         'street': street,
         'postal': postal,
-        'longitude': longitude,
         'latitude': latitude,
+        'longitude': longitude,
         'wasteTypes': selectedWasteTypes,
       }),
     );
@@ -380,6 +380,7 @@ Future<String?> booking(
 
       //showErrorSnackBar(context, response.body);
     }
+    print('Booking is not successful!');
     return response.body;
   } catch (e) {
     print(e.toString());
@@ -447,6 +448,133 @@ Future<Map<String, List<Map<String, dynamic>>>?> fetchBookingData(
     }
   } catch (e) {
     print(e);
+  }
+  return null;
+}
+
+//booking update
+Future<String?> bookingUpdate(
+    BuildContext context,
+    int bookId,
+    DateTime date,
+    String province,
+    String city,
+    String brgy,
+    String street,
+    String postal,
+    double latitude,
+    double longitude,
+    List<Map<String, dynamic>> selectedWasteTypes) async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+  if (accessToken == null) {
+    print('No access token available. User needs to log in.');
+    await deleteTokens(context); // Logout use
+  }
+
+  try {
+    final response = await http.post(
+      Uri.parse('$baseUrl/booking_update'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'bookingId': bookId,
+        'date': date.toIso8601String(),
+        'province': province,
+        'city': city,
+        'brgy': brgy,
+        'street': street,
+        'postal': postal,
+        'latitude': latitude,
+        'longitude': longitude,
+        'wasteTypes': selectedWasteTypes,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      showSuccessSnackBar(context, 'Saved Changes');
+      return 'success';
+    } else {
+      if (response.statusCode == 401) {
+        // Access token might be expired, attempt to refresh it
+        print('Access token expired. Attempting to refresh...');
+        String? refreshMsg = await refreshAccessToken(context);
+        if (refreshMsg == null) {
+          await booking(context, bookId, date, province, city, brgy, street, postal,
+              longitude, latitude, selectedWasteTypes);
+        }
+      } else if (response.statusCode == 403) {
+        // Access token is invalid. logout
+        print('Access token invalid. Attempting to logout...');
+        showErrorSnackBar(
+            context, 'Active time has been expired please login again.');
+        await deleteTokens(context); // Logout use
+      } else {
+        print('Response: ${response.body}');
+      }
+
+      //showErrorSnackBar(context, response.body);
+    }
+    print('Update Booking is not successful!');
+    return response.body;
+  } catch (e) {
+    print(e.toString());
+  }
+  return null;
+}
+
+//booking cancel
+Future<String?> bookingCancel(
+    BuildContext context,
+    int bookId) async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+  if (accessToken == null) {
+    print('No access token available. User needs to log in.');
+    await deleteTokens(context); // Logout use
+  }
+
+  try {
+    final response = await http.post(
+      Uri.parse('$baseUrl/booking_cancel'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'bookingId': bookId
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      showSuccessSnackBar(context, 'Successfully Cancelled');
+      return 'success';
+    } else {
+      if (response.statusCode == 401) {
+        // Access token might be expired, attempt to refresh it
+        print('Access token expired. Attempting to refresh...');
+        String? refreshMsg = await refreshAccessToken(context);
+        if (refreshMsg == null) {
+          await bookingCancel(context, bookId);
+        }
+      } else if (response.statusCode == 403) {
+        // Access token is invalid. logout
+        print('Access token invalid. Attempting to logout...');
+        showErrorSnackBar(
+            context, 'Active time has been expired please login again.');
+        await deleteTokens(context); // Logout use
+      } else {
+        print('Response: ${response.body}');
+      }
+
+      //showErrorSnackBar(context, response.body);
+    }
+    print('Cancel Booking is not successful!');
+    return response.body;
+  } catch (e) {
+    print(e.toString());
   }
   return null;
 }

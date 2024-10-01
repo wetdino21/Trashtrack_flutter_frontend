@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:trashtrack/Customer/c_profile.dart';
+import 'package:trashtrack/Hauler/about_us.dart';
+import 'package:trashtrack/privacy_policy.dart';
 import 'package:trashtrack/styles.dart';
+import 'package:trashtrack/terms_conditions.dart';
 import 'dart:typed_data'; // for Uint8List
 import 'package:trashtrack/user_date.dart';
 
@@ -53,14 +56,22 @@ class _C_DrawerState extends State<C_Drawer> {
                   ? CircleAvatar(
                       backgroundImage: MemoryImage(imageBytes!),
                     )
-                  : Icon(
-                      Icons.person,
-                      size: 30,
+                  : Container(
+                    padding: EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(50),
+                          color: Colors.grey[100]),
+                      child: Icon(
+                        Icons.person,
+                        size: 30,
+                      ),
                     ),
               title: Row(
                 children: [
-                  Text(userData!= null?
-                    '${userData!['fname']} ${userData!['lname']}': 'Loading . . .',
+                  Text(
+                    userData != null
+                        ? '${userData!['fname']} ${userData!['lname']}'
+                        : 'Loading . . .',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   Icon(Icons.keyboard_arrow_down)
@@ -112,13 +123,13 @@ class _C_DrawerState extends State<C_Drawer> {
                         decoration: BoxDecoration(
                             color: Colors.grey[100],
                             borderRadius: BorderRadius.circular(10)),
-                        child: Icon(Icons.home)),
-                    title: Text('Home2'),
+                        child: Icon(Icons.account_circle)),
+                    title: Text('About Us'),
                     selectedColor: Colors.green,
                     //tileColor: Colors.black12,
                     onTap: () {
-                      // Home action
-                      Navigator.pop(context);
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => AboutUs()));
                     },
                   ),
 
@@ -129,13 +140,15 @@ class _C_DrawerState extends State<C_Drawer> {
                         decoration: BoxDecoration(
                             color: Colors.grey[100],
                             borderRadius: BorderRadius.circular(10)),
-                        child: Icon(Icons.home)),
-                    title: Text('Home3'),
+                        child: Icon(Icons.description)),
+                    title: Text('Terms and Conditions'),
                     selectedColor: Colors.green,
                     //tileColor: Colors.black12,
                     onTap: () {
-                      // Home action
-                      Navigator.pop(context);
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => TermsAndConditions()));
                     },
                   ),
 
@@ -146,13 +159,15 @@ class _C_DrawerState extends State<C_Drawer> {
                         decoration: BoxDecoration(
                             color: Colors.grey[100],
                             borderRadius: BorderRadius.circular(10)),
-                        child: Icon(Icons.home)),
-                    title: Text('Home4'),
+                        child: Icon(Icons.error)),
+                    title: Text('Privacy Policy'),
                     selectedColor: Colors.green,
                     //tileColor: Colors.black12,
                     onTap: () {
-                      // Home action
-                      Navigator.pop(context);
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => PrivacyPolicy()));
                     },
                   ),
                 ],

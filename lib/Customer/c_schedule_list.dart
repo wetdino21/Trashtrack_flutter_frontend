@@ -709,8 +709,16 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                     animation: _controller,
                     builder: (context, child) {
                       return TextButton(
-                        onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => C_MapScreen()));
+                        onPressed: () async {
+                          //Navigator.push(context, MaterialPageRoute(builder: (context) => C_MapScreen()));
+                          bool onLocation = await checkLocationPermission();
+                          if (onLocation)
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => C_MapScreen(
+                                        pickupPoint: LatLng(
+                                            10.25702151, 123.85040322))));
                         },
                         child: Container(
                           padding: EdgeInsets.all(10),

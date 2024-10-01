@@ -40,3 +40,37 @@ Future<List<dynamic>> fetchBarangays(String cityMunicipalityCode) async {
     throw Exception('Failed to load barangays');
   }
 }
+
+// Future<List<dynamic>> fetchCitiesMunicipalities(String provinceCode) async {
+//   final url = '$baseUrl/provinces/$provinceCode/cities-municipalities.json';
+//   print('Fetching cities/municipalities from: $url'); // Debugging line
+  
+//   final response = await http.get(Uri.parse(url));
+//   print('Response status: ${response.statusCode}'); // Log status code
+//   print('Response body: ${response.body}'); // Log body content
+
+//   if (response.statusCode == 200) {
+//     final List<dynamic> data = jsonDecode(response.body);
+//     data.sort((a, b) => a['name'].compareTo(b['name']));
+//     return data;
+//   } else {
+//     throw Exception('Failed to load cities/municipalities');
+//   }
+// }
+
+// Future<List<dynamic>> fetchBarangays(String cityMunicipalityCode) async {
+//   final url = '$baseUrl/cities-municipalities/$cityMunicipalityCode/barangays.json';
+//   print('Fetching barangays from: $url'); // Debugging line
+
+//   final response = await http.get(Uri.parse(url));
+//   print('Response status: ${response.statusCode}'); // Log status code
+//   print('Response body: ${response.body}'); // Log body content
+
+//   if (response.statusCode == 200) {
+//     final List<dynamic> data = jsonDecode(response.body);
+//     data.sort((a, b) => a['name'].compareTo(b['name']));
+//     return data;
+//   } else {
+//     throw Exception('Failed to load barangays');
+//   }
+// }

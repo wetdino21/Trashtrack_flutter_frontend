@@ -400,7 +400,7 @@ Future<Map<String, List<Map<String, dynamic>>>?> fetchBookingData(
     return null;
   }
 
-  try {
+  // try {
     final response = await http.post(
       Uri.parse('$baseUrl/fetch_booking'),
       headers: {
@@ -446,10 +446,10 @@ Future<Map<String, List<Map<String, dynamic>>>?> fetchBookingData(
       print('Response: ${response.body}');
       return null;
     }
-  } catch (e) {
-    print(e);
-  }
-  return null;
+  // } catch (e) {
+  //   print(e);
+  // }
+  //return null;
 }
 
 //booking update

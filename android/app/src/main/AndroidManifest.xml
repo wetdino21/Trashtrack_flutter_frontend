@@ -8,7 +8,7 @@
     
     <application
         android:label="TrashTrack"
-        android:icon="@mipmap/launcher_icon"
+        android:icon="@mipmap/ic_launcher"
         android:name="${applicationName}">
         <activity
             android:name=".MainActivity"

@@ -71,6 +71,7 @@ class _C_MapScreenState extends State<C_MapScreen> {
   void initState() {
     super.initState();
     if (widget.pickupPoint != null) {
+      print('finding route');
       pickUpDirection();
     }
 
@@ -492,7 +493,7 @@ class _C_MapScreenState extends State<C_MapScreen> {
     });
   }
 
-  //LOCATION PERMISSION
+  //current live
   Future<void> _getCurrentLocation() async {
     try {
       //if (!currentLocStreaming)
@@ -596,7 +597,7 @@ class _C_MapScreenState extends State<C_MapScreen> {
     }
   }
 
-  //LOCATION PERMISSION
+  //start live 
   Future<void> _startCurrentLocation() async {
     try {
       LocationPermission permission = await Geolocator.checkPermission();

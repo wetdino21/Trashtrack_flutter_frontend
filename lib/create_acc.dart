@@ -79,8 +79,6 @@ class _CreateAccState extends State<CreateAcc> {
 
   @override
   void dispose() {
-    // implement dispose
-    super.dispose();
     _fnameController.dispose();
     _mnameController.dispose();
     _lnameController.dispose();
@@ -93,6 +91,7 @@ class _CreateAccState extends State<CreateAcc> {
 
     _timer.cancel();
     _codeControllers.forEach((controller) => controller.dispose());
+    super.dispose();
   }
 
   Future<void> _loadProvinces() async {

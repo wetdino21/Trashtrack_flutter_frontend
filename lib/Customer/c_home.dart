@@ -98,19 +98,19 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            ElevatedButton(
-                                onPressed: () async {
-                                  bool onLocation =
-                                      await checkLocationPermission();
-                                  if (onLocation)
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => C_MapScreen(
-                                                pickupPoint: LatLng(10.25702151,
-                                                    123.85040322))));
-                                },
-                                child: Text('Go To Map')),
+                            // ElevatedButton(
+                            //     onPressed: () async {
+                            //       bool onLocation =
+                            //           await checkLocationPermission();
+                            //       if (onLocation)
+                            //         Navigator.push(
+                            //             context,
+                            //             MaterialPageRoute(
+                            //                 builder: (context) => C_MapScreen(
+                            //                     pickupPoint: LatLng(10.25702151,
+                            //                         123.85040322))));
+                            //     },
+                            //     child: Text('Go To Map')),
                             // Welcome Container
                             Container(
                               padding: EdgeInsets.all(16.0),

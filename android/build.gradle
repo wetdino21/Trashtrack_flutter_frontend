@@ -18,6 +18,7 @@
 // }
 
 
+//old
 buildscript {
     repositories {
         google()
@@ -28,6 +29,21 @@ buildscript {
         classpath 'com.google.gms:google-services:4.3.15' // Required for Google Sign-In and Firebase
     }
 }
+
+// //added
+// buildscript {
+//     ext.kotlin_version = '1.6.0' // Use a version compatible with the libraries
+//     repositories {
+//         google()
+//         mavenCentral()
+//     }
+
+//     dependencies {
+//         classpath 'com.android.tools.build:gradle:7.0.2'
+//         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+//     }
+// }
+
 
 allprojects {
     repositories {

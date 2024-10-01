@@ -9,9 +9,18 @@ final Color iconBoxColor = Color(0xFF001E03);
 final List<BoxShadow> shadowColor = [
   BoxShadow(
     color: Colors.grey.withOpacity(0.5), // Adjust opacity as needed
-    blurRadius: 4.0,
-    spreadRadius: 0.5,
-    offset: Offset(0, 2), // Position of the shadow
+    blurRadius: 5,
+    spreadRadius: 2,
+    offset: Offset(0, 3), // Position of the shadow
+  ),
+];
+
+final List<BoxShadow> shadowBigColor = [
+  BoxShadow(
+    color: Colors.black, // Adjust opacity as needed
+    blurRadius: 20,
+    spreadRadius: 2,
+    offset: Offset(0, 3), // Position of the shadow
   ),
 ];
 

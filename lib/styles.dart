@@ -16,7 +16,7 @@ final List<BoxShadow> shadowColor = [
 ];
 
 final List<BoxShadow> shadowBigColor = [
-  BoxShadow(
+  const BoxShadow(
     color: Colors.black, // Adjust opacity as needed
     blurRadius: 20,
     spreadRadius: 2,

@@ -141,14 +141,14 @@ class _C_NotificationScreenState extends State<C_NotificationScreen>
                     itemBuilder: (context, index) {
                       final notification = notifications![index];
                       final status = notification['notif_status'] ?? '';
-                      final statusColor = status == 'delivered'
+                      final statusColor = status == 'Delivered'
                           ? Colors.green
-                          : status == 'seen'
+                          : status == 'Seen'
                               ? Colors.white54
                               : Colors.transparent;
-                      final boxColor = status == 'delivered'
+                      final boxColor = status == 'Delivered'
                           ? Colors.green.withOpacity(0.2)
-                          : status == 'seen'
+                          : status == 'Seen'
                               ? Colors.blue.withOpacity(0.2)
                               : Colors.green;
 

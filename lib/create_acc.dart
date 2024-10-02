@@ -532,7 +532,7 @@ class _CreateAccState extends State<CreateAcc> {
       return 'Please enter your first name';
     }
     if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value)) {
-      return 'Name must contain only letters';
+      return 'First Name must contain only letters';
     }
     return '';
   }
@@ -541,7 +541,7 @@ class _CreateAccState extends State<CreateAcc> {
     if (value != null &&
         value.isNotEmpty &&
         !RegExp(r'^[a-zA-Z]+$').hasMatch(value)) {
-      return 'Name must contain only letters';
+      return 'Middle Name must contain only letters';
     }
     return '';
   }
@@ -551,7 +551,7 @@ class _CreateAccState extends State<CreateAcc> {
       return 'Please enter your last name';
     }
     if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value)) {
-      return 'Name must contain only letters';
+      return 'Last Name must contain only letters';
     }
     return '';
   }
@@ -811,30 +811,6 @@ class _CreateAccState extends State<CreateAcc> {
                             });
                           }
                         }
-
-                        // Navigate to the next screen if needed
-                        // Uncomment if necessary
-                        // if (_acceptTerms) {
-                        //   showSuccessSnackBar(context, 'Loading . . .');
-                        //   String? errorMessage = await sendEmailCodeCreateAcc(
-                        //       _emailController.text);
-                        //   if (errorMessage == null) {
-                        //     Navigator.push(
-                        //         context,
-                        //         MaterialPageRoute(
-                        //             builder: (context) =>
-                        //                 VerifyEmailCreateAccScreen(
-                        //                     fname: _fnameController.text,
-                        //                     lname: _lnameController.text,
-                        //                     email: _emailController.text,
-                        //                     password: _passController.text)));
-                        //   } else {
-                        //     showErrorSnackBar(context, errorMessage);
-                        //   }
-                        // } else {
-                        //   showErrorSnackBar(context,
-                        //       'You must accept the terms and conditions');
-                        // }
                       }
                     },
                     child: const Text('Continue'),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:trashtrack/Customer/c_contact.dart';
+import 'package:trashtrack/Customer/c_home.dart';
 import 'package:trashtrack/Customer/c_profile.dart';
 import 'package:trashtrack/Hauler/about_us.dart';
 import 'package:trashtrack/privacy_policy.dart';
@@ -8,7 +10,9 @@ import 'dart:typed_data'; // for Uint8List
 import 'package:trashtrack/user_date.dart';
 
 class C_Drawer extends StatefulWidget {
-  const C_Drawer({super.key});
+   final int? currentIndex; // Optional index parameter
+
+   const C_Drawer({super.key, this.currentIndex}); // Accept currentIndex
 
   @override
   State<C_Drawer> createState() => _C_DrawerState();
@@ -17,24 +21,24 @@ class C_Drawer extends StatefulWidget {
 class _C_DrawerState extends State<C_Drawer> {
   Uint8List? imageBytes;
   Map<String, dynamic>? userData;
+  int? selectedIndexs;
 
   @override
   void initState() {
     super.initState();
     _dbData();
+
+    selectedIndexs = widget.currentIndex ?? 0;
   }
 
   Future<void> _dbData() async {
     try {
-      //final data = await Hive.openBox('mybox');
       final data = await userDataFromHive();
-      // final data = await fetchCusData(context);
       if (!mounted) return;
       setState(() {
         imageBytes = data['profile'];
         userData = data;
       });
-      //await data.close();
     } catch (e) {
       if (!mounted) return;
       showErrorSnackBar(context, e.toString());
@@ -57,7 +61,7 @@ class _C_DrawerState extends State<C_Drawer> {
                       backgroundImage: MemoryImage(imageBytes!),
                     )
                   : Container(
-                    padding: EdgeInsets.all(5),
+                      padding: EdgeInsets.all(5),
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(50),
                           color: Colors.grey[100]),
@@ -78,7 +82,6 @@ class _C_DrawerState extends State<C_Drawer> {
                 ],
               ),
               trailing: IconButton(
-                //padding: EdgeInsets.all(20),
                 icon: Icon(
                   Icons.settings,
                   size: 35,
@@ -99,75 +102,75 @@ class _C_DrawerState extends State<C_Drawer> {
             Expanded(
               child: ListView(
                 children: [
-                  //home
+                  // Home
                   ListTile(
-                    leading: Container(
-                        padding: EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                            color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(10)),
-                        child: Icon(Icons.home)),
+                    leading: _buildIcon(Icons.home),
                     title: Text('Home'),
                     selectedColor: Colors.green,
-                    tileColor: Colors.black12,
+                    tileColor: selectedIndexs== 0 ? Colors.black12 : null,
                     onTap: () {
-                      // Home action
-                      Navigator.pop(context);
+                      // Navigate to home
+                      selectedIndexs == 0
+                          ? Navigator.pop(context)
+                          : Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => C_HomeScreen()));
                     },
                   ),
-
-                  //2
+                  // Contract
                   ListTile(
-                    leading: Container(
-                        padding: EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                            color: Colors.grey[100],
-                            borderRadius: BorderRadius.circular(10)),
-                        child: Icon(Icons.account_circle)),
+                    leading: _buildIcon(Icons.content_paste_search_sharp),
+                    title: Text('Contract'),
+                    selectedColor: Colors.green,
+                    tileColor:selectedIndexs == 1 ? Colors.black12 : null,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => C_ContractScreen()),
+                      );
+                    },
+                  ),
+                  // About Us
+                  ListTile(
+                    leading: _buildIcon(Icons.account_circle),
                     title: Text('About Us'),
                     selectedColor: Colors.green,
-                    //tileColor: Colors.black12,
+                    tileColor:selectedIndexs== 2 ? Colors.black12 : null,
                     onTap: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => AboutUs()));
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => AboutUs()),
+                      );
                     },
                   ),
-
-                  //
+                  // Terms and Conditions
                   ListTile(
-                    leading: Container(
-                        padding: EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                            color: Colors.grey[100],
-                            borderRadius: BorderRadius.circular(10)),
-                        child: Icon(Icons.description)),
+                    leading: _buildIcon(Icons.description),
                     title: Text('Terms and Conditions'),
                     selectedColor: Colors.green,
-                    //tileColor: Colors.black12,
+                    tileColor: selectedIndexs== 3 ? Colors.black12 : null,
                     onTap: () {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => TermsAndConditions()));
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => TermsAndConditions()),
+                      );
                     },
                   ),
-
-                  //
+                  // Privacy Policy
                   ListTile(
-                    leading: Container(
-                        padding: EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                            color: Colors.grey[100],
-                            borderRadius: BorderRadius.circular(10)),
-                        child: Icon(Icons.error)),
+                    leading: _buildIcon(Icons.error),
                     title: Text('Privacy Policy'),
                     selectedColor: Colors.green,
-                    //tileColor: Colors.black12,
+                    tileColor: selectedIndexs== 4 ? Colors.black12 : null,
                     onTap: () {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => PrivacyPolicy()));
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PrivacyPolicy()),
+                      );
                     },
                   ),
                 ],
@@ -176,6 +179,18 @@ class _C_DrawerState extends State<C_Drawer> {
           ],
         ),
       ),
+    );
+  }
+
+  // Helper method to build icon container
+  Widget _buildIcon(IconData icon) {
+    return Container(
+      padding: EdgeInsets.all(5),
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Icon(icon),
     );
   }
 }

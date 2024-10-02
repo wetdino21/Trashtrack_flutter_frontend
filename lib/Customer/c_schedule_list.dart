@@ -304,9 +304,10 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
             //     bookingData!['bk_longitude'] as double);
             double latitude = bookingData!['bk_latitude'];
             double longitude = bookingData!['bk_longitude'];
+            _selectedDate = DateTime.parse(bookingData!['bk_date']).toLocal();
             selectedPoint = LatLng(latitude, longitude);
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              _selectedDate = DateTime.parse(bookingData!['bk_date']).toLocal();
+              // _selectedDate = DateTime.parse(bookingData!['bk_date']).toLocal();
               _mapController.move(selectedPoint!, 13.0);
             });
           }
@@ -401,9 +402,9 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
   //LOCATION PERMISSION
   Future<void> _getCurrentLocation() async {
     try {
-      setState(() {
-        isLoadingLoc = true;
-      });
+      // setState(() {
+      //   isLoadingLoc = true;
+      // });
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
@@ -425,7 +426,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
         return;
       }
 
-      LocationSettings locationSettings = LocationSettings(
+      LocationSettings locationSettings = const LocationSettings(
         accuracy: LocationAccuracy.high, // Specify accuracy
       );
 
@@ -656,12 +657,12 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
 
   Widget _buildFirstStep() {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: Colors.deepPurple,
       appBar: AppBar(
         toolbarHeight: 100,
-        backgroundColor: backgroundColor,
+        backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
-        title: Text('Booking Details'),
+        title: Text(_isEditing? 'Editing Booking Details': 'Booking Details'),
         // Declare a boolean variable to track the visibility of the options box
 
         actions: [
@@ -669,7 +670,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
             bookingData!['bk_status'] == 'Pending' && !_isEditing
                 ? Container(
                     decoration: BoxDecoration(
-                      color: Colors.deepPurple,
+                      color: Colors.deepPurpleAccent,
                       borderRadius: BorderRadius.circular(30),
                     ),
                     child: IconButton(
@@ -688,7 +689,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
             if (bookingData!['bk_status'] == 'Pending')
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.deepPurple,
+                  color: Colors.deepPurpleAccent,
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: IconButton(
@@ -767,6 +768,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  SizedBox(height: 20),
                   PopScope(
                       canPop: false,
                       onPopInvokedWithResult: (didPop, result) async {
@@ -989,177 +991,203 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                           //crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Container(
-                              alignment: Alignment.center,
-                              width: double.infinity,
-                              padding: EdgeInsets.all(15),
+                              margin: EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                color: bookingData!['bk_status'] == 'Pending'
-                                    ? Colors.orange
-                                    : bookingData!['bk_status'] == 'Ongoing'
-                                        ? Colors.green
-                                        : bookingData!['bk_status'] ==
-                                                'Cancelled'
-                                            ? Colors.red
-                                            : Colors.blue,
-                                borderRadius: BorderRadius.vertical(
-                                    top: Radius.circular(10)),
-                              ),
+                                  color: Colors.grey[200],
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: shadowBigColor),
                               child: Column(
                                 children: [
-                                  Text(
-                                    bookingData == null
-                                        ? 'Loading ...'
-                                        : bookingData!['bk_status'] ==
-                                                    'Pending' ||
-                                                bookingData!['bk_status'] ==
-                                                    'Ongoing'
-                                            ? 'Your Request Pickup is ${bookingData!['bk_status']}'
-                                            : 'Your Request Pickup was ${bookingData!['bk_status']}',
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18),
-                                  ),
-                                  bookingData!['bk_status'] == 'Ongoing'
-                                      ? Text(
-                                          'Today is your waste collection day!',
+                                  Container(
+                                    alignment: Alignment.center,
+                                    width: double.infinity,
+                                    padding: EdgeInsets.all(15),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          bookingData!['bk_status'] == 'Pending'
+                                              ? Colors.orange
+                                              : bookingData!['bk_status'] ==
+                                                      'Ongoing'
+                                                  ? Colors.green
+                                                  : bookingData!['bk_status'] ==
+                                                          'Cancelled'
+                                                      ? Colors.red
+                                                      : Colors.blue,
+                                      borderRadius: BorderRadius.vertical(
+                                          top: Radius.circular(10)),
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          bookingData == null
+                                              ? 'Loading ...'
+                                              : bookingData!['bk_status'] ==
+                                                          'Pending' ||
+                                                      bookingData![
+                                                              'bk_status'] ==
+                                                          'Ongoing'
+                                                  ? 'Your Request Pickup is ${bookingData!['bk_status']}'
+                                                  : 'Your Request Pickup was ${bookingData!['bk_status']}',
                                           style: TextStyle(
-                                            color: Colors.white,
-                                          ),
-                                        )
-                                      : SizedBox()
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18),
+                                        ),
+                                        bookingData!['bk_status'] == 'Ongoing'
+                                            ? Text(
+                                                'Today is your waste collection day!',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                ),
+                                              )
+                                            : SizedBox()
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      //color: Colors.grey[200],
+                                      borderRadius: BorderRadius.vertical(
+                                          bottom: Radius.circular(10)),
+                                    ),
+                                    child: Container(
+                                      height: 100,
+                                      padding: EdgeInsets.all(5),
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          //color: Colors.white.withOpacity(.6),
+                                          color: Colors.white,
+                                          boxShadow: shadowColor),
+                                      child: Row(
+                                        // mainAxisAlignment: MainAxisAlignment.start,
+                                        // crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Expanded(
+                                              flex: 1,
+                                              child: Container(
+                                                  height: 35,
+                                                  width: 30,
+                                                  padding:
+                                                      EdgeInsets.only(left: 2),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            50),
+                                                    //color: Colors.white.withOpacity(.6),
+                                                    color: Colors.grey[300],
+                                                  ),
+                                                  alignment:
+                                                      Alignment.centerLeft,
+                                                  child: Icon(
+                                                    Icons.pin_drop,
+                                                    size: 30,
+                                                    color: Colors.redAccent,
+                                                  ))),
+                                          Expanded(
+                                              flex: 10,
+                                              child: Container(
+                                                  padding:
+                                                      EdgeInsets.only(left: 10),
+                                                  alignment:
+                                                      Alignment.centerLeft,
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Expanded(
+                                                          flex: 1,
+                                                          child: Row(
+                                                            children: [
+                                                              Text(
+                                                                fullname,
+                                                                style: TextStyle(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    fontSize:
+                                                                        17),
+                                                              ),
+                                                              Text(
+                                                                  '   | +(63)${contact}',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Colors
+                                                                        .grey,
+                                                                  )),
+                                                            ],
+                                                          )),
+                                                      Expanded(
+                                                          flex: 2,
+                                                          child: Text(
+                                                            '${street} \n${address}',
+                                                          )),
+                                                      Expanded(
+                                                          flex: 1,
+                                                          child: Row(
+                                                            children: [
+                                                              Container(
+                                                                padding:
+                                                                    EdgeInsets
+                                                                        .all(2),
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              3),
+                                                                  //color: Colors.white.withOpacity(.6),
+                                                                  border: Border.all(
+                                                                      color: Colors
+                                                                          .red),
+                                                                ),
+                                                                child: Text(
+                                                                  'Default',
+                                                                  style: TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                      color: Colors
+                                                                              .red[
+                                                                          300]),
+                                                                ),
+                                                              ),
+                                                              SizedBox(
+                                                                width: 5,
+                                                              ),
+                                                              Container(
+                                                                padding:
+                                                                    EdgeInsets
+                                                                        .all(2),
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              3),
+                                                                  //color: Colors.white.withOpacity(.6),
+                                                                  border: Border.all(
+                                                                      color: Colors
+                                                                          .grey),
+                                                                ),
+                                                                child: Text(
+                                                                  'Pickup Address',
+                                                                  style: TextStyle(
+                                                                      color: Colors
+                                                                          .black54),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          )),
+                                                    ],
+                                                  ))),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
                                 ],
-                              ),
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: boxColorTheme,
-                                borderRadius: BorderRadius.vertical(
-                                    bottom: Radius.circular(10)),
-                              ),
-                              child: Container(
-                                height: 100,
-                                padding: EdgeInsets.all(5),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  //color: Colors.white.withOpacity(.6),
-                                  color: Colors.white,
-                                ),
-                                child: Row(
-                                  // mainAxisAlignment: MainAxisAlignment.start,
-                                  // crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                        flex: 1,
-                                        child: Container(
-                                            height: 35,
-                                            width: 30,
-                                            padding: EdgeInsets.only(left: 2),
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(50),
-                                              //color: Colors.white.withOpacity(.6),
-                                              color: Colors.grey[300],
-                                            ),
-                                            alignment: Alignment.centerLeft,
-                                            child: Icon(
-                                              Icons.pin_drop,
-                                              size: 30,
-                                              color: Colors.redAccent,
-                                            ))),
-                                    Expanded(
-                                        flex: 10,
-                                        child: Container(
-                                            padding: EdgeInsets.only(left: 10),
-                                            alignment: Alignment.centerLeft,
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Expanded(
-                                                    flex: 1,
-                                                    child: Row(
-                                                      children: [
-                                                        Text(
-                                                          fullname,
-                                                          style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontSize: 17),
-                                                        ),
-                                                        Text(
-                                                            '   | +(63)${contact}',
-                                                            style: TextStyle(
-                                                              color:
-                                                                  Colors.grey,
-                                                            )),
-                                                      ],
-                                                    )),
-                                                Expanded(
-                                                    flex: 2,
-                                                    child: Text(
-                                                      '${street} \n${address}',
-                                                    )),
-                                                Expanded(
-                                                    flex: 1,
-                                                    child: Row(
-                                                      children: [
-                                                        Container(
-                                                          padding:
-                                                              EdgeInsets.all(2),
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        3),
-                                                            //color: Colors.white.withOpacity(.6),
-                                                            border: Border.all(
-                                                                color:
-                                                                    Colors.red),
-                                                          ),
-                                                          child: Text(
-                                                            'Default',
-                                                            style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                color: Colors
-                                                                    .red[300]),
-                                                          ),
-                                                        ),
-                                                        SizedBox(
-                                                          width: 5,
-                                                        ),
-                                                        Container(
-                                                          padding:
-                                                              EdgeInsets.all(2),
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        3),
-                                                            //color: Colors.white.withOpacity(.6),
-                                                            border: Border.all(
-                                                                color: Colors
-                                                                    .grey),
-                                                          ),
-                                                          child: Text(
-                                                            'Pickup Address',
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .black54),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    )),
-                                              ],
-                                            ))),
-                                  ],
-                                ),
                               ),
                             ),
                             _labelValidator(userDataValidator),
@@ -1168,10 +1196,11 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                             //MAPPPPPPPPPPPPPP
                             Container(
                               padding: EdgeInsets.all(10),
+                              margin: EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                color: boxColorTheme,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Colors.grey[200],
+                                  boxShadow: shadowBigColor),
                               child: Column(
                                 children: [
                                   Align(
@@ -1179,12 +1208,19 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                     child: Text(
                                       'Pin Location',
                                       style: TextStyle(
-                                          color: Colors.white70, fontSize: 16),
+                                          color: Colors.black,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold),
                                     ),
                                   ),
                                   Stack(
                                     children: [
                                       Container(
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            color: Colors.grey[200],
+                                            boxShadow: shadowColor),
                                         height: onMap ? 500 : 100,
                                         child: ClipRRect(
                                           borderRadius:
@@ -1254,6 +1290,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                                     boxShadow: shadowColor),
                                                 child: InkWell(
                                                   onTap: () {
+                                                    onMap = false;
                                                     setState(() {
                                                       if (selectedPoint != null)
                                                         _mapController.move(
@@ -1286,8 +1323,9 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                                 child: InkWell(
                                                   onTap: () {
                                                     setState(() {
-                                                      _getCurrentLocation();
+                                                     isLoadingLoc = true;
                                                     });
+                                                     _getCurrentLocation();
                                                   },
                                                   child: Icon(
                                                     Icons.my_location,
@@ -1346,10 +1384,11 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                 ? Container()
                                 : Container(
                                     padding: EdgeInsets.all(10),
+                                    margin: EdgeInsets.all(10),
                                     decoration: BoxDecoration(
-                                      color: boxColorTheme,
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: Colors.grey[200],
+                                        boxShadow: shadowBigColor),
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.center,
@@ -1357,13 +1396,15 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                         Text(
                                           'Waste Type',
                                           style: TextStyle(
-                                              color: Colors.white70,
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.bold,
                                               fontSize: 16),
                                         ),
                                         Container(
                                           padding: EdgeInsets.all(5),
                                           decoration: BoxDecoration(
                                               color: Colors.white,
+                                              boxShadow: shadowColor,
                                               borderRadius:
                                                   BorderRadius.circular(10)),
                                           child: _wasteCategoryList(),
@@ -1376,21 +1417,23 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                             SizedBox(height: 5.0),
                             Container(
                               padding: EdgeInsets.all(10),
+                              margin: EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                color: boxColorTheme,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Colors.grey[200],
+                                  boxShadow: shadowBigColor),
                               child: Container(
                                 padding: EdgeInsets.all(10),
                                 decoration: BoxDecoration(
                                     color: Colors.white,
-                                    borderRadius: BorderRadius.circular(10)),
+                                    borderRadius: BorderRadius.circular(10),
+                                    boxShadow: shadowColor),
                                 child: Column(
                                   children: [
                                     Center(
                                         child: Text(
                                       'Payment Method',
-                                      style: TextStyle(color: Colors.grey),
+                                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
                                     )),
                                     Image.asset('assets/paymongo.png'),
                                     Row(
@@ -1807,10 +1850,11 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
       },
       child: Container(
         padding: EdgeInsets.all(10),
+        margin: EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: boxColorTheme,
-          borderRadius: BorderRadius.circular(10),
-        ),
+            borderRadius: BorderRadius.circular(10),
+            color: Colors.grey[200],
+            boxShadow: shadowBigColor),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1818,15 +1862,18 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
               alignment: Alignment.center,
               child: Text(
                 label,
-                style: TextStyle(color: Colors.white70, fontSize: 16),
+                style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold),
               ),
             ),
             Container(
               padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-              ),
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: shadowColor),
               child: Row(
                 children: [
                   Icon(Icons.calendar_today, color: Colors.green),

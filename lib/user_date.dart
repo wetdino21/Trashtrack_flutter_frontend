@@ -16,9 +16,10 @@ Future<void> storeDataInHive(BuildContext context) async {
     String usertype = 'type';
     if (data.containsKey('cus_id')) {
       prefix = 'cus_';
-    } else if (data.containsKey('haul_id')) {
-      prefix = 'haul_';
+    } else if (data.containsKey('emp_id')) {
+      prefix = 'emp_';
       usertype = 'role';
+      print(data['emp_role']);
     } else {
       // Handle cases where neither cus_id nor haul_id is found
       throw Exception('Invalid data format');

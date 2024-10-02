@@ -1,16 +1,12 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:trashtrack/api_postgre_service.dart';
 import 'package:trashtrack/api_token.dart';
 import 'package:trashtrack/styles.dart';
-import 'dart:typed_data';
-import 'package:trashtrack/api_postgre_service.dart';
-import 'package:trashtrack/styles.dart';
-import 'package:trashtrack/api_email_service.dart';
 import 'package:flutter/services.dart';
 import 'package:trashtrack/api_address.dart';
 import 'dart:async';
-import 'package:trashtrack/Customer/c_home.dart';
 import 'package:trashtrack/user_date.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -31,8 +27,6 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
   final TextEditingController _mnameController = TextEditingController();
   final TextEditingController _lnameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passController = TextEditingController();
-  final TextEditingController _repassController = TextEditingController();
   final TextEditingController _contactController = TextEditingController();
   final TextEditingController _streetController = TextEditingController();
   final TextEditingController _postalController = TextEditingController();
@@ -52,9 +46,9 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
   String? _selectedCityMunicipalityName;
   String? _selectedBarangayName;
 
-  String? _selectedProvince;
-  String? _selectedCityMunicipality;
-  String? _selectedBarangay;
+  // String? _selectedProvince;
+  // String? _selectedCityMunicipality;
+  // String? _selectedBarangay;
 
   String emailvalidator = '';
   String passvalidator = '';
@@ -83,8 +77,6 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
     _mnameController.dispose();
     _lnameController.dispose();
     _emailController.dispose();
-    _passController.dispose();
-    _repassController.dispose();
     _contactController.dispose();
     _streetController.dispose();
     _postalController.dispose();
@@ -98,19 +90,20 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
       setState(() {
         userData = data;
         isLoading = false;
-        imageBytes = userData!['profile'];
+        _setData();
+        // imageBytes = userData!['profile'];
 
-        _fnameController.text = userData!['fname'];
-        _mnameController.text = userData!['mname'];
-        _lnameController.text = userData!['lname'];
-        _emailController.text = userData!['email'];
-        _contactController.text = userData!['contact'].toString().substring(1);
-        _streetController.text = userData!['street'];
-        _postalController.text = userData!['postal'];
+        // _fnameController.text = userData!['fname'];
+        // _mnameController.text = userData!['mname'];
+        // _lnameController.text = userData!['lname'];
+        // _emailController.text = userData!['email'];
+        // _contactController.text = userData!['contact'].toString().substring(1);
+        // _streetController.text = userData!['street'];
+        // _postalController.text = userData!['postal'];
 
-        _selectedProvinceName = userData!['province'];
-        _selectedCityMunicipalityName = userData!['city'];
-        _selectedBarangayName = userData!['brgy'];
+        // _selectedProvinceName = userData!['province'];
+        // _selectedCityMunicipalityName = userData!['city'];
+        // _selectedBarangayName = userData!['brgy'];
       });
 
       // final data = await fetchCusData(context);
@@ -128,6 +121,36 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
         isLoading = false;
       });
     }
+  }
+
+  void _setData() {
+    setState(() {
+      _imageFile = null;
+      imageBytes = userData!['profile'];
+
+      _fnameController.text = userData!['fname'];
+      _mnameController.text = userData!['mname'];
+      _lnameController.text = userData!['lname'];
+      _emailController.text = userData!['email'];
+      _contactController.text = userData!['contact'].toString().substring(1);
+      _streetController.text = userData!['street'];
+      _postalController.text = userData!['postal'];
+
+      _selectedProvinceName = userData!['province'];
+      _selectedCityMunicipalityName = userData!['city'];
+      _selectedBarangayName = userData!['brgy'];
+
+      fnamevalidator = '';
+      mnamevalidator = '';
+      lnamevalidator = '';
+      emailvalidator = '';
+      contactvalidator = '';
+      provincevalidator = '';
+      cityvalidator = '';
+      brgyvalidator = '';
+      streetvalidator = '';
+      postalvalidator = '';
+    });
   }
 
   Future<void> _pickImageGallery() async {
@@ -212,11 +235,11 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
   }
 
   // Validator All
-  _validator(String showValidator) {
+  _labelValidator(String showValidator) {
     return showValidator != ''
         ? Text(
             showValidator,
-            style: TextStyle(color: Colors.redAccent[100]),
+            style: TextStyle(color: Colors.red),
           )
         : SizedBox();
   }
@@ -332,23 +355,178 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
     return '';
   }
 
-  void _backToSignIn() {
-    if (_emailController.text.isNotEmpty ||
-        _passController.text.isNotEmpty ||
-        _repassController.text.isNotEmpty ||
-        _fnameController.text.isNotEmpty ||
-        _mnameController.text.isNotEmpty ||
-        _lnameController.text.isNotEmpty ||
-        _fnameController.text.isNotEmpty ||
-        _contactController.text.isNotEmpty ||
-        _selectedProvinceName != null ||
-        _selectedCityMunicipalityName != null ||
-        _selectedBarangayName != null ||
-        _streetController.text.isNotEmpty ||
-        _postalController.text.isNotEmpty) {
-      _showSignInConfirmationDialog(context);
+  void _cancelEdit() {
+    if (_imageFile != null ||
+        _fnameController.text != userData!['fname'] ||
+        _mnameController.text != userData!['mname'] ||
+        _lnameController.text != userData!['lname'] ||
+        _emailController.text != userData!['email'] ||
+        '0' + _contactController.text != userData!['contact'] ||
+        _selectedProvinceName != userData!['province'] ||
+        _selectedCityMunicipalityName != userData!['city'] ||
+        _selectedBarangayName != userData!['brgy'] ||
+        _streetController.text != userData!['street'] ||
+        _postalController.text != userData!['postal']) {
+      _showCancelConfirmDialog(context);
     } else {
-      Navigator.pushNamed(context, 'login');
+      if (_isEditing) {
+        setState(() {
+          _isEditing = false;
+        });
+      } else {
+        Navigator.pop(context);
+      }
+    }
+  }
+
+  void _showCancelConfirmDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.deepPurple,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(20.0))),
+          title: Text('Unsave Changes', style: TextStyle(color: Colors.white)),
+          content: Text('Any changes will be reset.',
+              style: TextStyle(color: Colors.white)),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel', style: TextStyle(color: Colors.white)),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  _isEditing = false;
+                  _setData();
+                });
+                Navigator.of(context).pop();
+              },
+              child: Text('Yes', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _checkChanges() async {
+    bool goodData = false;
+    bool goodEmail = false;
+    bool goodContact = false;
+    //check if anything changes
+    if (_imageFile != null ||
+        _fnameController.text != userData!['fname'] ||
+        _mnameController.text != userData!['mname'] ||
+        _lnameController.text != userData!['lname'] ||
+        _emailController.text != userData!['email'] ||
+        '0' + _contactController.text != userData!['contact'] ||
+        _selectedProvinceName != userData!['province'] ||
+        _selectedCityMunicipalityName != userData!['city'] ||
+        _selectedBarangayName != userData!['brgy'] ||
+        _streetController.text != userData!['street'] ||
+        _postalController.text != userData!['postal']) {
+      //validate data changes
+      if ((_emailController.text.isEmpty || emailvalidator.isNotEmpty) ||
+          (_fnameController.text.isEmpty || fnamevalidator.isNotEmpty) ||
+          (mnamevalidator.isNotEmpty) ||
+          (_lnameController.text.isEmpty || lnamevalidator.isNotEmpty) ||
+          (_contactController.text.isEmpty || contactvalidator.isNotEmpty) ||
+          (_selectedProvinceName == null || provincevalidator.isNotEmpty) ||
+          (_selectedCityMunicipalityName == null || cityvalidator.isNotEmpty) ||
+          (_selectedBarangayName == null || brgyvalidator.isNotEmpty) ||
+          (_streetController.text.isEmpty || streetvalidator.isNotEmpty) ||
+          (_postalController.text.isEmpty || postalvalidator.isNotEmpty)) {
+        //call validation
+        setState(() {
+          emailvalidator = _validateEmail(_emailController.text);
+          fnamevalidator = _validateFname(_fnameController.text);
+          mnamevalidator = _validateMname(_mnameController.text);
+          lnamevalidator = _validateLname(_lnameController.text);
+          contactvalidator = _validateContact(_contactController.text);
+          provincevalidator = _validateProvince(_selectedProvinceName);
+          cityvalidator = _validateCity(_selectedCityMunicipalityName);
+          brgyvalidator = _validateBrgy(_selectedBarangayName);
+          streetvalidator = _validateStreet(_streetController.text);
+          postalvalidator = _validatePostalCode(_postalController.text);
+        });
+        debugPrint('bad data');
+      } else {
+        debugPrint('good data');
+        goodData = true;
+      }
+
+      //check email
+      if (_emailController.text != userData!['email']) {
+        String? emailErrorMsg = await emailCheck(_emailController.text);
+        // Show any existing error message
+        if (emailErrorMsg != null && _emailController.text.isNotEmpty) {
+          setState(() {
+            emailvalidator = emailErrorMsg;
+            debugPrint('bad email');
+            goodEmail = false;
+          });
+        } else {
+          debugPrint('good email');
+          goodEmail = true;
+        }
+      } else {
+        debugPrint('good email');
+        goodEmail = true;
+      }
+
+      //check contact
+      if ('0' + _contactController.text != userData!['contact']) {
+        String? dbContactMsg = await contactCheck(_contactController.text);
+        // Show any existing error message
+        if (dbContactMsg != null) {
+          setState(() {
+            contactvalidator = dbContactMsg;
+          });
+          goodContact = false;
+        } else {
+          print('good contact');
+          goodContact = true;
+        }
+      } else {
+        print('good contact');
+        goodContact = true;
+      }
+
+      //final check
+      if (goodData && goodEmail && goodContact) {
+        print('successs update');
+        _showConfirmChangeDialog(context);
+        // String? createMessage = await ssss(
+        //     context,
+        //     _emailController.text,
+        //     _fnameController.text,
+        //     _mnameController.text,
+        //     _lnameController.text,
+        //     ('0' + _contactController.text),
+        //     _selectedProvinceName,
+        //     _selectedCityMunicipalityName,
+        //     _selectedBarangayName,
+        //     _streetController.text,
+        //     _postalController.text);
+        // if (createMessage != null) {
+        //   showErrorSnackBar(context, createMessage);
+        // } else {
+        //   //success
+        // }
+      }
+    } else {
+      if (_isEditing) {
+        setState(() {
+          _isEditing = false;
+          _setData();
+        });
+      } else {
+        Navigator.pop(context);
+      }
     }
   }
 
@@ -359,7 +537,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
       appBar: AppBar(
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
-        title: Text( _isEditing? 'Edit Profile': 'Profile'),
+        title: Text(_isEditing ? 'Edit Profile' : 'Profile'),
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -379,8 +557,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                 if (didPop) {
                                   return;
                                 }
-                                // _backToSignIn();
-                                Navigator.pop(context);
+                                _cancelEdit();
                               },
                               child: Container()),
                           Container(
@@ -397,15 +574,17 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                 InkWell(
                                   onTap: () {
                                     //
+                                    if (_isEditing) _pickImageGallery();
                                   },
                                   child: Stack(
                                     children: [
-                                      imageBytes != null
+                                      imageBytes != null || _imageFile != null
                                           ? Container(
                                               padding: EdgeInsets.all(7),
                                               decoration: BoxDecoration(
                                                   borderRadius:
                                                       BorderRadius.circular(80),
+                                                  boxShadow: shadowColor,
                                                   color: Colors.deepPurple),
                                               child: CircleAvatar(
                                                 radius: 50,
@@ -421,6 +600,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                               decoration: BoxDecoration(
                                                   borderRadius:
                                                       BorderRadius.circular(80),
+                                                  boxShadow: shadowColor,
                                                   color: Colors.deepPurple),
                                               child: Icon(
                                                 Icons.person,
@@ -434,7 +614,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                             right: 0,
                                             child: InkWell(
                                               onTap: () {
-                                                _pickImageGallery();
+                                                // _pickImageGallery();
                                                 //_pickImageCamera();
                                               },
                                               child: Container(
@@ -473,6 +653,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                       padding: EdgeInsets.symmetric(
                                           horizontal: 20, vertical: 10),
                                       decoration: BoxDecoration(
+                                          boxShadow: shadowColor,
                                           borderRadius:
                                               BorderRadius.circular(10),
                                           color: Colors.deepPurple),
@@ -519,7 +700,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                           });
                                         },
                                       ),
-                                      _validator(fnamevalidator),
+                                      _labelValidator(fnamevalidator),
                                       const SizedBox(height: 5),
                                       _buildTextField(
                                         controller: _mnameController,
@@ -531,7 +712,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                           });
                                         },
                                       ),
-                                      _validator(mnamevalidator),
+                                      _labelValidator(mnamevalidator),
                                       const SizedBox(height: 5),
                                       _buildTextField(
                                         controller: _lnameController,
@@ -543,7 +724,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                           });
                                         },
                                       ),
-                                      _validator(lnamevalidator),
+                                      _labelValidator(lnamevalidator),
                                       const SizedBox(height: 5),
                                       _buildTextField(
                                         controller: _emailController,
@@ -555,7 +736,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                           });
                                         },
                                       ),
-                                      _validator(emailvalidator),
+                                      _labelValidator(emailvalidator),
                                       const SizedBox(height: 5),
                                       _buildNumberField(
                                         inputFormatters: [
@@ -564,7 +745,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                           LengthLimitingTextInputFormatter(10),
                                         ],
                                       ),
-                                      _validator(contactvalidator),
+                                      _labelValidator(contactvalidator),
                                       const SizedBox(height: 20),
                                       Center(
                                           child: Text(
@@ -606,21 +787,27 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                                             .spaceBetween,
                                                     children: [
                                                       // Show selected values
-                                                      Text(
-                                                        _selectedProvinceName ==
-                                                                null
-                                                            ? 'Select Province'
-                                                            : _selectedCityMunicipalityName ==
-                                                                    null
-                                                                ? '${_selectedProvinceName} / '
-                                                                : _selectedBarangayName ==
-                                                                        null
-                                                                    ? '${_selectedProvinceName} / ${_selectedCityMunicipalityName} / '
-                                                                    : '${_selectedProvinceName} / '
-                                                                        '${_selectedCityMunicipalityName} / '
-                                                                        '${_selectedBarangayName}',
-                                                        style: TextStyle(
-                                                            fontSize: 16.0),
+                                                      Expanded(
+                                                        child: Text(
+                                                          _selectedProvinceName ==
+                                                                  null
+                                                              ? 'Select Province'
+                                                              : _selectedCityMunicipalityName ==
+                                                                      null
+                                                                  ? '${_selectedProvinceName} / '
+                                                                  : _selectedBarangayName ==
+                                                                          null
+                                                                      ? '${_selectedProvinceName} / ${_selectedCityMunicipalityName} / '
+                                                                      : '${_selectedProvinceName} / '
+                                                                          '${_selectedCityMunicipalityName} / '
+                                                                          '${_selectedBarangayName}',
+                                                          style: TextStyle(
+                                                              fontSize: 16.0),
+                                                          overflow: TextOverflow
+                                                              .visible, // Allow wrapping
+                                                          softWrap:
+                                                              true, // Enable soft wrapping
+                                                        ),
                                                       ),
                                                       IconButton(
                                                           icon: Icon(
@@ -650,7 +837,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                                 ),
                                                 if (_showProvinceDropdown)
                                                   Container(
-                                                    height: 400,
+                                                    height: 100,
                                                     margin:
                                                         EdgeInsets.symmetric(
                                                             horizontal: 10),
@@ -849,71 +1036,15 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                           ),
                                         ],
                                       ),
-                                      // // Dropdown for Province
-                                      // _buildDropdown(
-                                      //   selectedValue: _selectedProvince,
-                                      //   items: _provinces,
-                                      //   hintText: 'Province',
-                                      //   onChanged: (value) {
-                                      //     setState(() {
-                                      //       _selectedProvince = value;
-                                      //       provincevalidator =
-                                      //           _validateProvince(value);
-                                      //       final selectedProvince =
-                                      //           _provinces.firstWhere((item) =>
-                                      //               item['code'] == value);
-                                      //       _selectedProvinceName =
-                                      //           selectedProvince['name'];
-                                      //     });
-                                      //     _loadCitiesMunicipalities(value!);
-                                      //   },
-                                      // ),
-                                      // _validator(provincevalidator),
-                                      // SizedBox(height: 5),
-                                      // // Dropdown for City/Municipality
-                                      // _buildDropdown(
-                                      //   selectedValue:
-                                      //       _selectedCityMunicipality,
-                                      //   items: _citiesMunicipalities,
-                                      //   hintText: 'City/Municipality',
-                                      //   onChanged: (value) {
-                                      //     setState(() {
-                                      //       _selectedCityMunicipality = value;
-                                      //       cityvalidator =
-                                      //           _validateCity(value);
-                                      //       final selectedCity =
-                                      //           _citiesMunicipalities
-                                      //               .firstWhere((item) =>
-                                      //                   item['code'] == value);
-                                      //       _selectedCityMunicipalityName =
-                                      //           selectedCity['name'];
-                                      //     });
-                                      //     _loadBarangays(value!);
-                                      //   },
-                                      // ),
-                                      // _validator(cityvalidator),
-                                      // SizedBox(height: 5),
-                                      // // Dropdown for Barangay
-                                      // _buildDropdown(
-                                      //   selectedValue: _selectedBarangay,
-                                      //   items: _barangays,
-                                      //   hintText: 'Barangay',
-                                      //   onChanged: (value) {
-                                      //     setState(() {
-                                      //       _selectedBarangay = value;
-                                      //       brgyvalidator =
-                                      //           _validateBrgy(value);
-                                      //       final selectedBarangay =
-                                      //           _barangays.firstWhere((item) =>
-                                      //               item['code'] == value);
-                                      //       _selectedBarangayName =
-                                      //           selectedBarangay['name'];
-                                      //       print(_selectedBarangayName);
-                                      //     });
-                                      //   },
-                                      // ),
-                                      // _validator(brgyvalidator),
-                                      // const SizedBox(height: 5),
+                                      if (_selectedProvinceName == null ||
+                                          _selectedCityMunicipalityName ==
+                                              null ||
+                                          _selectedBarangayName == null)
+                                        Text(
+                                          'Please select your adrress.',
+                                          style: TextStyle(color: Colors.red),
+                                        ),
+                                      const SizedBox(height: 5),
                                       _buildTextField(
                                         controller: _streetController,
                                         hintText:
@@ -925,7 +1056,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                           });
                                         },
                                       ),
-                                      _validator(streetvalidator),
+                                      _labelValidator(streetvalidator),
                                       const SizedBox(height: 5),
                                       _buildTextField(
                                         controller: _postalController,
@@ -944,7 +1075,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                           });
                                         },
                                       ),
-                                      _validator(postalvalidator),
+                                      _labelValidator(postalvalidator),
                                       const SizedBox(height: 20),
                                       SizedBox(height: 20),
                                       Row(
@@ -953,7 +1084,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                         children: [
                                           InkWell(
                                             onTap: () {
-                                              _showConfirmChangeDialog(context);
+                                              _checkChanges();
                                             },
                                             child: Container(
                                               padding: EdgeInsets.symmetric(
@@ -977,9 +1108,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                           SizedBox(width: 20),
                                           InkWell(
                                             onTap: () {
-                                              setState(() {
-                                                _isEditing = false;
-                                              });
+                                              _cancelEdit();
                                             },
                                             child: Container(
                                               padding: EdgeInsets.symmetric(
@@ -1057,9 +1186,10 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
           Text(
             value,
             style: TextStyle(
+              color: Colors.grey[900],
               fontSize: 18.0,
               fontWeight: FontWeight.bold,
-              shadows: shadowColor
+              //shadows: shadowColor
             ),
           ),
           Divider(
@@ -1235,7 +1365,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(20.0))),
           title: Text('Confirm Changes', style: TextStyle(color: Colors.white)),
-          content: Text('Are you sure to save changes to your profile details?',
+          content: Text('Save changes to your profile details?',
               style: TextStyle(color: Colors.white)),
           actions: [
             TextButton(
@@ -1256,37 +1386,6 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
       },
     );
   }
-}
-
-void _showSignInConfirmationDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        backgroundColor: Colors.deepPurple,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(20.0))),
-        title: Text('Sign In', style: TextStyle(color: Colors.white)),
-        content: Text(
-            'Back to sign in now? Any data from this form will be removed!',
-            style: TextStyle(color: Colors.white)),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Text('Cancel', style: TextStyle(color: Colors.white)),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pushNamed(context, 'login');
-            },
-            child: Text('Yes', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      );
-    },
-  );
 }
 
 class SettingsScreen extends StatelessWidget {

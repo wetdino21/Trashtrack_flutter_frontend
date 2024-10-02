@@ -276,7 +276,7 @@ Future<String> loginWithGoogle(BuildContext context, String email) async {
     return 'No account associated with this email';
   } else if (response.statusCode == 402) {
     print('Error response: ${response.body}');
-    return 'Looks like this account is registered with email and password. Please log in using your email and password.';
+    return 'Please log in using your email and password.';
   } else {
     print('Error response: ${response.body}');
     return response.body;

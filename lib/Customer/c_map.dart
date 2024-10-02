@@ -20,7 +20,8 @@ class C_MapScreen extends StatefulWidget {
 }
 
 class _C_MapScreenState extends State<C_MapScreen> {
-  final GlobalKey<_C_MapScreenState> _mapScreenKey = GlobalKey<_C_MapScreenState>();
+  final GlobalKey<_C_MapScreenState> _mapScreenKey =
+      GlobalKey<_C_MapScreenState>();
   bool hideScreen = false;
   final MapController _mapController = MapController();
   LatLng? _currentLocation;
@@ -515,7 +516,7 @@ class _C_MapScreenState extends State<C_MapScreen> {
       }
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        // Optionally, open the location settings:
+        // open the location settings:
         await Geolocator.openLocationSettings();
         return;
       }
@@ -583,10 +584,10 @@ class _C_MapScreenState extends State<C_MapScreen> {
 
       // setState(() {
       //   _currentLocation = LatLng(position.latitude, position.longitude);
+      //  selectedCurrentName = getCurrentName;
       //   _mapController.move(
       //       _currentLocation!, 13.0); // Move to current location
 
-      //   selectedCurrentName = getCurrentName;
       // });
     } catch (e) {
       print('fail to get current location!');
@@ -597,7 +598,7 @@ class _C_MapScreenState extends State<C_MapScreen> {
     }
   }
 
-  //start live 
+  //start live
   Future<void> _startCurrentLocation() async {
     try {
       LocationPermission permission = await Geolocator.checkPermission();
@@ -860,11 +861,12 @@ class _C_MapScreenState extends State<C_MapScreen> {
                                   SizedBox(width: 3),
                                   Expanded(
                                     child: Container(
-                                      padding: EdgeInsets.only(left: 3),
+                                      padding: EdgeInsets.only(left: 15),
                                       decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(5),
-                                          border: Border.all(width: 1, color: Colors.grey)),
+                                          border: Border.all(
+                                              width: 1, color: Colors.grey)),
                                       child: TextField(
                                         controller: _startController,
                                         focusNode: _startFocusNode,
@@ -912,11 +914,12 @@ class _C_MapScreenState extends State<C_MapScreen> {
                                   SizedBox(width: 3),
                                   Expanded(
                                     child: Container(
-                                      padding: EdgeInsets.only(left: 3),
+                                      padding: EdgeInsets.only(left: 15),
                                       decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(5),
-                                          border: Border.all(width: 1, color: Colors.grey)),
+                                          border: Border.all(
+                                              width: 1, color: Colors.grey)),
                                       child: TextField(
                                         controller: _destinationController,
                                         focusNode: _destinationFocusNode,
@@ -1304,7 +1307,8 @@ class _C_MapScreenState extends State<C_MapScreen> {
                         child: Text(
                           selectedPlaceName == null ? '' : selectedPlaceName!,
                           style: TextStyle(
-                              color: Colors.grey[700], fontWeight: FontWeight.bold),
+                              color: Colors.grey[700],
+                              fontWeight: FontWeight.bold),
                           softWrap: true,
                           overflow: TextOverflow
                               .visible, // Prevent clipping, allow text to expand

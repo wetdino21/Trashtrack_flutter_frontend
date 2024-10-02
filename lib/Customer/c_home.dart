@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:trashtrack/Customer/c_appbar.dart';
 import 'package:trashtrack/Customer/c_bottom_nav_bar.dart';
 import 'package:trashtrack/Customer/c_drawer.dart';
-import 'package:trashtrack/Customer/c_map.dart';
 import 'package:trashtrack/Customer/c_waste_info.dart';
 import 'package:trashtrack/Customer/c_booking.dart';
 import 'package:trashtrack/api_token.dart';
@@ -85,7 +83,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
         appBar: C_CustomAppBar(
           title: 'Home',
         ),
-        drawer: C_Drawer(),
+        drawer: C_Drawer(currentIndex: 0,),
         body: RefreshIndicator(
           onRefresh: _dbData,
           child: isLoading

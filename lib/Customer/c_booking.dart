@@ -191,17 +191,18 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
         return;
       }
 
-      LocationSettings locationSettings = LocationSettings(
+      LocationSettings locationSettings = const LocationSettings(
         accuracy: LocationAccuracy.high, // Specify accuracy
       );
-
+      
+      print('getting current location');
       ///current pstion
       Position position = await Geolocator.getCurrentPosition(
         locationSettings: locationSettings,
       );
       // String? getCurrentName =
       //     await getPlaceName(position.latitude, position.longitude);
-
+      print('location success');
       setState(() {
         selectedPoint = LatLng(position.latitude, position.longitude);
         _mapController.move(selectedPoint!, 13.0); // Move to current location
@@ -211,6 +212,9 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
     } catch (e) {
       print('fail to get current location!');
     } finally {
+      if (!mounted) {
+        return;
+      }
       setState(() {
         isLoadingLoc = false;
       });
@@ -231,9 +235,9 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
 
   Widget _buildFirstStep() {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: Colors.deepPurple,
       appBar: AppBar(
-        backgroundColor: backgroundColor,
+        backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
         //title: Text('Request Pickup'),
         leading: IconButton(
@@ -445,18 +449,19 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                       children: [
                         Container(
                           padding: EdgeInsets.all(10),
+                          margin: EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: Colors.deepPurple,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                              color: Colors.grey[200],
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: shadowBigColor),
                           child: Container(
                             height: 100,
                             padding: EdgeInsets.all(5),
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              //color: Colors.white.withOpacity(.6),
-                              color: Colors.white,
-                            ),
+                                borderRadius: BorderRadius.circular(10),
+                                //color: Colors.white.withOpacity(.6),
+                                color: Colors.white,
+                                boxShadow: shadowColor),
                             child: Row(
                               // mainAxisAlignment: MainAxisAlignment.start,
                               // crossAxisAlignment: CrossAxisAlignment.start,
@@ -471,7 +476,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                           borderRadius:
                                               BorderRadius.circular(50),
                                           //color: Colors.white.withOpacity(.6),
-                                          color: Colors.grey[300],
+                                          color: Colors.white,
                                         ),
                                         alignment: Alignment.centerLeft,
                                         child: Icon(
@@ -569,24 +574,29 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                         //MAPPPPPPPPPPPPPP
                         Container(
                           padding: EdgeInsets.all(10),
+                          margin: EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: Colors.deepPurple,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                              color: Colors.grey[200],
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: shadowBigColor),
                           child: Column(
                             children: [
                               Align(
-                                alignment: Alignment.centerLeft,
+                                alignment: Alignment.center,
                                 child: Text(
                                   'Pin Location',
                                   style: TextStyle(
-                                      color: Colors.white70, fontSize: 16),
+                                      color: Colors.black, fontSize: 16),
                                 ),
                               ),
                               Stack(
                                 children: [
                                   Container(
                                     height: onMap ? 500 : 100,
+                                    decoration: BoxDecoration(
+                                        color: Colors.grey[200],
+                                        borderRadius: BorderRadius.circular(10),
+                                        boxShadow: shadowColor),
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(10),
                                       child: FlutterMap(
@@ -681,10 +691,11 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                                 color: Colors.white,
                                                 boxShadow: shadowColor),
                                             child: InkWell(
-                                              onTap: () {
-                                                setState(() {
-                                                  _getCurrentLocation();
-                                                });
+                                              onTap: () async{
+                                                // setState(() {
+                                                 
+                                                // });
+                                                await _getCurrentLocation();
                                               },
                                               child: Icon(
                                                 Icons.my_location,
@@ -702,12 +713,13 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                       color: const Color.fromARGB(
                                           0, 163, 145, 145),
                                       child: InkWell(
-                                        onTap: () {
+                                        onTap: () async{
                                           setState(() {
                                             onMap = true;
                                           });
-                                          if (selectedPoint == null)
-                                            _getCurrentLocation();
+                                          if (selectedPoint == null){
+                                            await _getCurrentLocation();
+                                          }
                                         },
                                       ),
                                     )),
@@ -742,24 +754,26 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                             ? Container()
                             : Container(
                                 padding: EdgeInsets.all(10),
+                                margin: EdgeInsets.all(10),
                                 decoration: BoxDecoration(
-                                  color: Colors.deepPurple,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
+                                    color: Colors.grey[200],
+                                    borderRadius: BorderRadius.circular(10),
+                                    boxShadow: shadowBigColor),
                                 child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Text(
                                       'Waste Type',
                                       style: TextStyle(
-                                          color: Colors.white70, fontSize: 16),
+                                          color: Colors.black, fontSize: 16),
                                     ),
                                     Container(
                                       padding: EdgeInsets.all(5),
                                       decoration: BoxDecoration(
                                           color: Colors.white,
                                           borderRadius:
-                                              BorderRadius.circular(10)),
+                                              BorderRadius.circular(10),
+                                          boxShadow: shadowColor),
                                       child: _wasteCategoryList(),
                                     ),
                                   ],
@@ -770,15 +784,17 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                         SizedBox(height: 5.0),
                         Container(
                           padding: EdgeInsets.all(10),
+                          margin: EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: Colors.deepPurple,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                              color: Colors.grey[200],
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: shadowBigColor),
                           child: Container(
                             padding: EdgeInsets.all(10),
                             decoration: BoxDecoration(
                                 color: Colors.white,
-                                borderRadius: BorderRadius.circular(10)),
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: shadowColor),
                             child: Column(
                               children: [
                                 Center(
@@ -899,67 +915,72 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                           ],
                         ),
                         SizedBox(height: 10.0),
-                        Align(
+                        Container(
+                          padding: EdgeInsets.only(right: 10),
                           alignment: Alignment.centerRight,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                shadowColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                      10.0), // Adjust the radius here
-                                ),
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 20.0, vertical: 12.0),
-                                backgroundColor: Colors.green),
-                            onPressed: () async {
-                              if (userData == null ||
-                                  selectedPoint == null ||
-                                  _selectedWasteTypes.isEmpty ||
-                                  _selectedDate == null) {
-                                setState(() {
-                                  userDataValidator =
-                                      _validateUserData(userData);
-                                  pinLocValidator =
-                                      _validatePinLocl(selectedPoint);
-                                  wasteCatValidator =
-                                      _validateWaste(_selectedWasteTypes);
-                                  dateValidator = _validateDate(_selectedDate);
-                                });
-                              } else if (!_acceptTerms) {
-                                showErrorSnackBar(
-                                    context, 'Accept the terms and condition');
-                              } else {
-                                print(_selectedWasteTypes);
-                                //good
-                                String? dbMessage = await booking(
-                                    context,
-                                    userData!['cus_id'],
-                                    _selectedDate!,
-                                    userData!['cus_province'],
-                                    userData!['cus_city'],
-                                    userData!['cus_brgy'],
-                                    userData!['cus_street'],
-                                    userData!['cus_postal'],
-                                    selectedPoint!.latitude,
-                                    selectedPoint!.longitude,
-                                    _selectedWasteTypes);
-                                if (dbMessage == 'success')
-                                  Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              C_ScheduleScreen()));
-                                else
+                          child: Container(
+                            decoration:
+                                BoxDecoration(boxShadow: shadowBigColor),
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  shadowColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 20.0, vertical: 12.0),
+                                  backgroundColor: Colors.green),
+                              onPressed: () async {
+                                if (userData == null ||
+                                    selectedPoint == null ||
+                                    _selectedWasteTypes.isEmpty ||
+                                    _selectedDate == null) {
+                                  setState(() {
+                                    userDataValidator =
+                                        _validateUserData(userData);
+                                    pinLocValidator =
+                                        _validatePinLocl(selectedPoint);
+                                    wasteCatValidator =
+                                        _validateWaste(_selectedWasteTypes);
+                                    dateValidator =
+                                        _validateDate(_selectedDate);
+                                  });
+                                } else if (!_acceptTerms) {
                                   showErrorSnackBar(context,
-                                      'Somthing\'s wrong. Please try again later.');
-                              }
-                            },
-                            child: Text(
-                              'SUBMIT',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold),
+                                      'Accept the terms and condition');
+                                } else {
+                                  print(_selectedWasteTypes);
+                                  //good
+                                  String? dbMessage = await booking(
+                                      context,
+                                      userData!['cus_id'],
+                                      _selectedDate!,
+                                      userData!['cus_province'],
+                                      userData!['cus_city'],
+                                      userData!['cus_brgy'],
+                                      userData!['cus_street'],
+                                      userData!['cus_postal'],
+                                      selectedPoint!.latitude,
+                                      selectedPoint!.longitude,
+                                      _selectedWasteTypes);
+                                  if (dbMessage == 'success')
+                                    Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                C_ScheduleScreen()));
+                                  else
+                                    showErrorSnackBar(context,
+                                        'Somthing\'s wrong. Please try again later.');
+                                }
+                              },
+                              child: Text(
+                                'SUBMIT',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold),
+                              ),
                             ),
                           ),
                         ),
@@ -1224,23 +1245,24 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
       },
       child: Container(
         padding: EdgeInsets.all(10),
+        margin: EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: Colors.deepPurple,
-          borderRadius: BorderRadius.circular(10),
-        ),
+            color: Colors.grey[200],
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: shadowBigColor),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
               label,
-              style: TextStyle(color: Colors.white70, fontSize: 16),
+              style: TextStyle(color: Colors.black, fontSize: 16),
             ),
             Container(
               padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-              ),
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: shadowColor),
               child: Row(
                 children: [
                   Icon(Icons.calendar_today, color: Colors.green),

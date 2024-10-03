@@ -14,7 +14,7 @@ class ForgotPassword extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         //title: Text('Forgot Password'),
-        backgroundColor: backgroundColor,
+        backgroundColor: deepGreen,
         foregroundColor: Colors.white,
       ),
       body: PasswordRecoveryScreen(),
@@ -53,7 +53,7 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: deepGreen,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -250,7 +250,7 @@ class _VerifyEmailForgotPassScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: deepGreen,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -463,10 +463,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     return Scaffold(
       appBar: AppBar(
         //title: Text('Forgot Password'),
-        backgroundColor: backgroundColor,
+        backgroundColor: deepGreen,
         foregroundColor: Colors.white,
       ),
-      backgroundColor: backgroundColor,
+      backgroundColor: deepGreen,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(

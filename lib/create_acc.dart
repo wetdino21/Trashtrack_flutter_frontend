@@ -197,7 +197,7 @@ class _CreateAccState extends State<CreateAcc> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: deepGreen,
       body: Column(
         children: [
           Expanded(
@@ -494,7 +494,7 @@ class _CreateAccState extends State<CreateAcc> {
     return showValidator != ''
         ? Text(
             showValidator,
-            style: TextStyle(color: Colors.redAccent[100]),
+            style: TextStyle(color: Colors.red),
           )
         : SizedBox();
   }
@@ -624,9 +624,9 @@ class _CreateAccState extends State<CreateAcc> {
   ///1st page
   Widget _buildFirstStep() {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: deepPurple,
       appBar: AppBar(
-        backgroundColor: backgroundColor,
+        backgroundColor: deepPurple,
         foregroundColor: Colors.white,
         toolbarHeight: 100,
         title: Row(
@@ -638,7 +638,7 @@ class _CreateAccState extends State<CreateAcc> {
                   'Registration',
                   style: TextStyle(
                     fontSize: 40,
-                    color: Colors.green,
+                    color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -658,7 +658,12 @@ class _CreateAccState extends State<CreateAcc> {
         key: _formKey,
         child: SingleChildScrollView(
           child: Container(
-            padding: const EdgeInsets.all(20),
+            margin: EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20.0),
+                boxShadow: shadowBigColor),
             child: Column(
               //crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -666,7 +671,8 @@ class _CreateAccState extends State<CreateAcc> {
                 const SizedBox(height: 60),
                 const Text(
                   'Please enter your account details below!',
-                  style: TextStyle(color: Colors.grey),
+                  style: TextStyle(
+                      color: Colors.grey, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
                 _buildTextField(
@@ -704,7 +710,7 @@ class _CreateAccState extends State<CreateAcc> {
                       _passwordVisible
                           ? Icons.visibility
                           : Icons.visibility_off,
-                      color: Colors.grey,
+                      color: deepPurple,
                     ),
                     onPressed: () {
                       setState(() {
@@ -748,7 +754,7 @@ class _CreateAccState extends State<CreateAcc> {
                       _confirmPasswordVisible
                           ? Icons.visibility
                           : Icons.visibility_off,
-                      color: Colors.grey,
+                      color: deepPurple,
                     ),
                     onPressed: () {
                       setState(() {
@@ -776,8 +782,8 @@ class _CreateAccState extends State<CreateAcc> {
                 // Checkbox terms
                 const SizedBox(height: 20),
                 Center(
-                  child: ElevatedButton(
-                    onPressed: () async {
+                  child: InkWell(
+                    onTap: () async {
                       // Check if any validation error or email sending error exists
                       if ((_emailController.text.isEmpty ||
                               emailvalidator.isNotEmpty) ||
@@ -813,14 +819,20 @@ class _CreateAccState extends State<CreateAcc> {
                         }
                       }
                     },
-                    child: const Text('Continue'),
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 100, vertical: 14),
-                        textStyle: const TextStyle(
-                            fontSize: 25, fontWeight: FontWeight.bold),
-                        foregroundColor: Colors.white),
+                    child: Container(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 70.0, vertical: 10),
+                        decoration: BoxDecoration(
+                            color: Colors.green,
+                            borderRadius: BorderRadius.circular(20.0),
+                            boxShadow: shadowColor),
+                        child: const Text(
+                          'Continue',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold),
+                        )),
                   ),
                 ),
                 Center(
@@ -868,7 +880,7 @@ class _CreateAccState extends State<CreateAcc> {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.transparent,
+                          backgroundColor: deepPurple,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30.0),
                             side: BorderSide(color: Colors.white54, width: 2.0),
@@ -882,8 +894,7 @@ class _CreateAccState extends State<CreateAcc> {
                         ),
                         label: Text(
                           'Google',
-                          style:
-                              TextStyle(color: Colors.white70, fontSize: 18.0),
+                          style: TextStyle(color: Colors.white, fontSize: 18.0),
                         ),
                       ),
                     ],
@@ -897,7 +908,10 @@ class _CreateAccState extends State<CreateAcc> {
                     children: [
                       Text(
                         'Already have an account?',
-                        style: TextStyle(color: Colors.grey, fontSize: 16),
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 16,
+                        ),
                       ),
                       TextButton(
                         onPressed: () {
@@ -1051,9 +1065,9 @@ class _CreateAccState extends State<CreateAcc> {
   ///2nd page
   Widget _buildSecondStep() {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: deepPurple,
       appBar: AppBar(
-        backgroundColor: backgroundColor,
+        backgroundColor: deepPurple,
         foregroundColor: Colors.white,
         toolbarHeight: 100,
         title: Row(
@@ -1065,7 +1079,7 @@ class _CreateAccState extends State<CreateAcc> {
                   'Registration',
                   style: TextStyle(
                     fontSize: 40,
-                    color: Colors.green,
+                    color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -1094,7 +1108,7 @@ class _CreateAccState extends State<CreateAcc> {
       ),
       body: SingleChildScrollView(
         child: Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(15),
           child: Form(
             key: _formKey,
             child: Column(
@@ -1105,7 +1119,7 @@ class _CreateAccState extends State<CreateAcc> {
                         children: [
                           Text(
                             'with Google Authentication',
-                            style: TextStyle(color: Colors.grey),
+                            style: TextStyle(color: Colors.white),
                           ),
                           InkWell(
                             onTap: () async {
@@ -1126,49 +1140,47 @@ class _CreateAccState extends State<CreateAcc> {
                               }
                             },
                             child: Container(
+                              padding: EdgeInsets.all(10.0),
                               decoration: BoxDecoration(
-                                color:
-                                    Colors.deepPurpleAccent, // Background color
-                                borderRadius: BorderRadius.circular(
-                                    10.0), // Border radius
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.2),
-                                    spreadRadius: 2,
-                                    blurRadius: 5,
-                                    offset: Offset(0, 3), // Shadow position
-                                  ),
-                                ],
-                              ),
-                              child: ListTile(
-                                contentPadding: EdgeInsets.all(
-                                    8.0), // Padding inside the container
-                                leading: _accountDetails != null
-                                    ? (_accountDetails!.photoBytes != null
-                                        ? ClipOval(
-                                            child: Image.memory(
-                                              _accountDetails!.photoBytes!,
-                                            ),
-                                          )
-                                        : ClipOval(
-                                            child: Container(
-                                                padding: EdgeInsets.all(8),
-                                                color: Colors.white,
-                                                child: Icon(Icons.person,
-                                                    size: 40))))
-                                    : SizedBox(),
-                                title: _accountDetails != null
-                                    ? Text(
-                                        _accountDetails!.email,
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold),
-                                      )
-                                    : Text('No email available'),
-                                trailing: Icon(
-                                  Icons.file_upload_outlined,
                                   color: Colors.white,
-                                  size: 30,
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  boxShadow: shadowBigColor),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    color: Colors.green, // Background color
+                                    borderRadius: BorderRadius.circular(
+                                        10.0), // Border radius
+                                    boxShadow: shadowColor),
+                                child: ListTile(
+                                  contentPadding: EdgeInsets.all(
+                                      8.0), // Padding inside the container
+                                  leading: _accountDetails != null
+                                      ? (_accountDetails!.photoBytes != null
+                                          ? ClipOval(
+                                              child: Image.memory(
+                                                _accountDetails!.photoBytes!,
+                                              ),
+                                            )
+                                          : ClipOval(
+                                              child: Container(
+                                                  padding: EdgeInsets.all(8),
+                                                  color: Colors.white,
+                                                  child: Icon(Icons.person,
+                                                      size: 40))))
+                                      : SizedBox(),
+                                  title: _accountDetails != null
+                                      ? Text(
+                                          _accountDetails!.email,
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold),
+                                        )
+                                      : Text('No email available'),
+                                  trailing: Icon(
+                                    Icons.file_upload_outlined,
+                                    color: Colors.white,
+                                    size: 30,
+                                  ),
                                 ),
                               ),
                             ),
@@ -1176,286 +1188,304 @@ class _CreateAccState extends State<CreateAcc> {
                         ],
                       )
                     : SizedBox(),
-
                 const SizedBox(height: 20),
-                Center(
-                    child: Text(
-                  'Personal Information',
-                  style: TextStyle(fontSize: 20, color: Colors.grey),
-                )),
-                const SizedBox(height: 20),
-                _buildTextField(
-                  controller: _fnameController,
-                  hintText: 'First Name',
-                  icon: Icons.person,
-                  onChanged: (value) {
-                    setState(() {
-                      fnamevalidator = _validateFname(
-                          value); // Trigger validation on text change
-                    });
-                  },
-                ),
-                _validator(fnamevalidator),
-                const SizedBox(height: 5),
-                _buildTextField(
-                  controller: _mnameController,
-                  hintText: 'Middle Name (Optional)',
-                  icon: Icons.person_outline,
-                  onChanged: (value) {
-                    setState(() {
-                      mnamevalidator = _validateMname(
-                          value); // Trigger validation on text change
-                    });
-                  },
-                ),
-                _validator(mnamevalidator),
-                const SizedBox(height: 5),
-                _buildTextField(
-                  controller: _lnameController,
-                  hintText: 'Last Name',
-                  icon: Icons.person,
-                  onChanged: (value) {
-                    setState(() {
-                      lnamevalidator = _validateLname(
-                          value); // Trigger validation on text change
-                    });
-                  },
-                ),
-                _validator(lnamevalidator),
-                const SizedBox(height: 5),
-                _buildNumberField(
-                  inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                    LengthLimitingTextInputFormatter(10),
-                  ],
-                ),
-                _validator(contactvalidator),
-                const SizedBox(height: 20),
-                Center(
-                    child: Text(
-                  'Complete Address',
-                  style: TextStyle(fontSize: 20, color: Colors.grey),
-                )),
-                const SizedBox(height: 20),
-                // Dropdown for Province
-                _buildDropdown(
-                  selectedValue: _selectedProvince,
-                  items: _provinces,
-                  hintText: 'Select Province',
-                  icon: Icons.location_city,
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedProvince = value;
-                      provincevalidator = _validateProvince(value);
-                      final selectedProvince = _provinces
-                          .firstWhere((item) => item['code'] == value);
-                      _selectedProvinceName = selectedProvince['name'];
-                    });
-                    _loadCitiesMunicipalities(value!);
-                  },
-                ),
-                _validator(provincevalidator),
-                SizedBox(height: 5),
-                // Dropdown for City/Municipality
-                _buildDropdown(
-                  selectedValue: _selectedCityMunicipality,
-                  items: _citiesMunicipalities,
-                  hintText: 'Select City/Municipality',
-                  icon: Icons.apartment,
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedCityMunicipality = value;
-                      cityvalidator = _validateCity(value);
-                      final selectedCity = _citiesMunicipalities
-                          .firstWhere((item) => item['code'] == value);
-                      _selectedCityMunicipalityName = selectedCity['name'];
-                    });
-                    _loadBarangays(value!);
-                  },
-                ),
-                _validator(cityvalidator),
-                SizedBox(height: 5),
-                // Dropdown for Barangay
-                _buildDropdown(
-                  selectedValue: _selectedBarangay,
-                  items: _barangays,
-                  hintText: 'Select Barangay',
-                  icon: Icons.maps_home_work,
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedBarangay = value;
-                      brgyvalidator = _validateBrgy(value);
-                      final selectedBarangay = _barangays
-                          .firstWhere((item) => item['code'] == value);
-                      _selectedBarangayName = selectedBarangay['name'];
-                      print(_selectedBarangayName);
-                    });
-                  },
-                ),
-                _validator(brgyvalidator),
-                const SizedBox(height: 5),
-                _buildTextField(
-                  controller: _streetController,
-                  hintText: 'Street Name, Building, House No.',
-                  icon: Icons.home,
-                  onChanged: (value) {
-                    setState(() {
-                      streetvalidator = _validateStreet(
-                          value); // Trigger validation on text change
-                    });
-                  },
-                ),
-                _validator(streetvalidator),
-                const SizedBox(height: 5),
-                _buildTextField(
-                  controller: _postalController,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                    LengthLimitingTextInputFormatter(4),
-                  ],
-                  hintText: 'Postal Code',
-                  icon: Icons.pin_drop,
-                  onChanged: (value) {
-                    setState(() {
-                      postalvalidator = _validatePostalCode(
-                          value); // Trigger validation on text change
-                      print(_postalController.text);
-                    });
-                  },
-                ),
-                _validator(postalvalidator),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Checkbox(
-                      value: _acceptTerms,
-                      activeColor: Colors.green,
-                      onChanged: (bool? newValue) {
-                        setState(() {
-                          _acceptTerms = newValue ?? false;
-                        });
-                      },
-                    ),
-                    Text(
-                      'I accept the ',
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, 'terms');
-                      },
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.zero,
+                Container(
+                  padding: EdgeInsets.all(16.0),
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15.0),
+                      boxShadow: shadowBigColor),
+                  child: Column(
+                    children: [
+                      Center(
+                          child: Text(
+                        'Personal Information',
+                        style: TextStyle(fontSize: 20, color: Colors.grey),
+                      )),
+                      const SizedBox(height: 20),
+                      _buildTextField(
+                        controller: _fnameController,
+                        hintText: 'First Name',
+                        icon: Icons.person,
+                        onChanged: (value) {
+                          setState(() {
+                            fnamevalidator = _validateFname(
+                                value); // Trigger validation on text change
+                          });
+                        },
                       ),
-                      child: Text(
-                        'terms and conditions.',
-                        style: TextStyle(
-                          color: Colors.green,
-                          decoration: TextDecoration.underline,
-                          decorationColor: Colors.green,
+                      _validator(fnamevalidator),
+                      const SizedBox(height: 15),
+                      _buildTextField(
+                        controller: _mnameController,
+                        hintText: 'Middle Name (Optional)',
+                        icon: Icons.person_outline,
+                        onChanged: (value) {
+                          setState(() {
+                            mnamevalidator = _validateMname(
+                                value); // Trigger validation on text change
+                          });
+                        },
+                      ),
+                      _validator(mnamevalidator),
+                      const SizedBox(height: 15),
+                      _buildTextField(
+                        controller: _lnameController,
+                        hintText: 'Last Name',
+                        icon: Icons.person,
+                        onChanged: (value) {
+                          setState(() {
+                            lnamevalidator = _validateLname(
+                                value); // Trigger validation on text change
+                          });
+                        },
+                      ),
+                      _validator(lnamevalidator),
+                      const SizedBox(height: 15),
+                      _buildNumberField(
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(10),
+                        ],
+                      ),
+                      _validator(contactvalidator),
+                      const SizedBox(height: 15),
+                      Center(
+                          child: Text(
+                        'Complete Address',
+                        style: TextStyle(fontSize: 20, color: Colors.grey),
+                      )),
+                      const SizedBox(height: 15),
+                      // Dropdown for Province
+                      _buildDropdown(
+                        selectedValue: _selectedProvince,
+                        items: _provinces,
+                        hintText: 'Province',
+                        icon: Icons.location_city,
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedProvince = value;
+                            provincevalidator = _validateProvince(value);
+                            final selectedProvince = _provinces
+                                .firstWhere((item) => item['code'] == value);
+                            _selectedProvinceName = selectedProvince['name'];
+                          });
+                          _loadCitiesMunicipalities(value!);
+                        },
+                      ),
+                      _validator(provincevalidator),
+                      SizedBox(height: 15),
+                      // Dropdown for City/Municipality
+                      _buildDropdown(
+                        selectedValue: _selectedCityMunicipality,
+                        items: _citiesMunicipalities,
+                        hintText: 'City/Municipality',
+                        icon: Icons.apartment,
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedCityMunicipality = value;
+                            cityvalidator = _validateCity(value);
+                            final selectedCity = _citiesMunicipalities
+                                .firstWhere((item) => item['code'] == value);
+                            _selectedCityMunicipalityName =
+                                selectedCity['name'];
+                          });
+                          _loadBarangays(value!);
+                        },
+                      ),
+                      _validator(cityvalidator),
+                      SizedBox(height: 15),
+                      // Dropdown for Barangay
+                      _buildDropdown(
+                        selectedValue: _selectedBarangay,
+                        items: _barangays,
+                        hintText: 'Barangay',
+                        icon: Icons.maps_home_work,
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedBarangay = value;
+                            brgyvalidator = _validateBrgy(value);
+                            final selectedBarangay = _barangays
+                                .firstWhere((item) => item['code'] == value);
+                            _selectedBarangayName = selectedBarangay['name'];
+                            print(_selectedBarangayName);
+                          });
+                        },
+                      ),
+                      _validator(brgyvalidator),
+                      const SizedBox(height: 15),
+                      _buildTextField(
+                        controller: _streetController,
+                        hintText: 'Street Name, Building, House No.',
+                        icon: Icons.home,
+                        onChanged: (value) {
+                          setState(() {
+                            streetvalidator = _validateStreet(
+                                value); // Trigger validation on text change
+                          });
+                        },
+                      ),
+                      _validator(streetvalidator),
+                      const SizedBox(height: 15),
+                      _buildTextField(
+                        controller: _postalController,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(4),
+                        ],
+                        hintText: 'Postal Code',
+                        icon: Icons.pin_drop,
+                        onChanged: (value) {
+                          setState(() {
+                            postalvalidator = _validatePostalCode(
+                                value); // Trigger validation on text change
+                            print(_postalController.text);
+                          });
+                        },
+                      ),
+                      _validator(postalvalidator),
+                      const SizedBox(height: 15),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Checkbox(
+                            value: _acceptTerms,
+                            activeColor: Colors.green,
+                            onChanged: (bool? newValue) {
+                              setState(() {
+                                _acceptTerms = newValue ?? false;
+                              });
+                            },
+                          ),
+                          Text(
+                            'I accept the ',
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pushNamed(context, 'terms');
+                            },
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.zero,
+                            ),
+                            child: Text(
+                              'terms and conditions.',
+                              style: TextStyle(
+                                color: Colors.green,
+                                decoration: TextDecoration.underline,
+                                decorationColor: Colors.green,
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                      const SizedBox(height: 15),
+                      Center(
+                        child: InkWell(
+                          onTap: () async {
+                            if ((_fnameController.text.isEmpty ||
+                                    fnamevalidator.isNotEmpty) ||
+                                (mnamevalidator.isNotEmpty) ||
+                                (_lnameController.text.isEmpty ||
+                                    lnamevalidator.isNotEmpty) ||
+                                (_contactController.text.isEmpty ||
+                                    contactvalidator.isNotEmpty) ||
+                                (_selectedProvinceName == null ||
+                                    provincevalidator.isNotEmpty) ||
+                                (_selectedCityMunicipalityName == null ||
+                                    cityvalidator.isNotEmpty) ||
+                                (_selectedBarangayName == null ||
+                                    brgyvalidator.isNotEmpty) ||
+                                (_streetController.text.isEmpty ||
+                                    streetvalidator.isNotEmpty) ||
+                                (_postalController.text.isEmpty ||
+                                    postalvalidator.isNotEmpty)) {
+                              setState(() {
+                                fnamevalidator =
+                                    _validateFname(_fnameController.text);
+                                mnamevalidator =
+                                    _validateMname(_mnameController.text);
+                                lnamevalidator =
+                                    _validateLname(_lnameController.text);
+                                contactvalidator =
+                                    _validateContact(_contactController.text);
+                                provincevalidator =
+                                    _validateProvince(_selectedProvinceName);
+                                cityvalidator = _validateCity(
+                                    _selectedCityMunicipalityName);
+                                brgyvalidator =
+                                    _validateBrgy(_selectedBarangayName);
+                                streetvalidator =
+                                    _validateStreet(_streetController.text);
+                                postalvalidator =
+                                    _validatePostalCode(_postalController.text);
+                              });
+                            } else if (_contactController.text.isNotEmpty) {
+                              String? dbContactMsg =
+                                  await contactCheck(_contactController.text);
+                              // Show any existing error message
+                              if (dbContactMsg != null) {
+                                setState(() {
+                                  contactvalidator = dbContactMsg;
+                                });
+                              } else {
+                                // If no errors, proceed with incrementing the step
+                                if (_currentStep < 3) {
+                                  if (_acceptTerms) {
+                                    if (isGoogle) {
+                                      await createGoogleAccount(
+                                          context,
+                                          _accountDetails?.email ?? '',
+                                          _accountDetails?.photoBytes != null
+                                              ? _accountDetails!.photoBytes!
+                                              : null,
+                                          _fnameController.text,
+                                          _mnameController.text,
+                                          _lnameController.text,
+                                          ('0' + _contactController.text),
+                                          _selectedProvinceName!,
+                                          _selectedCityMunicipalityName!,
+                                          _selectedBarangayName!,
+                                          _streetController.text,
+                                          _postalController.text);
+                                    } else {
+                                      setState(() {
+                                        _currentStep++;
+                                        if (emailChanged == true) {
+                                          emailChanged = false;
+                                          _resendCode();
+                                        }
+                                      });
+                                    }
+                                  } else {
+                                    showErrorSnackBar(context,
+                                        'You must accept the terms and conditions');
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 70.0, vertical: 10),
+                              decoration: BoxDecoration(
+                                  color: Colors.green,
+                                  borderRadius: BorderRadius.circular(15.0),
+                                  boxShadow: shadowColor),
+                              child: Text(
+                                isGoogle ? 'Done' : 'Next',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 25,
+                                    fontWeight: FontWeight.bold),
+                              )),
                         ),
                       ),
-                    )
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      if ((_fnameController.text.isEmpty ||
-                              fnamevalidator.isNotEmpty) ||
-                          (mnamevalidator.isNotEmpty) ||
-                          (_lnameController.text.isEmpty ||
-                              lnamevalidator.isNotEmpty) ||
-                          (_contactController.text.isEmpty ||
-                              contactvalidator.isNotEmpty) ||
-                          (_selectedProvinceName == null ||
-                              provincevalidator.isNotEmpty) ||
-                          (_selectedCityMunicipalityName == null ||
-                              cityvalidator.isNotEmpty) ||
-                          (_selectedBarangayName == null ||
-                              brgyvalidator.isNotEmpty) ||
-                          (_streetController.text.isEmpty ||
-                              streetvalidator.isNotEmpty) ||
-                          (_postalController.text.isEmpty ||
-                              postalvalidator.isNotEmpty)) {
-                        setState(() {
-                          fnamevalidator =
-                              _validateFname(_fnameController.text);
-                          mnamevalidator =
-                              _validateMname(_mnameController.text);
-                          lnamevalidator =
-                              _validateLname(_lnameController.text);
-                          contactvalidator =
-                              _validateContact(_contactController.text);
-                          provincevalidator =
-                              _validateProvince(_selectedProvinceName);
-                          cityvalidator =
-                              _validateCity(_selectedCityMunicipalityName);
-                          brgyvalidator = _validateBrgy(_selectedBarangayName);
-                          streetvalidator =
-                              _validateStreet(_streetController.text);
-                          postalvalidator =
-                              _validatePostalCode(_postalController.text);
-                        });
-                      } else if (_contactController.text.isNotEmpty) {
-                        String? dbContactMsg =
-                            await contactCheck(_contactController.text);
-                        // Show any existing error message
-                        if (dbContactMsg != null) {
-                          setState(() {
-                            contactvalidator = dbContactMsg;
-                          });
-                        } else {
-                          // If no errors, proceed with incrementing the step
-                          if (_currentStep < 3) {
-                            if (_acceptTerms) {
-                              if (isGoogle) {
-                                await createGoogleAccount(
-                                    context,
-                                    _accountDetails?.email ?? '',
-                                    _accountDetails?.photoBytes != null
-                                        ? _accountDetails!.photoBytes!
-                                        : null,
-                                    _fnameController.text,
-                                    _mnameController.text,
-                                    _lnameController.text,
-                                    ('0' + _contactController.text),
-                                    _selectedProvinceName!,
-                                    _selectedCityMunicipalityName!,
-                                    _selectedBarangayName!,
-                                    _streetController.text,
-                                    _postalController.text);
-                              } else {
-                                setState(() {
-                                  _currentStep++;
-                                  if (emailChanged == true) {
-                                    emailChanged = false;
-                                    _resendCode();
-                                  }
-                                });
-                              }
-                            } else {
-                              showErrorSnackBar(context,
-                                  'You must accept the terms and conditions');
-                            }
-                          }
-                        }
-                      }
-                    },
-                    child: Text(isGoogle ? 'Done' : 'Next'),
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 100, vertical: 14),
-                        textStyle: const TextStyle(
-                            fontSize: 25, fontWeight: FontWeight.bold),
-                        foregroundColor: Colors.white),
+                      const SizedBox(height: 20),
+                    ],
                   ),
-                ),
-                const SizedBox(height: 20),
+                )
               ],
             ),
           ),
@@ -1467,9 +1497,9 @@ class _CreateAccState extends State<CreateAcc> {
 //3rd page
   Widget _buildThirdStep() {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: deepPurple,
       appBar: AppBar(
-        backgroundColor: backgroundColor,
+        backgroundColor: deepPurple,
         foregroundColor: Colors.white,
         toolbarHeight: 100,
         title: Row(
@@ -1481,7 +1511,7 @@ class _CreateAccState extends State<CreateAcc> {
                   'Registration',
                   style: TextStyle(
                     fontSize: 40,
-                    color: Colors.green,
+                    color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -1510,192 +1540,203 @@ class _CreateAccState extends State<CreateAcc> {
         children: [
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Icon(Icons.email, color: Colors.lightGreenAccent, size: 100),
-                Text(
-                  'Check your email',
-                  style: TextStyle(
-                    fontSize: 28,
-                    color: Colors.lightGreenAccent,
-                    fontWeight: FontWeight.bold,
+            child: Container(
+              padding: EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(15.0),
+                  boxShadow: shadowBigColor),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Icon(Icons.email, color: deepPurple, size: 100),
+                  Text(
+                    'Check your email',
+                    style: TextStyle(
+                      fontSize: 28,
+                      color: Colors.grey,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 20),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      'We\'ve sent the code to',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.white,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    Text(
-                      _emailController.text,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.white,
-                      ),
-                      textAlign: TextAlign.center,
-                      softWrap: true,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-                SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: List.generate(6, (index) {
-                    return SizedBox(
-                      width: 50,
-                      child: TextFormField(
-                        controller: _codeControllers[index],
-                        keyboardType: TextInputType
-                            .text, // Accept characters instead of numbers
-                        textInputAction:
-                            TextInputAction.next, // Moves focus to next field
-                        maxLength: 1,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.white, fontSize: 24),
-                        decoration: InputDecoration(
-                          counterText: '',
-                          filled: true,
-                          fillColor: Color(0xFF0A2A18),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                            borderSide: BorderSide.none,
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.lightGreenAccent,
-                              width: 2.0,
-                            ),
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
+                  SizedBox(height: 20),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        'We\'ve sent the code to',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.white,
                         ),
-                        onChanged: (value) {
-                          // Convert input to uppercase
-                          final upperCaseValue = value.toUpperCase();
-                          if (upperCaseValue.length == 1) {
-                            _codeControllers[index].text = upperCaseValue;
-                            _codeControllers[index].selection =
-                                TextSelection.fromPosition(
-                              TextPosition(offset: upperCaseValue.length),
-                            );
-
-                            // Automatically move focus to the next field
-                            if (index < 5) {
-                              FocusScope.of(context).nextFocus();
-                            } else {
-                              // Close the keyboard when the last textbox is filled
-                              FocusScope.of(context).unfocus();
-                            }
-                          }
-                          //print(enteredCode);
-                        },
+                        textAlign: TextAlign.center,
                       ),
-                    );
-                  }),
-                ),
-                SizedBox(height: 20),
-                Text(
-                  'Code expires in: ${_formatTimer(_timerSeconds)}',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: _timerSeconds > 0 ? Colors.orange : Colors.red,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 20),
-                TextButton(
-                  onPressed: () {
-                    _resendCode();
-                  },
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      'Resend Code?',
-                      style: TextStyle(
-                        color: Colors.blue,
-                        fontSize: 16.0,
-                        decoration: TextDecoration.underline,
-                        decorationColor: Colors.blue,
+                      Text(
+                        _emailController.text,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.white,
+                        ),
+                        textAlign: TextAlign.center,
+                        softWrap: true,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
+                    ],
                   ),
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () async {
-                    print(_emailController.text);
-                    print(_passController.text);
-                    print(_fnameController.text);
-                    print(_mnameController.text);
-                    print(_lnameController.text);
-                    print(_contactController.text);
-                    print(_selectedProvinceName);
-                    print(_selectedCityMunicipalityName);
-                    print(_selectedBarangayName);
-                    print(_streetController.text);
-                    print(_postalController.text);
-                    String? error = _validateCode();
-                    if (error == null) {
-                      updateEnteredCode(); //to update stored enteredCode
-                      String? errorMessage = await verifyEmailCode(
-                          _emailController.text, enteredCode);
-                      if (errorMessage != null) {
-                        showErrorSnackBar(context, errorMessage);
-                      } else {
-                        // showSuccessSnackBar(
-                        //     context, 'Successful Email Verification');
-                        String? createMessage = await createCustomer(
-                            context,
-                            _emailController.text,
-                            _passController.text,
-                            _fnameController.text,
-                            _mnameController.text,
-                            _lnameController.text,
-                            ('0' + _contactController.text),
-                            _selectedProvinceName,
-                            _selectedCityMunicipalityName,
-                            _selectedBarangayName,
-                            _streetController.text,
-                            _postalController.text);
-                        if (createMessage != null) {
-                          showErrorSnackBar(context, createMessage);
-                        } else {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => SuccessVerifyEmail(),
+                  SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: List.generate(6, (index) {
+                      return SizedBox(
+                        width: 50,
+                        child: TextFormField(
+                          controller: _codeControllers[index],
+                          keyboardType: TextInputType
+                              .text, // Accept characters instead of numbers
+                          textInputAction:
+                              TextInputAction.next, // Moves focus to next field
+                          maxLength: 1,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.white, fontSize: 24),
+                          decoration: InputDecoration(
+                            counterText: '',
+                            filled: true,
+                            fillColor: Color(0xFF0A2A18),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                              borderSide: BorderSide.none,
                             ),
-                          );
-                        }
-                      }
-                    } else {
-                      showErrorSnackBar(context, error);
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.lightGreenAccent,
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.purple,
+                                width: 2.0,
+                              ),
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          ),
+                          onChanged: (value) {
+                            // Convert input to uppercase
+                            final upperCaseValue = value.toUpperCase();
+                            if (upperCaseValue.length == 1) {
+                              _codeControllers[index].text = upperCaseValue;
+                              _codeControllers[index].selection =
+                                  TextSelection.fromPosition(
+                                TextPosition(offset: upperCaseValue.length),
+                              );
+
+                              // Automatically move focus to the next field
+                              if (index < 5) {
+                                FocusScope.of(context).nextFocus();
+                              } else {
+                                // Close the keyboard when the last textbox is filled
+                                FocusScope.of(context).unfocus();
+                              }
+                            }
+                            //print(enteredCode);
+                          },
+                        ),
+                      );
+                    }),
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    'Code expires in: ${_formatTimer(_timerSeconds)}',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: _timerSeconds > 0 ? Colors.orange : Colors.red,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 20),
+                  TextButton(
+                    onPressed: () {
+                      _resendCode();
+                    },
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Text(
+                        'Resend Code?',
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontSize: 16.0,
+                          decoration: TextDecoration.underline,
+                          decorationColor: Colors.blue,
+                        ),
+                      ),
                     ),
                   ),
-                  child: Text(
-                    'Verify',
-                    style: TextStyle(color: Colors.black, fontSize: 18),
+                  SizedBox(height: 20),
+                  InkWell(
+                    onTap: () async {
+                      print(_emailController.text);
+                      print(_passController.text);
+                      print(_fnameController.text);
+                      print(_mnameController.text);
+                      print(_lnameController.text);
+                      print(_contactController.text);
+                      print(_selectedProvinceName);
+                      print(_selectedCityMunicipalityName);
+                      print(_selectedBarangayName);
+                      print(_streetController.text);
+                      print(_postalController.text);
+                      String? error = _validateCode();
+                      if (error == null) {
+                        updateEnteredCode(); //to update stored enteredCode
+                        String? errorMessage = await verifyEmailCode(
+                            _emailController.text, enteredCode);
+                        if (errorMessage != null) {
+                          showErrorSnackBar(context, errorMessage);
+                        } else {
+                          // showSuccessSnackBar(
+                          //     context, 'Successful Email Verification');
+                          String? createMessage = await createCustomer(
+                              context,
+                              _emailController.text,
+                              _passController.text,
+                              _fnameController.text,
+                              _mnameController.text,
+                              _lnameController.text,
+                              ('0' + _contactController.text),
+                              _selectedProvinceName,
+                              _selectedCityMunicipalityName,
+                              _selectedBarangayName,
+                              _streetController.text,
+                              _postalController.text);
+                          if (createMessage != null) {
+                            showErrorSnackBar(context, createMessage);
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => SuccessVerifyEmail(),
+                              ),
+                            );
+                          }
+                        }
+                      } else {
+                        showErrorSnackBar(context, error);
+                      }
+                    },
+                    child: Container(
+                      alignment: Alignment.center,
+                      padding: EdgeInsets.all(16.0),
+                      decoration: BoxDecoration(
+                          color: Colors.green,
+                          borderRadius: BorderRadius.circular(10.0),
+                          boxShadow: shadowColor),
+                      child: Text(
+                        'Verify',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
@@ -1714,14 +1755,8 @@ class _CreateAccState extends State<CreateAcc> {
     required ValueChanged<String?> onChanged,
     Widget? suffixIcon,
   }) {
-    return Theme(
-      data: Theme.of(context).copyWith(
-        inputDecorationTheme: InputDecorationTheme(
-          errorStyle: TextStyle(
-              color: const Color.fromARGB(
-                  255, 255, 181, 176)), // Change error text color
-        ),
-      ),
+    return Container(
+      decoration: BoxDecoration(boxShadow: shadowColor),
       child: TextFormField(
         controller: controller,
         obscureText: obscureText,
@@ -1738,16 +1773,16 @@ class _CreateAccState extends State<CreateAcc> {
           filled: true,
           fillColor: Colors.white,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10), // Rounded corners
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10), // Rounded corners
-            borderSide: const BorderSide(color: Colors.grey, width: 3.0),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10), // Rounded corners
-            borderSide: const BorderSide(color: Colors.green, width: 5.0),
-          ),
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide.none),
+          // enabledBorder: OutlineInputBorder(
+          //   borderRadius: BorderRadius.circular(10), // Rounded corners
+          //   borderSide: const BorderSide(color: Colors.grey, width: 3.0),
+          // ),
+          // focusedBorder: OutlineInputBorder(
+          //   borderRadius: BorderRadius.circular(10), // Rounded corners
+          //   borderSide: const BorderSide(color: Colors.green, width: 5.0),
+          // ),
         ),
         inputFormatters: inputFormatters,
         //validator: validator,
@@ -1765,14 +1800,8 @@ class _CreateAccState extends State<CreateAcc> {
   Widget _buildNumberField({
     required List<TextInputFormatter> inputFormatters,
   }) {
-    return Theme(
-      data: Theme.of(context).copyWith(
-        inputDecorationTheme: InputDecorationTheme(
-          errorStyle: TextStyle(
-              color: const Color.fromARGB(
-                  255, 255, 181, 176)), // Change error text color
-        ),
-      ),
+    return Container(
+      decoration: BoxDecoration(boxShadow: shadowColor),
       child: TextFormField(
         controller: _contactController,
         decoration: InputDecoration(
@@ -1790,21 +1819,25 @@ class _CreateAccState extends State<CreateAcc> {
             ],
           ),
           //prefixIcon: Icon(Icons.abc),
-          hintText: 'Contact Number',
-          hintStyle: TextStyle(color: Colors.grey),
+          labelText:
+              'Contact Number', // This will move the hint text to the upper left when focused
+          floatingLabelBehavior: FloatingLabelBehavior.auto,
+          labelStyle: TextStyle(color: Colors.grey),
+          // hintText: 'Contact Number',
+          // hintStyle: TextStyle(color: Colors.grey),
           filled: true,
           fillColor: Colors.white,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10), // Rounded corners
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10), // Rounded corners
-            borderSide: const BorderSide(color: Colors.grey, width: 3.0),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10), // Rounded corners
-            borderSide: const BorderSide(color: Colors.green, width: 5.0),
-          ),
+              borderRadius: BorderRadius.circular(10), // Rounded corners
+              borderSide: BorderSide.none),
+          // enabledBorder: OutlineInputBorder(
+          //   borderRadius: BorderRadius.circular(10), // Rounded corners
+          //   borderSide: const BorderSide(color: Colors.grey, width: 3.0),
+          // ),
+          // focusedBorder: OutlineInputBorder(
+          //   borderRadius: BorderRadius.circular(10), // Rounded corners
+          //   borderSide: const BorderSide(color: Colors.green, width: 5.0),
+          // ),
         ),
         keyboardType: TextInputType.number,
         inputFormatters: inputFormatters,
@@ -1840,33 +1873,31 @@ class _CreateAccState extends State<CreateAcc> {
     required ValueChanged<String?> onChanged,
     //required FormFieldValidator<String> validator,
   }) {
-    return Theme(
-      data: Theme.of(context).copyWith(
-        inputDecorationTheme: InputDecorationTheme(
-          errorStyle: TextStyle(
-              color: const Color.fromARGB(
-                  255, 255, 181, 176)), // Change error text color
-        ),
-      ),
+    return Container(
+      decoration: BoxDecoration(boxShadow: shadowColor),
       child: DropdownButtonFormField<String>(
         value: selectedValue,
-        hint: Text(hintText, style: TextStyle(color: Colors.grey)),
+        //hint: Text(hintText, style: TextStyle(color: Colors.grey)),
         icon: Icon(Icons.arrow_drop_down, color: Colors.grey),
         decoration: InputDecoration(
+          labelText:
+              hintText, // This will move the hint text to the upper left when focused
+          floatingLabelBehavior: FloatingLabelBehavior.auto,
+          labelStyle: TextStyle(color: Colors.grey),
           filled: true,
           fillColor: Colors.white,
           prefixIcon: Icon(icon, color: Colors.green),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(color: Colors.grey, width: 3.0),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(color: Colors.green, width: 5.0),
-          ),
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide.none),
+          // enabledBorder: OutlineInputBorder(
+          //   borderRadius: BorderRadius.circular(10),
+          //   borderSide: const BorderSide(color: Colors.grey, width: 3.0),
+          // ),
+          // focusedBorder: OutlineInputBorder(
+          //   borderRadius: BorderRadius.circular(10),
+          //   borderSide: const BorderSide(color: Colors.green, width: 5.0),
+          // ),
         ),
         items: items.map<DropdownMenuItem<String>>((item) {
           return DropdownMenuItem<String>(
@@ -1886,7 +1917,7 @@ class SuccessVerifyEmail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF04130B),
+      backgroundColor: deepGreen,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -1894,11 +1925,19 @@ class SuccessVerifyEmail extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Icon(Icons.check_circle,
-                  color: Colors.lightGreenAccent, size: 100),
+              PopScope(
+                  canPop: false,
+                  onPopInvokedWithResult: (didPop, result) async {
+                    if (didPop) {
+                      return;
+                    }
+                    //_cancelEdit();
+                  },
+                  child: Container()),
+              Icon(Icons.check_circle, color: Colors.white, size: 100),
               SizedBox(height: 20),
               Text(
-                'Successful Account Registration!',
+                'Registration Complete!',
                 style: TextStyle(
                   fontSize: 28,
                   color: Colors.lightGreenAccent,
@@ -1927,7 +1966,7 @@ class SuccessVerifyEmail extends StatelessWidget {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.lightGreenAccent,
+                  backgroundColor: deepPurple,
                   padding: EdgeInsets.symmetric(vertical: 15),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -1935,7 +1974,7 @@ class SuccessVerifyEmail extends StatelessWidget {
                 ),
                 child: Text(
                   'Okay',
-                  style: TextStyle(color: Colors.black, fontSize: 18),
+                  style: TextStyle(color: Colors.white, fontSize: 18),
                 ),
               ),
             ],

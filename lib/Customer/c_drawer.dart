@@ -68,6 +68,7 @@ class _C_DrawerState extends State<C_Drawer> {
                       child: Icon(
                         Icons.person,
                         size: 30,
+                        color: deepPurple,
                       ),
                     ),
               title: Row(
@@ -85,6 +86,7 @@ class _C_DrawerState extends State<C_Drawer> {
                 icon: Icon(
                   Icons.settings,
                   size: 35,
+                  color: deepPurple,
                 ),
                 onPressed: () {
                   Navigator.push(
@@ -190,7 +192,7 @@ class _C_DrawerState extends State<C_Drawer> {
         color: Colors.grey[100],
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Icon(icon),
+      child: Icon(icon, color: deepPurple,),
     );
   }
 }

@@ -224,7 +224,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: deepGreen,
       body: Column(
         children: [
           Expanded(child: _buildFirstStep()),
@@ -235,9 +235,9 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
 
   Widget _buildFirstStep() {
     return Scaffold(
-      backgroundColor: Colors.deepPurple,
+      backgroundColor: deepPurple,
       appBar: AppBar(
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: deepPurple,
         foregroundColor: Colors.white,
         //title: Text('Request Pickup'),
         leading: IconButton(

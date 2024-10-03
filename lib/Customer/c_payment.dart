@@ -9,7 +9,7 @@ class C_PaymentScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: deepGreen,
       appBar: C_CustomAppBar(title: 'Payment'),
       drawer: C_Drawer(),
       body: ListView(
@@ -189,9 +189,9 @@ class C_PaymentHistoryDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: deepGreen,
       appBar: AppBar(
-        backgroundColor: backgroundColor,
+        backgroundColor: deepGreen,
         foregroundColor: Colors.white,
         title: Text('Payment',
             style: TextStyle(
@@ -268,9 +268,9 @@ class C_PaymentHistoryDetails extends StatelessWidget {
 /////////////////
 Widget buildSecondStep(BuildContext context) {
   return Scaffold(
-    backgroundColor: backgroundColor,
+    backgroundColor: deepGreen,
     appBar: AppBar(
-      backgroundColor: backgroundColor,
+      backgroundColor: deepGreen,
       foregroundColor: Colors.white,
       title: Text('Payment',
           style: TextStyle(

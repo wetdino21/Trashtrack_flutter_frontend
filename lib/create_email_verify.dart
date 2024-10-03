@@ -105,7 +105,7 @@ class _VerifyEmailCreateAccScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: deepGreen,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

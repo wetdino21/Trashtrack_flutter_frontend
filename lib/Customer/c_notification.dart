@@ -77,9 +77,9 @@ class _C_NotificationScreenState extends State<C_NotificationScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: deepGreen,
       appBar: AppBar(
-        backgroundColor: backgroundColor,
+        backgroundColor: deepGreen,
         foregroundColor: Colors.white,
         title: Text('Notification'),
       ),

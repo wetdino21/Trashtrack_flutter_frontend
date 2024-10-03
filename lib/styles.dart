@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 
-final Color backgroundColor = Color(0xFF001E00);
+final Color deepGreen = Color(0xFF388E3C);
+//final Color backgroundColor = Color(0xFF001E00);
 // final Color accentColor = Color(0xFF6AA920);
 final Color buttonColor = Color(0xFF86BF3E);
 final Color boxColor = Color(0xFF103510);
 final Color accentColor = Colors.greenAccent;
 final Color iconBoxColor = Color(0xFF001E03);
+//final Color deepGreen= Color(0xFF388E3C);
+final Color deepPurple = Colors.deepPurple;
+final Color darkPurple = Color(0xFF3A0F63); // A darker purple shade
+
+final Color white = Colors.white;
+
 final List<BoxShadow> shadowColor = [
   BoxShadow(
     color: Colors.grey.withOpacity(0.5), // Adjust opacity as needed

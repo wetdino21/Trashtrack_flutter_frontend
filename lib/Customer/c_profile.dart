@@ -1392,9 +1392,9 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: deepGreen,
       appBar: AppBar(
-        backgroundColor: backgroundColor,
+        backgroundColor: deepGreen,
         foregroundColor: Colors.white,
         //iconTheme: IconThemeData(color: accentColor),
         title: Text('Settings'),

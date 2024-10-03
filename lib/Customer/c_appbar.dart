@@ -43,13 +43,13 @@ class _C_CustomAppBarState extends State<C_CustomAppBar> {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: backgroundColor,
+      backgroundColor: deepGreen,
       foregroundColor: Colors.white,
       elevation: 0,
       title: Text(
         widget.title,
         style: TextStyle(
-          color: accentColor,
+          color: white,
           fontSize: 24.0,
           fontWeight: FontWeight.bold,
         ),
@@ -65,7 +65,7 @@ class _C_CustomAppBarState extends State<C_CustomAppBar> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: Colors.green[900],
+              color: deepPurple,
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -85,7 +85,7 @@ class _C_CustomAppBarState extends State<C_CustomAppBar> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: Colors.green[900],
+              color: deepPurple,
               shape: BoxShape.circle,
               border: Border.all(width: 2, color: Colors.green),
             ),

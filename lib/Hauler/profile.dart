@@ -6,9 +6,9 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: deepGreen,
       appBar: AppBar(
-        backgroundColor: backgroundColor,
+        backgroundColor: deepGreen,
         foregroundColor: Colors.white,
         title: Text('Profile'),
         actions: [
@@ -106,9 +106,9 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: deepGreen,
       appBar: AppBar(
-        backgroundColor: backgroundColor,
+        backgroundColor: deepGreen,
         foregroundColor: Colors.white,
         //iconTheme: IconThemeData(color: accentColor),
         title: Row(
@@ -350,9 +350,9 @@ class EditProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: deepGreen,
       appBar: AppBar(
-        backgroundColor: backgroundColor,
+        backgroundColor: deepGreen,
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),

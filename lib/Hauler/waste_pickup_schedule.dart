@@ -26,9 +26,9 @@ class _PickUpScheduleState extends State<PickUpSchedule> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: deepGreen,
       appBar: AppBar(
-        backgroundColor: backgroundColor,
+        backgroundColor: deepGreen,
         foregroundColor: Colors.white,
         title: Text('Schedule'),
       ),

@@ -45,111 +45,120 @@ class C_ScheduleCardList extends StatelessWidget {
         //   borderRadius: BorderRadius.circular(10),
         //   color: boxColor,
         // ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(7),
-                color: Colors.deepPurpleAccent,
-                //boxShadow: shadowColor
-              ),
-              child: Column(
-                children: [
-                  Align(
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Pickup Date',
-                      style: TextStyle(color: Colors.white, fontSize: 14),
+        child: Container(
+          padding: EdgeInsets.all(10.0),
+          decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10.0),
+              boxShadow: shadowBigColor),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(7),
+                  color: Colors.deepPurpleAccent,
+                  boxShadow: shadowColor
+                ),
+                child: Column(
+                  children: [
+                    Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Pickup Date',
+                        style: TextStyle(color: Colors.white, fontSize: 14),
+                      ),
                     ),
-                  ),
+                    Row(
+                      children: [
+                        Icon(
+                            status == 'Cancelled' || status == 'Collected'
+                                ? Icons.history
+                                : Icons.calendar_today,
+                            size: status == 'Cancelled' || status == 'Collected'
+                                ? 35
+                                : 25,
+                            color: Colors.white),
+                        SizedBox(width: 10.0),
+                        Text(
+                          date,
+                          style: TextStyle(color: Colors.white, fontSize: 23.0),
+                        ),
+                      ],
+                    ),
+                    Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        wasteType,
+                        style: TextStyle(color: Colors.white70, fontSize: 16.0),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
                   Row(
                     children: [
                       Icon(
-                          status == 'Cancelled' || status == 'Collected'
-                              ? Icons.history
-                              : Icons.calendar_today,
-                          size: status == 'Cancelled' || status == 'Collected'
-                              ? 35
-                              : 25,
-                          color: Colors.white),
-                      SizedBox(width: 10.0),
+                        Icons.send,
+                        size: 15,
+                        color: Colors.grey,
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
                       Text(
-                        date,
-                        style: TextStyle(color: Colors.white, fontSize: 23.0),
+                        dateCreated,
+                        style: TextStyle(color: Colors.grey, fontSize: 12.0),
                       ),
                     ],
                   ),
-                  Align(
-                    alignment: Alignment.center,
-                    child: Text(
-                      wasteType,
-                      style: TextStyle(color: Colors.white70, fontSize: 16.0),
+                  Text(
+                    status,
+                    style: TextStyle(
+                      color: status == 'Pending'
+                          ? Colors.orange
+                          : status == 'Ongoing'
+                              ? Colors.green
+                              : status == 'Cancelled'
+                                  ? Colors.red
+                                  : Colors.blue,
+                      fontSize: 18.0,
+                      // shadows: [
+                      //   Shadow(
+                      //     blurRadius:
+                      //         50.0, // How much blur you want for the glow
+                      //     color: status == 'Pending'
+                      //         ? Colors.orangeAccent
+                      //         : status == 'Ongoing'
+                      //             ? Colors.greenAccent
+                      //             : status == 'Cancelled'
+                      //                 ? Colors.pinkAccent
+                      //                 : Colors
+                      //                     .lightBlueAccent, // The glow color
+                      //     offset: Offset(1, 1), // Position of the shadow
+                      //   ),
+                      //   Shadow(
+                      //     blurRadius: 50.0, // Increase blur for a stronger glow
+                      //     color: status == 'Pending'
+                      //         ? Colors.orangeAccent
+                      //         : status == 'Ongoing'
+                      //             ? Colors.greenAccent
+                      //             : status == 'Cancelled'
+                      //                 ? Colors.pinkAccent
+                      //                 : Colors.lightBlueAccent,
+                      //     offset: Offset(0, 0),
+                      //   ),
+                      // ],
                     ),
                   ),
                 ],
               ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.send,
-                      size: 15,
-                      color: Colors.white,
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Text(
-                      dateCreated,
-                      style: TextStyle(color: Colors.white70, fontSize: 12.0),
-                    ),
-                  ],
-                ),
-                Text(
-                  status,
-                  style: TextStyle(
-                    color: status == 'Pending'
-                        ? Colors.orangeAccent
-                        : status == 'Ongoing'
-                            ? Colors.greenAccent
-                            : status == 'Cancelled'
-                                ? Colors.pinkAccent
-                                : Colors.lightBlueAccent,
-                    fontSize: 18.0,
-                    shadows: [
-                      Shadow(
-                        blurRadius: 50.0, // How much blur you want for the glow
-                        color: status == 'Pending'
-                            ? Colors.orangeAccent
-                            : status == 'Ongoing'
-                                ? Colors.greenAccent
-                                : status == 'Cancelled'
-                                    ? Colors.pinkAccent
-                                    : Colors.lightBlueAccent, // The glow color
-                        offset: Offset(1, 1), // Position of the shadow
-                      ),
-                      Shadow(
-                        blurRadius: 50.0, // Increase blur for a stronger glow
-                        color: status == 'Pending'
-                            ? Colors.orangeAccent
-                            : status == 'Ongoing'
-                                ? Colors.greenAccent
-                                : status == 'Cancelled'
-                                    ? Colors.pinkAccent
-                                    : Colors.lightBlueAccent,
-                        offset: Offset(0, 0),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -646,7 +655,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: deepGreen,
       body: Column(
         children: [
           Expanded(child: _buildFirstStep()),
@@ -662,7 +671,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
         toolbarHeight: 100,
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
-        title: Text(_isEditing? 'Editing Booking Details': 'Booking Details'),
+        title: Text(_isEditing ? 'Editing Booking Details' : 'Booking Details'),
         // Declare a boolean variable to track the visibility of the options box
 
         actions: [
@@ -1323,9 +1332,9 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                                 child: InkWell(
                                                   onTap: () {
                                                     setState(() {
-                                                     isLoadingLoc = true;
+                                                      isLoadingLoc = true;
                                                     });
-                                                     _getCurrentLocation();
+                                                    _getCurrentLocation();
                                                   },
                                                   child: Icon(
                                                     Icons.my_location,
@@ -1433,7 +1442,9 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                     Center(
                                         child: Text(
                                       'Payment Method',
-                                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold),
                                     )),
                                     Image.asset('assets/paymongo.png'),
                                     Row(

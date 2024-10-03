@@ -96,7 +96,7 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: deepGreen,
       appBar: C_CustomAppBar(title: 'Schedule'), //Schedule
       drawer: C_Drawer(),
       body: RefreshIndicator(
@@ -106,8 +106,10 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
         child: ListView(
           children: [
             Container(
+              margin: EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Color(0xFF103510),
+                color: white,
+                boxShadow: shadowBigColor,
                 borderRadius: BorderRadius.circular(10.0),
               ),
               child: Row(
@@ -117,39 +119,40 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                     padding: EdgeInsets.all(16.0),
                     margin: EdgeInsets.all(5),
                     decoration: BoxDecoration(
-                      color: boxColor,
+                      color: white,
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                     child: Text(
                       'Book now?',
                       style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.bold),
+                          fontSize: 16.0, fontWeight: FontWeight.bold),
                     ),
                   ),
                   Center(
-                    child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => RequestPickupScreen(),
+                    child: Container(
+                      decoration: BoxDecoration(boxShadow: shadowColor),
+                      child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => RequestPickupScreen(),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: deepPurple,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15.0),
                             ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: buttonColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15.0),
+                            padding: EdgeInsets.symmetric(
+                                vertical: 16.0, horizontal: 16.0),
                           ),
-                          padding: EdgeInsets.symmetric(
-                              vertical: 16.0, horizontal: 16.0),
-                        ),
-                        child: Icon(
-                          Icons.keyboard_arrow_right_outlined,
-                          color: Colors.white,
-                        )),
+                          child: Icon(
+                            Icons.keyboard_arrow_right_outlined,
+                            color: Colors.white,
+                          )),
+                    ),
                   ),
                 ],
               ),
@@ -161,49 +164,56 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    color: Color(0xFF103510),
+                    color: white,
+                    boxShadow: shadowBigColor,
                     borderRadius: BorderRadius.circular(5.0),
                   ),
                   child: Row(
                     children: [
                       Expanded(
-                        child: ElevatedButton(
-                          onPressed: () => onPageSelected(0),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: selectedPage == 0
-                                ? Colors.deepPurple
-                                : Color(0xFF001E00),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(5.0),
+                        child: Container(
+                          decoration: BoxDecoration(boxShadow: shadowColor),
+                          child: ElevatedButton(
+                            onPressed: () => onPageSelected(0),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: selectedPage == 0
+                                  ? Colors.deepPurple
+                                  : white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5.0),
+                              ),
                             ),
-                          ),
-                          child: Text(
-                            'Current',
-                            style: TextStyle(
-                              color: selectedPage == 0
-                                  ? Colors.white
-                                  : Colors.white70,
+                            child: Text(
+                              'Current',
+                              style: TextStyle(
+                                color: selectedPage == 0
+                                    ? Colors.white
+                                    : Colors.black,
+                              ),
                             ),
                           ),
                         ),
                       ),
                       Expanded(
-                        child: ElevatedButton(
-                          onPressed: () => onPageSelected(1),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: selectedPage == 1
-                                ? Colors.deepPurple
-                                : Color(0xFF001E00),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(5.0),
+                        child: Container(
+                          decoration: BoxDecoration(boxShadow: shadowColor),
+                          child: ElevatedButton(
+                            onPressed: () => onPageSelected(1),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: selectedPage == 1
+                                  ? Colors.deepPurple
+                                  : white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5.0),
+                              ),
                             ),
-                          ),
-                          child: Text(
-                            'History',
-                            style: TextStyle(
-                              color: selectedPage == 1
-                                  ? Colors.white
-                                  : Colors.white70,
+                            child: Text(
+                              'History',
+                              style: TextStyle(
+                                color: selectedPage == 1
+                                    ? Colors.white
+                                    : Colors.black,
+                              ),
                             ),
                           ),
                         ),

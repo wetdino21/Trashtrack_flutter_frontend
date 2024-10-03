@@ -79,7 +79,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
       },
       child: Scaffold(
         key: _scaffoldKey,
-        backgroundColor: backgroundColor,
+        backgroundColor: deepGreen,
         appBar: C_CustomAppBar(
           title: 'Home',
         ),
@@ -96,6 +96,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            SizedBox(height: 20,),
                             // ElevatedButton(
                             //     onPressed: () async {
                             //       bool onLocation =
@@ -113,17 +114,16 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                             Container(
                               padding: EdgeInsets.all(16.0),
                               decoration: BoxDecoration(
-                                  color: Colors.deepPurple,
+                                  color: Colors.white,
                                   borderRadius: BorderRadius.circular(20.0),
-                                  boxShadow: shadowColor),
+                                  boxShadow: shadowBigColor),
                               child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Text(
                                     //'Welcome ${userData!['cus_fname']}!',
                                     'Welcome ${userData!['fname']}!',
                                     style: TextStyle(
-                                      color: Colors.white,
                                       fontSize: 24.0,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -132,14 +132,12 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                                   Text(
                                     'Ready to keep things tidy? Schedule your garbage pickup today!',
                                     style: TextStyle(
-                                      color: Colors.white70,
                                       fontSize: 14.0,
                                     ),
                                   ),
                                   Center(
                                     child: Container(
                                       decoration: BoxDecoration(
-                                        color: Colors.deepPurple,
                                         borderRadius:
                                             BorderRadius.circular(20.0),
                                       ),
@@ -149,7 +147,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                                         children: [
                                           Icon(
                                             Icons.arrow_left,
-                                            color: Colors.white,
+                                            color: deepPurple,
                                           ),
                                           Container(
                                             height: 200,
@@ -172,37 +170,42 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                                             ),
                                           ),
                                           Icon(Icons.arrow_right,
-                                              color: Colors.white),
+                                              color: deepPurple),
                                         ],
                                       ),
                                     ),
                                   ),
                                   SizedBox(height: 20.0),
                                   Center(
-                                    child: ElevatedButton(
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                RequestPickupScreen(),
-                                          ),
-                                        );
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.green,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(15.0),
-                                        ),
-                                        padding: EdgeInsets.symmetric(
-                                            vertical: 16.0, horizontal: 30.0),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        boxShadow: shadowColor
                                       ),
-                                      child: Text(
-                                        'Request Pickup Now',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 18.0,
+                                      child: ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  RequestPickupScreen(),
+                                            ),
+                                          );
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: deepPurple,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(15.0),
+                                          ),
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 16.0, horizontal: 30.0),
+                                        ),
+                                        child: Text(
+                                          'Request Pickup Now',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 18.0,
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -216,7 +219,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                             Text(
                               '  Waste Collection Info',
                               style: TextStyle(
-                                color: Colors.grey,
+                                color: white,
                                 fontSize: 18.0,
                               ),
                             ),
@@ -231,24 +234,19 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                                 },
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    color: Colors.deepPurple,
+                                    color: white,
+                                    boxShadow: shadowBigColor,
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: ListTile(
                                     contentPadding: EdgeInsets.all(10),
-                                    // leading: Image.asset(
-                                    //   'assets/truck.png',
-                                    //   height: 100,
-                                    //   width: 100,
-                                    // ),
                                     leading: Icon(
                                       Icons.view_list,
-                                      color: accentColor,
+                                      color: deepPurple,
                                     ),
                                     title: Text(
-                                      'Type of waste',
+                                      'Type of Waste',
                                       style: TextStyle(
-                                        color: Colors.white,
                                         fontSize: 18.0,
                                       ),
                                     ),
@@ -260,7 +258,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                             Text(
                               '  Previous waste pickup',
                               style: TextStyle(
-                                color: Colors.grey,
+                                color: white,
                                 fontSize: 18.0,
                               ),
                             ),
@@ -322,7 +320,8 @@ class StatisticBox extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: boxColor,
+        color: white,
+        boxShadow: shadowBigColor,
         borderRadius: BorderRadius.circular(15.0),
       ),
       padding: EdgeInsets.all(16.0),
@@ -332,7 +331,7 @@ class StatisticBox extends StatelessWidget {
         children: [
           Icon(
             icon,
-            color: iconColor,
+            color: deepPurple,
             size: 30.0,
           ),
           SizedBox(height: 10.0),
@@ -340,7 +339,6 @@ class StatisticBox extends StatelessWidget {
             child: Text(
               title,
               style: TextStyle(
-                color: Colors.white70,
                 fontSize: 14.0,
               ),
             ),
@@ -349,7 +347,6 @@ class StatisticBox extends StatelessWidget {
           Text(
             value,
             style: TextStyle(
-              color: Colors.white,
               fontSize: 20.0,
               fontWeight: FontWeight.bold,
             ),

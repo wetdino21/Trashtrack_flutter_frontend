@@ -11,9 +11,9 @@ class C_ChangePass extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: deepGreen,
       appBar: AppBar(
-        backgroundColor: backgroundColor,
+        backgroundColor: deepGreen,
         foregroundColor: accentColor,
         //title: Text('Change Password'),
       ),
@@ -48,7 +48,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: deepGreen,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -190,9 +190,9 @@ class _CheckEmailScreenState extends State<CheckEmailChangePass> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: deepGreen,
       appBar: AppBar(
-        backgroundColor: backgroundColor,
+        backgroundColor: deepGreen,
         foregroundColor: accentColor,
         //title: Text('Change Password'),
       ),
@@ -342,9 +342,9 @@ class _ChangeNewPassState extends State<ChangeNewPass> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       backgroundColor: backgroundColor,
+       backgroundColor: deepGreen,
       appBar: AppBar(
-        backgroundColor: backgroundColor,
+        backgroundColor: deepGreen,
         foregroundColor: accentColor,
         //title: Text('Change Password'),
       ),

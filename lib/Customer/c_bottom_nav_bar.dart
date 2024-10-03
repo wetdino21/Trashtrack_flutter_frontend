@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:trashtrack/styles.dart';
 
 class C_BottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -39,7 +40,7 @@ class C_BottomNavBar extends StatelessWidget {
         //highlightColor: Colors.transparent, // Disable highlight effect
       ),
       child: BottomNavigationBar(
-        backgroundColor: Colors.black,
+        backgroundColor: const Color.fromARGB(255, 21, 8, 44),
         currentIndex: currentIndex,
         items: [
           BottomNavigationBarItem(

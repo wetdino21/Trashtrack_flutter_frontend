@@ -7,7 +7,7 @@ class VehicleScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: deepGreen,
       appBar: CustomAppBar(title: 'Vehicle'),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

@@ -60,6 +60,8 @@ class _CreateAccState extends State<CreateAcc> {
   bool isGoogle = false;
   GoogleAccountDetails? _accountDetails;
 
+  bool isloading = false;
+
   final _formKey = GlobalKey<FormState>();
 
   //email verification
@@ -151,12 +153,17 @@ class _CreateAccState extends State<CreateAcc> {
 
   // Function to resend the code
   void _resendCode() async {
+    setState(() {
+      isloading = true;
+    });
     // Call your function to resend the code
     String? errorMessage = await sendEmailCodeCreateAcc(_emailController.text);
     if (errorMessage != null) {
       showErrorSnackBar(context, errorMessage);
+      setState(() {
+        isloading = false;
+      });
     } else {
-      showSuccessSnackBar(context, 'Successfully sent new code');
       // Reset timer seconds and start a new timer
       setState(() {
         _timer.cancel();
@@ -165,6 +172,10 @@ class _CreateAccState extends State<CreateAcc> {
         _timerSeconds = 300; // Reset to initial countdown value
         //_timer.cancel();
       });
+      setState(() {
+        isloading = false;
+      });
+      showSuccessSnackBar(context, 'Successfully sent new code');
     }
   }
 
@@ -198,72 +209,88 @@ class _CreateAccState extends State<CreateAcc> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: deepGreen,
-      body: Column(
+      body: Stack(
         children: [
-          Expanded(
-            child: _currentStep == 1
-                ? _buildFirstStep()
-                : _currentStep == 2
-                    ? _buildSecondStep()
-                    : _buildThirdStep(),
+          Column(
+            children: [
+              Expanded(
+                child: _currentStep == 1
+                    ? _buildFirstStep()
+                    : _currentStep == 2
+                        ? _buildSecondStep()
+                        : _buildThirdStep(),
+              ),
+              PopScope(
+                  canPop: false,
+                  onPopInvokedWithResult: (didPop, result) async {
+                    if (didPop) {
+                      return;
+                    }
+                    _backToSignIn();
+                  },
+                  child: Container()),
+              // Padding(
+              //   padding: const EdgeInsets.all(16.0),
+              //   child: Row(
+              //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //     children: [
+              //       if (_currentStep > 1)
+              //         ElevatedButton(
+              //           onPressed: () {
+              //             setState(() {
+              //               _currentStep--;
+              //             });
+              //           },
+              //           style: ElevatedButton.styleFrom(
+              //             backgroundColor: Colors.green,
+              //             shape: RoundedRectangleBorder(
+              //               borderRadius: BorderRadius.circular(10.0),
+              //             ),
+              //             padding: EdgeInsets.symmetric(horizontal: 16.0),
+              //           ),
+              //           child: Text(
+              //             'Back',
+              //             style: TextStyle(color: Colors.white, fontSize: 18.0),
+              //           ),
+              //         )
+              //       else
+              //         Container(),
+              //       _currentStep > 1
+              //           ? ElevatedButton(
+              //               onPressed: () {},
+              //               style: ElevatedButton.styleFrom(
+              //                 backgroundColor: Colors.green,
+              //                 shape: RoundedRectangleBorder(
+              //                   borderRadius: BorderRadius.circular(10.0),
+              //                 ),
+              //                 padding: EdgeInsets.symmetric(horizontal: 16.0),
+              //               ),
+              //               child: Text(
+              //                 _currentStep < 3 ? 'Next' : 'Submit',
+              //                 style: TextStyle(color: Colors.white, fontSize: 18.0),
+              //               ),
+              //             )
+              //           : SizedBox(),
+              //     ],
+              //   ),
+              // ),
+              // SizedBox(
+              //   height: 50,
+              // )
+            ],
           ),
-          PopScope(
-              canPop: false,
-              onPopInvokedWithResult: (didPop, result) async {
-                if (didPop) {
-                  return;
-                }
-                _backToSignIn();
-              },
-              child: Container()),
-          // Padding(
-          //   padding: const EdgeInsets.all(16.0),
-          //   child: Row(
-          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //     children: [
-          //       if (_currentStep > 1)
-          //         ElevatedButton(
-          //           onPressed: () {
-          //             setState(() {
-          //               _currentStep--;
-          //             });
-          //           },
-          //           style: ElevatedButton.styleFrom(
-          //             backgroundColor: Colors.green,
-          //             shape: RoundedRectangleBorder(
-          //               borderRadius: BorderRadius.circular(10.0),
-          //             ),
-          //             padding: EdgeInsets.symmetric(horizontal: 16.0),
-          //           ),
-          //           child: Text(
-          //             'Back',
-          //             style: TextStyle(color: Colors.white, fontSize: 18.0),
-          //           ),
-          //         )
-          //       else
-          //         Container(),
-          //       _currentStep > 1
-          //           ? ElevatedButton(
-          //               onPressed: () {},
-          //               style: ElevatedButton.styleFrom(
-          //                 backgroundColor: Colors.green,
-          //                 shape: RoundedRectangleBorder(
-          //                   borderRadius: BorderRadius.circular(10.0),
-          //                 ),
-          //                 padding: EdgeInsets.symmetric(horizontal: 16.0),
-          //               ),
-          //               child: Text(
-          //                 _currentStep < 3 ? 'Next' : 'Submit',
-          //                 style: TextStyle(color: Colors.white, fontSize: 18.0),
-          //               ),
-          //             )
-          //           : SizedBox(),
-          //     ],
-          //   ),
-          // ),
-          // SizedBox(
-          //   height: 50,
-          // )
+          if (isloading)
+            Positioned.fill(
+                child: InkWell(
+              child: Center(
+                child: CircularProgressIndicator(
+                  color: Colors.green,
+                  strokeWidth: 10,
+                  strokeAlign: 2,
+                  backgroundColor: Colors.deepPurple,
+                ),
+              ),
+            )),
         ],
       ),
     );
@@ -286,7 +313,8 @@ class _CreateAccState extends State<CreateAcc> {
                       (_passController.text.isEmpty ||
                           passvalidator.isNotEmpty) ||
                       (_repassController.text.isEmpty ||
-                          confpassvalidator.isNotEmpty)) {
+                          confpassvalidator.isNotEmpty) ||
+                      (_passController.text != _repassController.text)) {
                     setState(() {
                       emailvalidator = _validateEmail(_emailController.text);
                       passvalidator = _validatePassword(_passController.text);
@@ -322,7 +350,8 @@ class _CreateAccState extends State<CreateAcc> {
                       (_passController.text.isEmpty ||
                           passvalidator.isNotEmpty) ||
                       (_repassController.text.isEmpty ||
-                          confpassvalidator.isNotEmpty)) {
+                          confpassvalidator.isNotEmpty) ||
+                      (_passController.text != _repassController.text)) {
                     setState(() {
                       emailvalidator = _validateEmail(_emailController.text);
                       passvalidator = _validatePassword(_passController.text);
@@ -380,11 +409,11 @@ class _CreateAccState extends State<CreateAcc> {
                         if (_currentStep < 3) {
                           if (_acceptTerms) {
                             setState(() {
-                              _currentStep = index + 1;
                               if (emailChanged == true) {
                                 emailChanged = false;
                                 _resendCode();
                               }
+                              _currentStep = index + 1;
                               // _startTimer();
                             });
                           } else {
@@ -443,11 +472,11 @@ class _CreateAccState extends State<CreateAcc> {
                     if (_currentStep < 4) {
                       if (_acceptTerms) {
                         setState(() {
-                          _currentStep = index + 1;
                           if (emailChanged == true) {
                             emailChanged = false;
                             _resendCode();
                           }
+                          _currentStep = index + 1;
                           //_startTimer();
                         });
                       } else {
@@ -658,8 +687,8 @@ class _CreateAccState extends State<CreateAcc> {
         key: _formKey,
         child: SingleChildScrollView(
           child: Container(
-            margin: EdgeInsets.all(16.0),
-            padding: EdgeInsets.all(16.0),
+            margin: EdgeInsets.all(20.0),
+            padding: EdgeInsets.all(20.0),
             decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(20.0),
@@ -790,7 +819,8 @@ class _CreateAccState extends State<CreateAcc> {
                           (_passController.text.isEmpty ||
                               passvalidator.isNotEmpty) ||
                           (_repassController.text.isEmpty ||
-                              confpassvalidator.isNotEmpty)) {
+                              confpassvalidator.isNotEmpty) ||
+                          (_passController.text != _repassController.text)) {
                         setState(() {
                           emailvalidator =
                               _validateEmail(_emailController.text);
@@ -1451,11 +1481,11 @@ class _CreateAccState extends State<CreateAcc> {
                                           _postalController.text);
                                     } else {
                                       setState(() {
-                                        _currentStep++;
                                         if (emailChanged == true) {
                                           emailChanged = false;
                                           _resendCode();
                                         }
+                                        _currentStep++;
                                       });
                                     }
                                   } else {
@@ -1534,6 +1564,7 @@ class _CreateAccState extends State<CreateAcc> {
               color: Colors.white,
               size: 30,
             )),
+        //leading: SizedBox(),
         leadingWidth: 70,
       ),
       body: ListView(
@@ -1555,7 +1586,7 @@ class _CreateAccState extends State<CreateAcc> {
                     'Check your email',
                     style: TextStyle(
                       fontSize: 28,
-                      color: Colors.grey,
+                      color: Colors.grey[700],
                       fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,
@@ -1568,16 +1599,16 @@ class _CreateAccState extends State<CreateAcc> {
                       Text(
                         'We\'ve sent the code to',
                         style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.white,
+                          fontSize: 15,
+                          color: Colors.black54,
                         ),
                         textAlign: TextAlign.center,
                       ),
                       Text(
                         _emailController.text,
                         style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.white,
+                          fontSize: 16,
+                          color: deepPurple,
                         ),
                         textAlign: TextAlign.center,
                         softWrap: true,
@@ -1591,51 +1622,55 @@ class _CreateAccState extends State<CreateAcc> {
                     children: List.generate(6, (index) {
                       return SizedBox(
                         width: 50,
-                        child: TextFormField(
-                          controller: _codeControllers[index],
-                          keyboardType: TextInputType
-                              .text, // Accept characters instead of numbers
-                          textInputAction:
-                              TextInputAction.next, // Moves focus to next field
-                          maxLength: 1,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.white, fontSize: 24),
-                          decoration: InputDecoration(
-                            counterText: '',
-                            filled: true,
-                            fillColor: Color(0xFF0A2A18),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                              borderSide: BorderSide.none,
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.purple,
-                                width: 2.0,
+                        child: Container(
+                          decoration: BoxDecoration(boxShadow: shadowColor),
+                          child: TextFormField(
+                            cursorColor: deepGreen,
+                            controller: _codeControllers[index],
+                            keyboardType: TextInputType
+                                .number, // Accept characters instead of numbers
+                            textInputAction: TextInputAction
+                                .next, // Moves focus to next field
+                            maxLength: 1,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Colors.white, fontSize: 24),
+                            decoration: InputDecoration(
+                              counterText: '',
+                              filled: true,
+                              fillColor: deepPurple,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                                borderSide: BorderSide.none,
                               ),
-                              borderRadius: BorderRadius.circular(10.0),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: deepGreen,
+                                  width: 2.0,
+                                ),
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
                             ),
-                          ),
-                          onChanged: (value) {
-                            // Convert input to uppercase
-                            final upperCaseValue = value.toUpperCase();
-                            if (upperCaseValue.length == 1) {
-                              _codeControllers[index].text = upperCaseValue;
-                              _codeControllers[index].selection =
-                                  TextSelection.fromPosition(
-                                TextPosition(offset: upperCaseValue.length),
-                              );
+                            onChanged: (value) {
+                              // Convert input to uppercase
+                              final upperCaseValue = value.toUpperCase();
+                              if (upperCaseValue.length == 1) {
+                                _codeControllers[index].text = upperCaseValue;
+                                _codeControllers[index].selection =
+                                    TextSelection.fromPosition(
+                                  TextPosition(offset: upperCaseValue.length),
+                                );
 
-                              // Automatically move focus to the next field
-                              if (index < 5) {
-                                FocusScope.of(context).nextFocus();
-                              } else {
-                                // Close the keyboard when the last textbox is filled
-                                FocusScope.of(context).unfocus();
+                                // Automatically move focus to the next field
+                                if (index < 5) {
+                                  FocusScope.of(context).nextFocus();
+                                } else {
+                                  // Close the keyboard when the last textbox is filled
+                                  FocusScope.of(context).unfocus();
+                                }
                               }
-                            }
-                            //print(enteredCode);
-                          },
+                              //print(enteredCode);
+                            },
+                          ),
                         ),
                       );
                     }),
@@ -1650,22 +1685,24 @@ class _CreateAccState extends State<CreateAcc> {
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 20),
-                  TextButton(
-                    onPressed: () {
-                      _resendCode();
-                    },
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: Text(
-                        'Resend Code?',
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontSize: 16.0,
-                          decoration: TextDecoration.underline,
-                          decorationColor: Colors.blue,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          _resendCode();
+                        },
+                        child: Text(
+                          'Resend Code?',
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontSize: 16.0,
+                            decoration: TextDecoration.underline,
+                            decorationColor: Colors.blue,
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
                   SizedBox(height: 20),
                   InkWell(

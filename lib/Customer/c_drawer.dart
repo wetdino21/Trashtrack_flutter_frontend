@@ -73,11 +73,15 @@ class _C_DrawerState extends State<C_Drawer> {
                     ),
               title: Row(
                 children: [
-                  Text(
-                    userData != null
-                        ? '${userData!['fname']} ${userData!['lname']}'
-                        : 'Loading . . .',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  Expanded(
+                    child: Text(
+                      userData != null
+                          ? '${userData!['fname']} ${userData!['lname']}'
+                          : 'Loading . . .',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                      softWrap: true,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                   Icon(Icons.keyboard_arrow_down)
                 ],

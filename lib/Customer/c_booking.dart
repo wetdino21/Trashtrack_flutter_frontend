@@ -142,9 +142,10 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
           isLoading = false;
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to load waste categories')),
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text('Failed to load waste categories')),
+        // );
+        print('Failed to load waste categories');
       }
     } catch (e) {
       if (!mounted) return;
@@ -194,8 +195,9 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
       LocationSettings locationSettings = const LocationSettings(
         accuracy: LocationAccuracy.high, // Specify accuracy
       );
-      
+
       print('getting current location');
+
       ///current pstion
       Position position = await Geolocator.getCurrentPosition(
         locationSettings: locationSettings,
@@ -454,121 +456,141 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                               color: Colors.grey[200],
                               borderRadius: BorderRadius.circular(10),
                               boxShadow: shadowBigColor),
-                          child: Container(
-                            height: 100,
-                            padding: EdgeInsets.all(5),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                //color: Colors.white.withOpacity(.6),
-                                color: Colors.white,
-                                boxShadow: shadowColor),
-                            child: Row(
-                              // mainAxisAlignment: MainAxisAlignment.start,
-                              // crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                    flex: 1,
-                                    child: Container(
-                                        height: 35,
-                                        width: 30,
-                                        padding: EdgeInsets.only(left: 2),
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(50),
-                                          //color: Colors.white.withOpacity(.6),
-                                          color: Colors.white,
-                                        ),
-                                        alignment: Alignment.centerLeft,
-                                        child: Icon(
-                                          Icons.pin_drop,
-                                          size: 30,
-                                          color: Colors.redAccent,
-                                        ))),
-                                Expanded(
-                                    flex: 10,
-                                    child: Container(
-                                        padding: EdgeInsets.only(left: 10),
-                                        alignment: Alignment.centerLeft,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Expanded(
-                                                flex: 1,
-                                                child: Row(
-                                                  children: [
-                                                    Text(
+                          child: IntrinsicHeight(
+                            child: Container(
+                              padding: EdgeInsets.all(5),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Colors.white,
+                                  boxShadow: shadowColor),
+                              child: Row(
+                                // mainAxisAlignment: MainAxisAlignment.start,
+                                // crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                      flex: 1,
+                                      child: Container(
+                                          height: 35,
+                                          width: 30,
+                                          padding: EdgeInsets.only(left: 2),
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                            //color: Colors.white.withOpacity(.6),
+                                            color: Colors.white,
+                                          ),
+                                          alignment: Alignment.centerLeft,
+                                          child: Icon(
+                                            Icons.pin_drop,
+                                            size: 30,
+                                            color: Colors.redAccent,
+                                          ))),
+                                  Expanded(
+                                      flex: 10,
+                                      child: Container(
+                                          padding: EdgeInsets.only(left: 10),
+                                          alignment: Alignment.centerLeft,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Expanded(
+                                                    flex: 1,
+                                                    child: Text(
                                                       fullname,
                                                       style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontSize: 17),
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                             fontSize:
+                                                                        15
+                                                      ),
+                                                      
+                                                      //softWrap: true,
+                                                      // overflow:
+                                                      //     TextOverflow.ellipsis,
                                                     ),
-                                                    Text('   | +(63)${contact}',
-                                                        style: TextStyle(
-                                                          color: Colors.grey,
-                                                        )),
-                                                  ],
-                                                )),
-                                            Expanded(
-                                                flex: 2,
+                                                  ),
+                                                   Expanded(
+                                                    flex: 1,
                                                 child: Text(
-                                                  '${street} \n${address}',
-                                                )),
-                                            Expanded(
-                                                flex: 1,
-                                                child: Row(
-                                                  children: [
-                                                    Container(
-                                                      padding:
-                                                          EdgeInsets.all(2),
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(3),
-                                                        //color: Colors.white.withOpacity(.6),
-                                                        border: Border.all(
-                                                            color: Colors.red),
+                                                  '    |   +(63)${contact}',
+                                                  style: TextStyle(
+                                                    color: Colors.grey,
+                                                  ),
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                                ],
+                                              ),
+                                             
+                                              Expanded(
+                                                child: Expanded(
+                                                    flex: 2,
+                                                    child: Text(
+                                                      '${street} \n${address}',
+                                                    
+                                                    )),
+                                              ),
+                                              Expanded(
+                                                  flex: 1,
+                                                  child: Row(
+                                                    children: [
+                                                      Container(
+                                                        padding:
+                                                            EdgeInsets.all(2),
+                                                        decoration: BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(3),
+                                                          //color: Colors.white.withOpacity(.6),
+                                                          border: Border.all(
+                                                              color: Colors.red),
+                                                        ),
+                                                        child: Text(
+                                                          'Default',
+                                                          style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight.bold,
+                                                              color: Colors
+                                                                  .red[300]),
+                                                        ),
                                                       ),
-                                                      child: Text(
-                                                        'Default',
-                                                        style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            color: Colors
-                                                                .red[300]),
+                                                      SizedBox(
+                                                        width: 5,
                                                       ),
-                                                    ),
-                                                    SizedBox(
-                                                      width: 5,
-                                                    ),
-                                                    Container(
-                                                      padding:
-                                                          EdgeInsets.all(2),
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(3),
-                                                        //color: Colors.white.withOpacity(.6),
-                                                        border: Border.all(
-                                                            color: Colors.grey),
+                                                      Container(
+                                                        padding:
+                                                            EdgeInsets.all(2),
+                                                        decoration: BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(3),
+                                                          //color: Colors.white.withOpacity(.6),
+                                                          border: Border.all(
+                                                              color: Colors.grey),
+                                                        ),
+                                                        child: Text(
+                                                          'Pickup Address',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.black54),
+                                                        ),
                                                       ),
-                                                      child: Text(
-                                                        'Pickup Address',
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.black54),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                )),
-                                          ],
-                                        ))),
-                              ],
+                                                    ],
+                                                  )),
+                                              SizedBox(height: 5),
+                                              _labelValidator(userDataValidator),
+                                            ],
+                                          ))),
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                        _labelValidator(userDataValidator),
+
                         SizedBox(height: 5.0),
 
                         //MAPPPPPPPPPPPPPP
@@ -691,9 +713,9 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                                 color: Colors.white,
                                                 boxShadow: shadowColor),
                                             child: InkWell(
-                                              onTap: () async{
+                                              onTap: () async {
                                                 // setState(() {
-                                                 
+
                                                 // });
                                                 await _getCurrentLocation();
                                               },
@@ -713,11 +735,11 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                       color: const Color.fromARGB(
                                           0, 163, 145, 145),
                                       child: InkWell(
-                                        onTap: () async{
+                                        onTap: () async {
                                           setState(() {
                                             onMap = true;
                                           });
-                                          if (selectedPoint == null){
+                                          if (selectedPoint == null) {
                                             await _getCurrentLocation();
                                           }
                                         },
@@ -742,13 +764,15 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                       : SizedBox(),
                                 ],
                               ),
+                              SizedBox(height: 5.0),
+                              _labelValidator(pinLocValidator),
                             ],
                           ),
                         ),
-                        _labelValidator(pinLocValidator),
+
                         SizedBox(height: 5.0),
                         _buildDatePicker('Date Schedule', 'Select Date'),
-                        _labelValidator(dateValidator),
+                        //_labelValidator(dateValidator),
                         SizedBox(height: 5.0),
                         isLoading
                             ? Container()
@@ -776,10 +800,13 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                           boxShadow: shadowColor),
                                       child: _wasteCategoryList(),
                                     ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    _labelValidator(wasteCatValidator),
                                   ],
                                 ),
                               ),
-                        _labelValidator(wasteCatValidator),
 
                         SizedBox(height: 5.0),
                         Container(
@@ -918,70 +945,64 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                         Container(
                           padding: EdgeInsets.only(right: 10),
                           alignment: Alignment.centerRight,
-                          child: Container(
-                            decoration:
-                                BoxDecoration(boxShadow: shadowBigColor),
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  shadowColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 20.0, vertical: 12.0),
-                                  backgroundColor: Colors.green),
-                              onPressed: () async {
-                                if (userData == null ||
-                                    selectedPoint == null ||
-                                    _selectedWasteTypes.isEmpty ||
-                                    _selectedDate == null) {
-                                  setState(() {
-                                    userDataValidator =
-                                        _validateUserData(userData);
-                                    pinLocValidator =
-                                        _validatePinLocl(selectedPoint);
-                                    wasteCatValidator =
-                                        _validateWaste(_selectedWasteTypes);
-                                    dateValidator =
-                                        _validateDate(_selectedDate);
-                                  });
-                                } else if (!_acceptTerms) {
-                                  showErrorSnackBar(context,
-                                      'Accept the terms and condition');
-                                } else {
-                                  print(_selectedWasteTypes);
-                                  //good
-                                  String? dbMessage = await booking(
+                          child: InkWell(
+                            onTap: () async {
+                              if (userData == null ||
+                                  selectedPoint == null ||
+                                  _selectedWasteTypes.isEmpty ||
+                                  _selectedDate == null) {
+                                setState(() {
+                                  userDataValidator =
+                                      _validateUserData(userData);
+                                  pinLocValidator =
+                                      _validatePinLocl(selectedPoint);
+                                  wasteCatValidator =
+                                      _validateWaste(_selectedWasteTypes);
+                                  dateValidator = _validateDate(_selectedDate);
+                                });
+                              } else if (!_acceptTerms) {
+                                showErrorSnackBar(
+                                    context, 'Accept the terms and condition');
+                              } else {
+                                print(_selectedWasteTypes);
+                                //good
+                                String? dbMessage = await booking(
+                                    context,
+                                    userData!['cus_id'],
+                                    _selectedDate!,
+                                    userData!['cus_province'],
+                                    userData!['cus_city'],
+                                    userData!['cus_brgy'],
+                                    userData!['cus_street'],
+                                    userData!['cus_postal'],
+                                    selectedPoint!.latitude,
+                                    selectedPoint!.longitude,
+                                    _selectedWasteTypes);
+                                if (dbMessage == 'success')
+                                  Navigator.pushReplacement(
                                       context,
-                                      userData!['cus_id'],
-                                      _selectedDate!,
-                                      userData!['cus_province'],
-                                      userData!['cus_city'],
-                                      userData!['cus_brgy'],
-                                      userData!['cus_street'],
-                                      userData!['cus_postal'],
-                                      selectedPoint!.latitude,
-                                      selectedPoint!.longitude,
-                                      _selectedWasteTypes);
-                                  if (dbMessage == 'success')
-                                    Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                C_ScheduleScreen()));
-                                  else
-                                    showErrorSnackBar(context,
-                                        'Somthing\'s wrong. Please try again later.');
-                                }
-                              },
-                              child: Text(
-                                'SUBMIT',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              C_ScheduleScreen()));
+                                else
+                                  showErrorSnackBar(context,
+                                      'Somthing\'s wrong. Please try again later.');
+                              }
+                            },
+                            child: Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 30.0, vertical: 10),
+                                decoration: BoxDecoration(
+                                    color: Colors.green,
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    boxShadow: shadowMidColor),
+                                child: const Text(
+                                  'SUBMIT',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
+                                )),
                           ),
                         ),
                         SizedBox(height: 50),
@@ -1040,7 +1061,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
     return showValidator != ''
         ? Text(
             showValidator,
-            style: TextStyle(color: Colors.redAccent[100]),
+            style: TextStyle(color: Colors.red),
           )
         : SizedBox();
   }
@@ -1281,6 +1302,8 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                 ],
               ),
             ),
+            SizedBox(height: 5.0),
+            _labelValidator(dateValidator),
           ],
         ),
       ),

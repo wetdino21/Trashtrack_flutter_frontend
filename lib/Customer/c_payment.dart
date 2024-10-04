@@ -18,7 +18,7 @@ class C_PaymentScreen extends StatelessWidget {
           Text(
             '  Payment History',
             style: TextStyle(
-              color: Colors.grey,
+              color: white,
               fontSize: 18.0,
             ),
           ),

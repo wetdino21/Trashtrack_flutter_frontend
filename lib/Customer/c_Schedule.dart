@@ -99,144 +99,141 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
       backgroundColor: deepGreen,
       appBar: C_CustomAppBar(title: 'Schedule'), //Schedule
       drawer: C_Drawer(),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          await _fetchBookingData();
-        },
-        child: ListView(
-          children: [
-            Container(
-              margin: EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: white,
-                boxShadow: shadowBigColor,
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(16.0),
-                    margin: EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                      color: white,
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                    child: Text(
-                      'Book now?',
-                      style: TextStyle(
-                          fontSize: 16.0, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  Center(
-                    child: Container(
-                      decoration: BoxDecoration(boxShadow: shadowColor),
-                      child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => RequestPickupScreen(),
-                              ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: deepPurple,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15.0),
-                            ),
-                            padding: EdgeInsets.symmetric(
-                                vertical: 16.0, horizontal: 16.0),
-                          ),
-                          child: Icon(
-                            Icons.keyboard_arrow_right_outlined,
-                            color: Colors.white,
-                          )),
-                    ),
-                  ),
-                ],
-              ),
+      body: ListView(
+        children: [
+          Container(
+            margin: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: white,
+              boxShadow: shadowMidColor,
+              borderRadius: BorderRadius.circular(10.0),
             ),
-            SizedBox(height: 20.0),
-            SizedBox(height: 10.0),
-            Column(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding: EdgeInsets.all(16.0),
+                  margin: EdgeInsets.all(5),
                   decoration: BoxDecoration(
                     color: white,
-                    boxShadow: shadowBigColor,
-                    borderRadius: BorderRadius.circular(5.0),
+                    borderRadius: BorderRadius.circular(20.0),
                   ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(boxShadow: shadowColor),
-                          child: ElevatedButton(
-                            onPressed: () => onPageSelected(0),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: selectedPage == 0
-                                  ? Colors.deepPurple
-                                  : white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5.0),
-                              ),
-                            ),
-                            child: Text(
-                              'Current',
-                              style: TextStyle(
-                                color: selectedPage == 0
-                                    ? Colors.white
-                                    : Colors.black,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(boxShadow: shadowColor),
-                          child: ElevatedButton(
-                            onPressed: () => onPageSelected(1),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: selectedPage == 1
-                                  ? Colors.deepPurple
-                                  : white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5.0),
-                              ),
-                            ),
-                            child: Text(
-                              'History',
-                              style: TextStyle(
-                                color: selectedPage == 1
-                                    ? Colors.white
-                                    : Colors.black,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    'Book now?',
+                    style:
+                        TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
                   ),
                 ),
-                SizedBox(height: 20.0),
-                Container(
-                  height: MediaQuery.of(context).size.height * .6,
-                  //height: MediaQuery.of(context).size.height - kBottomNavigationBarHeight,
-                  //padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: PageView(
-                    controller: _pageController,
-                    onPageChanged: (index) {
-                      setState(() {
-                        selectedPage = index;
-                      });
-                    },
-                    children: [
-                      // Current Schedule
+                Center(
+                  child: Container(
+                    decoration: BoxDecoration(boxShadow: shadowColor),
+                    child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => RequestPickupScreen(),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: deepGreen,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15.0),
+                          ),
+                          padding: EdgeInsets.symmetric(
+                              vertical: 16.0, horizontal: 16.0),
+                        ),
+                        child: Icon(
+                          Icons.keyboard_arrow_right_outlined,
+                          color: Colors.white,
+                        )),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 10.0),
+          Column(
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: white,
+                  boxShadow: shadowMidColor,
+                  borderRadius: BorderRadius.circular(5.0),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(boxShadow: shadowColor),
+                        child: ElevatedButton(
+                          onPressed: () => onPageSelected(0),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                selectedPage == 0 ? Colors.deepPurple : white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5.0),
+                            ),
+                          ),
+                          child: Text(
+                            'Current',
+                            style: TextStyle(
+                              color: selectedPage == 0
+                                  ? Colors.white
+                                  : Colors.black,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(boxShadow: shadowColor),
+                        child: ElevatedButton(
+                          onPressed: () => onPageSelected(1),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                selectedPage == 1 ? Colors.deepPurple : white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5.0),
+                            ),
+                          ),
+                          child: Text(
+                            'History',
+                            style: TextStyle(
+                              color: selectedPage == 1
+                                  ? Colors.white
+                                  : Colors.black,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 20.0),
+              Container(
+                height: MediaQuery.of(context).size.height * .58,
+                //height: MediaQuery.of(context).size.height - kBottomNavigationBarHeight,
+                //padding: EdgeInsets.symmetric(horizontal: 10),
+                child: PageView(
+                  controller: _pageController,
+                  onPageChanged: (index) {
+                    setState(() {
+                      selectedPage = index;
+                    });
+                  },
+                  children: [
+                    // Current Schedule
 
-                      isLoading
+                    RefreshIndicator(
+                      onRefresh: () async {
+                        await _fetchBookingData();
+                      },
+                      child: isLoading
                           ? AnimatedBuilder(
                               animation: _controller,
                               builder: (context, child) {
@@ -284,17 +281,38 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                                 );
                               })
                           : bookingList == null
-                              ? Center(
-                                  child: Text(
-                                  'No available Current Schedule.\n\n\n\n',
-                                  style: TextStyle(
-                                      color: accentColor, fontSize: 20),
-                                ))
+                              ? ListView(
+                                  children: [
+                                    Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        SizedBox(
+                                          height: 100,
+                                        ),
+                                        Text(
+                                          'No Available Current Schedule .\n\n\n\n',
+                                          style: TextStyle(
+                                              color: white, fontSize: 20),
+                                        ),
+                                        SizedBox(
+                                          height: 100,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                )
                               : ListView.builder(
-                                  itemCount: bookingList?.length ?? 0,
+                                  itemCount: bookingList?.length == null
+                                      ? 0
+                                      : bookingList!.length + 1,
                                   itemBuilder: (context, index) {
+                                    if (index == 0) {
+                                      return SizedBox(height: 20.0);
+                                    }
+
                                     // Safely retrieve the booking details from bookingList
-                                    final booking = bookingList?[index];
+                                    final booking = bookingList?[index - 1];
 
                                     if (booking == null) {
                                       return SizedBox.shrink();
@@ -361,9 +379,14 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                                     return Container();
                                   },
                                 ),
+                    ),
 
-                      // History Schedule
-                      isLoading
+                    // History Schedule
+                    RefreshIndicator(
+                      onRefresh: () async {
+                        await _fetchBookingData();
+                      },
+                      child: isLoading
                           ? AnimatedBuilder(
                               animation: _controller,
                               builder: (context, child) {
@@ -414,14 +437,19 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                               ? Center(
                                   child: Text(
                                   'No available Scheduled History.\n\n\n\n',
-                                  style: TextStyle(
-                                      color: accentColor, fontSize: 20),
+                                  style: TextStyle(color: white, fontSize: 20),
                                 ))
                               : ListView.builder(
-                                  itemCount: bookingList?.length ?? 0,
+                                  itemCount: bookingList?.length == null
+                                      ? 0
+                                      : bookingList!.length + 1,
                                   itemBuilder: (context, index) {
+                                    if (index == 0) {
+                                      return SizedBox(height: 20.0);
+                                    }
+
                                     // Safely retrieve the booking details from bookingList
-                                    final booking = bookingList?[index];
+                                    final booking = bookingList?[index - 1];
 
                                     if (booking == null) {
                                       return SizedBox.shrink();
@@ -488,13 +516,13 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                                     return Container();
                                   },
                                 ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
       ),
       bottomNavigationBar: C_BottomNavBar(
         currentIndex: 2,

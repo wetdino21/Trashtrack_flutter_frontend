@@ -7,6 +7,7 @@ class C_CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final String title;
 
   C_CustomAppBar({required this.title});
+   //C_CustomAppBar({required this.title, Key? key}) : super(key: key); 
 
   @override
   _C_CustomAppBarState createState() => _C_CustomAppBarState();
@@ -16,6 +17,7 @@ class C_CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class _C_CustomAppBarState extends State<C_CustomAppBar> {
+ 
   Uint8List? imageBytes;
 
   @override
@@ -87,7 +89,7 @@ class _C_CustomAppBarState extends State<C_CustomAppBar> {
             decoration: BoxDecoration(
               color: deepPurple,
               shape: BoxShape.circle,
-              border: Border.all(width: 2, color: Colors.green),
+              border: Border.all(width: 2, color: deepPurple),
             ),
             child: imageBytes != null
                 ? CircleAvatar(

@@ -29,9 +29,9 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: deepPurple,
+      backgroundColor: deepGreen,
       appBar: AppBar(
-        backgroundColor: deepPurple,
+        backgroundColor: deepGreen,
         foregroundColor: Colors.white,
         leading: IconButton(
             onPressed: () {

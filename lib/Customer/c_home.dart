@@ -10,7 +10,6 @@ import 'package:trashtrack/styles.dart';
 import 'package:trashtrack/user_date.dart';
 import 'package:flutter_cube/flutter_cube.dart';
 
-
 class C_HomeScreen extends StatefulWidget {
   @override
   State<C_HomeScreen> createState() => _C_HomeScreenState();
@@ -29,7 +28,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
   @override
   void initState() {
     super.initState();
-     _obj = Object(
+    _obj = Object(
       scale: Vector3(12.0, 12.0, 12.0),
       //position: Vector3(0, 0, 0),
       rotation: Vector3(0, -90, 0), // Start sideways
@@ -83,9 +82,15 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
         appBar: C_CustomAppBar(
           title: 'Home',
         ),
-        drawer: C_Drawer(currentIndex: 0,),
+        drawer: C_Drawer(
+          currentIndex: 0,
+        ),
         body: RefreshIndicator(
           onRefresh: _dbData,
+          // onRefresh: () async {
+          //   Navigator.push(context,
+          //       MaterialPageRoute(builder: (context) => C_HomeScreen()));
+          // },
           child: isLoading
               ? Center(child: CircularProgressIndicator())
               : userData != null
@@ -96,7 +101,9 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            SizedBox(height: 20,),
+                            SizedBox(
+                              height: 20,
+                            ),
                             // ElevatedButton(
                             //     onPressed: () async {
                             //       bool onLocation =
@@ -125,6 +132,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                                     'Welcome ${userData!['fname']}!',
                                     style: TextStyle(
                                       fontSize: 24.0,
+                                      color: deepPurple,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -165,7 +173,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                                                 //         Vector3(0, -90, 0),
                                                 //     fileName:
                                                 //         'assets/objects/base.obj'));
-                                                 scene.world.add(_obj);
+                                                scene.world.add(_obj);
                                               },
                                             ),
                                           ),
@@ -178,9 +186,8 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                                   SizedBox(height: 20.0),
                                   Center(
                                     child: Container(
-                                      decoration: BoxDecoration(
-                                        boxShadow: shadowColor
-                                      ),
+                                      decoration:
+                                          BoxDecoration(boxShadow: shadowColor),
                                       child: ElevatedButton(
                                         onPressed: () {
                                           Navigator.push(
@@ -235,7 +242,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                                 child: Container(
                                   decoration: BoxDecoration(
                                     color: white,
-                                    boxShadow: shadowBigColor,
+                                    boxShadow: shadowMidColor,
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: ListTile(
@@ -321,7 +328,7 @@ class StatisticBox extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: white,
-        boxShadow: shadowBigColor,
+        boxShadow: shadowMidColor,
         borderRadius: BorderRadius.circular(15.0),
       ),
       padding: EdgeInsets.all(16.0),

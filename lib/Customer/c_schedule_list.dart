@@ -50,17 +50,16 @@ class C_ScheduleCardList extends StatelessWidget {
           decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10.0),
-              boxShadow: shadowBigColor),
+              boxShadow: shadowMidColor),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 padding: EdgeInsets.all(5),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(7),
-                  color: Colors.deepPurpleAccent,
-                  boxShadow: shadowColor
-                ),
+                    borderRadius: BorderRadius.circular(7),
+                    color: Colors.deepPurpleAccent,
+                    boxShadow: shadowColor),
                 child: Column(
                   children: [
                     Align(
@@ -1060,139 +1059,146 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                       borderRadius: BorderRadius.vertical(
                                           bottom: Radius.circular(10)),
                                     ),
-                                    child: Container(
-                                      height: 100,
-                                      padding: EdgeInsets.all(5),
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          //color: Colors.white.withOpacity(.6),
-                                          color: Colors.white,
-                                          boxShadow: shadowColor),
-                                      child: Row(
-                                        // mainAxisAlignment: MainAxisAlignment.start,
-                                        // crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Expanded(
-                                              flex: 1,
-                                              child: Container(
-                                                  height: 35,
-                                                  width: 30,
-                                                  padding:
-                                                      EdgeInsets.only(left: 2),
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            50),
-                                                    //color: Colors.white.withOpacity(.6),
-                                                    color: Colors.grey[300],
-                                                  ),
-                                                  alignment:
-                                                      Alignment.centerLeft,
-                                                  child: Icon(
-                                                    Icons.pin_drop,
-                                                    size: 30,
-                                                    color: Colors.redAccent,
-                                                  ))),
-                                          Expanded(
-                                              flex: 10,
-                                              child: Container(
-                                                  padding:
-                                                      EdgeInsets.only(left: 10),
-                                                  alignment:
-                                                      Alignment.centerLeft,
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Expanded(
-                                                          flex: 1,
-                                                          child: Row(
-                                                            children: [
-                                                              Text(
+                                    child: IntrinsicHeight(
+                                      child: Container(
+                                        padding: EdgeInsets.all(5),
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            //color: Colors.white.withOpacity(.6),
+                                            color: Colors.white,
+                                            boxShadow: shadowColor),
+                                        child: Row(
+                                          // mainAxisAlignment: MainAxisAlignment.start,
+                                          // crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Expanded(
+                                                flex: 1,
+                                                child: Container(
+                                                    height: 35,
+                                                    width: 30,
+                                                    padding: EdgeInsets.only(
+                                                        left: 2),
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              50),
+                                                      //color: Colors.white.withOpacity(.6),
+                                                      color: Colors.grey[300],
+                                                    ),
+                                                    alignment:
+                                                        Alignment.centerLeft,
+                                                    child: Icon(
+                                                      Icons.pin_drop,
+                                                      size: 30,
+                                                      color: Colors.redAccent,
+                                                    ))),
+                                            Expanded(
+                                                flex: 10,
+                                                child: Container(
+                                                    padding: EdgeInsets.only(
+                                                        left: 10),
+                                                    alignment:
+                                                        Alignment.centerLeft,
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Row(
+                                                           crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: [
+                                                            Expanded(
+                                                              child: Text(
                                                                 fullname,
                                                                 style: TextStyle(
                                                                     fontWeight:
                                                                         FontWeight
                                                                             .bold,
                                                                     fontSize:
-                                                                        17),
+                                                                        15),
+                                                                softWrap: true,
                                                               ),
-                                                              Text(
-                                                                  '   | +(63)${contact}',
+                                                            ),
+                                                            Expanded(
+                                                              child: Text(
+                                                                  '    |  +(63)${contact}',
                                                                   style:
                                                                       TextStyle(
                                                                     color: Colors
                                                                         .grey,
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
                                                                   )),
-                                                            ],
-                                                          )),
-                                                      Expanded(
-                                                          flex: 2,
-                                                          child: Text(
-                                                            '${street} \n${address}',
-                                                          )),
-                                                      Expanded(
-                                                          flex: 1,
-                                                          child: Row(
-                                                            children: [
-                                                              Container(
-                                                                padding:
-                                                                    EdgeInsets
-                                                                        .all(2),
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              3),
-                                                                  //color: Colors.white.withOpacity(.6),
-                                                                  border: Border.all(
-                                                                      color: Colors
-                                                                          .red),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        Expanded(
+                                                            flex: 2,
+                                                            child: Text(
+                                                              '${street} \n${address}',
+                                                            )),
+                                                        Expanded(
+                                                            flex: 1,
+                                                            child: Row(
+                                                              children: [
+                                                                Container(
+                                                                  padding:
+                                                                      EdgeInsets
+                                                                          .all(
+                                                                              2),
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    borderRadius:
+                                                                        BorderRadius
+                                                                            .circular(3),
+                                                                    //color: Colors.white.withOpacity(.6),
+                                                                    border: Border.all(
+                                                                        color: Colors
+                                                                            .red),
+                                                                  ),
+                                                                  child: Text(
+                                                                    'Default',
+                                                                    style: TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .bold,
+                                                                        color: Colors
+                                                                            .red[300]),
+                                                                  ),
                                                                 ),
-                                                                child: Text(
-                                                                  'Default',
-                                                                  style: TextStyle(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      color: Colors
-                                                                              .red[
-                                                                          300]),
+                                                                SizedBox(
+                                                                  width: 5,
                                                                 ),
-                                                              ),
-                                                              SizedBox(
-                                                                width: 5,
-                                                              ),
-                                                              Container(
-                                                                padding:
-                                                                    EdgeInsets
-                                                                        .all(2),
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              3),
-                                                                  //color: Colors.white.withOpacity(.6),
-                                                                  border: Border.all(
-                                                                      color: Colors
-                                                                          .grey),
+                                                                Container(
+                                                                  padding:
+                                                                      EdgeInsets
+                                                                          .all(
+                                                                              2),
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    borderRadius:
+                                                                        BorderRadius
+                                                                            .circular(3),
+                                                                    //color: Colors.white.withOpacity(.6),
+                                                                    border: Border.all(
+                                                                        color: Colors
+                                                                            .grey),
+                                                                  ),
+                                                                  child: Text(
+                                                                    'Pickup Address',
+                                                                    style: TextStyle(
+                                                                        color: Colors
+                                                                            .black54),
+                                                                  ),
                                                                 ),
-                                                                child: Text(
-                                                                  'Pickup Address',
-                                                                  style: TextStyle(
-                                                                      color: Colors
-                                                                          .black54),
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          )),
-                                                    ],
-                                                  ))),
-                                        ],
+                                                              ],
+                                                            )),
+                                                      ],
+                                                    ))),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),

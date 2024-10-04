@@ -1,55 +1,68 @@
 import 'package:flutter/material.dart';
 
-final Color deepGreen = Color(0xFF388E3C);
+const Color deepGreen = Color(0xFF388E3C);
 //final Color backgroundColor = Color(0xFF001E00);
 // final Color accentColor = Color(0xFF6AA920);
-final Color buttonColor = Color(0xFF86BF3E);
-final Color boxColor = Color(0xFF103510);
-final Color accentColor = Colors.greenAccent;
-final Color iconBoxColor = Color(0xFF001E03);
+const Color buttonColor = Color(0xFF86BF3E);
+const Color boxColor = Color(0xFF103510);
+const Color accentColor = Colors.greenAccent;
+const Color iconBoxColor = Color(0xFF001E03);
 //final Color deepGreen= Color(0xFF388E3C);
-final Color deepPurple = Colors.deepPurple;
-final Color darkPurple = Color(0xFF3A0F63); // A darker purple shade
+const Color deepPurple = Colors.deepPurple;
+const Color darkPurple = Color(0xFF3A0F63); // A darker purple shade
 
-final Color white = Colors.white;
+const Color white = Colors.white;
 
-final List<BoxShadow> shadowColor = [
+List<BoxShadow> shadowColor = [
   BoxShadow(
-    color: Colors.grey.withOpacity(0.5), // Adjust opacity as needed
-    blurRadius: 5,
-    spreadRadius: 2,
-    offset: Offset(0, 3), // Position of the shadow
+    color: Colors.grey.withOpacity(0.7),
+    spreadRadius: 2, // Softness of the shadow
+    blurRadius: 5, // How much the shadow spreads
+    offset: Offset(3, 3), //Offset(-5, -5) right  and bottom
   ),
 ];
 
-final List<BoxShadow> shadowBigColor = [
-  const BoxShadow(
-    color: Colors.black, // Adjust opacity as needed
+List<BoxShadow> shadowBigColor = [
+  BoxShadow(
+    color: Colors.black.withOpacity(.7),
+    spreadRadius: 5,
     blurRadius: 20,
-    spreadRadius: 2,
-    offset: Offset(0, 3), // Position of the shadow
+    offset: Offset(5, 5), // Position of the shadow
+  ),
+];
+
+List<BoxShadow> shadowMidColor = [
+  BoxShadow(
+    color: Colors.black.withOpacity(.7),
+    spreadRadius: 5,
+    blurRadius: 10,
+    offset: Offset(5, 5), // Only right (5px) and bottom (5px) shadow
   ),
 ];
 
 //snackbar
 void showErrorSnackBar(BuildContext context, String errorMessage) {
-  ScaffoldMessenger.of(context).clearSnackBars(); // Clear existing SnackBars
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text(errorMessage),
-      backgroundColor: Colors.red,
-    ),
-  );
+  if (context.mounted) {
+    ScaffoldMessenger.of(context).clearSnackBars(); // Clear existing SnackBars
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(errorMessage),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
 }
 
 void showSuccessSnackBar(BuildContext context, String successMessage) {
-  ScaffoldMessenger.of(context).clearSnackBars(); // Clear existing SnackBars
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text(successMessage),
-      backgroundColor: Colors.green,
-    ),
-  );
+  if (context.mounted) {
+    ScaffoldMessenger.of(context).clearSnackBars(); // Clear existing SnackBars
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(successMessage),
+        backgroundColor: Colors.green,
+      ),
+    );
+  }
 }
 
 class CustomOverlay extends StatelessWidget {

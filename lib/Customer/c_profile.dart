@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:trashtrack/Customer/c_home.dart';
 import 'package:trashtrack/api_postgre_service.dart';
 import 'package:trashtrack/api_token.dart';
 import 'package:trashtrack/styles.dart';
@@ -32,7 +33,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
   final TextEditingController _postalController = TextEditingController();
 
   final ImagePicker _picker = ImagePicker();
-  XFile? _imageFile;
+  XFile? imageFile;
 
   bool _showProvinceDropdown = false;
   bool _showCityMunicipalityDropdown = false;
@@ -90,7 +91,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
       setState(() {
         userData = data;
         isLoading = false;
-        _setData();
+        _resetData();
         // imageBytes = userData!['profile'];
 
         // _fnameController.text = userData!['fname'];
@@ -123,9 +124,9 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
     }
   }
 
-  void _setData() {
+  void _resetData() {
     setState(() {
-      _imageFile = null;
+      imageFile = null;
       imageBytes = userData!['profile'];
 
       _fnameController.text = userData!['fname'];
@@ -161,7 +162,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
 
     if (pickedFile != null) {
       setState(() {
-        _imageFile = pickedFile;
+        imageFile = pickedFile;
       });
       //  print('Image selected: ${pickedFile.path}');
     } else {
@@ -177,7 +178,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
 
     if (pickedFile != null) {
       setState(() {
-        _imageFile = pickedFile;
+        imageFile = pickedFile;
       });
       // print('Image selected: ${pickedFile.path}');
     } else {
@@ -191,8 +192,8 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
       height: 200,
       width: 200,
       color: Colors.deepPurple, // Set the desired color here
-      child: _imageFile != null
-          ? Image.file(File(_imageFile!.path)) // Display the selected image
+      child: imageFile != null
+          ? Image.file(File(imageFile!.path)) // Display the selected image
           : Center(child: Text('No image selected')),
     );
   }
@@ -356,7 +357,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
   }
 
   void _cancelEdit() {
-    if (_imageFile != null ||
+    if (imageFile != null ||
         _fnameController.text != userData!['fname'] ||
         _mnameController.text != userData!['mname'] ||
         _lnameController.text != userData!['lname'] ||
@@ -401,7 +402,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
               onPressed: () {
                 setState(() {
                   _isEditing = false;
-                  _setData();
+                  _resetData();
                 });
                 Navigator.of(context).pop();
               },
@@ -418,7 +419,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
     bool goodEmail = false;
     bool goodContact = false;
     //check if anything changes
-    if (_imageFile != null ||
+    if (imageFile != null ||
         _fnameController.text != userData!['fname'] ||
         _mnameController.text != userData!['mname'] ||
         _lnameController.text != userData!['lname'] ||
@@ -522,7 +523,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
       if (_isEditing) {
         setState(() {
           _isEditing = false;
-          _setData();
+          _resetData();
         });
       } else {
         Navigator.pop(context);
@@ -573,12 +574,19 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                               children: [
                                 InkWell(
                                   onTap: () {
-                                    //
-                                    if (_isEditing) _pickImageGallery();
+                                    // if (imageBytes != null ||
+                                    //     _imageFile != null) {
+                                    //}
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => _imagePreview(
+                                              context, imageFile, imageBytes)),
+                                    );
                                   },
                                   child: Stack(
                                     children: [
-                                      imageBytes != null || _imageFile != null
+                                      imageBytes != null || imageFile != null
                                           ? Container(
                                               padding: EdgeInsets.all(7),
                                               decoration: BoxDecoration(
@@ -588,10 +596,10 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                                   color: Colors.deepPurple),
                                               child: CircleAvatar(
                                                 radius: 50,
-                                                backgroundImage: _imageFile !=
+                                                backgroundImage: imageFile !=
                                                         null
                                                     ? FileImage(
-                                                        File(_imageFile!.path))
+                                                        File(imageFile!.path))
                                                     : MemoryImage(imageBytes!),
                                               ),
                                             )
@@ -616,6 +624,8 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                               onTap: () {
                                                 // _pickImageGallery();
                                                 //_pickImageCamera();
+                                                if (_isEditing)
+                                                  _pickImageGallery();
                                               },
                                               child: Container(
                                                 padding: EdgeInsets.all(7),
@@ -1134,6 +1144,9 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                     ],
                                   )
                                 : Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       _labelField(
                                           label: 'Full Name',
@@ -1175,27 +1188,60 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Text(
             label,
             style: TextStyle(
-              color: Colors.grey,
-              fontSize: 16.0,
+                color: Colors.grey,
+                fontSize: 16.0,
+                fontWeight: FontWeight.bold),
+          ),
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            decoration: BoxDecoration(
+                color: white,
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: shadowColor),
+            child: Text(
+              value,
+              style: TextStyle(
+                color: Colors.grey[900],
+                fontSize: 18.0,
+                //shadows: shadowColor
+              ),
             ),
           ),
-          Text(
-            value,
-            style: TextStyle(
-              color: Colors.grey[900],
-              fontSize: 18.0,
-              fontWeight: FontWeight.bold,
-              //shadows: shadowColor
-            ),
-          ),
-          Divider(
-            color: Colors.deepPurple,
-          ),
+          SizedBox(height: 10)
+          // Divider(
+          //   color: Colors.deepPurple.withOpacity(0.5),
+          // ),
         ],
+      ),
+    );
+  }
+
+  Widget _imagePreview(BuildContext context, final XFile? imageFile,
+      final Uint8List? imageBytes) {
+    return Scaffold(
+      appBar: AppBar(),
+      body: Center(
+        child: imageFile != null
+            ? Image.file(File(imageFile.path))
+            : imageBytes != null
+                ? Image.memory(imageBytes)
+                : Container(
+                    padding: EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                        color: deepPurple,
+                        borderRadius: BorderRadius.circular(100)),
+                    child: Icon(
+                      Icons.person,
+                      size: 100,
+                      color: white,
+                    ),
+                  ),
       ),
     );
   }
@@ -1375,9 +1421,63 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
               child: Text('Cancel', style: TextStyle(color: Colors.white)),
             ),
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _showConfirmationDialog(context);
+              onPressed: () async {
+                //convert the pic
+                Uint8List? photoBytes;
+                if (imageFile != null) {
+                  photoBytes = await imageFile!
+                      .readAsBytes(); // Read bytes from the XFile
+                } else if (userData!['profile'] != null) {
+                  photoBytes = userData!['profile'];
+                }
+
+                String? updateMsg = await userUpdate(
+                    context,
+                    userData!['id'],
+                    _fnameController.text,
+                    _mnameController.text,
+                    _lnameController.text,
+                    _emailController.text,
+                    photoBytes,
+                    '0' + _contactController.text,
+                    _selectedProvinceName!,
+                    _selectedCityMunicipalityName!,
+                    _selectedBarangayName!,
+                    _streetController.text,
+                    _postalController.text);
+
+                if (updateMsg == 'success') {
+                  setState(() {
+                    isLoading = true;
+                  });
+                  // setState(() {
+                  //   _resetData();
+                  //   _isEditing = false;
+                  // });
+                  // Navigator.of(context).pop();
+
+                  if (!mounted) return;
+                  await _dbData();
+                  setState(() {
+                    _resetData();
+                    _isEditing = false;
+
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(builder: (context) => C_HomeScreen()),
+                    // );
+                    setState(() {
+                      isLoading = false;
+                    });
+                    
+                    Navigator.of(context).pop();
+                  });
+                } else {
+                  showErrorSnackBar(
+                      context, 'Something went wrong. Please try again later.');
+                }
+
+                //_showConfirmationDialog(context);
               },
               child: Text('Yes', style: TextStyle(color: Colors.white)),
             ),
@@ -1675,50 +1775,50 @@ class SettingsScreen extends StatelessWidget {
 //     );
 //   }
 
-void _showConfirmationDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        backgroundColor: Colors.green[900],
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(20.0))),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.check_circle, color: Colors.green, size: 60),
-            SizedBox(height: 20),
-            Text(
-              'Profile Saved!',
-              style: TextStyle(color: Colors.white, fontSize: 24),
-            ),
-            SizedBox(height: 10),
-            Text(
-              'Your information details has been successfully changed.',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white, fontSize: 16),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                // Continue updating details or other actions here
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                padding: EdgeInsets.symmetric(vertical: 15, horizontal: 80),
-              ),
-              child: Text(
-                'Okay',
-                style: TextStyle(color: Colors.black, fontSize: 16),
-              ),
-            ),
-          ],
-        ),
-      );
-    },
-  );
-}
+// void _showConfirmationDialog(BuildContext context) {
+//   showDialog(
+//     context: context,
+//     builder: (BuildContext context) {
+//       return AlertDialog(
+//         backgroundColor: Colors.green[900],
+//         shape: RoundedRectangleBorder(
+//             borderRadius: BorderRadius.all(Radius.circular(20.0))),
+//         content: Column(
+//           mainAxisSize: MainAxisSize.min,
+//           children: [
+//             Icon(Icons.check_circle, color: Colors.green, size: 60),
+//             SizedBox(height: 20),
+//             Text(
+//               'Profile Saved!',
+//               style: TextStyle(color: Colors.white, fontSize: 24),
+//             ),
+//             SizedBox(height: 10),
+//             Text(
+//               'Your information details has been successfully changed.',
+//               textAlign: TextAlign.center,
+//               style: TextStyle(color: Colors.white, fontSize: 16),
+//             ),
+//             SizedBox(height: 20),
+//             ElevatedButton(
+//               onPressed: () {
+//                 Navigator.of(context).pop();
+//                 // Continue updating details or other actions here
+//               },
+//               style: ElevatedButton.styleFrom(
+//                 backgroundColor: Colors.green,
+//                 shape: RoundedRectangleBorder(
+//                   borderRadius: BorderRadius.circular(10),
+//                 ),
+//                 padding: EdgeInsets.symmetric(vertical: 15, horizontal: 80),
+//               ),
+//               child: Text(
+//                 'Okay',
+//                 style: TextStyle(color: Colors.black, fontSize: 16),
+//               ),
+//             ),
+//           ],
+//         ),
+//       );
+//     },
+//   );
+// }

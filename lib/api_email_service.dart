@@ -89,9 +89,9 @@ Future<String?> sendEmailCodeForgotPass(String email) async {
     print('Good Email');
     return null; // No error, return null
   } else if (response.statusCode == 400) {
-    print('No associated account with this email!');
+    print('No associated account with this email.');
 
-    return 'No associated account with this email!'; // Return the error message from the server
+    return 'No associated account with this email.'; // Return the error message from the server
   } else if (response.statusCode == 429) {
     print('Too many requests. Please try again later.');
 

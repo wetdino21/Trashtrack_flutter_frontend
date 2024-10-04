@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:trashtrack/styles.dart';
 
 class C_BottomNavBar extends StatelessWidget {
   final int currentIndex;

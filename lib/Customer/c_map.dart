@@ -1193,7 +1193,8 @@ class _C_MapScreenState extends State<C_MapScreen> {
           //floating 2 btns
           !hideScreen
               ? Positioned(
-                  bottom: 200,
+                  //bottom: 200,
+                  bottom: MediaQuery.of(context).size.height *0.2,
                   right: 0,
                   child: Column(
                     children: [

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:trashtrack/api_network.dart';
 import 'package:trashtrack/api_token.dart';
+import 'package:trashtrack/styles.dart';
 import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
 // import 'package:app_links/app_links.dart';
-
 
 String baseUrl = globalUrl();
 
@@ -54,8 +54,26 @@ Future<void> launchPaymentLink(BuildContext context) async {
         throw Exception('No checkout URL in the response');
       }
     } else {
-      throw Exception('Failed to create payment intent');
+      if (response.statusCode == 401) {
+        // Access token might be expired, attempt to refresh it
+        print('Access token expired. Attempting to refresh...');
+        String? refreshMsg = await refreshAccessToken(context);
+        if (refreshMsg == null) {
+          return await launchPaymentLink(context);
+        }
+      } else if (response.statusCode == 403) {
+        // Access token is invalid. Logout
+        print('Access token invalid. Attempting to logout...');
+        showErrorSnackBar(
+            context, 'Active time has been expired. Please login again.');
+        await deleteTokens(context); // Logout user
+      } else {
+        print('Error updating user: ${response.body}');
+        showErrorSnackBar(context, 'Error updating user: ${response.body}');
+      }
     }
+    print('Unable to access the link!');
+    return;
   } catch (error) {
     print('Error: $error');
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -73,45 +91,61 @@ Future<void> launchPaymentLink2(BuildContext context) async {
     return;
   }
 
- try {
-      // API call to backend to create payment intent
-      final response = await http.post(
-        Uri.parse('$baseUrl/payment_link2'), // Backend endpoint
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'amount': 10000, // 100.00 PHP (amount in centavos)
-        }),
-      );
+  try {
+    // API call to backend to create payment intent
+    final response = await http.post(
+      Uri.parse('$baseUrl/payment_link2'), // Backend endpoint
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'amount': 10000, // 100.00 PHP (amount in centavos)
+      }),
+    );
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-       
-        // Get the checkoutUrl from the response
-        final checkoutUrl = data['checkoutUrl'];
-         print(checkoutUrl);
-        if (checkoutUrl != null) {
-          // Open the checkout URL
-          await _launchPaymentUrl(checkoutUrl);
-        } else {
-          throw Exception('No checkout URL in the response');
-        }
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+
+      // Get the checkoutUrl from the response
+      final checkoutUrl = data['checkoutUrl'];
+      print(checkoutUrl);
+      if (checkoutUrl != null) {
+        // Open the checkout URL
+        await _launchPaymentUrl(checkoutUrl);
       } else {
-        throw Exception('Failed to create payment intent');
+        throw Exception('No checkout URL in the response');
       }
-    } catch (error) {
-      print('Error: $error');
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Error creating payment link'),
-      ));
-    } 
-    // finally {
-    //   setState(() {
-    //     _loading = false;
-    //   });
-    // }
+    } else {
+      if (response.statusCode == 401) {
+        // Access token might be expired, attempt to refresh it
+        print('Access token expired. Attempting to refresh...');
+        String? refreshMsg = await refreshAccessToken(context);
+        if (refreshMsg == null) {
+          return await launchPaymentLink2(context);
+        }
+      } else if (response.statusCode == 403) {
+        // Access token is invalid. Logout
+        print('Access token invalid. Attempting to logout...');
+        showErrorSnackBar(
+            context, 'Active time has been expired. Please login again.');
+        await deleteTokens(context); // Logout user
+      } else {
+        print('Error updating user: ${response.body}');
+        showErrorSnackBar(context, 'Error updating user: ${response.body}');
+      }
+    }
+    print('Unable to access the link!');
+    return;
+  } catch (error) {
+    print('Error: $error');
+    showErrorSnackBar(context, 'Error payment link');
+  }
+  // finally {
+  //   setState(() {
+  //     _loading = false;
+  //   });
+  // }
 }
 
 /////

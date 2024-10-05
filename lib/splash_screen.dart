@@ -28,9 +28,10 @@ class _SplashScreenState extends State<SplashScreen> {
           PageView(
             controller: _controller,
             children: [
-              Image.asset('assets/splash1.jpg', fit: BoxFit.cover),
-              Image.asset('assets/splash2.jpg', fit: BoxFit.cover),
-              Image.asset('assets/splash3.jpg', fit: BoxFit.cover),
+              Image.asset('assets/trashtrack1.jpg', fit: BoxFit.cover),
+              Image.asset('assets/trashtrack2.jpg', fit: BoxFit.cover),
+              Image.asset('assets/trashtrack3.jpg', fit: BoxFit.cover),
+              Image.asset('assets/trashtrack4.jpg', fit: BoxFit.cover),
             ],
           ),
 
@@ -57,32 +58,32 @@ class _SplashScreenState extends State<SplashScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                 Text(
-                      "TrashTrack",
-                      style: TextStyle(
-                        fontSize: 50,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        letterSpacing: 1.0,
-                      ),
-                    ),
+                Text(
+                  "TrashTrack",
+                  style: TextStyle(
+                    fontSize: 50,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    letterSpacing: 1.0,
+                  ),
+                ),
                 SizedBox(height: 20),
 
                 Text(
-                      "Welcome to our TrashTrack! \n We've got your waste needs covered, \n from residential to commercial, big or small.",
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white,
-                        letterSpacing: 0.5,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+                  "Welcome to TrashTrack! \n We've got your waste needs covered, \n from residential to commercial, big or small.",
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                    letterSpacing: 0.5,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
                 SizedBox(height: 40),
 
                 // Dots Indicator
                 SmoothPageIndicator(
                   controller: _controller,
-                  count: 3,
+                  count: 4,
                   effect: WormEffect(
                     dotHeight: 18,
                     dotWidth: 18,

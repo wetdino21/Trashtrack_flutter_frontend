@@ -73,6 +73,47 @@ Future<String?> sendEmailCodeCreateAcc(String email) async {
   }
 }
 
+// send email code Create Acc
+Future<String?> sendCodeEmailUpdate(String email) async {
+  final baseUrl = Uri.parse('$BaseUrl/send_code_email_update');
+
+  final response = await http.post(
+    baseUrl,
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      'email': email,
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    print('Good Email to create');
+    return null; // No error, return null
+  } else if (response.statusCode == 400) {
+    print('Email is already taken!');
+
+    return 'Email is already taken!'; // Return the error message from the server
+  } else if (response.statusCode == 429) {
+    print('Too many requests. Please try again later.');
+
+    // Parse the JSON response body
+    final Map<String, dynamic> responseBody = jsonDecode(response.body);
+
+    // Get the timeremain value
+    final int timeremain = responseBody['timeremain'] ?? 0;
+
+    // Convert timeremain from milliseconds to seconds (or minutes, if needed)
+    final int secondsRemaining = (timeremain / 1000).ceil();
+
+    // Show the remaining time in the message
+    return 'Too many requests try again later for $secondsRemaining seconds.';
+    //return 'Too many requests try again later for 1 minute.'; // Return the error message from the server
+  } else {
+    //print('Error response: ${response.body}');
+    print('Failed to send verification code');
+    return 'error';
+  }
+}
+
 // send email code ForgotPass
 Future<String?> sendEmailCodeForgotPass(String email) async {
   final baseUrl = Uri.parse('$BaseUrl/send_code_forgotpass');

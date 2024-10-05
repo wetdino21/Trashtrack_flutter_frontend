@@ -17,6 +17,7 @@ class C_HomeScreen extends StatefulWidget {
 
 class _C_HomeScreenState extends State<C_HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  
   //user data
   Map<String, dynamic>? userData;
   //Box<dynamic>? userData;
@@ -61,6 +62,13 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
     }
   }
 
+  // @override
+  // void didChangeDependencies() {
+  //   super.didChangeDependencies();
+  //   // Refresh the app bar when dependencies change
+  //   appbarKey.currentState?.loadProfileImage();
+  // }
+
 //////////////////////////////////
   @override
   Widget build(BuildContext context) {
@@ -87,10 +95,6 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
         ),
         body: RefreshIndicator(
           onRefresh: _dbData,
-          // onRefresh: () async {
-          //   Navigator.push(context,
-          //       MaterialPageRoute(builder: (context) => C_HomeScreen()));
-          // },
           child: isLoading
               ? Center(child: CircularProgressIndicator())
               : userData != null
@@ -98,6 +102,16 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                       padding: EdgeInsets.symmetric(
                           horizontal: 16.0, vertical: 16.0),
                       children: [
+                        // InkWell(
+                        //   child: Text('data'),
+                        //   onTap: (){
+                        //   setState(() {
+                        //     deepGreen = Colors.grey;
+                        //     deepPurple = Colors.grey;
+                        //     darkPurple = Colors.grey;
+                        //   });
+                        // }),
+
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [

@@ -3,7 +3,11 @@ import 'package:http/http.dart' as http;
 import 'package:trashtrack/api_network.dart';
 import 'package:trashtrack/api_token.dart';
 import 'package:flutter/material.dart';
+
 import 'package:trashtrack/styles.dart';
+
+import 'package:provider/provider.dart'; 
+import 'package:trashtrack/data_model.dart';
 
 //final String baseUrl = 'http://localhost:3000';
 
@@ -27,8 +31,18 @@ Future<Map<String, dynamic>?> fetchCusData(BuildContext context) async {
     },
   );
   if (response.statusCode == 200) {
+    // final data = jsonDecode(response.body);
+    
+    // // Access the provider and update the user data
+    // Provider.of<UserData>(context, listen: false).setUserData(
+    //   data['cus_fname'],
+    //   data['cus_lname'],
+    //   data['cus_email'],
+    // );
+
     return jsonDecode(response.body);
   } else {
+    showErrorSnackBar(context, 'User not found!');
     if (response.statusCode == 401) {
       // Access token might be expired, attempt to refresh it
       print('Access token expired. Attempting to refresh...');
@@ -136,7 +150,7 @@ Future<List<Map<String, dynamic>>?> fetchCusNotifications(
       // Access token is invalid. logout
       print('Access token invalid. Attempting to logout...');
       await deleteTokens(context); // Logout user
-    } else if (response.statusCode == 404){
+    } else if (response.statusCode == 404) {
       print('No notification found');
       return null;
     }

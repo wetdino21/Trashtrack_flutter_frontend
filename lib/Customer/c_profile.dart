@@ -1,9 +1,8 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:trashtrack/Customer/c_home.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:trashtrack/api_email_service.dart';
 import 'package:trashtrack/api_postgre_service.dart';
-import 'package:trashtrack/api_token.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:flutter/services.dart';
 import 'package:trashtrack/api_address.dart';
@@ -21,7 +20,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
   Map<String, dynamic>? userData;
   bool isLoading = true;
   String? errorMessage;
-  Uint8List? imageBytes; // To store the image bytes
+  Uint8List? imageBytes;
   bool _isEditing = false;
 
   final TextEditingController _fnameController = TextEditingController();
@@ -34,6 +33,8 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
 
   final ImagePicker _picker = ImagePicker();
   XFile? imageFile;
+  late final PanelController _panelController;
+  bool isPanelOpen = false;
 
   bool _showProvinceDropdown = false;
   bool _showCityMunicipalityDropdown = false;
@@ -65,11 +66,24 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
   String postalvalidator = '';
   bool emailChanged = false;
 
+  int _currentStep = 1;
+
+  //email verification
+  final List<TextEditingController> _codeControllers =
+      List.generate(6, (_) => TextEditingController());
+  int _timerSeconds = 300;
+  late Timer _timer;
+  late int onResendCode;
+
   @override
   void initState() {
     super.initState();
     // _loadProvinces();
+    _panelController = PanelController();
+
     _dbData();
+    _startTimer();
+    _timer.cancel();
   }
 
   @override
@@ -81,6 +95,9 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
     _contactController.dispose();
     _streetController.dispose();
     _postalController.dispose();
+
+    _timer.cancel();
+    _codeControllers.forEach((controller) => controller.dispose());
     super.dispose();
   }
 
@@ -124,6 +141,77 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
     }
   }
 
+  //email
+  void _startTimer() {
+    //_timer.cancel();
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (mounted) {
+        // Check if the widget is still mounted
+        if (_timerSeconds > 0) {
+          setState(() {
+            _timerSeconds--;
+          });
+        } else {
+          timer.cancel();
+        }
+      }
+    });
+  }
+
+  // Function to resend the code
+  void _resendCode() async {
+    setState(() {
+      isLoading = true;
+    });
+    // Call your function to resend the code
+    String? errorMessage = await sendCodeEmailUpdate(_emailController.text);
+    if (errorMessage != null) {
+      showErrorSnackBar(context, errorMessage);
+      setState(() {
+        isLoading = false;
+      });
+    } else {
+      // Reset timer seconds and start a new timer
+      setState(() {
+        _timer.cancel();
+        _codeControllers.forEach((controller) => controller.clear());
+        _startTimer();
+        _timerSeconds = 300; // Reset to initial countdown value
+        //_timer.cancel();
+      });
+      setState(() {
+        isLoading = false;
+      });
+      showSuccessSnackBar(context, 'Successfully sent new code');
+    }
+  }
+
+  String _formatTimer(int seconds) {
+    final minutes = (seconds ~/ 60).toString().padLeft(2, '0');
+    final secs = (seconds % 60).toString().padLeft(2, '0');
+    return '$minutes:$secs';
+  }
+
+  String enteredCode = '';
+  // Function to combine the text of all controllers
+  void updateEnteredCode() {
+    setState(() {
+      enteredCode =
+          _codeControllers.map((controller) => controller.text).join();
+    });
+  }
+
+  //verify code validator
+  String? _validateCode() {
+    String enteredCode =
+        _codeControllers.map((controller) => controller.text).join();
+    if (enteredCode.length < 6) {
+      return 'Please enter the full code';
+    }
+
+    return null;
+  }
+
   void _resetData() {
     setState(() {
       imageFile = null;
@@ -155,6 +243,10 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
   }
 
   Future<void> _pickImageGallery() async {
+    _panelController.close();
+    setState(() {
+      isPanelOpen = false;
+    });
     final XFile? pickedFile = await _picker.pickImage(
       source: ImageSource.gallery,
       imageQuality: 100, // Set image quality (0-100)
@@ -171,6 +263,10 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
   }
 
   Future<void> _pickImageCamera() async {
+    _panelController.close();
+    setState(() {
+      isPanelOpen = false;
+    });
     final XFile? pickedFile = await _picker.pickImage(
       source: ImageSource.camera,
       imageQuality: 100, // Set image quality (0-100)
@@ -375,7 +471,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
           _isEditing = false;
         });
       } else {
-        Navigator.pop(context);
+        Navigator.pop(context, true);
       }
     }
   }
@@ -499,25 +595,14 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
 
       //final check
       if (goodData && goodEmail && goodContact) {
-        print('successs update');
-        _showConfirmChangeDialog(context);
-        // String? createMessage = await ssss(
-        //     context,
-        //     _emailController.text,
-        //     _fnameController.text,
-        //     _mnameController.text,
-        //     _lnameController.text,
-        //     ('0' + _contactController.text),
-        //     _selectedProvinceName,
-        //     _selectedCityMunicipalityName,
-        //     _selectedBarangayName,
-        //     _streetController.text,
-        //     _postalController.text);
-        // if (createMessage != null) {
-        //   showErrorSnackBar(context, createMessage);
-        // } else {
-        //   //success
-        // }
+        if (_emailController.text != userData!['email']) {
+          _resendCode();
+          setState(() {
+            _currentStep = 2;
+          });
+        } else {
+          _showConfirmChangeDialog(context);
+        }
       }
     } else {
       if (_isEditing) {
@@ -534,10 +619,79 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.deepPurple,
+      backgroundColor: deepGreen,
+      body: Stack(
+        children: [
+          Column(
+            children: [
+              Expanded(
+                child: _currentStep == 1 ? _firstPage() : _secondPage(),
+              ),
+              // PopScope(
+              //     canPop: false,
+              //     onPopInvokedWithResult: (didPop, result) async {
+              //       if (didPop) {
+              //         return;
+              //       }
+              //       // _backToSignIn();
+              //     },
+              //     child: Container()),
+            ],
+          ),
+          if (isPanelOpen)
+            Positioned.fill(
+              child: InkWell(
+                onTap: () {
+                  _panelController.close();
+                  setState(() {
+                    isPanelOpen = false;
+                  });
+                },
+                child: Container(
+                  color: Colors.black.withOpacity(0.3),
+                ),
+              ),
+            ),
+          SlidingUpPanel(
+            controller: _panelController,
+            minHeight: 0, // Start closed
+            maxHeight: MediaQuery.of(context).size.height * 0.3,
+            panel: _panelContent(),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            onPanelClosed: () {
+              setState(() {
+                isPanelOpen = false;
+              });
+            },
+          ),
+          //  if (_panelController.isPanelOpen)
+          //   Positioned.fill(child: GestureDetector(onTap: () {
+          //     _panelController.close();
+          //   })),
+          if (isLoading)
+            Positioned.fill(
+                child: InkWell(
+              child: Center(
+                child: CircularProgressIndicator(
+                  color: Colors.green,
+                  strokeWidth: 10,
+                  strokeAlign: 2,
+                  backgroundColor: Colors.deepPurple,
+                ),
+              ),
+            )),
+        ],
+      ),
+    );
+  }
+
+  //1st page
+  Widget _firstPage() {
+    return Scaffold(
+      backgroundColor: deepPurple,
       appBar: AppBar(
-        backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white,
+        backgroundColor: deepPurple,
+        foregroundColor: white,
         title: Text(_isEditing ? 'Edit Profile' : 'Profile'),
       ),
       body: RefreshIndicator(
@@ -545,637 +699,931 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
           //await _loadProvinces();
           await _dbData();
         },
-        child: isLoading
-            ? Center(child: CircularProgressIndicator())
-            : userData != null
-                ? ListView(
+        child: userData != null
+            ? ListView(
+                children: [
+                  Column(
                     children: [
-                      Column(
-                        children: [
-                          PopScope(
-                              canPop: false,
-                              onPopInvokedWithResult: (didPop, result) async {
-                                if (didPop) {
-                                  return;
-                                }
-                                _cancelEdit();
+                      PopScope(
+                          canPop: false,
+                          onPopInvokedWithResult: (didPop, result) async {
+                            if (didPop) {
+                              return;
+                            }
+                            _cancelEdit();
+                          },
+                          child: Container()),
+                      Container(
+                        width: double.infinity,
+                        margin: EdgeInsets.all(20),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 100, vertical: 20),
+                        decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            boxShadow: shadowBigColor,
+                            borderRadius: BorderRadius.circular(15)),
+                        child: Column(
+                          children: [
+                            InkWell(
+                              onTap: () {
+                                // if (imageBytes != null ||
+                                //     _imageFile != null) {
+                                //}
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => _imagePreview(
+                                          context, imageFile, imageBytes)),
+                                );
                               },
-                              child: Container()),
-                          Container(
-                            width: double.infinity,
-                            margin: EdgeInsets.all(20),
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 100, vertical: 20),
-                            decoration: BoxDecoration(
-                                color: Colors.grey[200],
-                                boxShadow: shadowBigColor,
-                                borderRadius: BorderRadius.circular(15)),
-                            child: Column(
-                              children: [
-                                InkWell(
-                                  onTap: () {
-                                    // if (imageBytes != null ||
-                                    //     _imageFile != null) {
-                                    //}
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => _imagePreview(
-                                              context, imageFile, imageBytes)),
-                                    );
-                                  },
-                                  child: Stack(
-                                    children: [
-                                      imageBytes != null || imageFile != null
-                                          ? Container(
-                                              padding: EdgeInsets.all(7),
+                              child: Stack(
+                                children: [
+                                  imageBytes != null || imageFile != null
+                                      ? Container(
+                                          padding: EdgeInsets.all(7),
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(80),
+                                              boxShadow: shadowColor,
+                                              color: Colors.deepPurple),
+                                          child: CircleAvatar(
+                                            radius: 50,
+                                            backgroundImage: imageFile != null
+                                                ? FileImage(
+                                                    File(imageFile!.path))
+                                                : MemoryImage(imageBytes!),
+                                          ),
+                                        )
+                                      : Container(
+                                          padding: EdgeInsets.all(7),
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(80),
+                                              boxShadow: shadowColor,
+                                              color: Colors.deepPurple),
+                                          child: Icon(
+                                            Icons.person,
+                                            size: 100,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                  if (_isEditing)
+                                    Positioned(
+                                        bottom: 0,
+                                        right: 0,
+                                        child: InkWell(
+                                          onTap: () {
+                                            //_pickImageCamera();
+                                            // if (_isEditing)
+                                            //   _pickImageGallery();
+
+                                            if (_isEditing) {
+                                              _panelController.open();
+                                              setState(() {
+                                                isPanelOpen = true;
+                                              });
+                                            }
+                                          },
+                                          child: Container(
+                                            padding: EdgeInsets.all(7),
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(50),
+                                                color: Colors.grey[200]),
+                                            child: Container(
+                                              padding: EdgeInsets.all(5),
                                               decoration: BoxDecoration(
                                                   borderRadius:
-                                                      BorderRadius.circular(80),
-                                                  boxShadow: shadowColor,
-                                                  color: Colors.deepPurple),
-                                              child: CircleAvatar(
-                                                radius: 50,
-                                                backgroundImage: imageFile !=
-                                                        null
-                                                    ? FileImage(
-                                                        File(imageFile!.path))
-                                                    : MemoryImage(imageBytes!),
-                                              ),
-                                            )
-                                          : Container(
-                                              padding: EdgeInsets.all(7),
-                                              decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(80),
-                                                  boxShadow: shadowColor,
+                                                      BorderRadius.circular(50),
                                                   color: Colors.deepPurple),
                                               child: Icon(
-                                                Icons.person,
-                                                size: 100,
+                                                Icons.photo_camera,
                                                 color: Colors.white,
                                               ),
                                             ),
-                                      if (_isEditing)
-                                        Positioned(
-                                            bottom: 0,
-                                            right: 0,
-                                            child: InkWell(
-                                              onTap: () {
-                                                // _pickImageGallery();
-                                                //_pickImageCamera();
-                                                if (_isEditing)
-                                                  _pickImageGallery();
-                                              },
-                                              child: Container(
-                                                padding: EdgeInsets.all(7),
-                                                decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            50),
-                                                    color: Colors.grey[200]),
-                                                child: Container(
-                                                  padding: EdgeInsets.all(5),
-                                                  decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              50),
-                                                      color: Colors.deepPurple),
-                                                  child: Icon(
-                                                    Icons.photo_camera,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                              ),
-                                            ))
+                                          ),
+                                        ))
+                                ],
+                              ),
+                            ),
+                            if (!_isEditing)
+                              InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    _isEditing = true;
+                                  });
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.all(5),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 10),
+                                  decoration: BoxDecoration(
+                                      boxShadow: shadowColor,
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: Colors.deepPurple),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.edit_outlined,
+                                        color: Colors.white,
+                                      ),
+                                      Text(
+                                        'Edit Profile',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold),
+                                      ),
                                     ],
                                   ),
                                 ),
-                                if (!_isEditing)
-                                  InkWell(
-                                    onTap: () {
+                              ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(
+                          right: 20,
+                          left: 20,
+                          bottom: 50,
+                        ),
+                        padding: EdgeInsets.all(15),
+                        decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            boxShadow: shadowBigColor,
+                            borderRadius: BorderRadius.circular(15)),
+                        child: _isEditing
+                            ? Column(
+                                children: [
+                                  _buildTextField(
+                                    controller: _fnameController,
+                                    hintText: 'First Name',
+                                    onChanged: (value) {
                                       setState(() {
-                                        _isEditing = true;
+                                        fnamevalidator = _validateFname(
+                                            value); // Trigger validation on text change
                                       });
                                     },
-                                    child: Container(
-                                      margin: EdgeInsets.all(5),
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 20, vertical: 10),
-                                      decoration: BoxDecoration(
-                                          boxShadow: shadowColor,
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          color: Colors.deepPurple),
-                                      child: Row(
-                                        children: [
-                                          Icon(
-                                            Icons.edit_outlined,
-                                            color: Colors.white,
-                                          ),
-                                          Text(
-                                            'Edit Profile',
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
                                   ),
-                              ],
-                            ),
-                          ),
-                          Container(
-                            margin: EdgeInsets.only(
-                              right: 20,
-                              left: 20,
-                              bottom: 50,
-                            ),
-                            padding: EdgeInsets.all(15),
-                            decoration: BoxDecoration(
-                                color: Colors.grey[200],
-                                boxShadow: shadowBigColor,
-                                borderRadius: BorderRadius.circular(15)),
-                            child: _isEditing
-                                ? Column(
-                                    children: [
-                                      _buildTextField(
-                                        controller: _fnameController,
-                                        hintText: 'First Name',
-                                        onChanged: (value) {
-                                          setState(() {
-                                            fnamevalidator = _validateFname(
-                                                value); // Trigger validation on text change
-                                          });
-                                        },
-                                      ),
-                                      _labelValidator(fnamevalidator),
-                                      const SizedBox(height: 5),
-                                      _buildTextField(
-                                        controller: _mnameController,
-                                        hintText: 'Middle Name (Optional)',
-                                        onChanged: (value) {
-                                          setState(() {
-                                            mnamevalidator = _validateMname(
-                                                value); // Trigger validation on text change
-                                          });
-                                        },
-                                      ),
-                                      _labelValidator(mnamevalidator),
-                                      const SizedBox(height: 5),
-                                      _buildTextField(
-                                        controller: _lnameController,
-                                        hintText: 'Last Name',
-                                        onChanged: (value) {
-                                          setState(() {
-                                            lnamevalidator = _validateLname(
-                                                value); // Trigger validation on text change
-                                          });
-                                        },
-                                      ),
-                                      _labelValidator(lnamevalidator),
-                                      const SizedBox(height: 5),
-                                      _buildTextField(
-                                        controller: _emailController,
-                                        hintText: 'Email',
-                                        onChanged: (value) {
-                                          setState(() {
-                                            emailvalidator = _validateEmail(
-                                                value); // Trigger validation on text change
-                                          });
-                                        },
-                                      ),
-                                      _labelValidator(emailvalidator),
-                                      const SizedBox(height: 5),
-                                      _buildNumberField(
-                                        inputFormatters: [
-                                          FilteringTextInputFormatter
-                                              .digitsOnly,
-                                          LengthLimitingTextInputFormatter(10),
-                                        ],
-                                      ),
-                                      _labelValidator(contactvalidator),
-                                      const SizedBox(height: 20),
-                                      Center(
-                                          child: Text(
-                                        'Complete Address',
-                                        style: TextStyle(
-                                            fontSize: 20, color: Colors.grey),
-                                      )),
-                                      const SizedBox(height: 20),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            '  Province/City or Municipality/Barangay',
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.grey[700]),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(5),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Container(
-                                                  padding: EdgeInsets.symmetric(
-                                                      vertical: 5.0,
-                                                      horizontal: 15),
-                                                  decoration: BoxDecoration(
-                                                      color: Colors.white,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10.0),
-                                                      boxShadow: shadowColor),
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      // Show selected values
-                                                      Expanded(
-                                                        child: Text(
-                                                          _selectedProvinceName ==
-                                                                  null
-                                                              ? 'Select Province'
-                                                              : _selectedCityMunicipalityName ==
-                                                                      null
-                                                                  ? '${_selectedProvinceName} / '
-                                                                  : _selectedBarangayName ==
-                                                                          null
-                                                                      ? '${_selectedProvinceName} / ${_selectedCityMunicipalityName} / '
-                                                                      : '${_selectedProvinceName} / '
-                                                                          '${_selectedCityMunicipalityName} / '
-                                                                          '${_selectedBarangayName}',
-                                                          style: TextStyle(
-                                                              fontSize: 16.0),
-                                                          overflow: TextOverflow
-                                                              .visible, // Allow wrapping
-                                                          softWrap:
-                                                              true, // Enable soft wrapping
-                                                        ),
-                                                      ),
-                                                      IconButton(
-                                                          icon: Icon(
-                                                            Icons.clear,
-                                                            color: Colors
-                                                                .deepPurple,
-                                                          ),
-                                                          onPressed: () {
-                                                            //close
-                                                            _loadProvinces();
-                                                            setState(() {
-                                                              _showCityMunicipalityDropdown =
-                                                                  false;
-                                                              _showBarangayDropdown =
-                                                                  false;
-
-                                                              _selectedProvinceName =
-                                                                  null;
-                                                              _selectedCityMunicipalityName =
-                                                                  null;
-                                                              _selectedBarangayName =
-                                                                  null;
-                                                            });
-                                                          })
-                                                    ],
-                                                  ),
-                                                ),
-                                                if (_showProvinceDropdown)
-                                                  Container(
-                                                    height: 100,
-                                                    margin:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 10),
-                                                    decoration: BoxDecoration(
-                                                        color: Colors.deepPurple
-                                                            .withOpacity(0.7),
-                                                        borderRadius:
-                                                            BorderRadius.vertical(
-                                                                bottom: Radius
-                                                                    .circular(
-                                                                        15)),
-                                                        boxShadow: shadowColor),
-                                                    child: ListView.builder(
-                                                      itemCount:
-                                                          _provinces.length,
-                                                      itemBuilder:
-                                                          (context, index) {
-                                                        final city =
-                                                            _provinces[index];
-
-                                                        return InkWell(
-                                                          onTap: () {
-                                                            setState(() {
-                                                              _loadCitiesMunicipalities(
-                                                                  city[
-                                                                      'code']); // Load barangays for the selected city
-
-                                                              _selectedProvinceName =
-                                                                  city[
-                                                                      'name']; // Set by name
-                                                              _showProvinceDropdown =
-                                                                  false;
-                                                              _showCityMunicipalityDropdown =
-                                                                  true;
-                                                            });
-                                                          },
-                                                          child: Container(
-                                                            padding: EdgeInsets
-                                                                .symmetric(
-                                                                    vertical:
-                                                                        10,
-                                                                    horizontal:
-                                                                        15),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              border: Border(
-                                                                  bottom: BorderSide(
-                                                                      color: Colors
-                                                                          .grey
-                                                                          .shade300)),
-                                                            ),
-                                                            child: Text(
-                                                              city[
-                                                                  'name'], // Display the name
-                                                              style: TextStyle(
-                                                                  fontSize: 16,
-                                                                  color: Colors
-                                                                      .white),
-                                                            ),
-                                                          ),
-                                                        );
-                                                      },
-                                                    ),
-                                                  ),
-                                                if (_showCityMunicipalityDropdown)
-                                                  Container(
-                                                    height: 400,
-                                                    margin:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 10),
-                                                    decoration: BoxDecoration(
-                                                        color: Colors.deepPurple
-                                                            .withOpacity(0.7),
-                                                        borderRadius:
-                                                            BorderRadius.vertical(
-                                                                bottom: Radius
-                                                                    .circular(
-                                                                        15)),
-                                                        boxShadow: shadowColor),
-                                                    child: ListView.builder(
-                                                      itemCount:
-                                                          _citiesMunicipalities
-                                                              .length,
-                                                      itemBuilder:
-                                                          (context, index) {
-                                                        final city =
-                                                            _citiesMunicipalities[
-                                                                index];
-
-                                                        return InkWell(
-                                                          onTap: () {
-                                                            setState(() {
-                                                              _loadBarangays(
-                                                                  city['code']);
-
-                                                              _selectedCityMunicipalityName =
-                                                                  city['name'];
-                                                              _showCityMunicipalityDropdown =
-                                                                  false;
-                                                              _showBarangayDropdown =
-                                                                  true;
-                                                            });
-                                                          },
-                                                          child: Container(
-                                                            padding: EdgeInsets
-                                                                .symmetric(
-                                                                    vertical:
-                                                                        10,
-                                                                    horizontal:
-                                                                        15),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              border: Border(
-                                                                  bottom: BorderSide(
-                                                                      color: Colors
-                                                                          .grey
-                                                                          .shade300)),
-                                                            ),
-                                                            child: Text(
-                                                              city[
-                                                                  'name'], // Display the name
-                                                              style: TextStyle(
-                                                                  fontSize: 16,
-                                                                  color: Colors
-                                                                      .white),
-                                                            ),
-                                                          ),
-                                                        );
-                                                      },
-                                                    ),
-                                                  ),
-
-                                                //brgy ddl
-                                                if (_showBarangayDropdown)
-                                                  Container(
-                                                    height: 400,
-                                                    margin:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 10),
-                                                    decoration: BoxDecoration(
-                                                        color: Colors.deepPurple
-                                                            .withOpacity(0.7),
-                                                        borderRadius:
-                                                            BorderRadius.vertical(
-                                                                bottom: Radius
-                                                                    .circular(
-                                                                        15)),
-                                                        boxShadow: shadowColor),
-                                                    child: ListView.builder(
-                                                      itemCount:
-                                                          _barangays.length,
-                                                      itemBuilder:
-                                                          (context, index) {
-                                                        final city =
-                                                            _barangays[index];
-
-                                                        return InkWell(
-                                                          onTap: () {
-                                                            setState(() {
-                                                              _selectedBarangayName =
-                                                                  city['name'];
-                                                              _showBarangayDropdown =
-                                                                  false;
-                                                            });
-                                                          },
-                                                          child: Container(
-                                                            padding: EdgeInsets
-                                                                .symmetric(
-                                                                    vertical:
-                                                                        10,
-                                                                    horizontal:
-                                                                        15),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              border: Border(
-                                                                  bottom: BorderSide(
-                                                                      color: Colors
-                                                                          .grey
-                                                                          .shade300)),
-                                                            ),
-                                                            child: Text(
-                                                              city[
-                                                                  'name'], // Display the name
-                                                              style: TextStyle(
-                                                                  fontSize: 16,
-                                                                  color: Colors
-                                                                      .white),
-                                                            ),
-                                                          ),
-                                                        );
-                                                      },
-                                                    ),
-                                                  )
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      if (_selectedProvinceName == null ||
-                                          _selectedCityMunicipalityName ==
-                                              null ||
-                                          _selectedBarangayName == null)
-                                        Text(
-                                          'Please select your adrress.',
-                                          style: TextStyle(color: Colors.red),
-                                        ),
-                                      const SizedBox(height: 5),
-                                      _buildTextField(
-                                        controller: _streetController,
-                                        hintText:
-                                            'Street Name, Building, House No.',
-                                        onChanged: (value) {
-                                          setState(() {
-                                            streetvalidator = _validateStreet(
-                                                value); // Trigger validation on text change
-                                          });
-                                        },
-                                      ),
-                                      _labelValidator(streetvalidator),
-                                      const SizedBox(height: 5),
-                                      _buildTextField(
-                                        controller: _postalController,
-                                        keyboardType: TextInputType.number,
-                                        inputFormatters: [
-                                          FilteringTextInputFormatter
-                                              .digitsOnly,
-                                          LengthLimitingTextInputFormatter(4),
-                                        ],
-                                        hintText: 'Postal Code',
-                                        onChanged: (value) {
-                                          setState(() {
-                                            postalvalidator = _validatePostalCode(
-                                                value); // Trigger validation on text change
-                                            //print(_postalController.text);
-                                          });
-                                        },
-                                      ),
-                                      _labelValidator(postalvalidator),
-                                      const SizedBox(height: 20),
-                                      SizedBox(height: 20),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          InkWell(
-                                            onTap: () {
-                                              _checkChanges();
-                                            },
-                                            child: Container(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 40.0,
-                                                  vertical: 10),
-                                              decoration: BoxDecoration(
-                                                  color: Colors.green[500],
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  boxShadow: shadowColor),
-                                              child: Text(
-                                                'SAVE',
-                                                style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 16,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(width: 20),
-                                          InkWell(
-                                            onTap: () {
-                                              _cancelEdit();
-                                            },
-                                            child: Container(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 30.0,
-                                                  vertical: 10),
-                                              decoration: BoxDecoration(
-                                                  color: Colors.blue[700],
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  boxShadow: shadowColor),
-                                              child: Text(
-                                                'CANCEL',
-                                                style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 16,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                                  _labelValidator(fnamevalidator),
+                                  const SizedBox(height: 5),
+                                  _buildTextField(
+                                    controller: _mnameController,
+                                    hintText: 'Middle Name (Optional)',
+                                    onChanged: (value) {
+                                      setState(() {
+                                        mnamevalidator = _validateMname(
+                                            value); // Trigger validation on text change
+                                      });
+                                    },
+                                  ),
+                                  _labelValidator(mnamevalidator),
+                                  const SizedBox(height: 5),
+                                  _buildTextField(
+                                    controller: _lnameController,
+                                    hintText: 'Last Name',
+                                    onChanged: (value) {
+                                      setState(() {
+                                        lnamevalidator = _validateLname(
+                                            value); // Trigger validation on text change
+                                      });
+                                    },
+                                  ),
+                                  _labelValidator(lnamevalidator),
+                                  const SizedBox(height: 5),
+                                  _buildTextField(
+                                    controller: _emailController,
+                                    hintText: 'Email',
+                                    onChanged: (value) {
+                                      setState(() {
+                                        emailvalidator = _validateEmail(
+                                            value); // Trigger validation on text change
+                                      });
+                                    },
+                                  ),
+                                  _labelValidator(emailvalidator),
+                                  const SizedBox(height: 5),
+                                  _buildNumberField(
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.digitsOnly,
+                                      LengthLimitingTextInputFormatter(10),
                                     ],
-                                  )
-                                : Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
+                                  ),
+                                  _labelValidator(contactvalidator),
+                                  const SizedBox(height: 20),
+                                  Center(
+                                      child: Text(
+                                    'Complete Address',
+                                    style: TextStyle(
+                                        fontSize: 20, color: Colors.grey),
+                                  )),
+                                  const SizedBox(height: 20),
+                                  Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      _labelField(
-                                          label: 'Full Name',
-                                          value:
-                                              '${userData?['fname'] ?? ''} ${userData?['mname'] ?? ''} ${userData?['lname'] ?? ''}'),
-                                      _labelField(
-                                          label: 'Email',
-                                          value: userData?['email'] ?? ''),
-                                      _labelField(
-                                          label: 'Phone Number',
-                                          value: userData?['contact'] ?? ''),
-                                      _labelField(
-                                          label: 'Address',
-                                          value:
-                                              '${userData?['street'] ?? ''}, ${userData?['brgy'] ?? ''}, ${userData?['city'] ?? ''}, ${userData?['province'] ?? ''}, ${userData?['postal'] ?? ''}'),
-                                      _labelField(
-                                          label: 'Status',
-                                          value: userData?['status'] ?? ''),
-                                      _labelField(
-                                          label: 'Type',
-                                          value: userData?['type'] ?? ''),
+                                      Text(
+                                        '  Province/City or Municipality/Barangay',
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.grey[700]),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(5),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 5.0,
+                                                  horizontal: 15),
+                                              decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10.0),
+                                                  boxShadow: shadowColor),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  // Show selected values
+                                                  Expanded(
+                                                    child: Text(
+                                                      _selectedProvinceName ==
+                                                              null
+                                                          ? 'Select Province'
+                                                          : _selectedCityMunicipalityName ==
+                                                                  null
+                                                              ? '${_selectedProvinceName} / '
+                                                              : _selectedBarangayName ==
+                                                                      null
+                                                                  ? '${_selectedProvinceName} / ${_selectedCityMunicipalityName} / '
+                                                                  : '${_selectedProvinceName} / '
+                                                                      '${_selectedCityMunicipalityName} / '
+                                                                      '${_selectedBarangayName}',
+                                                      style: TextStyle(
+                                                          fontSize: 16.0),
+                                                      overflow: TextOverflow
+                                                          .visible, // Allow wrapping
+                                                      softWrap:
+                                                          true, // Enable soft wrapping
+                                                    ),
+                                                  ),
+                                                  IconButton(
+                                                      icon: Icon(
+                                                        Icons.clear,
+                                                        color:
+                                                            Colors.deepPurple,
+                                                      ),
+                                                      onPressed: () {
+                                                        //close
+                                                        _loadProvinces();
+                                                        setState(() {
+                                                          _showCityMunicipalityDropdown =
+                                                              false;
+                                                          _showBarangayDropdown =
+                                                              false;
+
+                                                          _selectedProvinceName =
+                                                              null;
+                                                          _selectedCityMunicipalityName =
+                                                              null;
+                                                          _selectedBarangayName =
+                                                              null;
+                                                        });
+                                                      })
+                                                ],
+                                              ),
+                                            ),
+                                            if (_showProvinceDropdown)
+                                              Container(
+                                                height: 100,
+                                                margin: EdgeInsets.symmetric(
+                                                    horizontal: 10),
+                                                decoration: BoxDecoration(
+                                                    color: Colors.deepPurple
+                                                        .withOpacity(0.7),
+                                                    borderRadius:
+                                                        BorderRadius.vertical(
+                                                            bottom:
+                                                                Radius.circular(
+                                                                    15)),
+                                                    boxShadow: shadowColor),
+                                                child: ListView.builder(
+                                                  itemCount: _provinces.length,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    final city =
+                                                        _provinces[index];
+
+                                                    return InkWell(
+                                                      onTap: () {
+                                                        setState(() {
+                                                          _loadCitiesMunicipalities(
+                                                              city[
+                                                                  'code']); // Load barangays for the selected city
+
+                                                          _selectedProvinceName =
+                                                              city[
+                                                                  'name']; // Set by name
+                                                          _showProvinceDropdown =
+                                                              false;
+                                                          _showCityMunicipalityDropdown =
+                                                              true;
+                                                        });
+                                                      },
+                                                      child: Container(
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                vertical: 10,
+                                                                horizontal: 15),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          border: Border(
+                                                              bottom: BorderSide(
+                                                                  color: Colors
+                                                                      .grey
+                                                                      .shade300)),
+                                                        ),
+                                                        child: Text(
+                                                          city[
+                                                              'name'], // Display the name
+                                                          style: TextStyle(
+                                                              fontSize: 16,
+                                                              color:
+                                                                  Colors.white),
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            if (_showCityMunicipalityDropdown)
+                                              Container(
+                                                height: 400,
+                                                margin: EdgeInsets.symmetric(
+                                                    horizontal: 10),
+                                                decoration: BoxDecoration(
+                                                    color: Colors.deepPurple
+                                                        .withOpacity(0.7),
+                                                    borderRadius:
+                                                        BorderRadius.vertical(
+                                                            bottom:
+                                                                Radius.circular(
+                                                                    15)),
+                                                    boxShadow: shadowColor),
+                                                child: ListView.builder(
+                                                  itemCount:
+                                                      _citiesMunicipalities
+                                                          .length,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    final city =
+                                                        _citiesMunicipalities[
+                                                            index];
+
+                                                    return InkWell(
+                                                      onTap: () {
+                                                        setState(() {
+                                                          _loadBarangays(
+                                                              city['code']);
+
+                                                          _selectedCityMunicipalityName =
+                                                              city['name'];
+                                                          _showCityMunicipalityDropdown =
+                                                              false;
+                                                          _showBarangayDropdown =
+                                                              true;
+                                                        });
+                                                      },
+                                                      child: Container(
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                vertical: 10,
+                                                                horizontal: 15),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          border: Border(
+                                                              bottom: BorderSide(
+                                                                  color: Colors
+                                                                      .grey
+                                                                      .shade300)),
+                                                        ),
+                                                        child: Text(
+                                                          city[
+                                                              'name'], // Display the name
+                                                          style: TextStyle(
+                                                              fontSize: 16,
+                                                              color:
+                                                                  Colors.white),
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+
+                                            //brgy ddl
+                                            if (_showBarangayDropdown)
+                                              Container(
+                                                height: 400,
+                                                margin: EdgeInsets.symmetric(
+                                                    horizontal: 10),
+                                                decoration: BoxDecoration(
+                                                    color: Colors.deepPurple
+                                                        .withOpacity(0.7),
+                                                    borderRadius:
+                                                        BorderRadius.vertical(
+                                                            bottom:
+                                                                Radius.circular(
+                                                                    15)),
+                                                    boxShadow: shadowColor),
+                                                child: ListView.builder(
+                                                  itemCount: _barangays.length,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    final city =
+                                                        _barangays[index];
+
+                                                    return InkWell(
+                                                      onTap: () {
+                                                        setState(() {
+                                                          _selectedBarangayName =
+                                                              city['name'];
+                                                          _showBarangayDropdown =
+                                                              false;
+                                                        });
+                                                      },
+                                                      child: Container(
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                vertical: 10,
+                                                                horizontal: 15),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          border: Border(
+                                                              bottom: BorderSide(
+                                                                  color: Colors
+                                                                      .grey
+                                                                      .shade300)),
+                                                        ),
+                                                        child: Text(
+                                                          city[
+                                                              'name'], // Display the name
+                                                          style: TextStyle(
+                                                              fontSize: 16,
+                                                              color:
+                                                                  Colors.white),
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              )
+                                          ],
+                                        ),
+                                      ),
                                     ],
                                   ),
-                          ),
-                        ],
+                                  if (_selectedProvinceName == null ||
+                                      _selectedCityMunicipalityName == null ||
+                                      _selectedBarangayName == null)
+                                    Text(
+                                      'Please select your adrress.',
+                                      style: TextStyle(color: Colors.red),
+                                    ),
+                                  const SizedBox(height: 5),
+                                  _buildTextField(
+                                    controller: _streetController,
+                                    hintText:
+                                        'Street Name, Building, House No.',
+                                    onChanged: (value) {
+                                      setState(() {
+                                        streetvalidator = _validateStreet(
+                                            value); // Trigger validation on text change
+                                      });
+                                    },
+                                  ),
+                                  _labelValidator(streetvalidator),
+                                  const SizedBox(height: 5),
+                                  _buildTextField(
+                                    controller: _postalController,
+                                    keyboardType: TextInputType.number,
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.digitsOnly,
+                                      LengthLimitingTextInputFormatter(4),
+                                    ],
+                                    hintText: 'Postal Code',
+                                    onChanged: (value) {
+                                      setState(() {
+                                        postalvalidator = _validatePostalCode(
+                                            value); // Trigger validation on text change
+                                        //print(_postalController.text);
+                                      });
+                                    },
+                                  ),
+                                  _labelValidator(postalvalidator),
+                                  const SizedBox(height: 20),
+                                  SizedBox(height: 20),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      InkWell(
+                                        onTap: () {
+                                          _checkChanges();
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 40.0, vertical: 10),
+                                          decoration: BoxDecoration(
+                                              color: Colors.green[500],
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              boxShadow: shadowColor),
+                                          child: Text(
+                                            'SAVE',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: 20),
+                                      InkWell(
+                                        onTap: () {
+                                          _cancelEdit();
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 30.0, vertical: 10),
+                                          decoration: BoxDecoration(
+                                              color: Colors.blue[700],
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              boxShadow: shadowColor),
+                                          child: Text(
+                                            'CANCEL',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              )
+                            : Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  _labelField(
+                                      label: 'Full Name',
+                                      value:
+                                          '${userData?['fname'] ?? ''} ${userData?['mname'] ?? ''} ${userData?['lname'] ?? ''}'),
+                                  _labelField(
+                                      label: 'Email',
+                                      value: userData?['email'] ?? ''),
+                                  _labelField(
+                                      label: 'Phone Number',
+                                      value: userData?['contact'] ?? ''),
+                                  _labelField(
+                                      label: 'Address',
+                                      value:
+                                          '${userData?['street'] ?? ''}, ${userData?['brgy'] ?? ''}, ${userData?['city'] ?? ''}, ${userData?['province'] ?? ''}, ${userData?['postal'] ?? ''}'),
+                                  _labelField(
+                                      label: 'Status',
+                                      value: userData?['status'] ?? ''),
+                                  _labelField(
+                                      label: 'Type',
+                                      value: userData?['type'] ?? ''),
+                                ],
+                              ),
                       ),
                     ],
-                  )
-                : Center(child: Text('Error: $errorMessage')),
+                  ),
+                ],
+              )
+            : Center(child: Text('Error: $errorMessage')),
+      ),
+    );
+  }
+
+  Widget _panelContent() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: 20),
+        Center(
+          child: Container(
+            width: 60,
+            height: 5,
+            decoration: BoxDecoration(
+              color: Colors.grey[400],
+              borderRadius: BorderRadius.circular(2.5),
+            ),
+          ),
+        ),
+        SizedBox(height: 20),
+        Center(
+          child: Text(
+            'Change Profile Picture',
+            style: TextStyle(
+              fontSize: 20,
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 20),
+          height: MediaQuery.of(context).size.height * .2,
+          child: Material(
+            color: Colors.transparent,
+            child: ListView(
+              children: [
+                ListTile(
+                  onTap: _pickImageCamera,
+                  leading: Icon(Icons.camera_alt, color: deepPurple),
+                  title: Text(
+                    "Take Photo",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ),
+                ListTile(
+                  onTap: _pickImageGallery,
+                  leading: Icon(Icons.photo_library, color: deepPurple),
+                  title: Text(
+                    "Choose from Gallery",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  //2nd page
+  Widget _secondPage() {
+    return Scaffold(
+      backgroundColor: deepPurple,
+      appBar: AppBar(
+        backgroundColor: deepPurple,
+        foregroundColor: Colors.white,
+        leading: IconButton(
+            onPressed: () {
+              setState(() {
+                _currentStep--;
+              });
+            },
+            icon: Icon(
+              Icons.arrow_back_ios,
+              color: Colors.white,
+              size: 30,
+            )),
+        //leading: SizedBox(),
+        leadingWidth: 70,
+      ),
+      body: ListView(
+        children: [
+          PopScope(
+              canPop: false,
+              onPopInvokedWithResult: (didPop, result) async {
+                if (didPop) {
+                  return;
+                }
+                setState(() {
+                  _currentStep--;
+                });
+              },
+              child: Container()),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Container(
+              padding: EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(15.0),
+                  boxShadow: shadowBigColor),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Icon(Icons.email, color: deepPurple, size: 100),
+                  Text(
+                    'Check your email',
+                    style: TextStyle(
+                      fontSize: 28,
+                      color: Colors.grey[700],
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 20),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        'We\'ve sent the code to',
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: Colors.black54,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      Text(
+                        _emailController.text,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: deepPurple,
+                        ),
+                        textAlign: TextAlign.center,
+                        softWrap: true,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: List.generate(6, (index) {
+                      return SizedBox(
+                        width: 50,
+                        child: Container(
+                          decoration: BoxDecoration(boxShadow: shadowColor),
+                          child: TextFormField(
+                            cursorColor: deepGreen,
+                            controller: _codeControllers[index],
+                            keyboardType: TextInputType
+                                .number, // Accept characters instead of numbers
+                            textInputAction: TextInputAction
+                                .next, // Moves focus to next field
+                            maxLength: 1,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Colors.white, fontSize: 24),
+                            decoration: InputDecoration(
+                              counterText: '',
+                              filled: true,
+                              fillColor: deepPurple,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                                borderSide: BorderSide.none,
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: deepGreen,
+                                  width: 2.0,
+                                ),
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                            ),
+                            onChanged: (value) {
+                              // Convert input to uppercase
+                              final upperCaseValue = value.toUpperCase();
+                              if (upperCaseValue.length == 1) {
+                                _codeControllers[index].text = upperCaseValue;
+                                _codeControllers[index].selection =
+                                    TextSelection.fromPosition(
+                                  TextPosition(offset: upperCaseValue.length),
+                                );
+
+                                // Automatically move focus to the next field
+                                if (index < 5) {
+                                  FocusScope.of(context).nextFocus();
+                                } else {
+                                  // Close the keyboard when the last textbox is filled
+                                  FocusScope.of(context).unfocus();
+                                }
+                              }
+                              //print(enteredCode);
+                            },
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    'Code expires in: ${_formatTimer(_timerSeconds)}',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: _timerSeconds > 0 ? Colors.orange : Colors.red,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          _resendCode();
+                        },
+                        child: Text(
+                          'Resend Code?',
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontSize: 16.0,
+                            decoration: TextDecoration.underline,
+                            decorationColor: Colors.blue,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  InkWell(
+                    onTap: () async {
+                      String? error = _validateCode();
+                      if (error == null) {
+                        updateEnteredCode(); //to update stored enteredCode
+                        String? errorMessage = await verifyEmailCode(
+                            _emailController.text, enteredCode);
+                        if (errorMessage != null) {
+                          showErrorSnackBar(context, errorMessage);
+                        } else {
+                          //convert the pic
+                          Uint8List? photoBytes;
+                          if (imageFile != null) {
+                            photoBytes = await imageFile!
+                                .readAsBytes(); // Read bytes from the XFile
+                          } else if (userData!['profile'] != null) {
+                            photoBytes = userData!['profile'];
+                          }
+
+                          String? updateMsg = await userUpdate(
+                              context,
+                              userData!['id'],
+                              _fnameController.text,
+                              _mnameController.text,
+                              _lnameController.text,
+                              _emailController.text,
+                              photoBytes,
+                              '0' + _contactController.text,
+                              _selectedProvinceName!,
+                              _selectedCityMunicipalityName!,
+                              _selectedBarangayName!,
+                              _streetController.text,
+                              _postalController.text);
+
+                          if (updateMsg == 'success') {
+                            setState(() {
+                              isLoading = true;
+                            });
+
+                            if (!mounted) return;
+                            await _dbData();
+                            setState(() {
+                              _resetData();
+                              _isEditing = false;
+                              isLoading = false;
+                              //_currentStep--;
+                            });
+
+                            setState(() {
+                              _currentStep--; // Separate this update
+                            });
+                          } else {
+                            showErrorSnackBar(context,
+                                'Something went wrong. Please try again later.');
+                          }
+                        }
+                      } else {
+                        showErrorSnackBar(context, error);
+                      }
+                    },
+                    child: Container(
+                      alignment: Alignment.center,
+                      padding: EdgeInsets.all(16.0),
+                      decoration: BoxDecoration(
+                          color: Colors.green,
+                          borderRadius: BorderRadius.circular(10.0),
+                          boxShadow: shadowColor),
+                      child: Text(
+                        'Verify',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -1422,6 +1870,10 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
             ),
             TextButton(
               onPressed: () async {
+                Navigator.pop(context);
+                setState(() {
+                  isLoading = true;
+                });
                 //convert the pic
                 Uint8List? photoBytes;
                 if (imageFile != null) {
@@ -1447,30 +1899,14 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                     _postalController.text);
 
                 if (updateMsg == 'success') {
-                  setState(() {
-                    isLoading = true;
-                  });
-                  // setState(() {
-                  //   _resetData();
-                  //   _isEditing = false;
-                  // });
-                  // Navigator.of(context).pop();
-
                   if (!mounted) return;
                   await _dbData();
                   setState(() {
                     _resetData();
                     _isEditing = false;
+                    isLoading = false;
 
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(builder: (context) => C_HomeScreen()),
-                    // );
-                    setState(() {
-                      isLoading = false;
-                    });
-                    
-                    Navigator.of(context).pop();
+                    //Navigator.pop(context);
                   });
                 } else {
                   showErrorSnackBar(
@@ -1478,6 +1914,9 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                 }
 
                 //_showConfirmationDialog(context);
+                setState(() {
+                  isLoading = false;
+                });
               },
               child: Text('Yes', style: TextStyle(color: Colors.white)),
             ),
@@ -1488,210 +1927,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
   }
 }
 
-class SettingsScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: deepGreen,
-      appBar: AppBar(
-        backgroundColor: deepGreen,
-        foregroundColor: Colors.white,
-        //iconTheme: IconThemeData(color: accentColor),
-        title: Text('Settings'),
-        // leading: IconButton(
-        //     onPressed: () {
-        //       Navigator.pushNamed(context, 'c_profile');
-        //     },
-        //     icon: Icon(Icons.arrow_back)),
-      ),
-      body: SingleChildScrollView(
-        child: Container(
-          margin: EdgeInsets.all(16.0),
-          padding: EdgeInsets.all(16.0),
-          decoration: BoxDecoration(
-            color: Colors.green[700],
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  color: Colors.green[900],
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-                ),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      backgroundImage: AssetImage(
-                          'assets/anime.jpg'), // Replace with your image asset path
-                      radius: 30,
-                    ),
-                    SizedBox(width: 10),
-                    Text(
-                      'customer Kim',
-                      style: TextStyle(color: Colors.white, fontSize: 18),
-                    ),
-                  ],
-                ),
-              ),
-              ListTile(
-                title:
-                    Text('Edit details', style: TextStyle(color: Colors.white)),
-                trailing: Icon(Icons.arrow_forward_ios, color: Colors.white),
-                onTap: () {
-                  // Handle Edit Profile
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //       builder: (context) => EditProfileScreen()),
-                  // );
-                },
-              ),
-              Divider(color: Colors.grey),
-              ListTile(
-                title: Text('Change password',
-                    style: TextStyle(color: Colors.white)),
-                trailing: Icon(Icons.arrow_forward_ios, color: Colors.white),
-                onTap: () {
-                  Navigator.pushNamed(context, 'change_pass');
-                },
-              ),
-              Divider(color: Colors.grey),
-              ListTile(
-                title: Text('Deactivate Account',
-                    style: TextStyle(color: Colors.white)),
-                trailing: Icon(Icons.arrow_forward_ios, color: Colors.white),
-                onTap: () {
-                  _dectivateAccount(context);
-                },
-              ),
-              Divider(color: Colors.grey),
-              ListTile(
-                title: Text('About us', style: TextStyle(color: Colors.white)),
-                trailing: Icon(Icons.arrow_forward_ios, color: Colors.white),
-                onTap: () {
-                  Navigator.pushNamed(context, 'about_us');
-                },
-              ),
-              Divider(color: Colors.grey),
-              ListTile(
-                title: Text('Privacy policy',
-                    style: TextStyle(color: Colors.white)),
-                trailing: Icon(Icons.arrow_forward_ios, color: Colors.white),
-                onTap: () {
-                  Navigator.pushNamed(context, 'privacy_policy');
-                },
-              ),
-              Divider(color: Colors.grey),
-              ListTile(
-                title: Text('Terms and conditions',
-                    style: TextStyle(color: Colors.white)),
-                trailing: Icon(Icons.arrow_forward_ios, color: Colors.white),
-                onTap: () {
-                  Navigator.pushNamed(context, 'terms');
-                },
-              ),
-              Divider(color: Colors.grey),
-              ListTile(
-                title: Text('Logout Account',
-                    style: TextStyle(color: Colors.white)),
-                trailing: Icon(Icons.arrow_forward_ios, color: Colors.white),
-                onTap: () {
-                  // Handle Logout
-                  showLogoutConfirmationDialog(context);
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 
-  //deactivation confirm
-  void _dectivateAccount(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.green[900],
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(20.0))),
-          title: Text('Deactivate', style: TextStyle(color: Colors.white)),
-          content: Text('Are you sure to deactivate your account?',
-              style: TextStyle(color: Colors.white)),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancel', style: TextStyle(color: Colors.white)),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.pushNamed(context, 'login');
-                _showSuccessDeactivate(context);
-              },
-              child: Text('Yes', style: TextStyle(color: Colors.white)),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  //success deactivation
-  void _showSuccessDeactivate(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.green[900],
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(20.0))),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.check_circle, color: Colors.green, size: 60),
-              SizedBox(height: 20),
-              Text(
-                'Account Deactivated!',
-                style: TextStyle(color: Colors.white, fontSize: 24),
-              ),
-              SizedBox(height: 10),
-              Text(
-                'Your Account has now successfully deactivated.',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white, fontSize: 16),
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  Navigator.pushNamed(context, 'login');
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  padding: EdgeInsets.symmetric(vertical: 15, horizontal: 80),
-                ),
-                child: Text(
-                  'Okay',
-                  style: TextStyle(color: Colors.black, fontSize: 16),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-}
 
 // class EditProfileScreen extends StatelessWidget {
 //   @override

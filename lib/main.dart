@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+// import 'package:provider/provider.dart';
+// import 'package:trashtrack/data_model.dart';
 
 //Customer library
 import 'package:trashtrack/Customer/c_Schedule.dart';
@@ -24,6 +26,7 @@ import 'package:trashtrack/api_token.dart';
 
 //global
 import 'package:trashtrack/create_acc.dart';
+
 import 'package:trashtrack/deactivated.dart';
 import 'package:trashtrack/forgot_pass.dart';
 import 'package:trashtrack/login.dart';
@@ -46,11 +49,17 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     //token
 
+    // return MultiProvider(
+    //   providers: [
+    //     ChangeNotifierProvider(create: (_) => UserData()),
+    //   ],
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       //initialRoute: initialRoute,
       // home: TokenCheck(), // final firt route
       initialRoute: 'c_home', //for testing
+      //initialRoute: 'splash', //for testing
       routes: {
         'splash': (context) => SplashScreen(),
         'terms': (context) => TermsAndConditions(),

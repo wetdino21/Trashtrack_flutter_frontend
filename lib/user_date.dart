@@ -9,6 +9,7 @@ Future<void> storeDataInHive(BuildContext context) async {
   final data = await fetchCusData(context);
 
   if (data == null) {
+    //showErrorSnackBar(context, 'nulllllllllllllllllllllll');
     print('FETCH USER DATA IS NULL');
   } else {
 // Determine the prefix based on the data
@@ -72,7 +73,8 @@ Future<void> storeDataInHive(BuildContext context) async {
     await box.put('profile', imageBytes);
 
     // Optionally, print a message or handle UI updates
-    //print('Data has been saved to Hive.');
+    print('Data has been saved to Hive.');
+    //showErrorSnackBar(context, 'goooooooooooooooooood');
   }
 }
 
@@ -100,8 +102,8 @@ Future<Map<String, dynamic>> userDataFromHive() async {
     'profile': box.get('profile'),
   };
   // Optionally, print a message or handle UI updates
-  //print('Data has been retrieved from Hive.');
-
+  print('Data has been retrieved from Hive.');
+  
   //await box.close();
   return data;
 }

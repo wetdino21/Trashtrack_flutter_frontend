@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:trashtrack/Customer/c_profile.dart';
 import 'package:trashtrack/styles.dart';
 import 'dart:typed_data'; // for Uint8List
 import 'package:trashtrack/user_date.dart';
@@ -6,32 +7,31 @@ import 'package:trashtrack/user_date.dart';
 class C_CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final String title;
 
-  C_CustomAppBar({required this.title});
-   //C_CustomAppBar({required this.title, Key? key}) : super(key: key); 
+  //C_CustomAppBar({required this.title});
+  C_CustomAppBar({required this.title, Key? key}) : super(key: key);
 
   @override
-  _C_CustomAppBarState createState() => _C_CustomAppBarState();
+  C_CustomAppBarState createState() => C_CustomAppBarState();
 
   @override
   Size get preferredSize => Size.fromHeight(kToolbarHeight);
 }
 
-class _C_CustomAppBarState extends State<C_CustomAppBar> {
- 
+class C_CustomAppBarState extends State<C_CustomAppBar> {
   Uint8List? imageBytes;
 
   @override
   void initState() {
     super.initState();
-    _loadProfileImage();
+    loadProfileImage();
   }
 
-  Future<void> _loadProfileImage() async {
+  Future<void> loadProfileImage() async {
     final data = await userDataFromHive();
     setState(() {
-       imageBytes = data['profile'];
+      imageBytes = data['profile'];
     });
-   
+
     //  String? base64Image = await fetchProfile(context);
     //   if (base64Image != null) {
     //     setState(() {
@@ -39,7 +39,7 @@ class _C_CustomAppBarState extends State<C_CustomAppBar> {
     //     });
     //   }
 
-   // await box.close();
+    // await box.close();
   }
 
   @override
@@ -79,7 +79,15 @@ class _C_CustomAppBarState extends State<C_CustomAppBar> {
         ),
         InkWell(
           onTap: () {
-            Navigator.pushNamed(context, 'c_profile');
+            //Navigator.pushNamed(context, 'c_profile');
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => C_ProfileScreen()),
+            ).then((value) {
+              if (value == true) {
+                loadProfileImage();
+              }
+            });
           },
           borderRadius: BorderRadius.circular(50),
           child: Container(

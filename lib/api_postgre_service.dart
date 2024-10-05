@@ -296,7 +296,13 @@ Future<String?> userUpdate(
     );
 
     if (response.statusCode == 200) {
-      await storeDataInHive(context);
+      //store token to storage
+      final responseData = jsonDecode(response.body);
+      final String accessToken = responseData['accessToken'];
+      final String refreshToken = responseData['refreshToken'];
+      storeTokens(accessToken, refreshToken);
+      await storeDataInHive(context); // store data to local
+
       showSuccessSnackBar(context, 'User updated successfully');
       return 'success';
     } else {
@@ -452,8 +458,8 @@ Future<String?> booking(
         print('Access token expired. Attempting to refresh...');
         String? refreshMsg = await refreshAccessToken(context);
         if (refreshMsg == null) {
-          return await booking(context, id, date, province, city, brgy, street, postal,
-              longitude, latitude, selectedWasteTypes);
+          return await booking(context, id, date, province, city, brgy, street,
+              postal, longitude, latitude, selectedWasteTypes);
         }
       } else if (response.statusCode == 403) {
         // Access token is invalid. logout
@@ -589,8 +595,8 @@ Future<String?> bookingUpdate(
         print('Access token expired. Attempting to refresh...');
         String? refreshMsg = await refreshAccessToken(context);
         if (refreshMsg == null) {
-          return await bookingUpdate(context, bookId, date, province, city, brgy,
-              street, postal, latitude, longitude, selectedWasteTypes);
+          return await bookingUpdate(context, bookId, date, province, city,
+              brgy, street, postal, latitude, longitude, selectedWasteTypes);
         }
       } else if (response.statusCode == 403) {
         // Access token is invalid. logout
@@ -655,6 +661,62 @@ Future<String?> bookingCancel(BuildContext context, int bookId) async {
       //showErrorSnackBar(context, response.body);
     }
     print('Cancel Booking is not successful!');
+    return response.body;
+  } catch (e) {
+    print(e.toString());
+  }
+  return null;
+}
+
+
+//deactivate
+//booking update
+Future<String?> deactivateUser(
+    BuildContext context,
+    String email) async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+  if (accessToken == null) {
+    print('No access token available. User needs to log in.');
+    await deleteTokens(context); // Logout use
+  }
+
+  try {
+    final response = await http.post(
+      Uri.parse('$baseUrl/deactivate'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+       'email': email
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      showSuccessSnackBar(context, 'Your account has been deactivated!');
+      return 'success';
+    } else {
+      if (response.statusCode == 401) {
+        // Access token might be expired, attempt to refresh it
+        print('Access token expired. Attempting to refresh...');
+        String? refreshMsg = await refreshAccessToken(context);
+        if (refreshMsg == null) {
+          return await deactivateUser(context, email);
+        }
+      } else if (response.statusCode == 403) {
+        // Access token is invalid. logout
+        print('Access token invalid. Attempting to logout...');
+        showErrorSnackBar(
+            context, 'Active time has been expired please login again.');
+        await deleteTokens(context); // Logout use
+      } else {
+        print('Response: ${response.body}');
+      }
+
+      //showErrorSnackBar(context, response.body);
+    }
+    print('Update Booking is not successful!');
     return response.body;
   } catch (e) {
     print(e.toString());

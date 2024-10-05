@@ -207,14 +207,17 @@ Future<void> handleGoogleSignIn(BuildContext context) async {
     GoogleSignInAccount? user = await _googleSignIn.signIn();
 
     if (user != null) {
+       
       // print('Signed in: ${user.displayName}');
       // print('Email: ${user.email}');
       // print('Photo URL: ${user.photoUrl}');
 
       String email = user.email;
-
+      
       String? dbMessage = await loginWithGoogle(context, email);
+      
       if (dbMessage == 'customer') {
+       
         Navigator.pushReplacementNamed(context, 'c_home');
       } else if (dbMessage == 'hauler') {
         Navigator.pushReplacementNamed(context, 'home');
@@ -232,8 +235,8 @@ Future<void> handleGoogleSignIn(BuildContext context) async {
     // Sign out from Google after creating the account or checking the email
     await _handleSignOut();
   } catch (error) {
-    print('Sign-in failed: $error');
-    showErrorSnackBar(context, 'Sign-in failed: $error');
+    //print('Sign-in failed: $error');
+    //showErrorSnackBar(context, 'Sign-in failed: $error');
     _handleSignOut();
   }
 }
@@ -249,14 +252,15 @@ Future<String> loginWithGoogle(BuildContext context, String email) async {
   );
 
   if (response.statusCode == 200 || response.statusCode == 201) {
+     
     //store token to storage
     final responseData = jsonDecode(response.body);
     final String accessToken = responseData['accessToken'];
     final String refreshToken = responseData['refreshToken'];
     storeTokens(accessToken, refreshToken);
     await storeDataInHive(context); // store data to local
-
     if (response.statusCode == 200) {
+     
       print('Login successfully');
       return 'customer'; // No error
     }

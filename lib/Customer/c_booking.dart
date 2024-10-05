@@ -527,13 +527,11 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                               ),
                                              
                                               Expanded(
-                                                child: Expanded(
-                                                    flex: 2,
-                                                    child: Text(
-                                                      '${street} \n${address}',
-                                                    
-                                                    )),
-                                              ),
+                                                  flex: 2,
+                                                  child: Text(
+                                                    '${street} \n${address}',
+                                                  
+                                                  )),
                                               Expanded(
                                                   flex: 1,
                                                   child: Row(

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:trashtrack/Customer/c_contact.dart';
 import 'package:trashtrack/Customer/c_home.dart';
 import 'package:trashtrack/Customer/c_profile.dart';
-import 'package:trashtrack/Hauler/about_us.dart';
+import 'package:trashtrack/Customer/c_settings.dart';
+import 'package:trashtrack/Customer/c_about_us.dart';
 import 'package:trashtrack/privacy_policy.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:trashtrack/terms_conditions.dart';
@@ -96,7 +97,7 @@ class _C_DrawerState extends State<C_Drawer> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => SettingsScreen()));
+                          builder: (context) => C_SettingsScreen()));
                 },
               ),
               onTap: () {
@@ -147,7 +148,7 @@ class _C_DrawerState extends State<C_Drawer> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => AboutUs()),
+                        MaterialPageRoute(builder: (context) => C_AboutUs()),
                       );
                     },
                   ),
@@ -193,7 +194,7 @@ class _C_DrawerState extends State<C_Drawer> {
     return Container(
       padding: EdgeInsets.all(5),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: Colors.grey[200],
         borderRadius: BorderRadius.circular(10),
       ),
       child: Icon(icon, color: deepPurple,),

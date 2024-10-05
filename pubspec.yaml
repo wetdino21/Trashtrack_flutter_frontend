@@ -59,7 +59,8 @@ dependencies:
   flutter_cube: 0.1.1
   collection: ^1.18.0 #for list/map compare
   image_picker: ^1.1.2
-
+  provider: ^6.1.2
+  
   #flutter_launcher_icons: ^0.14.1
 
 dev_dependencies:
@@ -89,9 +90,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/splash1.jpg
-    - assets/splash2.jpg
-    - assets/splash3.jpg
+    - assets/
     - assets/Brands.png
     - assets/default.jpg
     - assets/anime.jpg

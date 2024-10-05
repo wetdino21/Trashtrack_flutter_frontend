@@ -309,9 +309,20 @@ class _C_MapScreenState extends State<C_MapScreen> {
             routeDistances = routesData
                 .map<double>((route) => (route['distance'] as num).toDouble())
                 .toList();
-            routeDurations = routesData
-                .map<double>((route) => (route['duration'] as num).toDouble())
-                .toList();
+            routeDurations = routesData.map<double>((route) {
+              double originalDuration = (route['duration'] as num).toDouble();
+
+              // Assuming 2 minutes added per kilometer
+              double distanceInKm = route['distance'] / 1000;
+              double addedDuration =
+                  distanceInKm * 1.2 * 60; // 1.2 minutes per km in seconds
+
+              return originalDuration + addedDuration; // Adjusted duration
+            }).toList();
+            
+            // routeDurations = routesData
+            //     .map<double>((route) => (route['duration'] as num).toDouble())
+            //     .toList();
 
             if (routesData.length == 1) {
               nearestDuration = formatDuration(routeDurations[0]);
@@ -1194,7 +1205,7 @@ class _C_MapScreenState extends State<C_MapScreen> {
           !hideScreen
               ? Positioned(
                   //bottom: 200,
-                  bottom: MediaQuery.of(context).size.height *0.2,
+                  bottom: MediaQuery.of(context).size.height * 0.2,
                   right: 0,
                   child: Column(
                     children: [
@@ -1341,8 +1352,10 @@ class _C_MapScreenState extends State<C_MapScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                     
                       Row(
                         children: [
+                           SizedBox(width: 10),
                           Text(
                             '${nearestDuration} ',
                             style: TextStyle(
@@ -1350,7 +1363,7 @@ class _C_MapScreenState extends State<C_MapScreen> {
                                 fontSize: 20,
                                 color: nearestDistance == ''
                                     ? Colors.red
-                                    : Colors.green),
+                                    : Colors.blue),
                           ),
                           Text(
                             '(${nearestDistance})',
@@ -1363,6 +1376,7 @@ class _C_MapScreenState extends State<C_MapScreen> {
                       ),
                       Row(
                         children: [
+                           SizedBox(width: 10),
                           Text(
                             'Fastest Route',
                             style:

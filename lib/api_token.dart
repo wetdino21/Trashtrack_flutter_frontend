@@ -104,13 +104,20 @@ Future<void> deleteTokens(BuildContext context) async {
 
   //delete hive boxe
   await Hive.deleteBoxFromDisk('mybox');
-  // showErrorSnackBar(
-  //     context, 'Your active time has been expired. \nPlease login again.');
-  Navigator.pushNamedAndRemoveUntil(
-    context,
-    'login',
-    (Route<dynamic> route) => false, // Remove all previous routes
-  );
+
+  // Delay navigation until the widget is stable
+  Future.microtask(() {
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      'login',
+      (Route<dynamic> route) => false, // Remove all previous routes
+    );
+  });
+  // Navigator.pushNamedAndRemoveUntil(
+  //   context,
+  //   'login',
+  //   (Route<dynamic> route) => false, // Remove all previous routes
+  // );
 }
 
 // Function to make API call (with token verification)
@@ -284,7 +291,7 @@ Future<String> onOpenApp(BuildContext context) async {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: Colors.red,
+          backgroundColor: Colors.red[900],
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(15.0))),
           title: Text('Logout', style: TextStyle(color: Colors.white)),

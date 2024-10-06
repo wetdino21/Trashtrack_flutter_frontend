@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:trashtrack/Customer/c_appbar.dart';
 import 'package:trashtrack/Customer/c_bottom_nav_bar.dart';
 import 'package:trashtrack/Customer/c_drawer.dart';
 import 'package:trashtrack/Customer/c_waste_info.dart';
 import 'package:trashtrack/Customer/c_booking.dart';
 import 'package:trashtrack/api_token.dart';
+import 'package:trashtrack/data_model.dart';
 import 'package:trashtrack/styles.dart';
 
-import 'package:trashtrack/user_date.dart';
+import 'package:trashtrack/user_data.dart';
 import 'package:flutter_cube/flutter_cube.dart';
 
 class C_HomeScreen extends StatefulWidget {
@@ -17,7 +19,7 @@ class C_HomeScreen extends StatefulWidget {
 
 class _C_HomeScreenState extends State<C_HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  
+
   //user data
   Map<String, dynamic>? userData;
   //Box<dynamic>? userData;
@@ -25,6 +27,19 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
   String? errorMessage;
   //Uint8List? imageBytes;
   late Object _obj;
+  UserModel? userModel;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _obj = Object(
+      scale: Vector3(12.0, 12.0, 12.0),
+      //position: Vector3(0, 0, 0),
+      rotation: Vector3(0, -90, 0), // Start sideways
+      fileName: 'assets/objects/base.obj',
+    );
+    userModel = Provider.of<UserModel>(context); // Access provider here
+  }
 
   @override
   void initState() {
@@ -41,6 +56,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
 // Fetch user data from the server
   Future<void> _dbData() async {
     try {
+      await storeDataInHive(context);
       //final data = await Hive.openBox('mybox');
       final data = await userDataFromHive();
       // final data = await fetchCusData(context);
@@ -53,6 +69,25 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
         //   imageBytes = base64Decode(userData!['profileImage']);
         // }
       });
+
+      Provider.of<UserModel>(context, listen: false).setUserData(data['fname'],
+          data['lname'], data['email'], data['auth'], data['profile']);
+
+      //if online provider
+      // final data2 = await fetchCusData(context);
+      // if (data2 != null) {
+      //   Provider.of<UserModel>(context, listen: false).setUserData(
+      //     data2['cus_fname'],
+      //     data2['cus_lname'],
+      //     data2['cus_email'],
+      //     data2['profileImage'] != null
+      //         ? base64Decode(data2['profileImage'])
+      //         : null,
+      //   );
+      // } else {
+      //   showErrorSnackBar(context, 'errorMessage');
+      // }
+
       //await data.close();
     } catch (e) {
       setState(() {
@@ -136,14 +171,14 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                               padding: EdgeInsets.all(16.0),
                               decoration: BoxDecoration(
                                   color: Colors.white,
-                                  borderRadius: BorderRadius.circular(20.0),
+                                  borderRadius: BorderRadius.circular(10.0),
                                   boxShadow: shadowBigColor),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Text(
                                     //'Welcome ${userData!['cus_fname']}!',
-                                    'Welcome ${userData!['fname']}!',
+                                    'Welcome ${userModel!.fname}!',
                                     style: TextStyle(
                                       fontSize: 24.0,
                                       color: deepPurple,
@@ -161,7 +196,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                                     child: Container(
                                       decoration: BoxDecoration(
                                         borderRadius:
-                                            BorderRadius.circular(20.0),
+                                            BorderRadius.circular(10.0),
                                       ),
                                       child: Row(
                                         mainAxisAlignment:
@@ -216,7 +251,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                                           backgroundColor: deepPurple,
                                           shape: RoundedRectangleBorder(
                                             borderRadius:
-                                                BorderRadius.circular(15.0),
+                                                BorderRadius.circular(10.0),
                                           ),
                                           padding: EdgeInsets.symmetric(
                                               vertical: 16.0, horizontal: 30.0),
@@ -343,7 +378,7 @@ class StatisticBox extends StatelessWidget {
       decoration: BoxDecoration(
         color: white,
         boxShadow: shadowMidColor,
-        borderRadius: BorderRadius.circular(15.0),
+        borderRadius: BorderRadius.circular(10.0),
       ),
       padding: EdgeInsets.all(16.0),
       child: Column(

@@ -8,7 +8,7 @@ import 'package:trashtrack/api_token.dart';
 import 'package:trashtrack/create_acc.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:trashtrack/user_date.dart';
+import 'package:trashtrack/user_data.dart';
 
 // final String baseUrl = 'http://192.168.254.187:3000';
 String baseUrl = globalUrl();
@@ -280,7 +280,7 @@ Future<String> loginWithGoogle(BuildContext context, String email) async {
     return 'No account associated with this email';
   } else if (response.statusCode == 402) {
     print('Error response: ${response.body}');
-    return 'Please log in using your email and password.';
+    return 'Looks like this account is not registered with Google. Please log in using your email and password.';
   } else {
     print('Error response: ${response.body}');
     return response.body;

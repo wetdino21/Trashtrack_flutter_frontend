@@ -5,7 +5,7 @@ import 'package:trashtrack/api_network.dart';
 import 'package:trashtrack/api_token.dart';
 import 'package:flutter/material.dart';
 import 'package:trashtrack/styles.dart';
-import 'package:trashtrack/user_date.dart';
+import 'package:trashtrack/user_data.dart';
 
 // final String baseUrl = 'http://192.168.254.187:3000';
 String baseUrl = globalUrl();
@@ -668,12 +668,9 @@ Future<String?> bookingCancel(BuildContext context, int bookId) async {
   return null;
 }
 
-
 //deactivate
 //booking update
-Future<String?> deactivateUser(
-    BuildContext context,
-    String email) async {
+Future<String?> deactivateUser(BuildContext context, String email) async {
   Map<String, String?> tokens = await getTokens();
   String? accessToken = tokens['access_token'];
   if (accessToken == null) {
@@ -688,9 +685,7 @@ Future<String?> deactivateUser(
         'Authorization': 'Bearer $accessToken',
         'Content-Type': 'application/json',
       },
-      body: jsonEncode({
-       'email': email
-      }),
+      body: jsonEncode({'email': email}),
     );
 
     if (response.statusCode == 200) {
@@ -703,6 +698,119 @@ Future<String?> deactivateUser(
         String? refreshMsg = await refreshAccessToken(context);
         if (refreshMsg == null) {
           return await deactivateUser(context, email);
+        }
+      } else if (response.statusCode == 403) {
+        // Access token is invalid. logout
+        print('Access token invalid. Attempting to logout...');
+        showErrorSnackBar(
+            context, 'Active time has been expired please login again.');
+        await deleteTokens(context); // Logout use
+      } else {
+        print('Response: ${response.body}');
+      }
+
+      //showErrorSnackBar(context, response.body);
+    }
+    print('Update Booking is not successful!');
+    return response.body;
+  } catch (e) {
+    print(e.toString());
+  }
+  return null;
+}
+
+//binding password-email update
+Future<String?> binding_trashtrack(
+    BuildContext context, String? password) async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+  if (accessToken == null) {
+    print('No access token available. User needs to log in.');
+    await deleteTokens(context); // Logout use
+  }
+
+  try {
+    final response = await http.post(
+      Uri.parse('$baseUrl/binding_trashtrack'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'password': password,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      await storeDataInHive(context);
+      showSuccessSnackBar(context, 'Bound Successfully');
+      return 'success';
+    } else {
+      if (response.statusCode == 401) {
+        // Access token might be expired, attempt to refresh it
+        print('Access token expired. Attempting to refresh...');
+        String? refreshMsg = await refreshAccessToken(context);
+        if (refreshMsg == null) {
+          return await binding_trashtrack(context, password);
+        }
+      } else if (response.statusCode == 403) {
+        // Access token is invalid. logout
+        print('Access token invalid. Attempting to logout...');
+        showErrorSnackBar(
+            context, 'Active time has been expired please login again.');
+        await deleteTokens(context); // Logout use
+      } else {
+        print('Response: ${response.body}');
+      }
+
+      //showErrorSnackBar(context, response.body);
+    }
+    print('Update Booking is not successful!');
+    return response.body;
+  } catch (e) {
+    print(e.toString());
+  }
+  return null;
+}
+
+//binding password-email update
+Future<String?> binding_google(BuildContext context, String? email) async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+  if (accessToken == null) {
+    print('No access token available. User needs to log in.');
+    await deleteTokens(context); // Logout use
+  }
+
+  try {
+    final response = await http.post(
+      Uri.parse('$baseUrl/binding_google'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'email': email,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      //store token to storage
+      final responseData = jsonDecode(response.body);
+      final String accessToken = responseData['accessToken'];
+      final String refreshToken = responseData['refreshToken'];
+      storeTokens(accessToken, refreshToken);
+      await storeDataInHive(context); // store data to local
+
+      showSuccessSnackBar(context, 'Bound Successfully');
+      return 'success';
+    } else {
+      if (response.statusCode == 401) {
+        // Access token might be expired, attempt to refresh it
+        print('Access token expired. Attempting to refresh...');
+        String? refreshMsg = await refreshAccessToken(context);
+        if (refreshMsg == null) {
+          return await binding_google(context, email);
         }
       } else if (response.statusCode == 403) {
         // Access token is invalid. logout

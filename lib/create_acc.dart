@@ -36,9 +36,15 @@ class _CreateAccState extends State<CreateAcc> {
   String? _selectedCityMunicipalityName;
   String? _selectedBarangayName;
 
-  String? _selectedProvince;
-  String? _selectedCityMunicipality;
-  String? _selectedBarangay;
+  bool _ddlOpen = false;
+  bool _ddlClicked = false;
+  bool _showProvinceDropdown = false;
+  bool _showCityMunicipalityDropdown = false;
+  bool _showBarangayDropdown = false;
+
+  // String? _selectedProvince;
+  // String? _selectedCityMunicipality;
+  // String? _selectedBarangay;
 
   bool _acceptTerms = false;
   bool _passwordVisible = false;
@@ -101,6 +107,7 @@ class _CreateAccState extends State<CreateAcc> {
       final provinces = await fetchProvinces();
       setState(() {
         _provinces = provinces;
+        _showProvinceDropdown = true;
       });
     } catch (e) {
       print('Error fetching provinces: $e');
@@ -113,9 +120,7 @@ class _CreateAccState extends State<CreateAcc> {
           await fetchCitiesMunicipalities(provinceCode);
       setState(() {
         _citiesMunicipalities = citiesMunicipalities;
-        _barangays = []; // Clear barangays when a new city is selected
-        _selectedCityMunicipalityName = null;
-        _selectedBarangayName = null;
+        _showCityMunicipalityDropdown = true;
       });
     } catch (e) {
       print('Error fetching cities/municipalities: $e');
@@ -127,12 +132,50 @@ class _CreateAccState extends State<CreateAcc> {
       final barangays = await fetchBarangays(cityMunicipalityCode);
       setState(() {
         _barangays = barangays;
-        _selectedBarangayName = null;
+        _showBarangayDropdown = true;
       });
     } catch (e) {
       print('Error fetching barangays: $e');
     }
   }
+
+  // Future<void> _loadProvinces() async {
+  //   try {
+  //     final provinces = await fetchProvinces();
+  //     setState(() {
+  //       _provinces = provinces;
+  //     });
+  //   } catch (e) {
+  //     print('Error fetching provinces: $e');
+  //   }
+  // }
+
+  // Future<void> _loadCitiesMunicipalities(String provinceCode) async {
+  //   try {
+  //     final citiesMunicipalities =
+  //         await fetchCitiesMunicipalities(provinceCode);
+  //     setState(() {
+  //       _citiesMunicipalities = citiesMunicipalities;
+  //       _barangays = []; // Clear barangays when a new city is selected
+  //       _selectedCityMunicipalityName = null;
+  //       _selectedBarangayName = null;
+  //     });
+  //   } catch (e) {
+  //     print('Error fetching cities/municipalities: $e');
+  //   }
+  // }
+
+  // Future<void> _loadBarangays(String cityMunicipalityCode) async {
+  //   try {
+  //     final barangays = await fetchBarangays(cityMunicipalityCode);
+  //     setState(() {
+  //       _barangays = barangays;
+  //       _selectedBarangayName = null;
+  //     });
+  //   } catch (e) {
+  //     print('Error fetching barangays: $e');
+  //   }
+  // }
 
 //email
   void _startTimer() {
@@ -435,6 +478,8 @@ class _CreateAccState extends State<CreateAcc> {
                 //page 2 to 3
                 if ((_currentStep == 2) && (index + 1 == 3)) {
                   setState(() {
+                    _ddlClicked = true;
+
                     fnamevalidator = _validateFname(_fnameController.text);
                     mnamevalidator = _validateMname(_mnameController.text);
                     lnamevalidator = _validateLname(_lnameController.text);
@@ -467,23 +512,49 @@ class _CreateAccState extends State<CreateAcc> {
                           streetvalidator.isNotEmpty) ||
                       (_postalController.text.isEmpty ||
                           postalvalidator.isNotEmpty)) {
-                  } else {
-                    // If no errors, proceed with incrementing the step
-                    if (_currentStep < 4) {
-                      if (_acceptTerms) {
-                        setState(() {
-                          if (emailChanged == true) {
-                            emailChanged = false;
-                            _resendCode();
-                          }
-                          _currentStep = index + 1;
-                          //_startTimer();
-                        });
-                      } else {
-                        showErrorSnackBar(context,
-                            'You must accept the terms and conditions');
+                  } else if (_contactController.text.isNotEmpty) {
+                    String? dbContactMsg =
+                        await contactCheck(_contactController.text);
+                    // Show any existing error message
+                    if (dbContactMsg != null) {
+                      setState(() {
+                        contactvalidator = dbContactMsg;
+                      });
+                    } else {
+                      // If no errors, proceed with incrementing the step
+                      if (_currentStep < 4) {
+                        if (_acceptTerms) {
+                          setState(() {
+                            if (emailChanged == true) {
+                              emailChanged = false;
+                              _resendCode();
+                            }
+                            _currentStep = index + 1;
+                            //_startTimer();
+                          });
+                        } else {
+                          showErrorSnackBar(context,
+                              'You must accept the terms and conditions');
+                        }
                       }
                     }
+                  } else {
+                    // // If no errors, proceed with incrementing the step
+                    // if (_currentStep < 4) {
+                    //   if (_acceptTerms) {
+                    //     setState(() {
+                    //       if (emailChanged == true) {
+                    //         emailChanged = false;
+                    //         _resendCode();
+                    //       }
+                    //       _currentStep = index + 1;
+                    //       //_startTimer();
+                    //     });
+                    //   } else {
+                    //     showErrorSnackBar(context,
+                    //         'You must accept the terms and conditions');
+                    //   }
+                    // }
                   }
                 }
 
@@ -597,6 +668,13 @@ class _CreateAccState extends State<CreateAcc> {
     return '';
   }
 
+  //  String _validateAddress(String? value) {
+  //   if (value == null || value.isEmpty) {
+  //     return 'Please enter your province';
+  //   }
+  //   return '';
+  // }
+
   String _validateProvince(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter your province';
@@ -622,6 +700,9 @@ class _CreateAccState extends State<CreateAcc> {
     if (value == null || value.isEmpty) {
       return 'Please enter your street name, building, house No';
     }
+    if (value.length < 3) {
+      return 'Atleat 3 letters long';
+    }
     return '';
   }
 
@@ -635,6 +716,10 @@ class _CreateAccState extends State<CreateAcc> {
     if (value.length != 4) {
       // Adjust according to postal code length
       return 'Postal code must be 4 digits long';
+    }
+    if (value[0] != '6') {
+      // Adjust according to postal code length
+      return 'Invalid Postal Code';
     }
     return '';
   }
@@ -1230,7 +1315,10 @@ class _CreateAccState extends State<CreateAcc> {
                       Center(
                           child: Text(
                         'Personal Information',
-                        style: TextStyle(fontSize: 20, color: Colors.grey),
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: greytitleColor),
                       )),
                       const SizedBox(height: 20),
                       _buildTextField(
@@ -1283,67 +1371,333 @@ class _CreateAccState extends State<CreateAcc> {
                       Center(
                           child: Text(
                         'Complete Address',
-                        style: TextStyle(fontSize: 20, color: Colors.grey),
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: greytitleColor),
                       )),
-                      const SizedBox(height: 15),
-                      // Dropdown for Province
-                      _buildDropdown(
-                        selectedValue: _selectedProvince,
-                        items: _provinces,
-                        hintText: 'Province',
-                        icon: Icons.location_city,
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedProvince = value;
-                            provincevalidator = _validateProvince(value);
-                            final selectedProvince = _provinces
-                                .firstWhere((item) => item['code'] == value);
-                            _selectedProvinceName = selectedProvince['name'];
-                          });
-                          _loadCitiesMunicipalities(value!);
-                        },
+                      const SizedBox(height: 20),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '  Province/City or Municipality/Barangay',
+                            style:
+                                TextStyle(fontSize: 16, color: greytitleColor),
+                          ),
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                _ddlOpen = !_ddlOpen;
+                                _ddlClicked = true;
+                              });
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(5),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 5.0, horizontal: 15),
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
+                                        boxShadow: shadowColor),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        // Show selected values
+                                        Expanded(
+                                          child: Text(
+                                            _selectedProvinceName == null
+                                                ? 'Select Province'
+                                                : _selectedCityMunicipalityName ==
+                                                        null
+                                                    ? '${_selectedProvinceName} / '
+                                                    : _selectedBarangayName ==
+                                                            null
+                                                        ? '${_selectedProvinceName} / ${_selectedCityMunicipalityName} / '
+                                                        : '${_selectedProvinceName} / '
+                                                            '${_selectedCityMunicipalityName} / '
+                                                            '${_selectedBarangayName}',
+                                            style: TextStyle(
+                                                fontSize: 16.0,
+                                                color: _selectedProvinceName ==
+                                                        null
+                                                    ? Colors.grey
+                                                    : Colors.black),
+                                            overflow: TextOverflow
+                                                .visible, // Allow wrapping
+                                            softWrap:
+                                                true, // Enable soft wrapping
+                                          ),
+                                        ),
+                                        _selectedProvinceName != null
+                                            ? IconButton(
+                                                icon: Icon(
+                                                  Icons.clear,
+                                                  color: Colors.deepPurple,
+                                                ),
+                                                onPressed: () {
+                                                  //close
+                                                  _loadProvinces();
+                                                  setState(() {
+                                                    _provinces = [];
+                                                    _citiesMunicipalities = [];
+                                                    _barangays = [];
+
+                                                    _showCityMunicipalityDropdown =
+                                                        false;
+                                                    _showBarangayDropdown =
+                                                        false;
+
+                                                    _selectedProvinceName =
+                                                        null;
+                                                    _selectedCityMunicipalityName =
+                                                        null;
+                                                    _selectedBarangayName =
+                                                        null;
+                                                  });
+                                                })
+                                            : IconButton(
+                                                highlightColor:
+                                                    Colors.transparent,
+                                                onPressed: () {
+                                                  //null
+                                                },
+                                                icon: Icon(
+                                                  Icons.clear,
+                                                  color: Colors.transparent,
+                                                ),
+                                              ),
+                                      ],
+                                    ),
+                                  ),
+                                  if (_ddlOpen)
+                                    if (_showProvinceDropdown)
+                                      Container(
+                                        height: 100,
+                                        margin: EdgeInsets.symmetric(
+                                            horizontal: 10),
+                                        decoration: BoxDecoration(
+                                            color: Colors.deepPurple
+                                                .withOpacity(0.7),
+                                            borderRadius: BorderRadius.vertical(
+                                                bottom: Radius.circular(15)),
+                                            boxShadow: shadowColor),
+                                        child: ListView.builder(
+                                          itemCount: _provinces.length,
+                                          itemBuilder: (context, index) {
+                                            final city = _provinces[index];
+
+                                            return InkWell(
+                                              onTap: () async {
+                                                setState(() {
+                                                  _showProvinceDropdown = false;
+                                                  _showCityMunicipalityDropdown =
+                                                      true;
+                                                  _loadCitiesMunicipalities(city[
+                                                      'code']); // Load barangays for the selected city
+
+                                                  _selectedProvinceName = city[
+                                                      'name']; // Set by name
+                                                });
+                                              },
+                                              child: Container(
+                                                padding: EdgeInsets.symmetric(
+                                                    vertical: 10,
+                                                    horizontal: 15),
+                                                decoration: BoxDecoration(
+                                                  border: Border(
+                                                      bottom: BorderSide(
+                                                          color: Colors
+                                                              .grey.shade300)),
+                                                ),
+                                                child: Text(
+                                                  city[
+                                                      'name'], // Display the name
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      color: Colors.white),
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                  if (_showCityMunicipalityDropdown)
+                                    Container(
+                                      height: 400,
+                                      margin:
+                                          EdgeInsets.symmetric(horizontal: 10),
+                                      decoration: BoxDecoration(
+                                          color: Colors.deepPurple
+                                              .withOpacity(0.7),
+                                          borderRadius: BorderRadius.vertical(
+                                              bottom: Radius.circular(15)),
+                                          boxShadow: shadowColor),
+                                      child: ListView.builder(
+                                        itemCount: _citiesMunicipalities.length,
+                                        itemBuilder: (context, index) {
+                                          final city =
+                                              _citiesMunicipalities[index];
+
+                                          return InkWell(
+                                            onTap: () async {
+                                              setState(() {
+                                                _showCityMunicipalityDropdown =
+                                                    false;
+                                                _showBarangayDropdown = true;
+                                                _loadBarangays(city['code']);
+                                                _selectedCityMunicipalityName =
+                                                    city['name'];
+                                              });
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 10, horizontal: 15),
+                                              decoration: BoxDecoration(
+                                                border: Border(
+                                                    bottom: BorderSide(
+                                                        color: Colors
+                                                            .grey.shade300)),
+                                              ),
+                                              child: Text(
+                                                city[
+                                                    'name'], // Display the name
+                                                style: TextStyle(
+                                                    fontSize: 16,
+                                                    color: Colors.white),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+
+                                  //brgy ddl
+                                  if (_showBarangayDropdown)
+                                    Container(
+                                      height: 400,
+                                      margin:
+                                          EdgeInsets.symmetric(horizontal: 10),
+                                      decoration: BoxDecoration(
+                                          color: Colors.deepPurple
+                                              .withOpacity(0.7),
+                                          borderRadius: BorderRadius.vertical(
+                                              bottom: Radius.circular(15)),
+                                          boxShadow: shadowColor),
+                                      child: ListView.builder(
+                                        itemCount: _barangays.length,
+                                        itemBuilder: (context, index) {
+                                          final city = _barangays[index];
+
+                                          return InkWell(
+                                            onTap: () async {
+                                              setState(() {
+                                                _showBarangayDropdown = false;
+                                                _selectedBarangayName =
+                                                    city['name'];
+                                              });
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 10, horizontal: 15),
+                                              decoration: BoxDecoration(
+                                                border: Border(
+                                                    bottom: BorderSide(
+                                                        color: Colors
+                                                            .grey.shade300)),
+                                              ),
+                                              child: Text(
+                                                city[
+                                                    'name'], // Display the name
+                                                style: TextStyle(
+                                                    fontSize: 16,
+                                                    color: Colors.white),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    )
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      _validator(provincevalidator),
-                      SizedBox(height: 15),
-                      // Dropdown for City/Municipality
-                      _buildDropdown(
-                        selectedValue: _selectedCityMunicipality,
-                        items: _citiesMunicipalities,
-                        hintText: 'City/Municipality',
-                        icon: Icons.apartment,
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedCityMunicipality = value;
-                            cityvalidator = _validateCity(value);
-                            final selectedCity = _citiesMunicipalities
-                                .firstWhere((item) => item['code'] == value);
-                            _selectedCityMunicipalityName =
-                                selectedCity['name'];
-                          });
-                          _loadBarangays(value!);
-                        },
-                      ),
-                      _validator(cityvalidator),
-                      SizedBox(height: 15),
-                      // Dropdown for Barangay
-                      _buildDropdown(
-                        selectedValue: _selectedBarangay,
-                        items: _barangays,
-                        hintText: 'Barangay',
-                        icon: Icons.maps_home_work,
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedBarangay = value;
-                            brgyvalidator = _validateBrgy(value);
-                            final selectedBarangay = _barangays
-                                .firstWhere((item) => item['code'] == value);
-                            _selectedBarangayName = selectedBarangay['name'];
-                            print(_selectedBarangayName);
-                          });
-                        },
-                      ),
-                      _validator(brgyvalidator),
-                      const SizedBox(height: 15),
+                      if (_ddlClicked)
+                        if (_selectedProvinceName == null ||
+                            _selectedCityMunicipalityName == null ||
+                            _selectedBarangayName == null)
+                          Text(
+                            'Please select your adrress.',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                      const SizedBox(height: 20),
+                      // const SizedBox(height: 15),
+                      // // Dropdown for Province
+                      // _buildDropdown(
+                      //   selectedValue: _selectedProvince,
+                      //   items: _provinces,
+                      //   hintText: 'Province',
+                      //   icon: Icons.location_city,
+                      //   onChanged: (value) {
+                      //     setState(() {
+                      //       _selectedProvince = value;
+                      //       provincevalidator = _validateProvince(value);
+                      //       final selectedProvince = _provinces
+                      //           .firstWhere((item) => item['code'] == value);
+                      //       _selectedProvinceName = selectedProvince['name'];
+                      //     });
+                      //     _loadCitiesMunicipalities(value!);
+                      //   },
+                      // ),
+                      // _validator(provincevalidator),
+                      // SizedBox(height: 15),
+                      // // Dropdown for City/Municipality
+                      // _buildDropdown(
+                      //   selectedValue: _selectedCityMunicipality,
+                      //   items: _citiesMunicipalities,
+                      //   hintText: 'City/Municipality',
+                      //   icon: Icons.apartment,
+                      //   onChanged: (value) {
+                      //     setState(() {
+                      //       _selectedCityMunicipality = value;
+                      //       cityvalidator = _validateCity(value);
+                      //       final selectedCity = _citiesMunicipalities
+                      //           .firstWhere((item) => item['code'] == value);
+                      //       _selectedCityMunicipalityName =
+                      //           selectedCity['name'];
+                      //     });
+                      //     _loadBarangays(value!);
+                      //   },
+                      // ),
+                      // _validator(cityvalidator),
+                      // SizedBox(height: 15),
+                      // // Dropdown for Barangay
+                      // _buildDropdown(
+                      //   selectedValue: _selectedBarangay,
+                      //   items: _barangays,
+                      //   hintText: 'Barangay',
+                      //   icon: Icons.maps_home_work,
+                      //   onChanged: (value) {
+                      //     setState(() {
+                      //       _selectedBarangay = value;
+                      //       brgyvalidator = _validateBrgy(value);
+                      //       final selectedBarangay = _barangays
+                      //           .firstWhere((item) => item['code'] == value);
+                      //       _selectedBarangayName = selectedBarangay['name'];
+                      //       print(_selectedBarangayName);
+                      //     });
+                      //   },
+                      // ),
+                      // _validator(brgyvalidator),
+                      // const SizedBox(height: 15),
                       _buildTextField(
                         controller: _streetController,
                         hintText: 'Street Name, Building, House No.',
@@ -1365,7 +1719,7 @@ class _CreateAccState extends State<CreateAcc> {
                           LengthLimitingTextInputFormatter(4),
                         ],
                         hintText: 'Postal Code',
-                        icon: Icons.pin_drop,
+                        icon: Icons.local_post_office,
                         onChanged: (value) {
                           setState(() {
                             postalvalidator = _validatePostalCode(
@@ -1414,6 +1768,8 @@ class _CreateAccState extends State<CreateAcc> {
                       Center(
                         child: InkWell(
                           onTap: () async {
+                            _ddlClicked = true;
+
                             if ((_fnameController.text.isEmpty ||
                                     fnamevalidator.isNotEmpty) ||
                                 (mnamevalidator.isNotEmpty) ||
@@ -1792,44 +2148,59 @@ class _CreateAccState extends State<CreateAcc> {
     required ValueChanged<String?> onChanged,
     Widget? suffixIcon,
   }) {
-    return Container(
-      decoration: BoxDecoration(boxShadow: shadowColor),
-      child: TextFormField(
-        controller: controller,
-        obscureText: obscureText,
-        keyboardType: keyboardType,
-        decoration: InputDecoration(
-          labelText:
-              hintText, // This will move the hint text to the upper left when focused
-          floatingLabelBehavior: FloatingLabelBehavior.auto,
-          labelStyle: TextStyle(color: Colors.grey),
-          //hintText: hintText,
-          //hintStyle: TextStyle(color: Colors.green),
-          prefixIcon: Icon(icon, color: Colors.green),
-          suffixIcon: suffixIcon,
-          filled: true,
-          fillColor: Colors.white,
-          border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide.none),
-          // enabledBorder: OutlineInputBorder(
-          //   borderRadius: BorderRadius.circular(10), // Rounded corners
-          //   borderSide: const BorderSide(color: Colors.grey, width: 3.0),
-          // ),
-          // focusedBorder: OutlineInputBorder(
-          //   borderRadius: BorderRadius.circular(10), // Rounded corners
-          //   borderSide: const BorderSide(color: Colors.green, width: 5.0),
-          // ),
-        ),
-        inputFormatters: inputFormatters,
-        //validator: validator,
-        onChanged: onChanged,
-        // onChanged: (value) {
-        //   // Trigger validation on text change
-        //   setState(() {
-        //     _formKey.currentState?.validate();
-        //   });
-        // },
+    return Padding(
+      padding: const EdgeInsets.all(5),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            ' ' + hintText,
+            style: TextStyle(
+                fontSize: 16,
+                //4fontWeight: FontWeight.bold,
+                color: Colors.grey[700]),
+          ),
+          Container(
+            decoration: BoxDecoration(boxShadow: shadowColor),
+            child: TextFormField(
+              controller: controller,
+              obscureText: obscureText,
+              keyboardType: keyboardType,
+              decoration: InputDecoration(
+                // labelText:
+                //     hintText, // This will move the hint text to the upper left when focused
+                // floatingLabelBehavior: FloatingLabelBehavior.auto,
+                // labelStyle: TextStyle(color: Colors.grey),
+                hintText: hintText,
+                hintStyle: TextStyle(color: Colors.grey[300]),
+                // prefixIcon: Icon(icon, color: Colors.green),
+                // suffixIcon: suffixIcon,
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none),
+                // enabledBorder: OutlineInputBorder(
+                //   borderRadius: BorderRadius.circular(10), // Rounded corners
+                //   borderSide: const BorderSide(color: Colors.grey, width: 3.0),
+                // ),
+                // focusedBorder: OutlineInputBorder(
+                //   borderRadius: BorderRadius.circular(10), // Rounded corners
+                //   borderSide: const BorderSide(color: Colors.green, width: 5.0),
+                // ),
+              ),
+              inputFormatters: inputFormatters,
+              //validator: validator,
+              onChanged: onChanged,
+              // onChanged: (value) {
+              //   // Trigger validation on text change
+              //   setState(() {
+              //     _formKey.currentState?.validate();
+              //   });
+              // },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -1837,67 +2208,82 @@ class _CreateAccState extends State<CreateAcc> {
   Widget _buildNumberField({
     required List<TextInputFormatter> inputFormatters,
   }) {
-    return Container(
-      decoration: BoxDecoration(boxShadow: shadowColor),
-      child: TextFormField(
-        controller: _contactController,
-        decoration: InputDecoration(
-          //prefixText: '+63 ',
-          prefixIcon: Column(
-            children: [
-              SizedBox(
-                height: 12,
-              ),
-              Text('+63',
-                  style: TextStyle(
-                      color: Colors.green,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16)),
-            ],
+    return Padding(
+      padding: const EdgeInsets.all(5),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            ' ' + 'Contact Number',
+            style: TextStyle(
+                fontSize: 16,
+                //4fontWeight: FontWeight.bold,
+                color: Colors.grey[700]),
           ),
-          //prefixIcon: Icon(Icons.abc),
-          labelText:
-              'Contact Number', // This will move the hint text to the upper left when focused
-          floatingLabelBehavior: FloatingLabelBehavior.auto,
-          labelStyle: TextStyle(color: Colors.grey),
-          // hintText: 'Contact Number',
-          // hintStyle: TextStyle(color: Colors.grey),
-          filled: true,
-          fillColor: Colors.white,
-          border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10), // Rounded corners
-              borderSide: BorderSide.none),
-          // enabledBorder: OutlineInputBorder(
-          //   borderRadius: BorderRadius.circular(10), // Rounded corners
-          //   borderSide: const BorderSide(color: Colors.grey, width: 3.0),
-          // ),
-          // focusedBorder: OutlineInputBorder(
-          //   borderRadius: BorderRadius.circular(10), // Rounded corners
-          //   borderSide: const BorderSide(color: Colors.green, width: 5.0),
-          // ),
-        ),
-        keyboardType: TextInputType.number,
-        inputFormatters: inputFormatters,
-        // validator: (value) {
-        //   if (value == null || value.isEmpty) {
-        //     return 'Please enter your contact number';
-        //   }
-        //   final contactNumber = value.replaceFirst(RegExp(r'^0'), '');
-        //   if (contactNumber.length != 10 || !contactNumber.startsWith('9')) {
-        //     return 'Invalid Phone Number';
-        //   }
-        //   return null;
-        // },
-        onChanged: (value) {
-          if (value.length > 10) {
-            _contactController.text = value.substring(0, 10);
-            _contactController.selection = TextSelection.fromPosition(
-                TextPosition(offset: _contactController.text.length));
-          }
-          setState(() {
-            contactvalidator = _validateContact(value);
-          });
-        },
+          Container(
+            decoration: BoxDecoration(boxShadow: shadowColor),
+            child: TextFormField(
+              controller: _contactController,
+              decoration: InputDecoration(
+                //prefixText: '+63 ',
+                prefixIcon: Column(
+                  children: [
+                    SizedBox(
+                      height: 12,
+                    ),
+                    Text('+63',
+                        style: TextStyle(
+                            color: Colors.green,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16)),
+                  ],
+                ),
+                //prefixIcon: Icon(Icons.abc),
+                // labelText:
+                //     'Contact Number', // This will move the hint text to the upper left when focused
+                // floatingLabelBehavior: FloatingLabelBehavior.auto,
+                // labelStyle: TextStyle(color: Colors.grey),
+                hintText: 'Contact Number',
+                hintStyle: TextStyle(color: Colors.grey[300]),
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10), // Rounded corners
+                    borderSide: BorderSide.none),
+                // enabledBorder: OutlineInputBorder(
+                //   borderRadius: BorderRadius.circular(10), // Rounded corners
+                //   borderSide: const BorderSide(color: Colors.grey, width: 3.0),
+                // ),
+                // focusedBorder: OutlineInputBorder(
+                //   borderRadius: BorderRadius.circular(10), // Rounded corners
+                //   borderSide: const BorderSide(color: Colors.green, width: 5.0),
+                // ),
+              ),
+              keyboardType: TextInputType.number,
+              inputFormatters: inputFormatters,
+              // validator: (value) {
+              //   if (value == null || value.isEmpty) {
+              //     return 'Please enter your contact number';
+              //   }
+              //   final contactNumber = value.replaceFirst(RegExp(r'^0'), '');
+              //   if (contactNumber.length != 10 || !contactNumber.startsWith('9')) {
+              //     return 'Invalid Phone Number';
+              //   }
+              //   return null;
+              // },
+              onChanged: (value) {
+                if (value.length > 10) {
+                  _contactController.text = value.substring(0, 10);
+                  _contactController.selection = TextSelection.fromPosition(
+                      TextPosition(offset: _contactController.text.length));
+                }
+                setState(() {
+                  contactvalidator = _validateContact(value);
+                });
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -2027,7 +2413,7 @@ class SuccessfulGoogleRegistration extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF04130B),
+      backgroundColor: deepPurple,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -2035,6 +2421,15 @@ class SuccessfulGoogleRegistration extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              PopScope(
+                  canPop: false,
+                  onPopInvokedWithResult: (didPop, result) async {
+                    if (didPop) {
+                      return;
+                    }
+                    //
+                  },
+                  child: Container()),
               Icon(Icons.check_circle,
                   color: Colors.lightGreenAccent, size: 100),
               SizedBox(height: 20),

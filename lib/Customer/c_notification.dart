@@ -141,16 +141,16 @@ class _C_NotificationScreenState extends State<C_NotificationScreen>
                     itemBuilder: (context, index) {
                       final notification = notifications![index];
                       final status = notification['notif_status'] ?? '';
-                      final statusColor = status == 'Delivered'
+                      final statusColor = status == 'Sent'
                           ? Colors.green
                           : status == 'Seen'
                               ? Colors.white54
                               : Colors.transparent;
-                      final boxColor = status == 'Delivered'
-                          ? Colors.green.withOpacity(0.2)
+                      final boxColor = status == 'Sent'
+                          ? deepPurple
                           : status == 'Seen'
-                              ? Colors.blue.withOpacity(0.2)
-                              : Colors.green;
+                              ? Colors.black
+                              : deepPurple;
 
                       return NotificationCard(
                         dateTime:
@@ -158,7 +158,7 @@ class _C_NotificationScreenState extends State<C_NotificationScreen>
                         title: notification['notif_message'],
                         status: status,
                         statusColor: statusColor,
-                        boxColor: boxColor,
+                        notifBoxColor: boxColor,
                       );
                     },
                   ),
@@ -178,14 +178,14 @@ class NotificationCard extends StatelessWidget {
   final String title;
   final String status;
   final Color statusColor;
-  final Color boxColor;
+  final Color notifBoxColor;
 
   NotificationCard({
     required this.dateTime,
     required this.title,
     this.status = '',
     this.statusColor = Colors.transparent,
-    this.boxColor = Colors.transparent,
+    this.notifBoxColor = Colors.transparent,
   });
 
   @override
@@ -222,8 +222,9 @@ class NotificationCard extends StatelessWidget {
         padding: EdgeInsets.all(10),
         margin: EdgeInsets.all(5),
         decoration: BoxDecoration(
-          color: boxColor,
+          color: notifBoxColor,
           borderRadius: BorderRadius.circular(8),
+          boxShadow: shadowLowColor
         ),
         child: Row(
           children: [

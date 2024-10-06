@@ -6,9 +6,6 @@ import 'package:flutter/material.dart';
 
 import 'package:trashtrack/styles.dart';
 
-import 'package:provider/provider.dart'; 
-import 'package:trashtrack/data_model.dart';
-
 //final String baseUrl = 'http://localhost:3000';
 
 //final String baseUrl = 'http://192.168.254.187:3000';
@@ -32,12 +29,13 @@ Future<Map<String, dynamic>?> fetchCusData(BuildContext context) async {
   );
   if (response.statusCode == 200) {
     // final data = jsonDecode(response.body);
-    
+
     // // Access the provider and update the user data
-    // Provider.of<UserData>(context, listen: false).setUserData(
+    // Provider.of<UserModel>(context, listen: false).setUserData(
     //   data['cus_fname'],
     //   data['cus_lname'],
     //   data['cus_email'],
+    //   data['profileImage'] != null ? base64Decode(data['profileImage']) : null,
     // );
 
     return jsonDecode(response.body);

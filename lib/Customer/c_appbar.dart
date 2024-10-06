@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:trashtrack/Customer/c_profile.dart';
+import 'package:provider/provider.dart';
+import 'package:trashtrack/data_model.dart';
 import 'package:trashtrack/styles.dart';
 import 'dart:typed_data'; // for Uint8List
-import 'package:trashtrack/user_date.dart';
+import 'package:trashtrack/user_data.dart';
 
 class C_CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final String title;
@@ -19,11 +20,18 @@ class C_CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
 
 class C_CustomAppBarState extends State<C_CustomAppBar> {
   Uint8List? imageBytes;
+  UserModel? userModel;
 
   @override
   void initState() {
     super.initState();
     loadProfileImage();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    userModel = Provider.of<UserModel>(context); // Access provider here
   }
 
   Future<void> loadProfileImage() async {
@@ -79,15 +87,15 @@ class C_CustomAppBarState extends State<C_CustomAppBar> {
         ),
         InkWell(
           onTap: () {
-            //Navigator.pushNamed(context, 'c_profile');
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => C_ProfileScreen()),
-            ).then((value) {
-              if (value == true) {
-                loadProfileImage();
-              }
-            });
+            Navigator.pushNamed(context, 'c_profile');
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(builder: (context) => C_ProfileScreen()),
+            // ).then((value) {
+            //   if (value == true) {
+            //     loadProfileImage();
+            //   }
+            // });
           },
           borderRadius: BorderRadius.circular(50),
           child: Container(
@@ -99,9 +107,10 @@ class C_CustomAppBarState extends State<C_CustomAppBar> {
               shape: BoxShape.circle,
               border: Border.all(width: 2, color: deepPurple),
             ),
-            child: imageBytes != null
+            //child: imageBytes != null
+            child: userModel!.profile!= null
                 ? CircleAvatar(
-                    backgroundImage: MemoryImage(imageBytes!),
+                    backgroundImage: MemoryImage(userModel!.profile!),
                   )
                 : Icon(
                     Icons.person,

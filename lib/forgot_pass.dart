@@ -237,6 +237,7 @@ class _VerifyEmailForgotPassScreenState
   void initState() {
     super.initState();
     _startTimer();
+    //_timer.cancel();
   }
 
   @override

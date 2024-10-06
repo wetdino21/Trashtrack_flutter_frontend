@@ -1,13 +1,15 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:trashtrack/api_email_service.dart';
 import 'package:trashtrack/api_postgre_service.dart';
+import 'package:trashtrack/data_model.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:flutter/services.dart';
 import 'package:trashtrack/api_address.dart';
 import 'dart:async';
-import 'package:trashtrack/user_date.dart';
+import 'package:trashtrack/user_data.dart';
 import 'package:image_picker/image_picker.dart';
 
 class C_ProfileScreen extends StatefulWidget {
@@ -68,6 +70,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
 
   int _currentStep = 1;
 
+  UserModel? userModel;
   //email verification
   final List<TextEditingController> _codeControllers =
       List.generate(6, (_) => TextEditingController());
@@ -99,6 +102,12 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
     _timer.cancel();
     _codeControllers.forEach((controller) => controller.dispose());
     super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    userModel = Provider.of<UserModel>(context); // Access provider here
   }
 
 // Fetch user data from the server
@@ -435,6 +444,9 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
     if (value == null || value.isEmpty) {
       return 'Please enter your street name, building, house No';
     }
+    if (value.length < 3) {
+      return 'Atleat 3 letters long';
+    }
     return '';
   }
 
@@ -448,6 +460,10 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
     if (value.length != 4) {
       // Adjust according to postal code length
       return 'Postal code must be 4 digits long';
+    }
+    if (value[0] != '6') {
+      // Adjust according to postal code length
+      return 'Invalid Postal Code';
     }
     return '';
   }
@@ -610,6 +626,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
           _isEditing = false;
           _resetData();
         });
+        showSuccessSnackBar(context, 'No changes Made');
       } else {
         Navigator.pop(context);
       }
@@ -618,6 +635,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    //final userModel = Provider.of<UserModel>(context);
     return Scaffold(
       backgroundColor: deepGreen,
       body: Stack(
@@ -926,7 +944,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                         style: TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
-                                            color: Colors.grey[700]),
+                                            color: greytitleColor),
                                       ),
                                       Padding(
                                         padding: const EdgeInsets.all(5),
@@ -982,6 +1000,11 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                                         //close
                                                         _loadProvinces();
                                                         setState(() {
+                                                          _provinces = [];
+                                                          _citiesMunicipalities =
+                                                              [];
+                                                          _barangays = [];
+
                                                           _showCityMunicipalityDropdown =
                                                               false;
                                                           _showBarangayDropdown =
@@ -1584,6 +1607,15 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
 
                             if (!mounted) return;
                             await _dbData();
+                            // Update the user data in the provider
+                            userModel!.setUserData(
+                                _fnameController.text,
+                                userModel!.lname ??
+                                    '', // Keep current last name
+                                userModel!.email ?? '', 
+                                userModel!.auth ?? '', 
+                                photoBytes);
+
                             setState(() {
                               _resetData();
                               _isEditing = false;
@@ -1902,6 +1934,14 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                   if (!mounted) return;
                   await _dbData();
                   setState(() {
+                    // Update the user data in the provider
+                    userModel!.setUserData(
+                        _fnameController.text,
+                        userModel!.lname ?? '', // Keep current last name
+                        userModel!.email ?? '',
+                        userModel!.auth ?? '', 
+                        photoBytes);
+
                     _resetData();
                     _isEditing = false;
                     isLoading = false;

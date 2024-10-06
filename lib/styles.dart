@@ -9,6 +9,7 @@ const Color iconBoxColor = Color(0xFF001E03);
 Color deepGreen = Color(0xFF388E3C);
 Color deepPurple = Colors.deepPurple;
 Color darkPurple = Color(0xFF3A0F63);
+Color? greytitleColor = Colors.grey[700];
 
 const Color white = Colors.white;
 
@@ -23,26 +24,35 @@ List<BoxShadow> shadowColor = [
 
 List<BoxShadow> shadowBigColor = [
   BoxShadow(
-    color: Colors.black.withOpacity(.7),
+    color: Colors.black.withOpacity(.5),
     spreadRadius: 5,
-    blurRadius: 20,
+    blurRadius: 10,
     offset: Offset(5, 5), // Position of the shadow
   ),
 ];
 
 List<BoxShadow> shadowMidColor = [
   BoxShadow(
-    color: Colors.black.withOpacity(.7),
-    spreadRadius: 5,
-    blurRadius: 10,
+    color: Colors.black.withOpacity(.5),
+    spreadRadius: 2,
+    blurRadius: 5,
+    offset: Offset(5, 5), // Only right (5px) and bottom (5px) shadow
+  ),
+];
+
+List<BoxShadow> shadowLowColor = [
+  BoxShadow(
+    color: Colors.black.withOpacity(.5),
+    spreadRadius: 1,
+    blurRadius: 3,
     offset: Offset(5, 5), // Only right (5px) and bottom (5px) shadow
   ),
 ];
 
 BorderRadius borderRadius5 = BorderRadius.circular(5);
 BorderRadius borderRadius10 = BorderRadius.circular(10);
-BorderRadius borderRadius15 = BorderRadius.circular(15);
-BorderRadius borderRadius50 = BorderRadius.circular(15);
+BorderRadius borderRadius15 = BorderRadius.circular(10);
+BorderRadius borderRadius50 = BorderRadius.circular(10);
 BoxDecoration boxDecoration1 = BoxDecoration(boxShadow: shadowColor, borderRadius: borderRadius10, color: white);
 BoxDecoration boxDecorationBig = BoxDecoration(boxShadow: shadowBigColor, borderRadius: borderRadius50, color: white);
 //snackbar

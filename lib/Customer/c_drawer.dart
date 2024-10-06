@@ -8,12 +8,12 @@ import 'package:trashtrack/privacy_policy.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:trashtrack/terms_conditions.dart';
 import 'dart:typed_data'; // for Uint8List
-import 'package:trashtrack/user_date.dart';
+import 'package:trashtrack/user_data.dart';
 
 class C_Drawer extends StatefulWidget {
-   final int? currentIndex; // Optional index parameter
+  final int? currentIndex; // Optional index parameter
 
-   const C_Drawer({super.key, this.currentIndex}); // Accept currentIndex
+  const C_Drawer({super.key, this.currentIndex}); // Accept currentIndex
 
   @override
   State<C_Drawer> createState() => _C_DrawerState();
@@ -65,11 +65,12 @@ class _C_DrawerState extends State<C_Drawer> {
                       padding: EdgeInsets.all(5),
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(50),
-                          color: Colors.grey[100]),
+                          boxShadow: shadowColor,
+                          color: deepGreen),
                       child: Icon(
                         Icons.person,
                         size: 30,
-                        color: deepPurple,
+                        color: white,
                       ),
                     ),
               title: Row(
@@ -114,15 +115,22 @@ class _C_DrawerState extends State<C_Drawer> {
                     leading: _buildIcon(Icons.home),
                     title: Text('Home'),
                     selectedColor: Colors.green,
-                    tileColor: selectedIndexs== 0 ? Colors.black12 : null,
+                    tileColor: selectedIndexs == 0 ? Colors.black12 : null,
                     onTap: () {
                       // Navigate to home
-                      selectedIndexs == 0
-                          ? Navigator.pop(context)
-                          : Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => C_HomeScreen()));
+                      if (selectedIndexs != 0) {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => C_HomeScreen()));
+                      }
+
+                      // selectedIndexs == 0
+                      //     ? Navigator.pop(context)
+                      //     : Navigator.push(
+                      //         context,
+                      //         MaterialPageRoute(
+                      //             builder: (context) => C_HomeScreen()));
                     },
                   ),
                   // Contract
@@ -130,13 +138,15 @@ class _C_DrawerState extends State<C_Drawer> {
                     leading: _buildIcon(Icons.content_paste_search_sharp),
                     title: Text('Contract'),
                     selectedColor: Colors.green,
-                    tileColor:selectedIndexs == 1 ? Colors.black12 : null,
+                    tileColor: selectedIndexs == 1 ? Colors.black12 : null,
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => C_ContractScreen()),
-                      );
+                      if (selectedIndexs != 1) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => C_ContractScreen()),
+                        );
+                      }
                     },
                   ),
                   // About Us
@@ -144,7 +154,7 @@ class _C_DrawerState extends State<C_Drawer> {
                     leading: _buildIcon(Icons.account_circle),
                     title: Text('About Us'),
                     selectedColor: Colors.green,
-                    tileColor:selectedIndexs== 2 ? Colors.black12 : null,
+                    tileColor: selectedIndexs == 2 ? Colors.black12 : null,
                     onTap: () {
                       Navigator.push(
                         context,
@@ -157,7 +167,7 @@ class _C_DrawerState extends State<C_Drawer> {
                     leading: _buildIcon(Icons.description),
                     title: Text('Terms and Conditions'),
                     selectedColor: Colors.green,
-                    tileColor: selectedIndexs== 3 ? Colors.black12 : null,
+                    tileColor: selectedIndexs == 3 ? Colors.black12 : null,
                     onTap: () {
                       Navigator.push(
                         context,
@@ -171,7 +181,7 @@ class _C_DrawerState extends State<C_Drawer> {
                     leading: _buildIcon(Icons.error),
                     title: Text('Privacy Policy'),
                     selectedColor: Colors.green,
-                    tileColor: selectedIndexs== 4 ? Colors.black12 : null,
+                    tileColor: selectedIndexs == 4 ? Colors.black12 : null,
                     onTap: () {
                       Navigator.push(
                         context,
@@ -192,12 +202,16 @@ class _C_DrawerState extends State<C_Drawer> {
   // Helper method to build icon container
   Widget _buildIcon(IconData icon) {
     return Container(
-      padding: EdgeInsets.all(5),
+      padding: EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(10),
+        color: deepPurple,
+        boxShadow: shadowColor,
+        borderRadius: BorderRadius.circular(100),
       ),
-      child: Icon(icon, color: deepPurple,),
+      child: Icon(
+        icon,
+        color: white,
+      ),
     );
   }
 }

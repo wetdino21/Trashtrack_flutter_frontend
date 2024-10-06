@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-// import 'package:provider/provider.dart';
-// import 'package:trashtrack/data_model.dart';
+import 'package:provider/provider.dart';
+import 'package:trashtrack/data_model.dart';
 
 //Customer library
 import 'package:trashtrack/Customer/c_Schedule.dart';
@@ -40,9 +40,20 @@ import 'package:hive_flutter/hive_flutter.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
-  runApp(MyApp());
-  // runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => UserModel(), // Initialize UserModel without default values
+      child: MyApp(),
+    ),
+  );
 }
+
+// void main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   await Hive.initFlutter();
+//   runApp(MyApp());
+//   // runApp(const MyApp());
+// }
 
 class MyApp extends StatelessWidget {
   @override

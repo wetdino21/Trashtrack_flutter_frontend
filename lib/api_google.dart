@@ -8,10 +8,11 @@ import 'package:trashtrack/api_token.dart';
 import 'package:trashtrack/create_acc.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:trashtrack/user_data.dart';
+import 'package:trashtrack/user_hive_data.dart';
 
 // final String baseUrl = 'http://192.168.254.187:3000';
 String baseUrl = globalUrl();
+//String? baseUrl = globalUrl().getBaseUrl();
 
 // Google Sign-In instance
 final GoogleSignIn _googleSignIn = GoogleSignIn();

@@ -11,6 +11,7 @@ final storage = FlutterSecureStorage();
 
 // final String baseUrl = 'http://192.168.254.187:3000';
 String baseUrl = globalUrl();
+//String? baseUrl = globalUrl().getBaseUrl();
 
 // Store tokens in secure storage
 Future<void> storeNewUser(String newUser) async {

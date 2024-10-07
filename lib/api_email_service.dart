@@ -4,6 +4,8 @@ import 'package:trashtrack/api_network.dart';
 
 // final String Url = 'http://192.168.254.187:3000';
 String BaseUrl = globalUrl();
+// String? BaseUrl = globalUrl().getBaseUrl();
+
 Future<void> sendEmailSignUp(String to, String subject, String code) async {
   final baseUrl = Uri.parse('$BaseUrl/send_email');
 

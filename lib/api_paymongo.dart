@@ -8,6 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 // import 'package:app_links/app_links.dart';
 
 String baseUrl = globalUrl();
+//String? baseUrl = globalUrl().getBaseUrl();
 
 Future<void> _launchPaymentUrl(String url) async {
   final Uri uri = Uri.parse(url);

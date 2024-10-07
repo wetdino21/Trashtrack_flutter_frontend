@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:trashtrack/api_network.dart';
 import 'package:trashtrack/data_model.dart';
 
 //Customer library
 import 'package:trashtrack/Customer/c_Schedule.dart';
 import 'package:trashtrack/Customer/c_about_us.dart';
-import 'package:trashtrack/Customer/c_change_pass.dart';
+import 'package:trashtrack/change_pass.dart';
 import 'package:trashtrack/Customer/c_home.dart';
 import 'package:trashtrack/Customer/c_map.dart';
 import 'package:trashtrack/Customer/c_notification.dart';
@@ -58,17 +59,12 @@ void main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    //token
-
-    // return MultiProvider(
-    //   providers: [
-    //     ChangeNotifierProvider(create: (_) => UserData()),
-    //   ],
-
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       //initialRoute: initialRoute,
       // home: TokenCheck(), // final firt route
+      //home: StoreNetwork(), // for testing with network
+
       initialRoute: 'c_home', //for testing
       //initialRoute: 'splash', //for testing
       routes: {
@@ -80,13 +76,14 @@ class MyApp extends StatelessWidget {
         'login': (context) => const LoginPage(),
         'deactivated': (context) => const DeactivatedScreen(),
         'suspended': (context) => const SuspendedScreen(),
+        //'change_pass': (context) => ChangePassword(),
 
         //Hauler Routes
         'home': (context) => HomeScreen(),
         'map': (context) => MapScreen(),
         'schedule': (context) => ScheduleScreen(),
         'vehicle': (context) => VehicleScreen(),
-        'change_pass': (context) => ChangePass(),
+        //'change_pass': (context) => ChangePass(),
         'about_us': (context) => AboutUs(),
         'privacy_policy': (context) => PrivacyPolicy(),
         'notification': (context) => NotificationScreen(),
@@ -97,7 +94,7 @@ class MyApp extends StatelessWidget {
         'c_map': (context) => C_MapScreen(),
         'c_schedule': (context) => C_ScheduleScreen(),
         'c_payment': (context) => C_PaymentScreen(),
-        'c_change_pass': (context) => C_ChangePass(),
+
         'c_about_us': (context) => C_AboutUs(),
         'c_notification': (context) => C_NotificationScreen(),
         'c_profile': (context) => C_ProfileScreen(),

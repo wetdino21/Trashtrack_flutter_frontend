@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:trashtrack/data_model.dart';
 import 'package:trashtrack/styles.dart';
 import 'dart:typed_data'; // for Uint8List
-import 'package:trashtrack/user_data.dart';
+import 'package:trashtrack/user_hive_data.dart';
 
 class C_CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final String title;

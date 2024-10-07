@@ -9,7 +9,7 @@ import 'package:trashtrack/styles.dart';
 import 'package:flutter/services.dart';
 import 'package:trashtrack/api_address.dart';
 import 'dart:async';
-import 'package:trashtrack/user_data.dart';
+import 'package:trashtrack/user_hive_data.dart';
 import 'package:image_picker/image_picker.dart';
 
 class C_ProfileScreen extends StatefulWidget {

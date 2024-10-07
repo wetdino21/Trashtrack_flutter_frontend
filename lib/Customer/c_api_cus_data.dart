@@ -10,6 +10,7 @@ import 'package:trashtrack/styles.dart';
 
 //final String baseUrl = 'http://192.168.254.187:3000';
 String baseUrl = globalUrl();
+//String? baseUrl = globalUrl().getBaseUrl();
 
 Future<Map<String, dynamic>?> fetchCusData(BuildContext context) async {
   Map<String, String?> tokens = await getTokens();
@@ -60,7 +61,8 @@ Future<Map<String, dynamic>?> fetchCusData(BuildContext context) async {
       print('Response: ${response.body}');
     }
 
-    showErrorSnackBar(context, response.body);
+    //error user not found
+    showErrorSnackBar(context, '${response.body} in fetching data');
     return null;
   }
 }

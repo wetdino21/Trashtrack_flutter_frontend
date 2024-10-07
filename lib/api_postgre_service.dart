@@ -5,10 +5,11 @@ import 'package:trashtrack/api_network.dart';
 import 'package:trashtrack/api_token.dart';
 import 'package:flutter/material.dart';
 import 'package:trashtrack/styles.dart';
-import 'package:trashtrack/user_data.dart';
+import 'package:trashtrack/user_hive_data.dart';
 
 // final String baseUrl = 'http://192.168.254.187:3000';
 String baseUrl = globalUrl();
+//String? baseUrl = globalUrl().getBaseUrl();
 
 Future<String?> createCode(String email) async {
   final response = await http.post(
@@ -178,6 +179,7 @@ Future<String?> createCustomer(
 
 Future<String?> loginAccount(
     BuildContext context, String email, String password) async {
+  showErrorSnackBar(context, baseUrl!);
   final response = await http.post(
     Uri.parse('$baseUrl/login'),
     headers: {'Content-Type': 'application/json'},
@@ -221,7 +223,7 @@ Future<String?> loginAccount(
   return response.body;
 }
 
-Future<String?> updatepassword(String email, String newPassword) async {
+Future<String?> updateForgotPassword(String email, String newPassword) async {
   final response = await http.post(
     Uri.parse('$baseUrl/update_password'),
     headers: {'Content-Type': 'application/json'},
@@ -825,6 +827,58 @@ Future<String?> binding_google(BuildContext context, String? email) async {
       //showErrorSnackBar(context, response.body);
     }
     print('Update Booking is not successful!');
+    return response.body;
+  } catch (e) {
+    print(e.toString());
+  }
+  return null;
+}
+
+// update password
+Future<String?> change_password(BuildContext context, String? newPassword) async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+  if (accessToken == null) {
+    print('No access token available. User needs to log in.');
+    await deleteTokens(context); // Logout use
+  }
+
+  try {
+    final response = await http.post(
+      Uri.parse('$baseUrl/change_password'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'newPassword': newPassword,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      showSuccessSnackBar(context, 'Password Changed');
+      return 'success';
+    } else {
+      if (response.statusCode == 401) {
+        // Access token might be expired, attempt to refresh it
+        print('Access token expired. Attempting to refresh...');
+        String? refreshMsg = await refreshAccessToken(context);
+        if (refreshMsg == null) {
+          return await change_password(context, newPassword);
+        }
+      } else if (response.statusCode == 403) {
+        // Access token is invalid. logout
+        print('Access token invalid. Attempting to logout...');
+        showErrorSnackBar(
+            context, 'Active time has been expired please login again.');
+        await deleteTokens(context); // Logout use
+      } else {
+        print('Response: ${response.body}');
+      }
+
+      //showErrorSnackBar(context, response.body);
+    }
+    print('Change password is not successful!');
     return response.body;
   } catch (e) {
     print(e.toString());

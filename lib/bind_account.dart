@@ -469,7 +469,7 @@ class _BindWithTrashTrackScreenState extends State<BindWithTrashTrackScreen> {
 
         isloading = false;
       });
-      showSuccessSnackBar(context, 'Successfully resent new code');
+      showSuccessSnackBar(context, 'Successfully sent new code');
     }
   }
 

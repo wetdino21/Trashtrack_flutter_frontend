@@ -8,7 +8,7 @@ import 'package:trashtrack/privacy_policy.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:trashtrack/terms_conditions.dart';
 import 'dart:typed_data'; // for Uint8List
-import 'package:trashtrack/user_data.dart';
+import 'package:trashtrack/user_hive_data.dart';
 
 class C_Drawer extends StatefulWidget {
   final int? currentIndex; // Optional index parameter
@@ -133,22 +133,22 @@ class _C_DrawerState extends State<C_Drawer> {
                       //             builder: (context) => C_HomeScreen()));
                     },
                   ),
-                  // Contract
-                  ListTile(
-                    leading: _buildIcon(Icons.content_paste_search_sharp),
-                    title: Text('Contract'),
-                    selectedColor: Colors.green,
-                    tileColor: selectedIndexs == 1 ? Colors.black12 : null,
-                    onTap: () {
-                      if (selectedIndexs != 1) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => C_ContractScreen()),
-                        );
-                      }
-                    },
-                  ),
+                  // // Contract
+                  // ListTile(
+                  //   leading: _buildIcon(Icons.content_paste_search_sharp),
+                  //   title: Text('Contract'),
+                  //   selectedColor: Colors.green,
+                  //   tileColor: selectedIndexs == 1 ? Colors.black12 : null,
+                  //   onTap: () {
+                  //     if (selectedIndexs != 1) {
+                  //       Navigator.push(
+                  //         context,
+                  //         MaterialPageRoute(
+                  //             builder: (context) => C_ContractScreen()),
+                  //       );
+                  //     }
+                  //   },
+                  // ),
                   // About Us
                   ListTile(
                     leading: _buildIcon(Icons.account_circle),

@@ -9,7 +9,7 @@ import 'package:trashtrack/api_token.dart';
 import 'package:trashtrack/data_model.dart';
 import 'package:trashtrack/styles.dart';
 
-import 'package:trashtrack/user_data.dart';
+import 'package:trashtrack/user_hive_data.dart';
 import 'package:flutter_cube/flutter_cube.dart';
 
 class C_HomeScreen extends StatefulWidget {
@@ -90,10 +90,10 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
 
       //await data.close();
     } catch (e) {
-      setState(() {
-        errorMessage = e.toString();
-        isLoading = false;
-      });
+      // setState(() {
+      //   errorMessage = e.toString();
+      //   isLoading = false;
+      // });
     }
   }
 

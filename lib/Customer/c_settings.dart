@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:trashtrack/api_postgre_service.dart';
 import 'package:trashtrack/api_token.dart';
 import 'package:trashtrack/bind_account.dart';
+import 'package:trashtrack/change_pass.dart';
 import 'package:trashtrack/data_model.dart';
 import 'package:trashtrack/styles.dart';
 
@@ -75,8 +76,8 @@ class _C_SettingsScreenState extends State<C_SettingsScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  BindWithGoogleScreen(email: userModel!.email!),
+                              builder: (context) => BindWithGoogleScreen(
+                                  email: userModel!.email!),
                             ),
                           );
                         } else if (userModel!.auth == 'GOOGLE') {
@@ -101,7 +102,17 @@ class _C_SettingsScreenState extends State<C_SettingsScreen> {
                     leading: _buildIcon(Icons.lock),
                     title: Text('Change password'),
                     onTap: () {
-                      Navigator.pushNamed(context, 'change_pass');
+                      if (userModel!.auth == 'GOOGLE') {
+                        _showNoPassConfirmDialog(context);
+                      } else {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                ChangePassword(email: userModel!.email!),
+                          ),
+                        );
+                      }
                     },
                   ),
                   ListTile(
@@ -138,6 +149,45 @@ class _C_SettingsScreenState extends State<C_SettingsScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  //show no pass
+  void _showNoPassConfirmDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.deepPurple,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(20.0))),
+          title: Text('No Password', style: TextStyle(color: Colors.white)),
+          content: Text(
+              'Looks like your account is a Google Account. Do you want to bind and create a password instead?',
+              style: TextStyle(color: Colors.white)),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        BindWithTrashTrackScreen(email: userModel!.email!),
+                  ),
+                );
+              },
+              child: Text('Yes', style: TextStyle(color: Colors.white)),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
     );
   }
 

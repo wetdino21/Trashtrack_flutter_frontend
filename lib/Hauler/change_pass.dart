@@ -5,8 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:trashtrack/login.dart';
 import 'package:trashtrack/styles.dart';
 
-class ChangePass extends StatelessWidget {
-  const ChangePass({super.key});
+class ChangePassHaul extends StatelessWidget {
+  const ChangePassHaul({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,18 +17,18 @@ class ChangePass extends StatelessWidget {
         foregroundColor: accentColor,
         //title: Text('Change Password'),
       ),
-      body: ChangePasswordScreen(),
+      body: ChangePasswordHaulScreen(),
     );
   }
 }
 
 // Password Recovery Screen
-class ChangePasswordScreen extends StatefulWidget {
+class ChangePasswordHaulScreen extends StatefulWidget {
   @override
-  _ChangePasswordScreenState createState() => _ChangePasswordScreenState();
+  _ChangePasswordHaulScreenState createState() => _ChangePasswordHaulScreenState();
 }
 
-class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
+class _ChangePasswordHaulScreenState extends State<ChangePasswordHaulScreen> {
   final TextEditingController _emailController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 

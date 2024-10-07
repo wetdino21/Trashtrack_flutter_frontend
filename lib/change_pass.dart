@@ -1,4 +1,12 @@
 import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:trashtrack/data_model.dart';
+import 'package:trashtrack/login.dart';
+import 'package:trashtrack/styles.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:trashtrack/api_email_service.dart';
@@ -6,36 +14,57 @@ import 'package:trashtrack/api_postgre_service.dart';
 import 'package:trashtrack/login.dart';
 import 'package:trashtrack/styles.dart';
 
-class ForgotPassword extends StatelessWidget {
-  const ForgotPassword({super.key});
+// Reset Password Screen
+class ChangePassword extends StatefulWidget {
+  final String email;
+
+  ChangePassword({
+    required this.email,
+  });
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        //title: Text('Forgot Password'),
-        backgroundColor: deepGreen,
-        foregroundColor: Colors.white,
-      ),
-      body: PasswordRecoveryScreen(),
-    );
-  }
+  _ChangePasswordState createState() => _ChangePasswordState();
 }
 
-// Password Recovery Screen
-class PasswordRecoveryScreen extends StatefulWidget {
-  @override
-  _PasswordRecoveryScreenState createState() => _PasswordRecoveryScreenState();
-}
-
-class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
-  final TextEditingController _emailController = TextEditingController();
+class _ChangePasswordState extends State<ChangePassword> {
+  bool _isObscured = true;
+  bool _isObscured2 = true;
   final _formKey = GlobalKey<FormState>();
-  String emailvalidator = '';
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+
+  String passvalidator = '';
+  String confirmpassvalidator = '';
   bool isLoading = false;
+  UserModel? userModel;
+  int _currentStep = 1;
+  bool _isLoading = false;
+
+  bool isloading = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _startTimer();
+    _timer.cancel();
+    _resendCode();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    userModel = Provider.of<UserModel>(context); // Access provider here
+  }
+
   @override
   void dispose() {
-    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+
+    _timer.cancel();
+    _codeControllers.forEach((controller) => controller.dispose());
     super.dispose();
   }
 
@@ -50,202 +79,39 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
         : SizedBox();
   }
 
-  String _validateEmail(String? value) {
-    final emailPattern = r'^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$';
-    ////validator
+  String _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please enter your email';
+      return 'Please enter your password';
     }
-    if (!RegExp(emailPattern).hasMatch(value)) {
-      return 'Please enter a valid email';
+    if (value.length < 8) {
+      return 'Password must be at least 8 characters long';
+    }
+    final hasLetter = RegExp(r'[a-zA-Z]').hasMatch(value);
+    final hasNumber = RegExp(r'[0-9]').hasMatch(value);
+    if (!hasLetter || !hasNumber) {
+      return 'Password must contain both letters and numbers';
+    }
+    // if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
+    //   return 'Password must contain a special character';
+    // }
+    return '';
+  }
+
+  String _validateConfirmPassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please re-enter your password';
+    }
+    if (value != _passwordController.text) {
+      return 'Passwords do not match';
     }
     return '';
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: deepGreen,
-      body: Stack(
-        children: [
-          ListView(
-            children: [
-              SizedBox(height: 50),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Form(
-                  key: _formKey,
-                  child: Center(
-                    child: Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 16.0, vertical: 100),
-                      decoration: BoxDecoration(
-                          color: white,
-                          borderRadius: BorderRadius.circular(15.0),
-                          boxShadow: shadowBigColor),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Text(
-                            'Password Recovery',
-                            style: TextStyle(
-                              fontSize: 28,
-                              color: deepPurple,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          SizedBox(height: 20),
-                          Text(
-                            'Please enter your email associated with the account.',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.black54,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          SizedBox(height: 20),
-                          Container(
-                            decoration: BoxDecoration(boxShadow: shadowColor),
-                            child: TextFormField(
-                              controller: _emailController,
-                              decoration: InputDecoration(
-                                labelText: 'Email',
-                                labelStyle: TextStyle(color: Colors.grey),
-                                filled: true,
-                                fillColor: white,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                  borderSide: BorderSide.none,
-                                ),
-                                prefixIcon:
-                                    Icon(Icons.email, color: deepPurple),
-                              ),
-                              onChanged: (value) {
-                                setState(() {
-                                  emailvalidator = _validateEmail(value);
-                                });
-                              },
-                            ),
-                          ),
-                          _validator(emailvalidator),
-                          SizedBox(height: 20),
-                          InkWell(
-                            onTap: () async {
-                              if (_emailController.text.isEmpty ||
-                                  emailvalidator != '') {
-                                setState(() {
-                                  emailvalidator =
-                                      _validateEmail(_emailController.text);
-                                });
-                              } else {
-                                setState(() {
-                                  isLoading = true;
-                                });
-
-                                String? errorMessage =
-                                    await sendEmailCodeForgotPass(
-                                        _emailController.text);
-                                if (errorMessage != null) {
-                                  showErrorSnackBar(context, errorMessage);
-                                  setState(() {
-                                    isLoading = false;
-                                  });
-                                } else {
-                                  setState(() {
-                                    isLoading = false;
-                                  });
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          VerifyEmailForgotPassScreen(
-                                              email: _emailController.text),
-                                    ),
-                                  );
-                                }
-                              }
-                            },
-                            child: Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 70.0, vertical: 10),
-                                decoration: BoxDecoration(
-                                    color: Colors.green,
-                                    borderRadius: BorderRadius.circular(10.0),
-                                    boxShadow: shadowColor),
-                                child: Center(
-                                  child: const Text(
-                                    'Next',
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 25,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                )),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          if (isLoading)
-            Positioned.fill(
-                child: InkWell(
-              child: Center(
-                child: CircularProgressIndicator(
-                  color: Colors.green,
-                  strokeWidth: 10,
-                  strokeAlign: 2,
-                  backgroundColor: Colors.deepPurple,
-                ),
-              ),
-            )),
-        ],
-      ),
-    );
-  }
-}
-
-// Check Email Screen
-class VerifyEmailForgotPassScreen extends StatefulWidget {
-  final String email;
-
-  VerifyEmailForgotPassScreen({
-    required this.email,
-  });
-
-  @override
-  _VerifyEmailForgotPassScreenState createState() =>
-      _VerifyEmailForgotPassScreenState();
-}
-
-class _VerifyEmailForgotPassScreenState
-    extends State<VerifyEmailForgotPassScreen> {
   final List<TextEditingController> _codeControllers =
       List.generate(6, (_) => TextEditingController());
   int _timerSeconds = 300;
   late Timer _timer;
   late int onResendCode;
-
-  bool isloading = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _startTimer();
-    //_timer.cancel();
-  }
-
-  @override
-  void dispose() {
-    _timer.cancel();
-    _codeControllers.forEach((controller) => controller.dispose());
-    super.dispose();
-  }
 
   void _startTimer() {
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
@@ -284,7 +150,7 @@ class _VerifyEmailForgotPassScreenState
 
         isloading = false;
       });
-      showSuccessSnackBar(context, 'Successfully sent new code');
+      showSuccessSnackBar(context, 'Successfully resent new code');
     }
   }
 
@@ -316,6 +182,38 @@ class _VerifyEmailForgotPassScreenState
 
   @override
   Widget build(BuildContext context) {
+    //final userModel = Provider.of<UserModel>(context);
+    return Scaffold(
+      backgroundColor: deepGreen,
+      body: Stack(
+        children: [
+          Column(
+            children: [
+              Expanded(
+                child: _currentStep == 1 ? _emailScreen() : _passwordScreen(),
+                // : _secondGoogleBind(),
+              ),
+            ],
+          ),
+          if (_isLoading)
+            Positioned.fill(
+                child: InkWell(
+              child: Center(
+                child: CircularProgressIndicator(
+                  color: Colors.green,
+                  strokeWidth: 10,
+                  strokeAlign: 2,
+                  backgroundColor: Colors.deepPurple,
+                ),
+              ),
+            )),
+        ],
+      ),
+    );
+  }
+
+  //1st page
+  Widget _emailScreen() {
     return Scaffold(
       backgroundColor: deepGreen,
       appBar: AppBar(
@@ -363,7 +261,7 @@ class _VerifyEmailForgotPassScreenState
                             textAlign: TextAlign.center,
                           ),
                           Text(
-                            widget.email,
+                            userModel!.email!,
                             style: TextStyle(
                               fontSize: 16,
                               color: deepPurple,
@@ -473,19 +371,13 @@ class _VerifyEmailForgotPassScreenState
                             updateEnteredCode(); //to update stored enteredCode
                             print(enteredCode);
                             String? errorMessage = await verifyEmailCode(
-                                widget.email, enteredCode);
+                                userModel!.email!, enteredCode);
                             if (errorMessage != null) {
                               showErrorSnackBar(context, errorMessage);
                             } else {
-                              showSuccessSnackBar(
-                                  context, 'Successful Email Verification');
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      ResetPasswordScreen(email: widget.email),
-                                ),
-                              );
+                              setState(() {
+                                _currentStep++;
+                              });
                             }
                           } else {
                             showErrorSnackBar(context, error);
@@ -529,98 +421,28 @@ class _VerifyEmailForgotPassScreenState
       ),
     );
   }
-}
 
-// Reset Password Screen
-class ResetPasswordScreen extends StatefulWidget {
-  final String email;
-
-  ResetPasswordScreen({
-    required this.email,
-  });
-
-  @override
-  _ResetPasswordScreenState createState() => _ResetPasswordScreenState();
-}
-
-class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
-  bool _isObscured = true;
-  bool _isObscured2 = true;
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
-
-  String passvalidator = '';
-  String confirmpassvalidator = '';
-  bool isLoading = false;
-
-  @override
-  void dispose() {
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
-    super.dispose();
-  }
-
-  _validator(String showValidator) {
-    return showValidator != ''
-        ? Center(
-            child: Text(
-              showValidator,
-              style: TextStyle(color: Colors.red),
-            ),
-          )
-        : SizedBox();
-  }
-
-  String _validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter your password';
-    }
-    if (value.length < 8) {
-      return 'Password must be at least 8 characters long';
-    }
-    final hasLetter = RegExp(r'[a-zA-Z]').hasMatch(value);
-    final hasNumber = RegExp(r'[0-9]').hasMatch(value);
-    if (!hasLetter || !hasNumber) {
-      return 'Password must contain both letters and numbers';
-    }
-    // if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
-    //   return 'Password must contain a special character';
-    // }
-    return '';
-  }
-
-  String _validateConfirmPassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please re-enter your password';
-    }
-    if (value != _passwordController.text) {
-      return 'Passwords do not match';
-    }
-    return '';
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  //2nd page
+  Widget _passwordScreen() {
     return Scaffold(
       backgroundColor: deepPurple,
       appBar: AppBar(
         backgroundColor: deepPurple,
         foregroundColor: Colors.white,
-        leading: IconButton(
-            onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ForgotPassword(),
-                  ),
-                ),
-            icon: Icon(Icons.arrow_back)),
       ),
       body: Stack(
         children: [
           ListView(
             children: [
+              PopScope(
+                  canPop: false,
+                  onPopInvokedWithResult: (didPop, result) async {
+                    if (didPop) {
+                      return;
+                    }
+                    Navigator.pop(context);
+                  },
+                  child: Container()),
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Form(
@@ -637,7 +459,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Text(
-                          'Reset Your Password',
+                          'Change Your Password',
                           style: TextStyle(
                             fontSize: 28,
                             color: deepGreen,
@@ -749,28 +571,22 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                     _confirmPasswordController.text);
                               });
                             } else {
-                              setState(() {
-                                isLoading = true;
-                              });
-                              String? errorMessage = await updateForgotPassword(
-                                  widget.email, _passwordController.text);
+                              //update pass
+                              String? errorMessage = await change_password(
+                                  context, _passwordController.text);
 
-                              // If there's an error, show it in a SnackBar
-                              if (errorMessage != null) {
-                                showErrorSnackBar(context, errorMessage);
-                                setState(() {
-                                  isLoading = false;
-                                });
-                              } else {
-                                setState(() {
-                                  isLoading = false;
-                                });
+                              if (errorMessage == 'success') {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => SuccessScreen(),
                                   ),
                                 );
+                              } else {
+                                showErrorSnackBar(context, errorMessage!);
+                                setState(() {
+                                  isLoading = false;
+                                });
                               }
                             }
                           },
@@ -842,7 +658,7 @@ class SuccessScreen extends StatelessWidget {
                   color: Colors.lightGreenAccent, size: 100),
               SizedBox(height: 20),
               Text(
-                'Password Reset Successful!',
+                'Password Changed Successful!',
                 style: TextStyle(
                   fontSize: 28,
                   color: Colors.lightGreenAccent,
@@ -852,7 +668,7 @@ class SuccessScreen extends StatelessWidget {
               ),
               SizedBox(height: 20),
               Text(
-                'Your password has been successfully changed.',
+                'Your password has been successfully updated.',
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.white,
@@ -862,13 +678,8 @@ class SuccessScreen extends StatelessWidget {
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => LoginPage(),
-                    ),
-                    (route) => false,
-                  );
+                  Navigator.pop(context);
+                  Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.lightGreenAccent,
@@ -878,7 +689,7 @@ class SuccessScreen extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  'Sign in',
+                  'Okay',
                   style: TextStyle(color: Colors.black, fontSize: 18),
                 ),
               ),

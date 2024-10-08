@@ -271,7 +271,7 @@ Future<String?> userUpdate(
   String? accessToken = tokens['access_token'];
   if (accessToken == null) {
     print('No access token available. User needs to log in.');
-    await deleteTokens(context); // Logout user
+    await deleteTokens(); // Logout user
     return null;
   }
 
@@ -321,7 +321,7 @@ Future<String?> userUpdate(
         print('Access token invalid. Attempting to logout...');
         showErrorSnackBar(
             context, 'Active time has been expired. Please login again.');
-        await deleteTokens(context); // Logout user
+        await deleteTokens(); // Logout user
       } else {
         print('Error updating user: ${response.body}');
         showErrorSnackBar(context, 'Error updating user: ${response.body}');
@@ -369,7 +369,7 @@ Future<void> updateProfile(
   print('$fname $lname');
   if (accessToken == null) {
     print('No access token available. User needs to log in.');
-    await deleteTokens(context); // Logout use
+    await deleteTokens(); // Logout use
     return;
   }
 
@@ -401,7 +401,7 @@ Future<void> updateProfile(
       print('Access token invalid. Attempting to logout...');
       showErrorSnackBar(
           context, 'Active time has been expired please login again.');
-      await deleteTokens(context); // Logout use
+      await deleteTokens(); // Logout use
     } else {
       print('Response: ${response.body}');
     }
@@ -427,7 +427,7 @@ Future<String?> booking(
   String? accessToken = tokens['access_token'];
   if (accessToken == null) {
     print('No access token available. User needs to log in.');
-    await deleteTokens(context); // Logout use
+    await deleteTokens(); // Logout use
   }
 
   try {
@@ -468,7 +468,7 @@ Future<String?> booking(
         print('Access token invalid. Attempting to logout...');
         showErrorSnackBar(
             context, 'Active time has been expired please login again.');
-        await deleteTokens(context); // Logout use
+        await deleteTokens(); // Logout use
       } else {
         print('Response: ${response.body}');
       }
@@ -491,7 +491,7 @@ Future<Map<String, List<Map<String, dynamic>>>?> fetchBookingData(
 
   if (accessToken == null) {
     print('No access token available. User needs to log in.');
-    await deleteTokens(context);
+    await deleteTokens();
     return null;
   }
 
@@ -525,13 +525,13 @@ Future<Map<String, List<Map<String, dynamic>>>?> fetchBookingData(
         return await fetchBookingData(context);
       } else {
         // Refresh token is invalid or expired, logout the user
-        await deleteTokens(context); // Logout user
+        await deleteTokens(); // Logout user
         return null;
       }
     } else if (response.statusCode == 403) {
       // Access token is invalid. logout
       print('Access token invalid. Attempting to logout...');
-      await deleteTokens(context); // Logout user
+      await deleteTokens(); // Logout user
     } else if (response.statusCode == 404) {
       print('No booking found');
       return null;
@@ -564,7 +564,7 @@ Future<String?> bookingUpdate(
   String? accessToken = tokens['access_token'];
   if (accessToken == null) {
     print('No access token available. User needs to log in.');
-    await deleteTokens(context); // Logout use
+    await deleteTokens(); // Logout use
   }
 
   try {
@@ -605,7 +605,7 @@ Future<String?> bookingUpdate(
         print('Access token invalid. Attempting to logout...');
         showErrorSnackBar(
             context, 'Active time has been expired please login again.');
-        await deleteTokens(context); // Logout use
+        await deleteTokens(); // Logout use
       } else {
         print('Response: ${response.body}');
       }
@@ -626,7 +626,7 @@ Future<String?> bookingCancel(BuildContext context, int bookId) async {
   String? accessToken = tokens['access_token'];
   if (accessToken == null) {
     print('No access token available. User needs to log in.');
-    await deleteTokens(context); // Logout use
+    await deleteTokens(); // Logout use
   }
 
   try {
@@ -655,7 +655,7 @@ Future<String?> bookingCancel(BuildContext context, int bookId) async {
         print('Access token invalid. Attempting to logout...');
         showErrorSnackBar(
             context, 'Active time has been expired please login again.');
-        await deleteTokens(context); // Logout use
+        await deleteTokens(); // Logout use
       } else {
         print('Response: ${response.body}');
       }
@@ -677,7 +677,7 @@ Future<String?> deactivateUser(BuildContext context, String email) async {
   String? accessToken = tokens['access_token'];
   if (accessToken == null) {
     print('No access token available. User needs to log in.');
-    await deleteTokens(context); // Logout use
+    await deleteTokens(); // Logout use
   }
 
   try {
@@ -706,7 +706,7 @@ Future<String?> deactivateUser(BuildContext context, String email) async {
         print('Access token invalid. Attempting to logout...');
         showErrorSnackBar(
             context, 'Active time has been expired please login again.');
-        await deleteTokens(context); // Logout use
+        await deleteTokens(); // Logout use
       } else {
         print('Response: ${response.body}');
       }
@@ -728,7 +728,7 @@ Future<String?> binding_trashtrack(
   String? accessToken = tokens['access_token'];
   if (accessToken == null) {
     print('No access token available. User needs to log in.');
-    await deleteTokens(context); // Logout use
+    await deleteTokens(); // Logout use
   }
 
   try {
@@ -760,7 +760,7 @@ Future<String?> binding_trashtrack(
         print('Access token invalid. Attempting to logout...');
         showErrorSnackBar(
             context, 'Active time has been expired please login again.');
-        await deleteTokens(context); // Logout use
+        await deleteTokens(); // Logout use
       } else {
         print('Response: ${response.body}');
       }
@@ -781,7 +781,7 @@ Future<String?> binding_google(BuildContext context, String? email) async {
   String? accessToken = tokens['access_token'];
   if (accessToken == null) {
     print('No access token available. User needs to log in.');
-    await deleteTokens(context); // Logout use
+    await deleteTokens(); // Logout use
   }
 
   try {
@@ -819,7 +819,7 @@ Future<String?> binding_google(BuildContext context, String? email) async {
         print('Access token invalid. Attempting to logout...');
         showErrorSnackBar(
             context, 'Active time has been expired please login again.');
-        await deleteTokens(context); // Logout use
+        await deleteTokens(); // Logout use
       } else {
         print('Response: ${response.body}');
       }
@@ -840,7 +840,7 @@ Future<String?> change_password(BuildContext context, String? newPassword) async
   String? accessToken = tokens['access_token'];
   if (accessToken == null) {
     print('No access token available. User needs to log in.');
-    await deleteTokens(context); // Logout use
+    await deleteTokens(); // Logout use
   }
 
   try {
@@ -871,7 +871,7 @@ Future<String?> change_password(BuildContext context, String? newPassword) async
         print('Access token invalid. Attempting to logout...');
         showErrorSnackBar(
             context, 'Active time has been expired please login again.');
-        await deleteTokens(context); // Logout use
+        await deleteTokens(); // Logout use
       } else {
         print('Response: ${response.body}');
       }

@@ -140,23 +140,24 @@ class _C_NotificationScreenState extends State<C_NotificationScreen>
                     itemCount: notifications!.length,
                     itemBuilder: (context, index) {
                       final notification = notifications![index];
-                      final status = notification['notif_status'] ?? '';
-                      final statusColor = status == 'Sent'
-                          ? Colors.green
-                          : status == 'Seen'
-                              ? Colors.white54
-                              : Colors.transparent;
-                      final boxColor = status == 'Sent'
-                          ? deepPurple
-                          : status == 'Seen'
-                              ? Colors.black
-                              : deepPurple;
+                      final bool status = notification['notif_read'] ==
+                          true; // Ensure this is a boolean
+                      String showStatus = status
+                          ? 'Read'
+                          : 'Sent'; 
+
+                      final Color statusColor = status
+                          ? Colors.white54
+                          : Colors.green; // Color for the status text
+                      final Color boxColor = status
+                          ? Colors.black
+                          : deepPurple; // Color for the notification box
 
                       return NotificationCard(
                         dateTime:
                             formatDateTime(notification['notif_created_at']),
                         title: notification['notif_message'],
-                        status: status,
+                        status: showStatus,
                         statusColor: statusColor,
                         notifBoxColor: boxColor,
                       );
@@ -222,10 +223,9 @@ class NotificationCard extends StatelessWidget {
         padding: EdgeInsets.all(10),
         margin: EdgeInsets.all(5),
         decoration: BoxDecoration(
-          color: notifBoxColor,
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: shadowLowColor
-        ),
+            color: notifBoxColor,
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: shadowLowColor),
         child: Row(
           children: [
             Icon(Icons.circle, color: statusColor, size: 16),

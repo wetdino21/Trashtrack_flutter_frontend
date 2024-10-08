@@ -24,6 +24,8 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
   bool isLoading = false;
   int selectedPage = 0;
   late PageController _pageController;
+  bool containCurrent = false;
+  bool containHistory = false;
 
   @override
   void initState() {
@@ -69,6 +71,30 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
         setState(() {
           bookingList = data['booking'];
           bookingWasteList = data['wasteTypes'];
+
+          if (bookingList != null) {
+            var filteredCurrent = bookingList!.where((booking) {
+              return booking['bk_status'] == 'Pending' ||
+                  booking['bk_status'] == 'Ongoing';
+            }).toList();
+
+            // Check if filteredList has any items
+            if (filteredCurrent.isNotEmpty) {
+              containCurrent = true;
+            }
+          }
+
+          if (bookingList != null) {
+            var filteredHistory = bookingList!.where((booking) {
+              return booking['bk_status'] == 'Cancelled' ||
+                  booking['bk_status'] == 'Collected';
+            }).toList();
+
+            // Check if filteredList has any items
+            if (filteredHistory.isNotEmpty) {
+              containHistory = true;
+            }
+          }
           isLoading = false;
         });
       } else {
@@ -280,7 +306,7 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                                   },
                                 );
                               })
-                          : bookingList == null
+                          : bookingList == null || !containCurrent
                               ? ListView(
                                   children: [
                                     Column(
@@ -433,12 +459,28 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                                   },
                                 );
                               })
-                          : bookingList == null
-                              ? Center(
-                                  child: Text(
-                                  'No available Scheduled History.\n\n\n\n',
-                                  style: TextStyle(color: white, fontSize: 20),
-                                ))
+                          : bookingList == null || !containHistory
+                              ? ListView(
+                                  children: [
+                                    Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        SizedBox(
+                                          height: 100,
+                                        ),
+                                        Text(
+                                          'No available Scheduled History.\n\n\n\n',
+                                          style: TextStyle(
+                                              color: white, fontSize: 20),
+                                        ),
+                                        SizedBox(
+                                          height: 100,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                )
                               : ListView.builder(
                                   itemCount: bookingList?.length == null
                                       ? 0

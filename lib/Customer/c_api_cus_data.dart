@@ -18,7 +18,7 @@ Future<Map<String, dynamic>?> fetchCusData(BuildContext context) async {
 
   if (accessToken == null) {
     print('No access token available. User needs to log in.');
-    await deleteTokens(context);
+    await deleteTokens();
     return null;
   }
 
@@ -50,13 +50,13 @@ Future<Map<String, dynamic>?> fetchCusData(BuildContext context) async {
         return await fetchCusData(context);
       } else {
         // Refresh token is invalid or expired, logout the user
-        await deleteTokens(context); // Logout user
+        await deleteTokens(); // Logout user
         return null;
       }
     } else if (response.statusCode == 403) {
       // Access token is invalid. logout
       print('Access token invalid. Attempting to logout...');
-      await deleteTokens(context); // Logout use
+      await deleteTokens(); // Logout use
     } else {
       print('Response: ${response.body}');
     }
@@ -74,7 +74,7 @@ Future<String?> fetchProfile(BuildContext context) async {
 
   if (accessToken == null) {
     print('No access token available. User needs to log in.');
-    await deleteTokens(context);
+    await deleteTokens();
     return null;
   }
 
@@ -97,13 +97,13 @@ Future<String?> fetchProfile(BuildContext context) async {
         return await fetchProfile(context);
       } else {
         // Refresh token is invalid or expired, logout the user
-        await deleteTokens(context); // Logout user
+        await deleteTokens(); // Logout user
         return null;
       }
     } else if (response.statusCode == 403) {
       // Access token is invalid. logout
       print('Access token invalid. Attempting to logout...');
-      await deleteTokens(context); // Logout use
+      await deleteTokens(); // Logout use
     } else {
       print('Response: ${response.body}');
     }
@@ -121,7 +121,7 @@ Future<List<Map<String, dynamic>>?> fetchCusNotifications(
 
   if (accessToken == null) {
     print('No access token available. User needs to log in.');
-    await deleteTokens(context);
+    await deleteTokens();
     return null;
   }
 
@@ -143,13 +143,13 @@ Future<List<Map<String, dynamic>>?> fetchCusNotifications(
         return await fetchCusNotifications(context);
       } else {
         // Refresh token is invalid or expired, logout the user
-        await deleteTokens(context); // Logout user
+        await deleteTokens(); // Logout user
         return null;
       }
     } else if (response.statusCode == 403) {
       // Access token is invalid. logout
       print('Access token invalid. Attempting to logout...');
-      await deleteTokens(context); // Logout user
+      await deleteTokens(); // Logout user
     } else if (response.statusCode == 404) {
       print('No notification found');
       return null;

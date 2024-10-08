@@ -319,7 +319,7 @@ class _C_MapScreenState extends State<C_MapScreen> {
 
               return originalDuration + addedDuration; // Adjusted duration
             }).toList();
-            
+
             // routeDurations = routesData
             //     .map<double>((route) => (route['duration'] as num).toDouble())
             //     .toList();
@@ -1352,10 +1352,9 @@ class _C_MapScreenState extends State<C_MapScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                     
                       Row(
                         children: [
-                           SizedBox(width: 10),
+                          SizedBox(width: 10),
                           Text(
                             '${nearestDuration} ',
                             style: TextStyle(
@@ -1376,7 +1375,7 @@ class _C_MapScreenState extends State<C_MapScreen> {
                       ),
                       Row(
                         children: [
-                           SizedBox(width: 10),
+                          SizedBox(width: 10),
                           Text(
                             'Fastest Route',
                             style:
@@ -1516,31 +1515,38 @@ class RouteMarker extends StatelessWidget {
             ],
           ),
         ),
-        Container(
-          height: 50,
-          child: Row(
-            children: [
-              Expanded(
-                flex: 6,
-                child: Container(),
-              ),
-              Expanded(
-                flex: 1,
-                child: Container(
-                  color: isFastestRoute
-                      ? Colors.blue
-                      : Colors.white, // Highlight if fastest
-                  // Set the width and height for the stick
-                  height: double.infinity, // Fills the parent height
-                ),
-              ),
-              Expanded(
-                flex: 6,
-                child: SizedBox(),
-              ),
-            ],
+        Stack(children: [
+          Container(
+            height: 50,
           ),
-        )
+          Positioned(top: 0, bottom: 0, left: 25, child: 
+          Image.asset(isFastestRoute? 'assets/pin_blue.png' :  'assets/pin_white.png'))
+        ]),
+        // Container(
+        //   height: 50,
+        //   child: Row(
+        //     children: [
+        //       Expanded(
+        //         flex: 6,
+        //         child: Container(),
+        //       ),
+        //       Expanded(
+        //         flex: 1,
+        //         child: Container(
+        //           color: isFastestRoute
+        //               ? Colors.blue
+        //               : Colors.white, // Highlight if fastest
+        //           // Set the width and height for the stick
+        //           height: double.infinity, // Fills the parent height
+        //         ),
+        //       ),
+        //       Expanded(
+        //         flex: 6,
+        //         child: SizedBox(),
+        //       ),
+        //     ],
+        //   ),
+        // )
       ],
     );
   }

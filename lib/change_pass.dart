@@ -150,7 +150,7 @@ class _ChangePasswordState extends State<ChangePassword> {
 
         isloading = false;
       });
-      showSuccessSnackBar(context, 'Successfully resent new code');
+      showSuccessSnackBar(context, 'Successfully sent new code');
     }
   }
 

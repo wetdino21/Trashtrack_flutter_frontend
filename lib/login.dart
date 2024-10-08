@@ -33,11 +33,11 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(
         backgroundColor: deepGreen,
         foregroundColor: Colors.white,
-        leading: IconButton(
-            onPressed: () {
-              Navigator.pushNamed(context, 'splash');
-            },
-            icon: Icon(Icons.arrow_back)),
+        // leading: IconButton(
+        //     onPressed: () {
+        //       Navigator.pushNamed(context, 'splash');
+        //     },
+        //     icon: Icon(Icons.arrow_back)),
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -47,6 +47,15 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                PopScope(
+                    canPop: false,
+                    onPopInvokedWithResult: (didPop, result) async {
+                      if (didPop) {
+                        return;
+                      }
+                       Navigator.pushNamed(context, 'splash');
+                    },
+                    child: Container()),
                 Container(
                   padding: EdgeInsets.all(16.0),
                   decoration: BoxDecoration(
@@ -172,7 +181,8 @@ class _LoginPageState extends State<LoginPage> {
                               color: const Color.fromARGB(255, 196, 52, 41),
                               fontSize: 16.0,
                               decoration: TextDecoration.underline,
-                              decorationColor: const Color.fromARGB(255, 170, 40, 31),
+                              decorationColor:
+                                  const Color.fromARGB(255, 170, 40, 31),
                             ),
                           ),
                         ),
@@ -335,9 +345,9 @@ class _LoginPageState extends State<LoginPage> {
                             Text(
                               'Don\'t have an account yet?',
                               style: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 16,
-                                  ),
+                                color: Colors.grey,
+                                fontSize: 16,
+                              ),
                             ),
                             TextButton(
                               onPressed: () {

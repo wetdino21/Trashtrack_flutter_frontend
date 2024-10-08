@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 class UserModel extends ChangeNotifier {
   // User fields
+  String? id;
   String? fname;
   String? lname;
   String? email;
@@ -10,8 +11,9 @@ class UserModel extends ChangeNotifier {
   Uint8List? profile;
 
   // Fetch or update user data and notify listeners
-  void setUserData(String? newFname, String? newLname, String? newEmail,
-      String? newAuth, Uint8List? newProfile) {
+  void setUserData(String? newId, String? newFname, String? newLname,
+      String? newEmail, String? newAuth, Uint8List? newProfile) {
+    id = newId;
     fname = newFname;
     lname = newLname;
     email = newEmail;
@@ -27,13 +29,13 @@ class UserModel extends ChangeNotifier {
     notifyListeners();
   }
 
-   // update auth
+  // update auth
   void setBindTrashtrack(String? userAuth) {
     auth = userAuth;
     notifyListeners();
   }
 
-     // update auth
+  // update auth
   void setBindGoogle(String? userAuth, String? newEmail) {
     auth = userAuth;
     email = newEmail;

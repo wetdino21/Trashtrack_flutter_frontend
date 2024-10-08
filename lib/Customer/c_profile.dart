@@ -1609,11 +1609,12 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                             await _dbData();
                             // Update the user data in the provider
                             userModel!.setUserData(
+                                userModel!.id ?? '',
                                 _fnameController.text,
                                 userModel!.lname ??
                                     '', // Keep current last name
-                                userModel!.email ?? '', 
-                                userModel!.auth ?? '', 
+                                userModel!.email ?? '',
+                                userModel!.auth ?? '',
                                 photoBytes);
 
                             setState(() {
@@ -1936,10 +1937,11 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                   setState(() {
                     // Update the user data in the provider
                     userModel!.setUserData(
+                        userModel!.id ?? '',
                         _fnameController.text,
                         userModel!.lname ?? '', // Keep current last name
                         userModel!.email ?? '',
-                        userModel!.auth ?? '', 
+                        userModel!.auth ?? '',
                         photoBytes);
 
                     _resetData();

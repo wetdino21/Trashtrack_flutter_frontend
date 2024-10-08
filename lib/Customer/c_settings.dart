@@ -232,7 +232,7 @@ class _C_SettingsScreenState extends State<C_SettingsScreen> {
                 String? deactMsg =
                     await deactivateUser(context, userModel!.email!);
                 if (deactMsg == 'success') {
-                  deleteTokens(context);
+                  deleteTokens();
 
                   Navigator.of(context).pop();
                   Navigator.pushNamed(context, 'login');

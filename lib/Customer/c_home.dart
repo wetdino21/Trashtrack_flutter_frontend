@@ -53,10 +53,18 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
     _dbData();
   }
 
+  //   @override
+  // void dispose() {
+  //   showErrorSnackBar(context, 'homeeeeee dispose');
+  //   print('home disposeeee');
+  //   super.dispose();
+  // }
+
 // Fetch user data from the server
   Future<void> _dbData() async {
     try {
-      await storeDataInHive(context);
+      //await storeDataInHive(context);
+      
       //final data = await Hive.openBox('mybox');
       final data = await userDataFromHive();
       // final data = await fetchCusData(context);
@@ -70,7 +78,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
         // }
       });
 
-      Provider.of<UserModel>(context, listen: false).setUserData(data['fname'],
+      Provider.of<UserModel>(context, listen: false).setUserData(data['id'].toString(), data['fname'],
           data['lname'], data['email'], data['auth'], data['profile']);
 
       //if online provider
@@ -146,6 +154,20 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                         //     darkPurple = Colors.grey;
                         //   });
                         // }),
+                        
+                        // Stack(
+                        //   children: [
+                        //     Container(
+                        //       color: white,
+                        //       height: 200,
+                        //       width: 200,
+                        //     ),
+                        //     Positioned(
+                        //       top: 0,
+                        //       bottom: 0,
+                        //       child: Image.asset('assets/pin.png'))
+                        //   ]
+                        // ),
 
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,

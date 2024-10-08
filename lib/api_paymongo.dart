@@ -23,7 +23,7 @@ Future<void> launchPaymentLink(BuildContext context) async {
   String? accessToken = tokens['access_token'];
   if (accessToken == null) {
     print('No access token available. User needs to log in.');
-    await deleteTokens(context); // Logout user
+    await deleteTokens(); // Logout user
     return;
   }
 
@@ -67,7 +67,7 @@ Future<void> launchPaymentLink(BuildContext context) async {
         print('Access token invalid. Attempting to logout...');
         showErrorSnackBar(
             context, 'Active time has been expired. Please login again.');
-        await deleteTokens(context); // Logout user
+        await deleteTokens(); // Logout user
       } else {
         print('Error updating user: ${response.body}');
         showErrorSnackBar(context, 'Error updating user: ${response.body}');
@@ -88,7 +88,7 @@ Future<void> launchPaymentLink2(BuildContext context) async {
   String? accessToken = tokens['access_token'];
   if (accessToken == null) {
     print('No access token available. User needs to log in.');
-    await deleteTokens(context); // Logout user
+    await deleteTokens(); // Logout user
     return;
   }
 
@@ -130,7 +130,7 @@ Future<void> launchPaymentLink2(BuildContext context) async {
         print('Access token invalid. Attempting to logout...');
         showErrorSnackBar(
             context, 'Active time has been expired. Please login again.');
-        await deleteTokens(context); // Logout user
+        await deleteTokens(); // Logout user
       } else {
         print('Error updating user: ${response.body}');
         showErrorSnackBar(context, 'Error updating user: ${response.body}');
@@ -156,7 +156,7 @@ Future<void> checkPaymentStatus(
   String? accessToken = tokens['access_token'];
   if (accessToken == null) {
     print('No access token available. User needs to log in.');
-    await deleteTokens(context); // Logout user
+    await deleteTokens(); // Logout user
     return;
   }
 

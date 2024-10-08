@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:trashtrack/Customer/c_api_cus_data.dart'; // For imageBytes if applicable
 import 'dart:convert';
 
+import 'package:trashtrack/styles.dart';
+
 Future<void> storeDataInHive(BuildContext context) async {
   // Fetch data from the API or another source
   final data = await fetchCusData(context);
@@ -72,9 +74,27 @@ Future<void> storeDataInHive(BuildContext context) async {
     await box.put('auth', auth);
     await box.put('profile', imageBytes);
 
-    // Optionally, print a message or handle UI updates
+    //notification count
+    List<Map<String, dynamic>>? notifications;
+    int unreadCount = 0;
+    try {
+      final notifData = await fetchCusNotifications(context);
+      if (notifData != null) {
+        notifications = notifData;
+        // Count unread notifications
+        unreadCount = notifications.where((notification) {
+          return notification['notif_read'] == false;
+        }).length;
+      } else {
+        print('NOTIFICATION USER DATA IS NULL');
+      }
+    } catch (e) {
+      showErrorSnackBar(context, e.toString());
+    }
+
+    await box.put('notif_count', unreadCount);
+
     print('Data has been saved to Hive.');
-    //showErrorSnackBar(context, 'goooooooooooooooooood');
   }
 }
 

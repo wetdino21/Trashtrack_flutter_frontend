@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:flutter/material.dart';
 import 'package:trashtrack/api_network.dart';
+import 'package:trashtrack/main.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:hive/hive.dart';
 
@@ -99,26 +100,15 @@ Future<bool> loggedIn() async {
 }
 
 // Delete tokens (for logout)
-Future<void> deleteTokens(BuildContext context) async {
+Future<void> deleteTokens() async {
   await storage.delete(key: 'access_token');
   await storage.delete(key: 'refresh_token');
 
   //delete hive boxe
   await Hive.deleteBoxFromDisk('mybox');
-
+  navigatorKey.currentState?.pushNamed('/logout');
   // Delay navigation until the widget is stable
-  Future.microtask(() {
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      'login',
-      (Route<dynamic> route) => false, // Remove all previous routes
-    );
-  });
-  // Navigator.pushNamedAndRemoveUntil(
-  //   context,
-  //   'login',
-  //   (Route<dynamic> route) => false, // Remove all previous routes
-  // );
+
 }
 
 // Function to make API call (with token verification)
@@ -128,7 +118,7 @@ Future<void> makeApiRequest(BuildContext context) async {
 
   if (accessToken == null) {
     print('No access token available. User needs to log in.');
-    await deleteTokens(context); // Logout use
+    await deleteTokens(); // Logout use
     return;
   }
 
@@ -149,12 +139,12 @@ Future<void> makeApiRequest(BuildContext context) async {
       return await makeApiRequest(context);
     } else {
       // Refresh token is invalid or expired, logout the user
-      await deleteTokens(context); // Logout user
+      await deleteTokens(); // Logout user
     }
   } else if (response.statusCode == 403) {
     // Access token is invalid. logout
     print('Access token invalid. Attempting to logout...');
-    await deleteTokens(context); // Logout use
+    await deleteTokens(); // Logout use
   } else {
     print('Error: ${response.body}');
   }
@@ -167,7 +157,7 @@ Future<String?> refreshAccessToken(BuildContext context) async {
 
   if (refreshToken == null) {
     print('No refresh token available. User needs to log in.');
-    await deleteTokens(context); // Logout use
+    await deleteTokens(); // Logout use
     return 'invalid/expired token';
   }
 
@@ -187,7 +177,7 @@ Future<String?> refreshAccessToken(BuildContext context) async {
     return null;
   } else if (response.statusCode == 403) {
     print('Refresh token expired or invalid. Logging out...');
-    await deleteTokens(context); // Logout user if refresh token is invalid
+    await deleteTokens(); // Logout user if refresh token is invalid
     return 'invalid/expired token';
   }
   return response.body;
@@ -205,7 +195,7 @@ Future<String> onOpenApp(BuildContext context) async {
   }
   if (accessToken == null) {
     print('No access token available. User needs to log in.');
-    await deleteTokens(context); // Logout use
+    await deleteTokens(); // Logout use
     return 'login';
   }
 
@@ -229,13 +219,13 @@ Future<String> onOpenApp(BuildContext context) async {
         return await onOpenApp(context);
       } else {
         // Refresh token is invalid or expired, logout the user
-        await deleteTokens(context); // Logout user
+        await deleteTokens(); // Logout user
         return 'login';
       }
     } else if (response.statusCode == 403) {
       // Access token is invalid. logout
       print('Access token invalid. Attempting to logout...');
-      await deleteTokens(context); // Logout use
+      await deleteTokens(); // Logout use
     } else {
       print('Response: ${response.body}');
     }
@@ -286,34 +276,37 @@ Future<String> onOpenApp(BuildContext context) async {
 //   }
 // }
 
-
-  void showLogoutConfirmationDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.red[900],
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(15.0))),
-          title: Text('Logout', style: TextStyle(color: Colors.white)),
-          content: Text('Are you sure you want to log out?',
-              style: TextStyle(color: Colors.white)),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancel', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-            ),
-            TextButton(
-              onPressed: () {
-                deleteTokens(context);
-                Navigator.of(context).pop();
-              },
-              child: Text('Yes', style: TextStyle(color: Colors.white,  fontWeight: FontWeight.bold)),
-            ),
-          ],
-        );
-      },
-    );
-  }
+void showLogoutConfirmationDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: Colors.red[900],
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(15.0))),
+        title: Text('Logout', style: TextStyle(color: Colors.white)),
+        content: Text('Are you sure you want to log out?',
+            style: TextStyle(color: Colors.white)),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('Cancel',
+                style: TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+          TextButton(
+            onPressed: () {
+              deleteTokens();
+              Navigator.of(context).pop();
+            },
+            child: Text('Yes',
+                style: TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      );
+    },
+  );
+}

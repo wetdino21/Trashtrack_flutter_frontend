@@ -60,7 +60,7 @@ dependencies:
   collection: ^1.18.0 #for list/map compare
   image_picker: ^1.1.2
   provider: ^6.1.2
-  
+  web_socket_channel: ^3.0.1
   #flutter_launcher_icons: ^0.14.1
 
 dev_dependencies:

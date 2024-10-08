@@ -38,6 +38,9 @@ import 'package:trashtrack/terms_conditions.dart';
 ////asds
 import 'package:hive_flutter/hive_flutter.dart';
 
+import 'package:web_socket_channel/web_socket_channel.dart';
+import 'dart:convert';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
@@ -55,19 +58,24 @@ void main() async {
 //   runApp(MyApp());
 //   // runApp(const MyApp());
 // }
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       //initialRoute: initialRoute,
-      // home: TokenCheck(), // final firt route
+       home: TokenCheck(), // final firt route
       //home: StoreNetwork(), // for testing with network
 
-      initialRoute: 'c_home', //for testing
+      //home: WebSocketExample(), //for testing
+      //initialRoute: 'c_home', //for testing
       //initialRoute: 'splash', //for testing
       routes: {
+        '/logout': (context) => LoginPage(),
+
         'splash': (context) => SplashScreen(),
         'terms': (context) => TermsAndConditions(),
         'forgot_pass': (context) => const ForgotPassword(),
@@ -103,6 +111,73 @@ class MyApp extends StatelessWidget {
   }
 }
 
+class WebSocketExample extends StatefulWidget {
+  @override
+  _WebSocketExampleState createState() => _WebSocketExampleState();
+}
+
+class _WebSocketExampleState extends State<WebSocketExample> {
+  //late WebSocketChannel channel;
+  WebSocketChannel channel = WebSocketChannel.connect(
+    Uri.parse('ws://192.168.254.187:8080'),
+  );
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   // Connect to the WebSocket server
+  //   channel = WebSocketChannel.connect(
+  //     Uri.parse('ws://192.168.254.187:8080'),
+  //   );
+  // }
+
+  @override
+  void dispose() {
+    channel.sink.close();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('WebSocket Example'),
+      ),
+      body: Container(
+        padding: const EdgeInsets.all(8.0),
+        child: StreamBuilder(
+          stream: channel.stream,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              //return Text('Received: ${snapshot.data}');
+              try {
+                // Decode the incoming data from JSON string to Dart object
+                List<String> notifications = []; // To store notifications
+                final notification = json.decode(snapshot.data as String);
+                notifications.add(notification['notif_message']);
+                return ListView.builder(
+                  itemCount: notifications.length,
+                  itemBuilder: (context, index) {
+                    //final notification = notifications[index];
+                    return ListTile(
+                      title: Text(notifications[index]),
+                    );
+                  },
+                );
+              } catch (e) {
+                return Center(child: Text('Error decoding notifications: $e'));
+              }
+            } else {
+              return Text('Waiting for messagessss...');
+            }
+          },
+        ),
+      ),
+    );
+  }
+}
+
+////////
 class TokenCheck extends StatefulWidget {
   @override
   _TokenCheckState createState() => _TokenCheckState();
@@ -137,7 +212,7 @@ class _TokenCheckState extends State<TokenCheck> {
             ),
             ElevatedButton(
                 onPressed: () {
-                  deleteTokens(context);
+                  deleteTokens();
                 },
                 child: Text('delete token')),
           ],

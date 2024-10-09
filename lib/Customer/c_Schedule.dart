@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:trashtrack/Customer/c_appbar.dart';
-import 'package:trashtrack/Customer/c_bottom_nav_bar.dart';
-import 'package:trashtrack/Customer/c_drawer.dart';
 import 'package:trashtrack/Customer/c_schedule_list.dart';
 import 'package:trashtrack/Customer/c_booking.dart';
 import 'package:trashtrack/api_postgre_service.dart';
@@ -123,8 +120,8 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: deepGreen,
-      appBar: C_CustomAppBar(title: 'Schedule'), //Schedule
-      drawer: C_Drawer(),
+      // appBar: C_CustomAppBar(title: 'Schedule'), //Schedule
+      // drawer: C_Drawer(),
       body: ListView(
         children: [
           Container(
@@ -566,9 +563,9 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
           ),
         ],
       ),
-      bottomNavigationBar: C_BottomNavBar(
-        currentIndex: 2,
-      ),
+      // bottomNavigationBar: C_BottomNavBar(
+      //   currentIndex: 2,
+      // ),
     );
   }
 }

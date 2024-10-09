@@ -240,7 +240,7 @@ class _LoginPageState extends State<LoginPage> {
                                   ScaffoldMessenger.of(context)
                                       .clearSnackBars();
                                   Navigator.pushReplacementNamed(
-                                      context, 'c_home');
+                                      context, '/mainApp');
                                 } else if (dbMessage == 'hauler') {
                                   ScaffoldMessenger.of(context)
                                       .clearSnackBars();

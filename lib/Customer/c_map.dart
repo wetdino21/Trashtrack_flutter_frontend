@@ -3,9 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:http/http.dart' as http;
-import 'package:trashtrack/Customer/c_appbar.dart';
-import 'package:trashtrack/Customer/c_bottom_nav_bar.dart';
-import 'package:trashtrack/Customer/c_drawer.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:geolocator/geolocator.dart';
 import 'dart:async';
@@ -352,6 +349,7 @@ class _C_MapScreenState extends State<C_MapScreen> {
         retryCount++; //retry
         print('Failed to load routes: ${e}');
       } finally {
+        if (!mounted) return null;
         setState(() {
           isLoading = false;
         });
@@ -459,6 +457,7 @@ class _C_MapScreenState extends State<C_MapScreen> {
       });
     } catch (e) {
     } finally {
+      if (!mounted) return null;
       setState(() {
         isLoading = false;
       });
@@ -482,6 +481,7 @@ class _C_MapScreenState extends State<C_MapScreen> {
         await getPlaceName(selectedPoint!.latitude, selectedPoint!.longitude);
 
     // Then call setState to update the UI
+    if (!mounted) return null;
     setState(() {
       selectedPlaceName = placeName;
     });
@@ -490,19 +490,23 @@ class _C_MapScreenState extends State<C_MapScreen> {
   void fetchStartPlaceName() async {
     String? startPlace =
         await getPlaceName(startPoint!.latitude, startPoint!.longitude);
-    _startController.text = startPlace!;
-    setState(() {
-      startName = startPlace;
-    });
+    if (startPlace != null) {
+      _startController.text = startPlace;
+      setState(() {
+        startName = startPlace;
+      });
+    }
   }
 
   void fetchDestinationPlaceName() async {
     String? destinationPlace = await getPlaceName(
         destinationPoint!.latitude, destinationPoint!.longitude);
-    _destinationController.text = destinationPlace!;
-    setState(() {
-      destinationName = destinationPlace;
-    });
+    if (destinationPlace != null) {
+      _destinationController.text = destinationPlace;
+      setState(() {
+        destinationName = destinationPlace;
+      });
+    }
   }
 
   //current live
@@ -567,6 +571,8 @@ class _C_MapScreenState extends State<C_MapScreen> {
         (Position position) async {
           String? getCurrentName =
               await getPlaceName(position.latitude, position.longitude);
+
+          if (!mounted) return null;
           setState(() {
             _currentLocation = LatLng(position.latitude, position.longitude);
             selectedCurrentName = getCurrentName;
@@ -684,8 +690,8 @@ class _C_MapScreenState extends State<C_MapScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _mapScreenKey,
-      appBar: C_CustomAppBar(title: 'Map'),
-      drawer: C_Drawer(),
+      // appBar: C_CustomAppBar(title: 'Map'),
+      // drawer: C_Drawer(),
       body: Stack(
         children: [
           FlutterMap(
@@ -1434,9 +1440,9 @@ class _C_MapScreenState extends State<C_MapScreen> {
                       ),
                     )
                   : null,
-      bottomNavigationBar: C_BottomNavBar(
-        currentIndex: 1,
-      ),
+      // bottomNavigationBar: C_BottomNavBar(
+      //   currentIndex: 1,
+      // ),
     );
   }
 }
@@ -1519,8 +1525,13 @@ class RouteMarker extends StatelessWidget {
           Container(
             height: 50,
           ),
-          Positioned(top: 0, bottom: 0, left: 25, child: 
-          Image.asset(isFastestRoute? 'assets/pin_blue.png' :  'assets/pin_white.png'))
+          Positioned(
+              top: 0,
+              bottom: 0,
+              left: 25,
+              child: Image.asset(isFastestRoute
+                  ? 'assets/pin_blue.png'
+                  : 'assets/pin_white.png'))
         ]),
         // Container(
         //   height: 50,

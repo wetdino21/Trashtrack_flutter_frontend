@@ -2,13 +2,20 @@ import 'package:hive/hive.dart';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:trashtrack/Customer/c_api_cus_data.dart'; // For imageBytes if applicable
+import 'package:trashtrack/Customer/c_api_cus_data.dart'; 
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:trashtrack/main.dart';
 import 'package:trashtrack/styles.dart';
 
+String extractIpAddress(String url) {
+  // Remove the protocol
+  String withoutProtocol = url.replaceFirst(RegExp(r'http://'), '');
+  // Remove the port if present
+  String ipAddress = withoutProtocol.split(':')[0];
+  return ipAddress;
+}
 ////////////////////////////////////////////////////////////////////////
 //final String baseUrl = 'http://localhost:3000';
 

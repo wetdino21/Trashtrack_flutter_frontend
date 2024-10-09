@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:trashtrack/Customer/c_appbar.dart';
-import 'package:trashtrack/Customer/c_bottom_nav_bar.dart';
-import 'package:trashtrack/Customer/c_drawer.dart';
 import 'package:trashtrack/Customer/c_waste_info.dart';
 import 'package:trashtrack/Customer/c_booking.dart';
 import 'package:trashtrack/api_token.dart';
@@ -32,12 +29,12 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _obj = Object(
-      scale: Vector3(12.0, 12.0, 12.0),
-      //position: Vector3(0, 0, 0),
-      rotation: Vector3(0, -90, 0), // Start sideways
-      fileName: 'assets/objects/base.obj',
-    );
+    // _obj = Object(
+    //   scale: Vector3(12.0, 12.0, 12.0),
+    //   //position: Vector3(0, 0, 0),
+    //   rotation: Vector3(0, -90, 0), // Start sideways
+    //   fileName: 'assets/objects/base.obj',
+    // );
     userModel = Provider.of<UserModel>(context); // Access provider here
   }
 
@@ -64,10 +61,11 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
   Future<void> _dbData() async {
     try {
       //await storeDataInHive(context);
-      
+
       //final data = await Hive.openBox('mybox');
       final data = await userDataFromHive();
       // final data = await fetchCusData(context);
+      if(!mounted) return null;
       setState(() {
         userData = data;
         isLoading = false;
@@ -78,8 +76,8 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
         // }
       });
 
-      Provider.of<UserModel>(context, listen: false).setUserData(data['id'].toString(), data['fname'],
-          data['lname'], data['email'], data['auth'], data['profile']);
+      // Provider.of<UserModel>(context, listen: false).setUserData(data['id'].toString(), data['fname'],
+      //     data['lname'], data['email'], data['auth'], data['profile']);
 
       //if online provider
       // final data2 = await fetchCusData(context);
@@ -130,252 +128,288 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
       child: Scaffold(
         key: _scaffoldKey,
         backgroundColor: deepGreen,
-        appBar: C_CustomAppBar(
-          title: 'Home',
-        ),
-        drawer: C_Drawer(
-          currentIndex: 0,
-        ),
-        body: RefreshIndicator(
-          onRefresh: _dbData,
-          child: isLoading
-              ? Center(child: CircularProgressIndicator())
-              : userData != null
-                  ? ListView(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 16.0, vertical: 16.0),
-                      children: [
-                        // InkWell(
-                        //   child: Text('data'),
-                        //   onTap: (){
-                        //   setState(() {
-                        //     deepGreen = Colors.grey;
-                        //     deepPurple = Colors.grey;
-                        //     darkPurple = Colors.grey;
-                        //   });
-                        // }),
-                        
-                        // Stack(
-                        //   children: [
-                        //     Container(
-                        //       color: white,
-                        //       height: 200,
-                        //       width: 200,
-                        //     ),
-                        //     Positioned(
-                        //       top: 0,
-                        //       bottom: 0,
-                        //       child: Image.asset('assets/pin.png'))
-                        //   ]
-                        // ),
-
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+        // appBar: C_CustomAppBar(
+        //   title: 'Home',
+        // ),
+        // drawer: C_Drawer(
+        //   currentIndex: 0,
+        // ),
+        body: Stack(
+          children: [
+            RefreshIndicator(
+              onRefresh: _dbData,
+              child:
+                  // isLoading
+                  //     ? Center(child: CircularProgressIndicator())
+                  //     :
+                  userData != null
+                      ? ListView(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 16.0),
                           children: [
-                            SizedBox(
-                              height: 20,
-                            ),
-                            // ElevatedButton(
-                            //     onPressed: () async {
-                            //       bool onLocation =
-                            //           await checkLocationPermission();
-                            //       if (onLocation)
-                            //         Navigator.push(
-                            //             context,
-                            //             MaterialPageRoute(
-                            //                 builder: (context) => C_MapScreen(
-                            //                     pickupPoint: LatLng(10.25702151,
-                            //                         123.85040322))));
-                            //     },
-                            //     child: Text('Go To Map')),
-                            // Welcome Container
-                            Container(
-                              padding: EdgeInsets.all(16.0),
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10.0),
-                                  boxShadow: shadowBigColor),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    //'Welcome ${userData!['cus_fname']}!',
-                                    'Welcome ${userModel!.fname}!',
-                                    style: TextStyle(
-                                      fontSize: 24.0,
-                                      color: deepPurple,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  SizedBox(height: 10.0),
-                                  Text(
-                                    'Ready to keep things tidy? Schedule your garbage pickup today!',
-                                    style: TextStyle(
-                                      fontSize: 14.0,
-                                    ),
-                                  ),
-                                  Center(
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
+                            // InkWell(
+                            //   child: Text('data'),
+                            //   onTap: (){
+                            //   setState(() {
+                            //     deepGreen = Colors.grey;
+                            //     deepPurple = Colors.grey;
+                            //     darkPurple = Colors.grey;
+                            //   });
+                            // }),
+
+                            // Stack(
+                            //   children: [
+                            //     Container(
+                            //       color: white,
+                            //       height: 200,
+                            //       width: 200,
+                            //     ),
+                            //     Positioned(
+                            //       top: 0,
+                            //       bottom: 0,
+                            //       child: Image.asset('assets/pin.png'))
+                            //   ]
+                            // ),
+
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  height: 20,
+                                ),
+                                // ElevatedButton(
+                                //     onPressed: () async {
+                                //       bool onLocation =
+                                //           await checkLocationPermission();
+                                //       if (onLocation)
+                                //         Navigator.push(
+                                //             context,
+                                //             MaterialPageRoute(
+                                //                 builder: (context) => C_MapScreen(
+                                //                     pickupPoint: LatLng(10.25702151,
+                                //                         123.85040322))));
+                                //     },
+                                //     child: Text('Go To Map')),
+                                // Welcome Container
+                                Container(
+                                  padding: EdgeInsets.all(16.0),
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(10.0),
+                                      boxShadow: shadowBigColor),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        //'Welcome ${userData!['cus_fname']}!',
+                                        'Welcome ${userModel!.fname}!',
+                                        style: TextStyle(
+                                          fontSize: 24.0,
+                                          color: deepPurple,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Icon(
-                                            Icons.arrow_left,
-                                            color: deepPurple,
-                                          ),
-                                          Container(
-                                            height: 200,
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.7,
-                                            child: Cube(
-                                              onSceneCreated: (Scene scene) {
-                                                // scene.world.add(Object(
-                                                //     scale: Vector3(
-                                                //         12.0, 12.0, 12.0),
-                                                //     position: Vector3(0, 0, 0),
-                                                //     rotation:
-                                                //         Vector3(0, -90, 0),
-                                                //     fileName:
-                                                //         'assets/objects/base.obj'));
-                                                scene.world.add(_obj);
-                                              },
-                                            ),
-                                          ),
-                                          Icon(Icons.arrow_right,
-                                              color: deepPurple),
-                                        ],
+                                      SizedBox(height: 10.0),
+                                      Text(
+                                        'Ready to keep things tidy? Schedule your garbage pickup today!',
+                                        style: TextStyle(
+                                          fontSize: 14.0,
+                                        ),
                                       ),
-                                    ),
-                                  ),
-                                  SizedBox(height: 20.0),
-                                  Center(
-                                    child: Container(
-                                      decoration:
-                                          BoxDecoration(boxShadow: shadowColor),
-                                      child: ElevatedButton(
-                                        onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  RequestPickupScreen(),
-                                            ),
-                                          );
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: deepPurple,
-                                          shape: RoundedRectangleBorder(
+                                      Center(
+                                        child: Container(
+                                          decoration: BoxDecoration(
                                             borderRadius:
                                                 BorderRadius.circular(10.0),
                                           ),
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 16.0, horizontal: 30.0),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Icon(
+                                                Icons.arrow_left,
+                                                color: deepPurple,
+                                              ),
+                                              Container(
+                                                height: 200,
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.7,
+                                                child: Cube(
+                                                  onSceneCreated:
+                                                      (Scene scene) {
+                                                    // scene.world.add(Object(
+                                                    //     scale: Vector3(
+                                                    //         12.0, 12.0, 12.0),
+                                                    //     position: Vector3(0, 0, 0),
+                                                    //     rotation:
+                                                    //         Vector3(0, -90, 0),
+                                                    //     fileName:
+                                                    //         'assets/objects/base.obj'));
+                                                    scene.world.add(_obj);
+                                                  },
+                                                ),
+                                              ),
+                                              Icon(Icons.arrow_right,
+                                                  color: deepPurple),
+                                            ],
+                                          ),
                                         ),
-                                        child: Text(
-                                          'Request Pickup Now',
+                                      ),
+                                      SizedBox(height: 20.0),
+                                      Center(
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                              boxShadow: shadowColor),
+                                          child: ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      RequestPickupScreen(),
+                                                ),
+                                              );
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: deepPurple,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(10.0),
+                                              ),
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 16.0,
+                                                  horizontal: 30.0),
+                                            ),
+                                            child: Text(
+                                              'Request Pickup Now',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 18.0,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                                ////
+                                SizedBox(height: 20.0),
+                                Text(
+                                  '  Waste Collection Info',
+                                  style: TextStyle(
+                                    color: white,
+                                    fontSize: 18.0,
+                                  ),
+                                ),
+                                SizedBox(height: 5.0),
+
+                                GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  C_WasteInfo()));
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: white,
+                                        boxShadow: shadowMidColor,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: ListTile(
+                                        contentPadding: EdgeInsets.all(10),
+                                        leading: Icon(
+                                          Icons.view_list,
+                                          color: deepPurple,
+                                        ),
+                                        title: Text(
+                                          'Type of Waste',
                                           style: TextStyle(
-                                            color: Colors.white,
                                             fontSize: 18.0,
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                                    )),
 
-                            ////
-                            SizedBox(height: 20.0),
-                            Text(
-                              '  Waste Collection Info',
-                              style: TextStyle(
-                                color: white,
-                                fontSize: 18.0,
-                              ),
-                            ),
-                            SizedBox(height: 5.0),
-
-                            GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => C_WasteInfo()));
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
+                                /////
+                                SizedBox(height: 20.0),
+                                Text(
+                                  '  Previous waste pickup',
+                                  style: TextStyle(
                                     color: white,
-                                    boxShadow: shadowMidColor,
-                                    borderRadius: BorderRadius.circular(10),
+                                    fontSize: 18.0,
                                   ),
-                                  child: ListTile(
-                                    contentPadding: EdgeInsets.all(10),
-                                    leading: Icon(
-                                      Icons.view_list,
-                                      color: deepPurple,
-                                    ),
-                                    title: Text(
-                                      'Type of Waste',
-                                      style: TextStyle(
-                                        fontSize: 18.0,
-                                      ),
-                                    ),
-                                  ),
-                                )),
-
-                            /////
-                            SizedBox(height: 20.0),
-                            Text(
-                              '  Previous waste pickup',
-                              style: TextStyle(
-                                color: white,
-                                fontSize: 18.0,
-                              ),
-                            ),
-                            SizedBox(height: 5.0),
-
-                            // Statistic Boxes
-                            GridView.count(
-                              crossAxisCount: 2,
-                              shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              crossAxisSpacing: 10.0,
-                              mainAxisSpacing: 10.0,
-                              children: [
-                                StatisticBox(
-                                  icon: Icons.schedule,
-                                  title: 'Total Requests',
-                                  value: '150',
-                                  iconColor: accentColor,
                                 ),
-                                StatisticBox(
-                                  icon: Icons.delete_outline,
-                                  title: 'Total Tons Collected',
-                                  value: '75',
-                                  iconColor: accentColor,
+                                SizedBox(height: 5.0),
+
+                                // Statistic Boxes
+                                GridView.count(
+                                  crossAxisCount: 2,
+                                  shrinkWrap: true,
+                                  physics: NeverScrollableScrollPhysics(),
+                                  crossAxisSpacing: 10.0,
+                                  mainAxisSpacing: 10.0,
+                                  children: [
+                                    StatisticBox(
+                                      icon: Icons.schedule,
+                                      title: 'Total Requests',
+                                      value: '150',
+                                      iconColor: accentColor,
+                                    ),
+                                    StatisticBox(
+                                      icon: Icons.delete_outline,
+                                      title: 'Total Tons Collected',
+                                      value: '75',
+                                      iconColor: accentColor,
+                                    ),
+                                  ],
                                 ),
+
+                                SizedBox(height: 20.0),
                               ],
                             ),
-
-                            SizedBox(height: 20.0),
                           ],
-                        ),
-                      ],
-                    )
-                  ///// if error
-                  : Center(child: Text('Error: $errorMessage')),
+                        )
+                      ///// if error
+                      :  Positioned.fill(
+                child: InkWell(
+                  onTap: () {},
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.green,
+                      strokeWidth: 10,
+                      strokeAlign: 2,
+                      backgroundColor: Colors.deepPurple,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            // if (isLoading)
+            //   Positioned.fill(
+            //     child: InkWell(
+            //       onTap: () {},
+            //       child: Center(
+            //         child: CircularProgressIndicator(
+            //           color: Colors.green,
+            //           strokeWidth: 10,
+            //           strokeAlign: 2,
+            //           backgroundColor: Colors.deepPurple,
+            //         ),
+            //       ),
+            //     ),
+            //   ),
+          ],
         ),
-        bottomNavigationBar: C_BottomNavBar(
-          currentIndex: 0,
-        ),
+        // bottomNavigationBar: C_BottomNavBar(
+        //   currentIndex: 0,
+        // ),
       ),
     );
   }

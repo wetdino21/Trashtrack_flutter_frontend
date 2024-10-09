@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:trashtrack/Customer/c_contact.dart';
 import 'package:trashtrack/Customer/c_home.dart';
 import 'package:trashtrack/Customer/c_profile.dart';
 import 'package:trashtrack/Customer/c_settings.dart';
@@ -133,7 +132,7 @@ class _C_DrawerState extends State<C_Drawer> {
                       //             builder: (context) => C_HomeScreen()));
                     },
                   ),
-                  // // Contract
+                  // // Contract d
                   // ListTile(
                   //   leading: _buildIcon(Icons.content_paste_search_sharp),
                   //   title: Text('Contract'),

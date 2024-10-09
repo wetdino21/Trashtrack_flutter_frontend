@@ -1323,9 +1323,9 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                   _labelField(
                                       label: 'Status',
                                       value: userData?['status'] ?? ''),
-                                  _labelField(
-                                      label: 'Type',
-                                      value: userData?['type'] ?? ''),
+                                  // _labelField(
+                                  //     label: 'Type',
+                                  //     value: userData?['type'] ?? ''),
                                 ],
                               ),
                       ),

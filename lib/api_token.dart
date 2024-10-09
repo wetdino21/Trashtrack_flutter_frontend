@@ -108,7 +108,6 @@ Future<void> deleteTokens() async {
   await Hive.deleteBoxFromDisk('mybox');
   navigatorKey.currentState?.pushNamed('/logout');
   // Delay navigation until the widget is stable
-
 }
 
 // Function to make API call (with token verification)
@@ -206,10 +205,14 @@ Future<String> onOpenApp(BuildContext context) async {
       'Content-Type': 'application/json',
     },
   );
-  if (response.statusCode == 200) {
-    return 'c_home';
-  } else if (response.statusCode == 201) {
-    return 'home';
+  if (response.statusCode == 200 || response.statusCode == 201) {
+    return '/mainApp';
+
+    // if (response.statusCode == 200) {
+    //   return 'c_home';
+    // } else if (response.statusCode == 201) {
+    //   return 'home';
+    // }
   } else {
     if (response.statusCode == 401) {
       // Access token might be expired, attempt to refresh it
@@ -290,18 +293,18 @@ void showLogoutConfirmationDialog(BuildContext context) {
         actions: [
           TextButton(
             onPressed: () {
+              deleteTokens();
               Navigator.of(context).pop();
             },
-            child: Text('Cancel',
+            child: Text('Yes',
                 style: TextStyle(
                     color: Colors.white, fontWeight: FontWeight.bold)),
           ),
           TextButton(
             onPressed: () {
-              deleteTokens();
               Navigator.of(context).pop();
             },
-            child: Text('Yes',
+            child: Text('Cancel',
                 style: TextStyle(
                     color: Colors.white, fontWeight: FontWeight.bold)),
           ),

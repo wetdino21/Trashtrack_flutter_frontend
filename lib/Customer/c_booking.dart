@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:trashtrack/Customer/c_Schedule.dart';
 import 'package:trashtrack/Customer/c_api_cus_data.dart';
 import 'package:trashtrack/api_postgre_service.dart';
+import 'package:trashtrack/mainApp.dart';
 import 'package:trashtrack/styles.dart';
 import 'dart:async';
 
@@ -495,42 +496,40 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Row(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
                                                   Expanded(
                                                     flex: 1,
                                                     child: Text(
                                                       fullname,
                                                       style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                             fontSize:
-                                                                        15
-                                                      ),
-                                                      
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 15),
+
                                                       //softWrap: true,
                                                       // overflow:
                                                       //     TextOverflow.ellipsis,
                                                     ),
                                                   ),
-                                                   Expanded(
+                                                  Expanded(
                                                     flex: 1,
-                                                child: Text(
-                                                  '    |   +(63)${contact}',
-                                                  style: TextStyle(
-                                                    color: Colors.grey,
+                                                    child: Text(
+                                                      '    |   +(63)${contact}',
+                                                      style: TextStyle(
+                                                        color: Colors.grey,
+                                                      ),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
                                                   ),
-                                                  overflow: TextOverflow.ellipsis,
-                                                ),
-                                              ),
                                                 ],
                                               ),
-                                             
                                               Expanded(
                                                   flex: 2,
                                                   child: Text(
                                                     '${street} \n${address}',
-                                                  
                                                   )),
                                               Expanded(
                                                   flex: 1,
@@ -539,19 +538,22 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                                       Container(
                                                         padding:
                                                             EdgeInsets.all(2),
-                                                        decoration: BoxDecoration(
+                                                        decoration:
+                                                            BoxDecoration(
                                                           borderRadius:
                                                               BorderRadius
                                                                   .circular(3),
                                                           //color: Colors.white.withOpacity(.6),
                                                           border: Border.all(
-                                                              color: Colors.red),
+                                                              color:
+                                                                  Colors.red),
                                                         ),
                                                         child: Text(
                                                           'Default',
                                                           style: TextStyle(
                                                               fontWeight:
-                                                                  FontWeight.bold,
+                                                                  FontWeight
+                                                                      .bold,
                                                               color: Colors
                                                                   .red[300]),
                                                         ),
@@ -562,25 +564,28 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                                       Container(
                                                         padding:
                                                             EdgeInsets.all(2),
-                                                        decoration: BoxDecoration(
+                                                        decoration:
+                                                            BoxDecoration(
                                                           borderRadius:
                                                               BorderRadius
                                                                   .circular(3),
                                                           //color: Colors.white.withOpacity(.6),
                                                           border: Border.all(
-                                                              color: Colors.grey),
+                                                              color:
+                                                                  Colors.grey),
                                                         ),
                                                         child: Text(
                                                           'Pickup Address',
                                                           style: TextStyle(
-                                                              color:
-                                                                  Colors.black54),
+                                                              color: Colors
+                                                                  .black54),
                                                         ),
                                                       ),
                                                     ],
                                                   )),
                                               SizedBox(height: 5),
-                                              _labelValidator(userDataValidator),
+                                              _labelValidator(
+                                                  userDataValidator),
                                             ],
                                           ))),
                                 ],
@@ -980,8 +985,14 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                   Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) =>
-                                              C_ScheduleScreen()));
+                                          builder: (context) => MainApp(
+                                                selectedIndex: 2,
+                                              )));
+                                // Navigator.pushReplacement(
+                                //     context,
+                                //     MaterialPageRoute(
+                                //         builder: (context) =>
+                                //             C_ScheduleScreen()));
                                 else
                                   showErrorSnackBar(context,
                                       'Somthing\'s wrong. Please try again later.');

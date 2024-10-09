@@ -10,6 +10,7 @@ Color deepGreen = Color(0xFF388E3C);
 Color deepPurple = Colors.deepPurple;
 Color darkPurple = Color(0xFF3A0F63);
 Color? greytitleColor = Colors.grey[700];
+Color darkRed = Color(0xFFB00020);
 
 const Color white = Colors.white;
 

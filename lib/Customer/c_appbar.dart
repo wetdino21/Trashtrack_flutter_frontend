@@ -2,16 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:trashtrack/api_network.dart';
+
 import 'package:trashtrack/data_model.dart';
 import 'package:trashtrack/styles.dart';
 import 'dart:typed_data'; // for Uint8List
 import 'package:trashtrack/user_hive_data.dart';
-import 'package:trashtrack/websocket.dart';
+// import 'package:trashtrack/websocket.dart';
 
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'dart:convert';
 
-// String baseUrl = globalUrl();
+//String baseUrl = globalUrl();
 //String? baseUrl = globalUrl().getBaseUrl();
 
 class C_CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
@@ -43,17 +44,15 @@ class C_CustomAppBarState extends State<C_CustomAppBar> {
   @override
   void initState() {
     super.initState();
-    //notificationService = NotificationService(userModel!.id!);
-
     loadProfileNotif();
-    // WidgetsBinding.instance.addPostFrameCallback((_) => connectWebSocket());
+     connectWebSocket();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     userModel = Provider.of<UserModel>(context); // Access provider here
-    connectWebSocket();
+    // connectWebSocket();
   }
 
   @override
@@ -71,10 +70,16 @@ class C_CustomAppBarState extends State<C_CustomAppBar> {
   // }
 
   Future<void> connectWebSocket() async {
+    String baseUrl = globalUrl();
+    //String? baseUrl = globalUrl().getBaseUrl();
+
+    String ipAddress = extractIpAddress(baseUrl);
+    //192.168.254.187
     final data = await userDataFromHive();
     if (data['id'] != null) {
       channel = WebSocketChannel.connect(
-        Uri.parse('ws://192.168.254.187:8080?userId=${data['id'].toString()}'),
+        Uri.parse('ws://${ipAddress}:8080?userId=${data['id'].toString()}'),
+        //Uri.parse('ws://192.168.254.187:8080?userId=${data['id'].toString()}'),
       );
       channel.stream.listen((message) {
         final notification = json.decode(message);
@@ -181,9 +186,15 @@ class C_CustomAppBarState extends State<C_CustomAppBar> {
                             borderRadius: BorderRadius.circular(100)),
                         child: CircleAvatar(
                             backgroundColor: Colors.red,
-                            child: Text(totalNotif >= 99? '+99': 
-                              '${totalNotif}',
-                              style: TextStyle(color: white, fontSize: totalNotif <= 9? 12 : totalNotif <= 99? 10: 8),
+                            child: Text(
+                              totalNotif >= 99 ? '99+' : '${totalNotif}',
+                              style: TextStyle(
+                                  color: white,
+                                  fontSize: totalNotif <= 9
+                                      ? 12
+                                      : totalNotif <= 99
+                                          ? 10
+                                          : 8),
                             )),
                       )))
           ],

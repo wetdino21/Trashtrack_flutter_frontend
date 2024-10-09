@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:trashtrack/api_network.dart';
 import 'package:trashtrack/api_token.dart';
@@ -179,7 +180,6 @@ Future<String?> createCustomer(
 
 Future<String?> loginAccount(
     BuildContext context, String email, String password) async {
-  showErrorSnackBar(context, baseUrl!);
   final response = await http.post(
     Uri.parse('$baseUrl/login'),
     headers: {'Content-Type': 'application/json'},
@@ -204,6 +204,12 @@ Future<String?> loginAccount(
       return 'hauler'; // No error
     }
   } else if (response.statusCode == 202) {
+    // Store data in Hive
+    final responseData = jsonDecode(response.body);
+    var box = await Hive.openBox('mybox');
+    await box.put('type', responseData['type']);
+    await box.put('email', responseData['email']);
+
     print('deactivated account');
     return response.statusCode.toString();
   } else if (response.statusCode == 203) {
@@ -835,7 +841,8 @@ Future<String?> binding_google(BuildContext context, String? email) async {
 }
 
 // update password
-Future<String?> change_password(BuildContext context, String? newPassword) async {
+Future<String?> change_password(
+    BuildContext context, String? newPassword) async {
   Map<String, String?> tokens = await getTokens();
   String? accessToken = tokens['access_token'];
   if (accessToken == null) {
@@ -884,4 +891,29 @@ Future<String?> change_password(BuildContext context, String? newPassword) async
     print(e.toString());
   }
   return null;
+}
+
+//deactivate
+Future<String?> reactivate() async {
+  var box = await Hive.openBox('mybox');
+  String email = box.get('email');
+  String type = box.get('type');
+
+  final response = await http.post(
+    Uri.parse('$baseUrl/reactivate'),
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      'email': email,
+      'type': type,
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    return response.statusCode.toString();
+  } else if (response.statusCode == 400) {
+    return 'error';
+  } else {
+    print('Error response: ${response.body}');
+    return response.body;
+  }
 }

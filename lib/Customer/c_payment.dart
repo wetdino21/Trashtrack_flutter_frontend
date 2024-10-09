@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:trashtrack/Customer/c_appbar.dart';
-import 'package:trashtrack/Customer/c_bottom_nav_bar.dart';
-import 'package:trashtrack/Customer/c_drawer.dart';
 import 'package:trashtrack/api_paymongo.dart';
 import 'package:trashtrack/styles.dart';
 
@@ -10,8 +7,8 @@ class C_PaymentScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: deepGreen,
-      appBar: C_CustomAppBar(title: 'Payment'),
-      drawer: C_Drawer(),
+      // appBar: C_CustomAppBar(title: 'Payment'),
+      // drawer: C_Drawer(),
       body: ListView(
         children: [
           SizedBox(height: 20.0),
@@ -88,9 +85,9 @@ class C_PaymentScreen extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: C_BottomNavBar(
-        currentIndex: 3,
-      ),
+      // bottomNavigationBar: C_BottomNavBar(
+      //   currentIndex: 3,
+      // ),
     );
   }
 }

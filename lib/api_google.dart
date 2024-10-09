@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
@@ -219,7 +220,7 @@ Future<void> handleGoogleSignIn(BuildContext context) async {
       
       if (dbMessage == 'customer') {
        
-        Navigator.pushReplacementNamed(context, 'c_home');
+        Navigator.pushReplacementNamed(context, '/mainApp');
       } else if (dbMessage == 'hauler') {
         Navigator.pushReplacementNamed(context, 'home');
       } else if (dbMessage == '202') {
@@ -272,6 +273,12 @@ Future<String> loginWithGoogle(BuildContext context, String email) async {
     print('Login successfully');
     return 'hauler'; // No error
   } else if (response.statusCode == 202) {
+     // Store data in Hive
+    final responseData = jsonDecode(response.body);
+    var box = await Hive.openBox('mybox');
+    await box.put('type', responseData['type']);
+    await box.put('email',  responseData['email']);
+
     print('deactivated account');
     return response.statusCode.toString();
   } else if (response.statusCode == 203) {

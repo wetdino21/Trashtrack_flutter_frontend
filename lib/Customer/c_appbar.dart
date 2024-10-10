@@ -106,24 +106,23 @@ class C_CustomAppBarState extends State<C_CustomAppBar> {
       imageBytes = data['profile'];
     });
 
-    final box = await Hive.openBox('mybox');
+     final box = await Hive.openBox('mybox');
     if (box.get('notif_count') == null) {
       showErrorSnackBar(context, '1111111111 ');
     } else {
       setState(() {
         totalNotif = box.get('notif_count');
       });
-      //showErrorSnackBar(context, totalNotif.toString());
     }
+    // final box = await Hive.openBox('mybox');
+    // if (box.get('notif_count') == null) {
+    //   showErrorSnackBar(context, '1111111111 ');
+    // } else {
+    //   setState(() {
+    //     totalNotif = box.get('notif_count');
+    //   });
+    // }
 
-    //  String? base64Image = await fetchProfile(context);
-    //   if (base64Image != null) {
-    //     setState(() {
-    //       imageBytes = base64Decode(base64Image);
-    //     });
-    //   }
-
-    // await box.close();
   }
 
   @override

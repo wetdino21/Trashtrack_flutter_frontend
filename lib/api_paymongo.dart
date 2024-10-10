@@ -58,7 +58,7 @@ Future<void> launchPaymentLink(BuildContext context) async {
       if (response.statusCode == 401) {
         // Access token might be expired, attempt to refresh it
         print('Access token expired. Attempting to refresh...');
-        String? refreshMsg = await refreshAccessToken(context);
+        String? refreshMsg = await refreshAccessToken();
         if (refreshMsg == null) {
           return await launchPaymentLink(context);
         }
@@ -121,7 +121,7 @@ Future<void> launchPaymentLink2(BuildContext context) async {
       if (response.statusCode == 401) {
         // Access token might be expired, attempt to refresh it
         print('Access token expired. Attempting to refresh...');
-        String? refreshMsg = await refreshAccessToken(context);
+        String? refreshMsg = await refreshAccessToken();
         if (refreshMsg == null) {
           return await launchPaymentLink2(context);
         }

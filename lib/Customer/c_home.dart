@@ -23,12 +23,20 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
   bool isLoading = true;
   String? errorMessage;
   //Uint8List? imageBytes;
-  late Object _obj;
+  //late Object _obj;
+  final Object _obj = Object(
+    scale: Vector3(12.0, 12.0, 12.0),
+    //position: Vector3(0, 0, 0),
+    rotation: Vector3(0, -90, 0), // Start sideways
+    fileName: 'assets/objects/base.obj',
+  );
   UserModel? userModel;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
+    // if (!mounted) return null;
     // _obj = Object(
     //   scale: Vector3(12.0, 12.0, 12.0),
     //   //position: Vector3(0, 0, 0),
@@ -41,21 +49,19 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _obj = Object(
-      scale: Vector3(12.0, 12.0, 12.0),
-      //position: Vector3(0, 0, 0),
-      rotation: Vector3(0, -90, 0), // Start sideways
-      fileName: 'assets/objects/base.obj',
-    );
+    // _obj = Object(
+    //   scale: Vector3(12.0, 12.0, 12.0),
+    //   //position: Vector3(0, 0, 0),
+    //   rotation: Vector3(0, -90, 0), // Start sideways
+    //   fileName: 'assets/objects/base.obj',
+    // );
     _dbData();
   }
 
-  //   @override
-  // void dispose() {
-  //   showErrorSnackBar(context, 'homeeeeee dispose');
-  //   print('home disposeeee');
-  //   super.dispose();
-  // }
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
 // Fetch user data from the server
   Future<void> _dbData() async {
@@ -65,7 +71,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
       //final data = await Hive.openBox('mybox');
       final data = await userDataFromHive();
       // final data = await fetchCusData(context);
-      if(!mounted) return null;
+      if (!mounted) return null;
       setState(() {
         userData = data;
         isLoading = false;
@@ -377,19 +383,19 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                           ],
                         )
                       ///// if error
-                      :  Positioned.fill(
-                child: InkWell(
-                  onTap: () {},
-                  child: Center(
-                    child: CircularProgressIndicator(
-                      color: Colors.green,
-                      strokeWidth: 10,
-                      strokeAlign: 2,
-                      backgroundColor: Colors.deepPurple,
-                    ),
-                  ),
-                ),
-              ),
+                      : Positioned.fill(
+                          child: InkWell(
+                            onTap: () {},
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                color: Colors.green,
+                                strokeWidth: 10,
+                                strokeAlign: 2,
+                                backgroundColor: Colors.deepPurple,
+                              ),
+                            ),
+                          ),
+                        ),
             ),
             // if (isLoading)
             //   Positioned.fill(

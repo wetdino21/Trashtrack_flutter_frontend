@@ -1,34 +1,34 @@
-import 'dart:convert';
-import 'package:web_socket_channel/web_socket_channel.dart';
+// import 'dart:convert';
+// import 'package:web_socket_channel/web_socket_channel.dart';
 
-class NotificationService {
-  final String userId;
-  late WebSocketChannel channel;
-  final Function(String) onNotificationReceived;
+// class NotificationService {
+//   final String userId;
+//   late WebSocketChannel channel;
+//   final Function(String) onNotificationReceived;
 
-  NotificationService(this.userId, this.onNotificationReceived) {
-    // Establish WebSocket connection and pass userId as a query parameter
-    channel = WebSocketChannel.connect(
-      Uri.parse('ws://192.168.254.187:8080?userId=$userId'),
-    );
+//   NotificationService(this.userId, this.onNotificationReceived) {
+//     // Establish WebSocket connection and pass userId as a query parameter
+//     channel = WebSocketChannel.connect(
+//       Uri.parse('ws://192.168.254.187:8080?userId=$userId'),
+//     );
 
-    // Listen for notifications from the server
-    channel.stream.listen((message) {
-      final notification = json.decode(message);
-      // Call the callback function to notify the UI
-      onNotificationReceived(notification['notif_message']);
-    }, onError: (error) {
-      print('WebSocket error: $error');
-    }, onDone: () {
-      print('WebSocket connection closed');
-    });
-  }
+//     // Listen for notifications from the server
+//     channel.stream.listen((message) {
+//       final notification = json.decode(message);
+//       // Call the callback function to notify the UI
+//       onNotificationReceived(notification['notif_message']);
+//     }, onError: (error) {
+//       print('WebSocket error: $error');
+//     }, onDone: () {
+//       print('WebSocket connection closed');
+//     });
+//   }
 
-  // Close WebSocket connection
-  void closeConnection() {
-    channel.sink.close();
-  }
-}
+//   // Close WebSocket connection
+//   void closeConnection() {
+//     channel.sink.close();
+//   }
+// }
 
 
 

@@ -323,7 +323,7 @@ class _LoginPageState extends State<LoginPage> {
                                 padding: EdgeInsets.symmetric(
                                     vertical: 10.0, horizontal: 35.0),
                               ),
-                              icon: Image.asset(
+                              icon: Image.asset(  
                                 'assets/Brands.png',
                                 height: 24.0,
                               ),

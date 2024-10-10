@@ -2,7 +2,7 @@ import 'package:hive/hive.dart';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:trashtrack/Customer/c_api_cus_data.dart'; 
+import 'package:trashtrack/Customer/c_api_cus_data.dart';
 import 'dart:convert';
 import 'dart:io';
 
@@ -30,35 +30,43 @@ globalUrl() {
   return 'http://192.168.254.187:3000';
 }
 
-
 // ////// COMMENT THIS IF IP STATIC ///////////////////////////////////////////////////////////////////
 
-// class globalUrl {
+// String? networkURL;
+
+// class NetworkglobalUrl {
 //   // Private constructor to prevent instantiation
-//   globalUrl._privateConstructor();
+//   NetworkglobalUrl._privateConstructor();
 
 //   // Static instance of the class
-//   static final globalUrl _instance = globalUrl._privateConstructor();
+//   static final NetworkglobalUrl _instance =
+//       NetworkglobalUrl._privateConstructor();
 
 //   // Variable to store the base URL
-//   String? baseUrl;
+//   String? _baseUrl;
 
 //   // Factory constructor to return the same instance every time
-//   factory globalUrl() {
+//   factory NetworkglobalUrl() {
 //     return _instance;
 //   }
 
 //   // Method to set the base URL
 //   void setBaseUrl(String ipAddress) {
-//     baseUrl = 'http://$ipAddress:3000';
+//     _baseUrl = 'http://$ipAddress:3000';
+//     networkURL = _baseUrl!; // Update global variable as well
 //   }
 
 //   // Method to retrieve the base URL
 //   String? getBaseUrl() {
-//     return baseUrl;
+//     return _baseUrl ??
+//         networkURL; // Return _baseUrl if set, otherwise return default global URL
 //   }
 // }
 
+// //final url
+//  globalUrl() {
+//   return networkURL;
+// }
 
 // //for storing network on open
 // class StoreNetwork extends StatefulWidget {
@@ -72,7 +80,9 @@ globalUrl() {
 //   @override
 //   void initState() {
 //     super.initState();
-//     _checkNetworkExist();
+//     WidgetsBinding.instance.addPostFrameCallback((_) {
+//       _checkNetworkExist();
+//     });
 //   }
 
 //   @override
@@ -82,7 +92,7 @@ globalUrl() {
 //   }
 
 //   Future<void> _checkNetworkExist() async {
-//     String? BaseUrl = globalUrl().getBaseUrl();
+//     String? BaseUrl = NetworkglobalUrl().getBaseUrl();
 
 //     if (BaseUrl != null) {
 //       Navigator.push(
@@ -113,9 +123,8 @@ globalUrl() {
 //                 children: [
 //                   TextField(
 //                     style: TextStyle(fontWeight: FontWeight.bold),
-//                     decoration: InputDecoration(
-//                       contentPadding: EdgeInsets.all(10)
-//                     ),
+//                     decoration:
+//                         InputDecoration(contentPadding: EdgeInsets.all(10)),
 //                     controller: _networkController,
 //                   ),
 //                 ],
@@ -125,8 +134,8 @@ globalUrl() {
 //                 onTap: () {
 //                   if (_networkController.text.isNotEmpty) {
 //                     // Set the IP address in the singleton
-//                     globalUrl().setBaseUrl(_networkController.text);
-//                     // String? baseUrl = globalUrl().getBaseUrl();
+//                     NetworkglobalUrl().setBaseUrl(_networkController.text);
+//                     // String? baseUrl = NetworkglobalUrl().getBaseUrl();
 //                     // showErrorSnackBar(context, baseUrl!);
 //                     // Navigate to the next screen
 //                     Navigator.push(context,

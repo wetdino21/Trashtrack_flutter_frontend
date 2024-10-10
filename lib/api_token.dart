@@ -133,7 +133,7 @@ Future<void> makeApiRequest(BuildContext context) async {
   } else if (response.statusCode == 401) {
     // Access token might be expired, attempt to refresh it
     print('Access token expired. Attempting to refresh...');
-    String? refreshMsg = await refreshAccessToken(context);
+    String? refreshMsg = await refreshAccessToken();
     if (refreshMsg == null) {
       return await makeApiRequest(context);
     } else {
@@ -150,7 +150,7 @@ Future<void> makeApiRequest(BuildContext context) async {
 }
 
 // Function to refresh the access token
-Future<String?> refreshAccessToken(BuildContext context) async {
+Future<String?> refreshAccessToken() async {
   Map<String, String?> tokens = await getTokens();
   String? refreshToken = tokens['refresh_token'];
 
@@ -217,7 +217,7 @@ Future<String> onOpenApp(BuildContext context) async {
     if (response.statusCode == 401) {
       // Access token might be expired, attempt to refresh it
       print('Access token expired. Attempting to refresh...');
-      String? refreshMsg = await refreshAccessToken(context);
+      String? refreshMsg = await refreshAccessToken();
       if (refreshMsg == null) {
         return await onOpenApp(context);
       } else {
@@ -266,7 +266,7 @@ Future<String> onOpenApp(BuildContext context) async {
 //   } else if (response.statusCode == 401) {
 //     // Access token might be expired, attempt to refresh it
 //     print('Access token expired. Attempting to refresh...');
-//     String? refreshMsg = await refreshAccessToken(context);
+//     String? refreshMsg = await refreshAccessToken();
 //     if (refreshMsg == null) {
 //       await makeApiRequest(context);
 //     }

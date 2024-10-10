@@ -34,11 +34,6 @@ Future<void> storeDataInHive(BuildContext context) async {
     final String? mname = data['${prefix}mname'];
     final String? lname = data['${prefix}lname'];
     final String? contact = data['${prefix}contact'];
-    // final String? province = data['${prefix}province'];
-    // final String? city = data['${prefix}city'];
-    // final String? brgy = data['${prefix}brgy'];
-    // final String? street = data['${prefix}street'];
-    // final String? postal = data['${prefix}postal'];
     final String? province = prefix == 'cus_' ? data['${prefix}province'] : '';
     final String? city = prefix == 'cus_' ? data['${prefix}city'] : '';
     final String? brgy = prefix == 'cus_' ? data['${prefix}brgy'] : '';
@@ -78,7 +73,7 @@ Future<void> storeDataInHive(BuildContext context) async {
     List<Map<String, dynamic>>? notifications;
     int unreadCount = 0;
     try {
-      final notifData = await fetchCusNotifications(context);
+      final notifData = await fetchCusNotifications();
       if (notifData != null) {
         notifications = notifData;
         // Count unread notifications
@@ -97,6 +92,32 @@ Future<void> storeDataInHive(BuildContext context) async {
     print('Data has been saved to Hive.');
   }
 }
+
+// //notification count
+// Future<void> notificationCount() async{
+//    //notification count
+//     List<Map<String, dynamic>>? notifications;
+//     int unreadCount = 0;
+
+//      try {
+//       final notifData = await fetchCusNotifications();
+//       if (notifData != null) {
+//         notifications = notifData;
+//         // Count unread notifications
+//         unreadCount = notifications.where((notification) {
+//           return notification['notif_read'] == false;
+//         }).length;
+//       } else {
+//         print('NOTIFICATION USER DATA IS NULL');
+//       }
+//     } catch (e) {
+//       //showErrorSnackBar(context, e.toString());
+//     }
+
+//     // Open Hive box
+//     var box = await Hive.openBox('countNotif');
+//     await box.put('notif_count', unreadCount);
+// }
 
 /////////////////////////
 Future<Map<String, dynamic>> userDataFromHive() async {

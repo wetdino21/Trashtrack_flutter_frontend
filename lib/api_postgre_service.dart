@@ -195,7 +195,7 @@ Future<String?> loginAccount(
     final String accessToken = responseData['accessToken'];
     final String refreshToken = responseData['refreshToken'];
     storeTokens(accessToken, refreshToken);
-    await storeDataInHive(context); // store data to local
+    //await storeDataInHive(context); // store data to local
 
     print('Login successfully');
     if (response.statusCode == 200) {
@@ -317,7 +317,7 @@ Future<String?> userUpdate(
       if (response.statusCode == 401) {
         // Access token might be expired, attempt to refresh it
         print('Access token expired. Attempting to refresh...');
-        String? refreshMsg = await refreshAccessToken(context);
+        String? refreshMsg = await refreshAccessToken();
         if (refreshMsg == null) {
           return await userUpdate(context, bookId, fname, mname, lname, email,
               photoBytes, contact, province, city, brgy, street, postal);
@@ -398,7 +398,7 @@ Future<void> updateProfile(
     if (response.statusCode == 401) {
       // Access token might be expired, attempt to refresh it
       print('Access token expired. Attempting to refresh...');
-      String? refreshMsg = await refreshAccessToken(context);
+      String? refreshMsg = await refreshAccessToken();
       if (refreshMsg == null) {
         return await updateProfile(context, fname, lname);
       }
@@ -464,7 +464,7 @@ Future<String?> booking(
       if (response.statusCode == 401) {
         // Access token might be expired, attempt to refresh it
         print('Access token expired. Attempting to refresh...');
-        String? refreshMsg = await refreshAccessToken(context);
+        String? refreshMsg = await refreshAccessToken();
         if (refreshMsg == null) {
           return await booking(context, id, date, province, city, brgy, street,
               postal, longitude, latitude, selectedWasteTypes);
@@ -526,7 +526,7 @@ Future<Map<String, List<Map<String, dynamic>>>?> fetchBookingData(
     if (response.statusCode == 401) {
       // Access token might be expired, attempt to refresh it
       print('Access token expired. Attempting to refresh...');
-      String? refreshMsg = await refreshAccessToken(context);
+      String? refreshMsg = await refreshAccessToken();
       if (refreshMsg == null) {
         return await fetchBookingData(context);
       } else {
@@ -601,7 +601,7 @@ Future<String?> bookingUpdate(
       if (response.statusCode == 401) {
         // Access token might be expired, attempt to refresh it
         print('Access token expired. Attempting to refresh...');
-        String? refreshMsg = await refreshAccessToken(context);
+        String? refreshMsg = await refreshAccessToken();
         if (refreshMsg == null) {
           return await bookingUpdate(context, bookId, date, province, city,
               brgy, street, postal, latitude, longitude, selectedWasteTypes);
@@ -652,7 +652,7 @@ Future<String?> bookingCancel(BuildContext context, int bookId) async {
       if (response.statusCode == 401) {
         // Access token might be expired, attempt to refresh it
         print('Access token expired. Attempting to refresh...');
-        String? refreshMsg = await refreshAccessToken(context);
+        String? refreshMsg = await refreshAccessToken();
         if (refreshMsg == null) {
           return await bookingCancel(context, bookId);
         }
@@ -703,7 +703,7 @@ Future<String?> deactivateUser(BuildContext context, String email) async {
       if (response.statusCode == 401) {
         // Access token might be expired, attempt to refresh it
         print('Access token expired. Attempting to refresh...');
-        String? refreshMsg = await refreshAccessToken(context);
+        String? refreshMsg = await refreshAccessToken();
         if (refreshMsg == null) {
           return await deactivateUser(context, email);
         }
@@ -757,7 +757,7 @@ Future<String?> binding_trashtrack(
       if (response.statusCode == 401) {
         // Access token might be expired, attempt to refresh it
         print('Access token expired. Attempting to refresh...');
-        String? refreshMsg = await refreshAccessToken(context);
+        String? refreshMsg = await refreshAccessToken();
         if (refreshMsg == null) {
           return await binding_trashtrack(context, password);
         }
@@ -816,7 +816,7 @@ Future<String?> binding_google(BuildContext context, String? email) async {
       if (response.statusCode == 401) {
         // Access token might be expired, attempt to refresh it
         print('Access token expired. Attempting to refresh...');
-        String? refreshMsg = await refreshAccessToken(context);
+        String? refreshMsg = await refreshAccessToken();
         if (refreshMsg == null) {
           return await binding_google(context, email);
         }
@@ -869,7 +869,7 @@ Future<String?> change_password(
       if (response.statusCode == 401) {
         // Access token might be expired, attempt to refresh it
         print('Access token expired. Attempting to refresh...');
-        String? refreshMsg = await refreshAccessToken(context);
+        String? refreshMsg = await refreshAccessToken();
         if (refreshMsg == null) {
           return await change_password(context, newPassword);
         }

@@ -23,7 +23,7 @@ Future<Map<String, dynamic>?> fetchCusData(BuildContext context) async {
   }
 
   final response = await http.post(
-    Uri.parse('$baseUrl/customer/fetch_data'),
+    Uri.parse('$baseUrl/fetch_data'),
     headers: {
       'Authorization': 'Bearer $accessToken',
     },
@@ -45,7 +45,7 @@ Future<Map<String, dynamic>?> fetchCusData(BuildContext context) async {
     if (response.statusCode == 401) {
       // Access token might be expired, attempt to refresh it
       print('Access token expired. Attempting to refresh...');
-      String? refreshMsg = await refreshAccessToken(context);
+      String? refreshMsg = await refreshAccessToken();
       if (refreshMsg == null) {
         return await fetchCusData(context);
       } else {
@@ -92,7 +92,7 @@ Future<String?> fetchProfile(BuildContext context) async {
     if (response.statusCode == 401) {
       // Access token might be expired, attempt to refresh it
       print('Access token expired. Attempting to refresh...');
-      String? refreshMsg = await refreshAccessToken(context);
+      String? refreshMsg = await refreshAccessToken();
       if (refreshMsg == null) {
         return await fetchProfile(context);
       } else {
@@ -114,8 +114,7 @@ Future<String?> fetchProfile(BuildContext context) async {
 }
 
 //notification
-Future<List<Map<String, dynamic>>?> fetchCusNotifications(
-    BuildContext context) async {
+Future<List<Map<String, dynamic>>?> fetchCusNotifications() async {
   Map<String, String?> tokens = await getTokens();
   String? accessToken = tokens['access_token'];
 
@@ -138,9 +137,9 @@ Future<List<Map<String, dynamic>>?> fetchCusNotifications(
     if (response.statusCode == 401) {
       // Access token might be expired, attempt to refresh it
       print('Access token expired. Attempting to refresh...');
-      String? refreshMsg = await refreshAccessToken(context);
+      String? refreshMsg = await refreshAccessToken();
       if (refreshMsg == null) {
-        return await fetchCusNotifications(context);
+        return await fetchCusNotifications();
       } else {
         // Refresh token is invalid or expired, logout the user
         await deleteTokens(); // Logout user

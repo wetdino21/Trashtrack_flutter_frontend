@@ -50,7 +50,7 @@ class _C_NotificationScreenState extends State<C_NotificationScreen>
       isLoading = true;
     });
     try {
-      final data = await fetchCusNotifications(context);
+      final data = await fetchCusNotifications();
       if (!mounted) {
         return;
       }

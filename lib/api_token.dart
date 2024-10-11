@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:flutter/material.dart';
 import 'package:trashtrack/api_network.dart';
+import 'package:trashtrack/data_model.dart';
 import 'package:trashtrack/main.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:hive/hive.dart';
@@ -106,6 +107,10 @@ Future<void> deleteTokens() async {
 
   //delete hive boxe
   await Hive.deleteBoxFromDisk('mybox');
+
+  // Clear user data from the model
+  UserModel globalUserModel = UserModel();
+  globalUserModel.clearModelData();
   navigatorKey.currentState?.pushNamed('/logout');
   // Delay navigation until the widget is stable
 }
@@ -198,42 +203,47 @@ Future<String> onOpenApp(BuildContext context) async {
     return 'login';
   }
 
-  final response = await http.post(
-    Uri.parse('$baseUrl/onOpenApp'),
-    headers: {
-      'Authorization': 'Bearer $accessToken',
-      'Content-Type': 'application/json',
-    },
-  );
-  if (response.statusCode == 200 || response.statusCode == 201) {
-    return '/mainApp';
+  try {
+    final response = await http.post(
+      Uri.parse('$baseUrl/onOpenApp'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+    );
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return '/mainApp';
 
-    // if (response.statusCode == 200) {
-    //   return 'c_home';
-    // } else if (response.statusCode == 201) {
-    //   return 'home';
-    // }
-  } else {
-    if (response.statusCode == 401) {
-      // Access token might be expired, attempt to refresh it
-      print('Access token expired. Attempting to refresh...');
-      String? refreshMsg = await refreshAccessToken();
-      if (refreshMsg == null) {
-        return await onOpenApp(context);
-      } else {
-        // Refresh token is invalid or expired, logout the user
-        await deleteTokens(); // Logout user
-        return 'login';
-      }
-    } else if (response.statusCode == 403) {
-      // Access token is invalid. logout
-      print('Access token invalid. Attempting to logout...');
-      await deleteTokens(); // Logout use
+      // if (response.statusCode == 200) {
+      //   return 'c_home';
+      // } else if (response.statusCode == 201) {
+      //   return 'home';
+      // }
     } else {
-      print('Response: ${response.body}');
-    }
+      if (response.statusCode == 401) {
+        // Access token might be expired, attempt to refresh it
+        print('Access token expired. Attempting to refresh...');
+        String? refreshMsg = await refreshAccessToken();
+        if (refreshMsg == null) {
+          return await onOpenApp(context);
+        } else {
+          // Refresh token is invalid or expired, logout the user
+          await deleteTokens(); // Logout user
+          return 'login';
+        }
+      } else if (response.statusCode == 403) {
+        // Access token is invalid. logout
+        print('Access token invalid. Attempting to logout...');
+        await deleteTokens(); // Logout use
+      } else {
+        print('Response: ${response.body}');
+      }
 
-    showErrorSnackBar(context, response.body);
+      showErrorSnackBar(context, response.body);
+      return 'login';
+    }
+  } catch (e) {
+    print(e.toString());
     return 'login';
   }
 }

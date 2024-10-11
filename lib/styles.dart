@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 
+final Logger logger = Logger();
 //final Color backgroundColor = Color(0xFF001E00);
 // final Color accentColor = Color(0xFF6AA920);
 const Color buttonColor = Color(0xFF86BF3E);
@@ -11,8 +13,9 @@ Color deepPurple = Colors.deepPurple;
 Color darkPurple = Color(0xFF3A0F63);
 Color? greytitleColor = Colors.grey[700];
 Color darkRed = Color(0xFFB00020);
-
-const Color white = Colors.white;
+Color whiteSoft = Colors.white.withOpacity(0.5);
+Color white = Colors.white;
+Color blackSoft = Colors.grey[600]!;
 
 List<BoxShadow> shadowColor = [
   BoxShadow(
@@ -54,8 +57,10 @@ BorderRadius borderRadius5 = BorderRadius.circular(5);
 BorderRadius borderRadius10 = BorderRadius.circular(10);
 BorderRadius borderRadius15 = BorderRadius.circular(10);
 BorderRadius borderRadius50 = BorderRadius.circular(10);
-BoxDecoration boxDecoration1 = BoxDecoration(boxShadow: shadowColor, borderRadius: borderRadius10, color: white);
-BoxDecoration boxDecorationBig = BoxDecoration(boxShadow: shadowBigColor, borderRadius: borderRadius50, color: white);
+BoxDecoration boxDecoration1 = BoxDecoration(
+    boxShadow: shadowColor, borderRadius: borderRadius10, color: white);
+BoxDecoration boxDecorationBig = BoxDecoration(
+    boxShadow: shadowBigColor, borderRadius: borderRadius50, color: white);
 //snackbar
 void showErrorSnackBar(BuildContext context, String errorMessage) {
   if (context.mounted) {

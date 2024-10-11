@@ -132,7 +132,7 @@ Future<GoogleAccountDetails?> handleGoogleSignUp(BuildContext context) async {
   } catch (error) {
     print('Sign-in failed: $error');
     showErrorSnackBar(context, 'Sign-in failed: $error');
-     _handleSignOut();
+    _handleSignOut();
     return null;
   }
   await _handleSignOut();
@@ -183,7 +183,7 @@ Future<void> createGoogleAccount(
     final String accessToken = responseData['accessToken'];
     final String refreshToken = responseData['refreshToken'];
     storeTokens(accessToken, refreshToken);
-    await storeDataInHive(context); // store data to local
+    //await storeDataInHive(context); // store data to local
 
     Navigator.pushReplacement(
       context,
@@ -209,20 +209,16 @@ Future<void> handleGoogleSignIn(BuildContext context) async {
     GoogleSignInAccount? user = await _googleSignIn.signIn();
 
     if (user != null) {
-       
       // print('Signed in: ${user.displayName}');
       // print('Email: ${user.email}');
       // print('Photo URL: ${user.photoUrl}');
 
       String email = user.email;
-      
+
       String? dbMessage = await loginWithGoogle(context, email);
-      
-      if (dbMessage == 'customer') {
-       
+
+      if (dbMessage == 'success') {
         Navigator.pushReplacementNamed(context, '/mainApp');
-      } else if (dbMessage == 'hauler') {
-        Navigator.pushReplacementNamed(context, 'home');
       } else if (dbMessage == '202') {
         Navigator.pushNamed(context, 'deactivated');
       } else if (dbMessage == '203') {
@@ -254,17 +250,15 @@ Future<String> loginWithGoogle(BuildContext context, String email) async {
   );
 
   if (response.statusCode == 200 || response.statusCode == 201) {
-     
     //store token to storage
     final responseData = jsonDecode(response.body);
     final String accessToken = responseData['accessToken'];
     final String refreshToken = responseData['refreshToken'];
     storeTokens(accessToken, refreshToken);
-    await storeDataInHive(context); // store data to local
+    //await storeDataInHive(context); // store data to local
     if (response.statusCode == 200) {
-     
       print('Login successfully');
-      return 'customer'; // No error
+      return 'success'; // No error
     }
     // else if (response.statusCode == 201) {
     //   print('Login successfully');
@@ -273,11 +267,11 @@ Future<String> loginWithGoogle(BuildContext context, String email) async {
     print('Login successfully');
     return 'hauler'; // No error
   } else if (response.statusCode == 202) {
-     // Store data in Hive
+    // Store data in Hive
     final responseData = jsonDecode(response.body);
     var box = await Hive.openBox('mybox');
     await box.put('type', responseData['type']);
-    await box.put('email',  responseData['email']);
+    await box.put('email', responseData['email']);
 
     print('deactivated account');
     return response.statusCode.toString();

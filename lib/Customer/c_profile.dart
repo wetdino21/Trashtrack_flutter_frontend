@@ -32,6 +32,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
   final TextEditingController _contactController = TextEditingController();
   final TextEditingController _streetController = TextEditingController();
   final TextEditingController _postalController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
 
   final ImagePicker _picker = ImagePicker();
   XFile? imageFile;
@@ -66,6 +67,8 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
   String brgyvalidator = '';
   String streetvalidator = '';
   String postalvalidator = '';
+  String addressvalidator = '';
+
   bool emailChanged = false;
 
   int _currentStep = 1;
@@ -77,6 +80,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
   int _timerSeconds = 300;
   late Timer _timer;
   late int onResendCode;
+  String? user;
 
   @override
   void initState() {
@@ -98,6 +102,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
     _contactController.dispose();
     _streetController.dispose();
     _postalController.dispose();
+    _addressController.dispose();
 
     _timer.cancel();
     _codeControllers.forEach((controller) => controller.dispose());
@@ -115,6 +120,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
     try {
       final data = await userDataFromHive();
       setState(() {
+        user = data['user'];
         userData = data;
         isLoading = false;
         _resetData();
@@ -233,6 +239,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
       _contactController.text = userData!['contact'].toString().substring(1);
       _streetController.text = userData!['street'];
       _postalController.text = userData!['postal'];
+      _addressController.text = userData!['address'];
 
       _selectedProvinceName = userData!['province'];
       _selectedCityMunicipalityName = userData!['city'];
@@ -468,6 +475,16 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
     return '';
   }
 
+  String _validateAddress(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter your Address';
+    }
+    if (value.length < 5) {
+      return 'Atleat 5 letters long';
+    }
+    return '';
+  }
+
   void _cancelEdit() {
     if (imageFile != null ||
         _fnameController.text != userData!['fname'] ||
@@ -479,7 +496,8 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
         _selectedCityMunicipalityName != userData!['city'] ||
         _selectedBarangayName != userData!['brgy'] ||
         _streetController.text != userData!['street'] ||
-        _postalController.text != userData!['postal']) {
+        _postalController.text != userData!['postal'] ||
+        _addressController.text != userData!['address']) {
       _showCancelConfirmDialog(context);
     } else {
       if (_isEditing) {
@@ -487,7 +505,8 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
           _isEditing = false;
         });
       } else {
-        Navigator.pop(context, true);
+        Navigator.pop(context);
+        //Navigator.pop(context, true);
       }
     }
   }
@@ -526,7 +545,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
     );
   }
 
-  void _checkChanges() async {
+  void _checkChangesCus() async {
     bool goodData = false;
     bool goodEmail = false;
     bool goodContact = false;
@@ -565,6 +584,101 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
           brgyvalidator = _validateBrgy(_selectedBarangayName);
           streetvalidator = _validateStreet(_streetController.text);
           postalvalidator = _validatePostalCode(_postalController.text);
+        });
+        debugPrint('bad data');
+      } else {
+        debugPrint('good data');
+        goodData = true;
+      }
+
+      //check email
+      if (_emailController.text != userData!['email']) {
+        String? emailErrorMsg = await emailCheck(_emailController.text);
+        // Show any existing error message
+        if (emailErrorMsg != null && _emailController.text.isNotEmpty) {
+          setState(() {
+            emailvalidator = emailErrorMsg;
+            debugPrint('bad email');
+            goodEmail = false;
+          });
+        } else {
+          debugPrint('good email');
+          goodEmail = true;
+        }
+      } else {
+        debugPrint('good email');
+        goodEmail = true;
+      }
+
+      //check contact
+      if ('0' + _contactController.text != userData!['contact']) {
+        String? dbContactMsg = await contactCheck(_contactController.text);
+        // Show any existing error message
+        if (dbContactMsg != null) {
+          setState(() {
+            contactvalidator = dbContactMsg;
+          });
+          goodContact = false;
+        } else {
+          print('good contact');
+          goodContact = true;
+        }
+      } else {
+        print('good contact');
+        goodContact = true;
+      }
+
+      //final check
+      if (goodData && goodEmail && goodContact) {
+        if (_emailController.text != userData!['email']) {
+          _resendCode();
+          setState(() {
+            _currentStep = 2;
+          });
+        } else {
+          _showConfirmChangeDialog(context);
+        }
+      }
+    } else {
+      if (_isEditing) {
+        setState(() {
+          _isEditing = false;
+          _resetData();
+        });
+        showSuccessSnackBar(context, 'No changes Made');
+      } else {
+        Navigator.pop(context);
+      }
+    }
+  }
+
+  void _checkChangesEmp() async {
+    bool goodData = false;
+    bool goodEmail = false;
+    bool goodContact = false;
+    //check if anything changes
+    if (imageFile != null ||
+        _fnameController.text != userData!['fname'] ||
+        _mnameController.text != userData!['mname'] ||
+        _lnameController.text != userData!['lname'] ||
+        _emailController.text != userData!['email'] ||
+        '0' + _contactController.text != userData!['contact'] ||
+        _addressController.text != userData!['address']) {
+      //validate data changes
+      if ((_emailController.text.isEmpty || emailvalidator.isNotEmpty) ||
+          (_fnameController.text.isEmpty || fnamevalidator.isNotEmpty) ||
+          (mnamevalidator.isNotEmpty) ||
+          (_lnameController.text.isEmpty || lnamevalidator.isNotEmpty) ||
+          (_contactController.text.isEmpty || contactvalidator.isNotEmpty) ||
+          (_addressController.text.isEmpty || addressvalidator.isNotEmpty)) {
+        //call validation
+        setState(() {
+          emailvalidator = _validateEmail(_emailController.text);
+          fnamevalidator = _validateFname(_fnameController.text);
+          mnamevalidator = _validateMname(_mnameController.text);
+          lnamevalidator = _validateLname(_lnameController.text);
+          contactvalidator = _validateContact(_contactController.text);
+          addressvalidator = _validateAddress(_addressController.text);
         });
         debugPrint('bad data');
       } else {
@@ -935,320 +1049,366 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                         fontSize: 20, color: Colors.grey),
                                   )),
                                   const SizedBox(height: 20),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        '  Province/City or Municipality/Barangay',
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: greytitleColor),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(5),
-                                        child: Column(
+
+                                  //if customer
+                                  if (user == 'customer')
+                                    Column(
+                                      children: [
+                                        Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            Container(
-                                              padding: EdgeInsets.symmetric(
-                                                  vertical: 5.0,
-                                                  horizontal: 15),
-                                              decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10.0),
-                                                  boxShadow: shadowColor),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
+                                            Text(
+                                              '  Province/City or Municipality/Barangay',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: greytitleColor),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.all(5),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
-                                                  // Show selected values
-                                                  Expanded(
-                                                    child: Text(
-                                                      _selectedProvinceName ==
-                                                              null
-                                                          ? 'Select Province'
-                                                          : _selectedCityMunicipalityName ==
-                                                                  null
-                                                              ? '${_selectedProvinceName} / '
-                                                              : _selectedBarangayName ==
-                                                                      null
-                                                                  ? '${_selectedProvinceName} / ${_selectedCityMunicipalityName} / '
-                                                                  : '${_selectedProvinceName} / '
-                                                                      '${_selectedCityMunicipalityName} / '
-                                                                      '${_selectedBarangayName}',
-                                                      style: TextStyle(
-                                                          fontSize: 16.0),
-                                                      overflow: TextOverflow
-                                                          .visible, // Allow wrapping
-                                                      softWrap:
-                                                          true, // Enable soft wrapping
+                                                  Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            vertical: 5.0,
+                                                            horizontal: 15),
+                                                    decoration: BoxDecoration(
+                                                        color: Colors.white,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10.0),
+                                                        boxShadow: shadowColor),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        // Show selected values
+                                                        Expanded(
+                                                          child: Text(
+                                                            _selectedProvinceName ==
+                                                                    null
+                                                                ? 'Select Province'
+                                                                : _selectedCityMunicipalityName ==
+                                                                        null
+                                                                    ? '${_selectedProvinceName} / '
+                                                                    : _selectedBarangayName ==
+                                                                            null
+                                                                        ? '${_selectedProvinceName} / ${_selectedCityMunicipalityName} / '
+                                                                        : '${_selectedProvinceName} / '
+                                                                            '${_selectedCityMunicipalityName} / '
+                                                                            '${_selectedBarangayName}',
+                                                            style: TextStyle(
+                                                                fontSize: 16.0),
+                                                            overflow: TextOverflow
+                                                                .visible, // Allow wrapping
+                                                            softWrap:
+                                                                true, // Enable soft wrapping
+                                                          ),
+                                                        ),
+                                                        IconButton(
+                                                            icon: Icon(
+                                                              Icons.clear,
+                                                              color: Colors
+                                                                  .deepPurple,
+                                                            ),
+                                                            onPressed: () {
+                                                              //close
+                                                              _loadProvinces();
+                                                              setState(() {
+                                                                _provinces = [];
+                                                                _citiesMunicipalities =
+                                                                    [];
+                                                                _barangays = [];
+
+                                                                _showCityMunicipalityDropdown =
+                                                                    false;
+                                                                _showBarangayDropdown =
+                                                                    false;
+
+                                                                _selectedProvinceName =
+                                                                    null;
+                                                                _selectedCityMunicipalityName =
+                                                                    null;
+                                                                _selectedBarangayName =
+                                                                    null;
+                                                              });
+                                                            })
+                                                      ],
                                                     ),
                                                   ),
-                                                  IconButton(
-                                                      icon: Icon(
-                                                        Icons.clear,
-                                                        color:
-                                                            Colors.deepPurple,
+                                                  if (_showProvinceDropdown)
+                                                    Container(
+                                                      height: 100,
+                                                      margin:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 10),
+                                                      decoration: BoxDecoration(
+                                                          color: Colors
+                                                              .deepPurple
+                                                              .withOpacity(0.7),
+                                                          borderRadius:
+                                                              BorderRadius.vertical(
+                                                                  bottom: Radius
+                                                                      .circular(
+                                                                          15)),
+                                                          boxShadow:
+                                                              shadowColor),
+                                                      child: ListView.builder(
+                                                        itemCount:
+                                                            _provinces.length,
+                                                        itemBuilder:
+                                                            (context, index) {
+                                                          final city =
+                                                              _provinces[index];
+
+                                                          return InkWell(
+                                                            onTap: () {
+                                                              setState(() {
+                                                                _loadCitiesMunicipalities(
+                                                                    city[
+                                                                        'code']); // Load barangays for the selected city
+
+                                                                _selectedProvinceName =
+                                                                    city[
+                                                                        'name']; // Set by name
+                                                                _showProvinceDropdown =
+                                                                    false;
+                                                                _showCityMunicipalityDropdown =
+                                                                    true;
+                                                              });
+                                                            },
+                                                            child: Container(
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                      vertical:
+                                                                          10,
+                                                                      horizontal:
+                                                                          15),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                border: Border(
+                                                                    bottom: BorderSide(
+                                                                        color: Colors
+                                                                            .grey
+                                                                            .shade300)),
+                                                              ),
+                                                              child: Text(
+                                                                city[
+                                                                    'name'], // Display the name
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        16,
+                                                                    color: Colors
+                                                                        .white),
+                                                              ),
+                                                            ),
+                                                          );
+                                                        },
                                                       ),
-                                                      onPressed: () {
-                                                        //close
-                                                        _loadProvinces();
-                                                        setState(() {
-                                                          _provinces = [];
-                                                          _citiesMunicipalities =
-                                                              [];
-                                                          _barangays = [];
+                                                    ),
+                                                  if (_showCityMunicipalityDropdown)
+                                                    Container(
+                                                      height: 400,
+                                                      margin:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 10),
+                                                      decoration: BoxDecoration(
+                                                          color: Colors
+                                                              .deepPurple
+                                                              .withOpacity(0.7),
+                                                          borderRadius:
+                                                              BorderRadius.vertical(
+                                                                  bottom: Radius
+                                                                      .circular(
+                                                                          15)),
+                                                          boxShadow:
+                                                              shadowColor),
+                                                      child: ListView.builder(
+                                                        itemCount:
+                                                            _citiesMunicipalities
+                                                                .length,
+                                                        itemBuilder:
+                                                            (context, index) {
+                                                          final city =
+                                                              _citiesMunicipalities[
+                                                                  index];
 
-                                                          _showCityMunicipalityDropdown =
-                                                              false;
-                                                          _showBarangayDropdown =
-                                                              false;
+                                                          return InkWell(
+                                                            onTap: () {
+                                                              setState(() {
+                                                                _loadBarangays(
+                                                                    city[
+                                                                        'code']);
 
-                                                          _selectedProvinceName =
-                                                              null;
-                                                          _selectedCityMunicipalityName =
-                                                              null;
-                                                          _selectedBarangayName =
-                                                              null;
-                                                        });
-                                                      })
+                                                                _selectedCityMunicipalityName =
+                                                                    city[
+                                                                        'name'];
+                                                                _showCityMunicipalityDropdown =
+                                                                    false;
+                                                                _showBarangayDropdown =
+                                                                    true;
+                                                              });
+                                                            },
+                                                            child: Container(
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                      vertical:
+                                                                          10,
+                                                                      horizontal:
+                                                                          15),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                border: Border(
+                                                                    bottom: BorderSide(
+                                                                        color: Colors
+                                                                            .grey
+                                                                            .shade300)),
+                                                              ),
+                                                              child: Text(
+                                                                city[
+                                                                    'name'], // Display the name
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        16,
+                                                                    color: Colors
+                                                                        .white),
+                                                              ),
+                                                            ),
+                                                          );
+                                                        },
+                                                      ),
+                                                    ),
+
+                                                  //brgy ddl
+                                                  if (_showBarangayDropdown)
+                                                    Container(
+                                                      height: 400,
+                                                      margin:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 10),
+                                                      decoration: BoxDecoration(
+                                                          color: Colors
+                                                              .deepPurple
+                                                              .withOpacity(0.7),
+                                                          borderRadius:
+                                                              BorderRadius.vertical(
+                                                                  bottom: Radius
+                                                                      .circular(
+                                                                          15)),
+                                                          boxShadow:
+                                                              shadowColor),
+                                                      child: ListView.builder(
+                                                        itemCount:
+                                                            _barangays.length,
+                                                        itemBuilder:
+                                                            (context, index) {
+                                                          final city =
+                                                              _barangays[index];
+
+                                                          return InkWell(
+                                                            onTap: () {
+                                                              setState(() {
+                                                                _selectedBarangayName =
+                                                                    city[
+                                                                        'name'];
+                                                                _showBarangayDropdown =
+                                                                    false;
+                                                              });
+                                                            },
+                                                            child: Container(
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                      vertical:
+                                                                          10,
+                                                                      horizontal:
+                                                                          15),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                border: Border(
+                                                                    bottom: BorderSide(
+                                                                        color: Colors
+                                                                            .grey
+                                                                            .shade300)),
+                                                              ),
+                                                              child: Text(
+                                                                city[
+                                                                    'name'], // Display the name
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        16,
+                                                                    color: Colors
+                                                                        .white),
+                                                              ),
+                                                            ),
+                                                          );
+                                                        },
+                                                      ),
+                                                    )
                                                 ],
                                               ),
                                             ),
-                                            if (_showProvinceDropdown)
-                                              Container(
-                                                height: 100,
-                                                margin: EdgeInsets.symmetric(
-                                                    horizontal: 10),
-                                                decoration: BoxDecoration(
-                                                    color: Colors.deepPurple
-                                                        .withOpacity(0.7),
-                                                    borderRadius:
-                                                        BorderRadius.vertical(
-                                                            bottom:
-                                                                Radius.circular(
-                                                                    15)),
-                                                    boxShadow: shadowColor),
-                                                child: ListView.builder(
-                                                  itemCount: _provinces.length,
-                                                  itemBuilder:
-                                                      (context, index) {
-                                                    final city =
-                                                        _provinces[index];
-
-                                                    return InkWell(
-                                                      onTap: () {
-                                                        setState(() {
-                                                          _loadCitiesMunicipalities(
-                                                              city[
-                                                                  'code']); // Load barangays for the selected city
-
-                                                          _selectedProvinceName =
-                                                              city[
-                                                                  'name']; // Set by name
-                                                          _showProvinceDropdown =
-                                                              false;
-                                                          _showCityMunicipalityDropdown =
-                                                              true;
-                                                        });
-                                                      },
-                                                      child: Container(
-                                                        padding: EdgeInsets
-                                                            .symmetric(
-                                                                vertical: 10,
-                                                                horizontal: 15),
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          border: Border(
-                                                              bottom: BorderSide(
-                                                                  color: Colors
-                                                                      .grey
-                                                                      .shade300)),
-                                                        ),
-                                                        child: Text(
-                                                          city[
-                                                              'name'], // Display the name
-                                                          style: TextStyle(
-                                                              fontSize: 16,
-                                                              color:
-                                                                  Colors.white),
-                                                        ),
-                                                      ),
-                                                    );
-                                                  },
-                                                ),
-                                              ),
-                                            if (_showCityMunicipalityDropdown)
-                                              Container(
-                                                height: 400,
-                                                margin: EdgeInsets.symmetric(
-                                                    horizontal: 10),
-                                                decoration: BoxDecoration(
-                                                    color: Colors.deepPurple
-                                                        .withOpacity(0.7),
-                                                    borderRadius:
-                                                        BorderRadius.vertical(
-                                                            bottom:
-                                                                Radius.circular(
-                                                                    15)),
-                                                    boxShadow: shadowColor),
-                                                child: ListView.builder(
-                                                  itemCount:
-                                                      _citiesMunicipalities
-                                                          .length,
-                                                  itemBuilder:
-                                                      (context, index) {
-                                                    final city =
-                                                        _citiesMunicipalities[
-                                                            index];
-
-                                                    return InkWell(
-                                                      onTap: () {
-                                                        setState(() {
-                                                          _loadBarangays(
-                                                              city['code']);
-
-                                                          _selectedCityMunicipalityName =
-                                                              city['name'];
-                                                          _showCityMunicipalityDropdown =
-                                                              false;
-                                                          _showBarangayDropdown =
-                                                              true;
-                                                        });
-                                                      },
-                                                      child: Container(
-                                                        padding: EdgeInsets
-                                                            .symmetric(
-                                                                vertical: 10,
-                                                                horizontal: 15),
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          border: Border(
-                                                              bottom: BorderSide(
-                                                                  color: Colors
-                                                                      .grey
-                                                                      .shade300)),
-                                                        ),
-                                                        child: Text(
-                                                          city[
-                                                              'name'], // Display the name
-                                                          style: TextStyle(
-                                                              fontSize: 16,
-                                                              color:
-                                                                  Colors.white),
-                                                        ),
-                                                      ),
-                                                    );
-                                                  },
-                                                ),
-                                              ),
-
-                                            //brgy ddl
-                                            if (_showBarangayDropdown)
-                                              Container(
-                                                height: 400,
-                                                margin: EdgeInsets.symmetric(
-                                                    horizontal: 10),
-                                                decoration: BoxDecoration(
-                                                    color: Colors.deepPurple
-                                                        .withOpacity(0.7),
-                                                    borderRadius:
-                                                        BorderRadius.vertical(
-                                                            bottom:
-                                                                Radius.circular(
-                                                                    15)),
-                                                    boxShadow: shadowColor),
-                                                child: ListView.builder(
-                                                  itemCount: _barangays.length,
-                                                  itemBuilder:
-                                                      (context, index) {
-                                                    final city =
-                                                        _barangays[index];
-
-                                                    return InkWell(
-                                                      onTap: () {
-                                                        setState(() {
-                                                          _selectedBarangayName =
-                                                              city['name'];
-                                                          _showBarangayDropdown =
-                                                              false;
-                                                        });
-                                                      },
-                                                      child: Container(
-                                                        padding: EdgeInsets
-                                                            .symmetric(
-                                                                vertical: 10,
-                                                                horizontal: 15),
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          border: Border(
-                                                              bottom: BorderSide(
-                                                                  color: Colors
-                                                                      .grey
-                                                                      .shade300)),
-                                                        ),
-                                                        child: Text(
-                                                          city[
-                                                              'name'], // Display the name
-                                                          style: TextStyle(
-                                                              fontSize: 16,
-                                                              color:
-                                                                  Colors.white),
-                                                        ),
-                                                      ),
-                                                    );
-                                                  },
-                                                ),
-                                              )
                                           ],
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  if (_selectedProvinceName == null ||
-                                      _selectedCityMunicipalityName == null ||
-                                      _selectedBarangayName == null)
-                                    Text(
-                                      'Please select your adrress.',
-                                      style: TextStyle(color: Colors.red),
+                                        if (_selectedProvinceName == null ||
+                                            _selectedCityMunicipalityName ==
+                                                null ||
+                                            _selectedBarangayName == null)
+                                          Text(
+                                            'Please select your adrress.',
+                                            style: TextStyle(color: Colors.red),
+                                          ),
+                                        const SizedBox(height: 5),
+                                        _buildTextField(
+                                          controller: _streetController,
+                                          hintText:
+                                              'Street Name, Building, House No.',
+                                          onChanged: (value) {
+                                            setState(() {
+                                              streetvalidator = _validateStreet(
+                                                  value); // Trigger validation on text change
+                                            });
+                                          },
+                                        ),
+                                        _labelValidator(streetvalidator),
+                                        const SizedBox(height: 5),
+                                        _buildTextField(
+                                          controller: _postalController,
+                                          keyboardType: TextInputType.number,
+                                          inputFormatters: [
+                                            FilteringTextInputFormatter
+                                                .digitsOnly,
+                                            LengthLimitingTextInputFormatter(4),
+                                          ],
+                                          hintText: 'Postal Code',
+                                          onChanged: (value) {
+                                            setState(() {
+                                              postalvalidator = _validatePostalCode(
+                                                  value); // Trigger validation on text change
+                                              //print(_postalController.text);
+                                            });
+                                          },
+                                        ),
+                                        _labelValidator(postalvalidator),
+                                      ],
                                     ),
-                                  const SizedBox(height: 5),
-                                  _buildTextField(
-                                    controller: _streetController,
-                                    hintText:
-                                        'Street Name, Building, House No.',
-                                    onChanged: (value) {
-                                      setState(() {
-                                        streetvalidator = _validateStreet(
-                                            value); // Trigger validation on text change
-                                      });
-                                    },
-                                  ),
-                                  _labelValidator(streetvalidator),
-                                  const SizedBox(height: 5),
-                                  _buildTextField(
-                                    controller: _postalController,
-                                    keyboardType: TextInputType.number,
-                                    inputFormatters: [
-                                      FilteringTextInputFormatter.digitsOnly,
-                                      LengthLimitingTextInputFormatter(4),
-                                    ],
-                                    hintText: 'Postal Code',
-                                    onChanged: (value) {
-                                      setState(() {
-                                        postalvalidator = _validatePostalCode(
-                                            value); // Trigger validation on text change
-                                        //print(_postalController.text);
-                                      });
-                                    },
-                                  ),
-                                  _labelValidator(postalvalidator),
+                                  //if hauler address
+                                  if (user == 'hauler')
+                                    _buildTextField(
+                                      controller: _addressController,
+                                      hintText: 'Address',
+                                      onChanged: (value) {
+                                        setState(() {
+                                          addressvalidator = _validateAddress(
+                                              value); // Trigger validation on text change
+                                        });
+                                      },
+                                    ),
+                                  _labelValidator(addressvalidator),
                                   const SizedBox(height: 20),
                                   SizedBox(height: 20),
                                   Row(
@@ -1257,7 +1417,11 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                     children: [
                                       InkWell(
                                         onTap: () {
-                                          _checkChanges();
+                                          if (user == 'customer') {
+                                            _checkChangesCus();
+                                          } else {
+                                            _checkChangesEmp();
+                                          }
                                         },
                                         child: Container(
                                           padding: EdgeInsets.symmetric(
@@ -1316,10 +1480,12 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                   _labelField(
                                       label: 'Phone Number',
                                       value: userData?['contact'] ?? ''),
+                                  //address condition
                                   _labelField(
                                       label: 'Address',
-                                      value:
-                                          '${userData?['street'] ?? ''}, ${userData?['brgy'] ?? ''}, ${userData?['city'] ?? ''}, ${userData?['province'] ?? ''}, ${userData?['postal'] ?? ''}'),
+                                      value: user == 'hauler'
+                                          ? '${userData?['address'] ?? ''}'
+                                          : '${userData?['street'] ?? ''}, ${userData?['brgy'] ?? ''}, ${userData?['city'] ?? ''}, ${userData?['province'] ?? ''}, ${userData?['postal'] ?? ''}'),
                                   _labelField(
                                       label: 'Status',
                                       value: userData?['status'] ?? ''),
@@ -1598,7 +1764,8 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                               _selectedCityMunicipalityName!,
                               _selectedBarangayName!,
                               _streetController.text,
-                              _postalController.text);
+                              _postalController.text,
+                              _addressController.text);
 
                           if (updateMsg == 'success') {
                             setState(() {
@@ -1609,13 +1776,9 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                             await _dbData();
                             // Update the user data in the provider
                             userModel!.setUserData(
-                                userModel!.id ?? '',
-                                _fnameController.text,
-                                userModel!.lname ??
-                                    '', // Keep current last name
-                                userModel!.email ?? '',
-                                userModel!.auth ?? '',
-                                photoBytes);
+                                newEmail: _emailController.text,
+                                newFname: _fnameController.text,
+                                newProfile: photoBytes);
 
                             setState(() {
                               _resetData();
@@ -1929,7 +2092,8 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                     _selectedCityMunicipalityName!,
                     _selectedBarangayName!,
                     _streetController.text,
-                    _postalController.text);
+                    _postalController.text,
+                    _addressController.text);
 
                 if (updateMsg == 'success') {
                   if (!mounted) return;
@@ -1937,12 +2101,9 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                   setState(() {
                     // Update the user data in the provider
                     userModel!.setUserData(
-                        userModel!.id ?? '',
-                        _fnameController.text,
-                        userModel!.lname ?? '', // Keep current last name
-                        userModel!.email ?? '',
-                        userModel!.auth ?? '',
-                        photoBytes);
+                        newEmail: _emailController.text,
+                        newFname: _fnameController.text,
+                        newProfile: photoBytes);
 
                     _resetData();
                     _isEditing = false;

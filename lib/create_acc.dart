@@ -2380,13 +2380,7 @@ class SuccessVerifyEmail extends StatelessWidget {
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => C_HomeScreen(),
-                    ),
-                    (route) => false,
-                  );
+                  Navigator.pushNamed(context, '/mainApp');
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: deepPurple,

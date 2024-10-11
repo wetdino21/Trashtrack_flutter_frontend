@@ -3,7 +3,9 @@ import 'package:intl/intl.dart';
 import 'package:trashtrack/Customer/c_schedule_list.dart';
 import 'package:trashtrack/Customer/c_booking.dart';
 import 'package:trashtrack/api_postgre_service.dart';
+import 'package:trashtrack/booking_list.dart';
 import 'package:trashtrack/styles.dart';
+import 'package:trashtrack/user_hive_data.dart';
 
 class C_ScheduleScreen extends StatefulWidget {
   @override
@@ -24,10 +26,13 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
   bool containCurrent = false;
   bool containHistory = false;
 
+  String? user;
+
   @override
   void initState() {
     super.initState();
     _fetchBookingData();
+    _dbData();
     _pageController = PageController(initialPage: selectedPage);
 
     _controller = AnimationController(
@@ -52,6 +57,20 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
     TickerCanceled;
     _controller.dispose();
     super.dispose();
+  }
+
+  Future<void> _dbData() async {
+    try {
+      final data = await userDataFromHive();
+      setState(() {
+        user = data['user'];
+      });
+    } catch (e) {
+      // setState(() {
+      //   errorMessage = e.toString();
+      //   isLoading = false;
+      // });
+    }
   }
 
   // Fetch booking from the server
@@ -88,6 +107,7 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
             }).toList();
 
             // Check if filteredList has any items
+
             if (filteredHistory.isNotEmpty) {
               containHistory = true;
             }
@@ -142,7 +162,7 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                     borderRadius: BorderRadius.circular(20.0),
                   ),
                   child: Text(
-                    'Book now?',
+                    user == 'customer' ? 'Book now?' : 'Pickup Waste?',
                     style:
                         TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
                   ),
@@ -152,12 +172,21 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                     decoration: BoxDecoration(boxShadow: shadowColor),
                     child: ElevatedButton(
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => RequestPickupScreen(),
-                            ),
-                          );
+                          if (user == 'customer') {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => RequestPickupScreen(),
+                              ),
+                            );
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Booking_List(),
+                              ),
+                            );
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: deepGreen,
@@ -237,7 +266,30 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                   ],
                 ),
               ),
-              SizedBox(height: 20.0),
+              Container(
+                height: 30,
+                child: Row(
+                  children: [
+                    Expanded(flex: 5, child: Container()),
+                    Expanded(
+                        flex: 1,
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                              boxShadow: shadowMidColor),
+                        )),
+                    Expanded(flex: 5, child: Container()),
+                    Expanded(
+                        flex: 1,
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                              boxShadow: shadowMidColor),
+                        )),
+                    Expanded(flex: 5, child: Container()),
+                  ],
+                ),
+              ),
               Container(
                 height: MediaQuery.of(context).size.height * .58,
                 //height: MediaQuery.of(context).size.height - kBottomNavigationBarHeight,
@@ -313,11 +365,22 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                                         SizedBox(
                                           height: 100,
                                         ),
-                                        Text(
-                                          'No Available Current Schedule .\n\n\n\n',
-                                          style: TextStyle(
-                                              color: white, fontSize: 20),
-                                        ),
+                                        Container(
+                                            alignment: Alignment.center,
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Icon(Icons.calendar_month,
+                                                    color: whiteSoft, size: 70),
+                                                Text(
+                                                  'No Available Current Schedule .\n\n\n\n',
+                                                  style: TextStyle(
+                                                      color: whiteSoft,
+                                                      fontSize: 20),
+                                                ),
+                                              ],
+                                            )),
                                         SizedBox(
                                           height: 100,
                                         ),
@@ -328,14 +391,10 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                               : ListView.builder(
                                   itemCount: bookingList?.length == null
                                       ? 0
-                                      : bookingList!.length + 1,
+                                      : bookingList!.length,
                                   itemBuilder: (context, index) {
-                                    if (index == 0) {
-                                      return SizedBox(height: 20.0);
-                                    }
-
                                     // Safely retrieve the booking details from bookingList
-                                    final booking = bookingList?[index - 1];
+                                    final booking = bookingList?[index];
 
                                     if (booking == null) {
                                       return SizedBox.shrink();
@@ -466,11 +525,22 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                                         SizedBox(
                                           height: 100,
                                         ),
-                                        Text(
-                                          'No available Scheduled History.\n\n\n\n',
-                                          style: TextStyle(
-                                              color: white, fontSize: 20),
-                                        ),
+                                        Container(
+                                            alignment: Alignment.center,
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Icon(Icons.history,
+                                                    color: whiteSoft, size: 70),
+                                                Text(
+                                                  'No available Scheduled History.\n\n\n\n',
+                                                  style: TextStyle(
+                                                      color: whiteSoft,
+                                                      fontSize: 20),
+                                                ),
+                                              ],
+                                            )),
                                         SizedBox(
                                           height: 100,
                                         ),
@@ -481,14 +551,10 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                               : ListView.builder(
                                   itemCount: bookingList?.length == null
                                       ? 0
-                                      : bookingList!.length + 1,
+                                      : bookingList!.length,
                                   itemBuilder: (context, index) {
-                                    if (index == 0) {
-                                      return SizedBox(height: 20.0);
-                                    }
-
                                     // Safely retrieve the booking details from bookingList
-                                    final booking = bookingList?[index - 1];
+                                    final booking = bookingList?[index];
 
                                     if (booking == null) {
                                       return SizedBox.shrink();

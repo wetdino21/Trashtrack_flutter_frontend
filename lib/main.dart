@@ -14,16 +14,6 @@ import 'package:trashtrack/Customer/c_notification.dart';
 import 'package:trashtrack/Customer/c_payment.dart';
 import 'package:trashtrack/Customer/c_profile.dart';
 
-//hauler library
-import 'package:trashtrack/Hauler/Schedule.dart';
-import 'package:trashtrack/Hauler/Vehicle.dart';
-import 'package:trashtrack/haul_about_us.dart';
-import 'package:trashtrack/Hauler/change_pass.dart';
-import 'package:trashtrack/Hauler/home.dart';
-import 'package:trashtrack/Hauler/map.dart';
-import 'package:trashtrack/Hauler/notification.dart';
-import 'package:trashtrack/Hauler/profile.dart';
-
 import 'package:trashtrack/api_token.dart';
 
 //global
@@ -64,7 +54,6 @@ void main() async {
 // }
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -74,7 +63,7 @@ class MyApp extends StatelessWidget {
       //initialRoute: initialRoute,
       home: TokenCheck(), // final firt route
       //home: StoreNetwork(), // for testing with network
-      
+
       //home: WebsocketMultiple(), //for testing
       //home: WebSocketExample(), //for testing
       //initialRoute: 'c_home', //for testing
@@ -82,34 +71,17 @@ class MyApp extends StatelessWidget {
       routes: {
         '/mainApp': (context) => MainApp(),
         '/logout': (context) => LoginPage(),
-
         'splash': (context) => SplashScreen(),
         'terms': (context) => TermsAndConditions(),
         'forgot_pass': (context) => const ForgotPassword(),
-        // 'email_verify': (context) => EmailVerification(),
         'create_acc': (context) => CreateAcc(),
         'login': (context) => LoginPage(),
         'deactivated': (context) => const DeactivatedScreen(),
         'suspended': (context) => const SuspendedScreen(),
-        //'change_pass': (context) => ChangePassword(),
-
-        //Hauler Routes
-        'home': (context) => HomeScreen(),
-        'map': (context) => MapScreen(),
-        'schedule': (context) => ScheduleScreen(),
-        'vehicle': (context) => VehicleScreen(),
-        //'change_pass': (context) => ChangePass(),
-        'about_us': (context) => AboutUs(),
-        'privacy_policy': (context) => PrivacyPolicy(),
-        'notification': (context) => NotificationScreen(),
-        'profile': (context) => ProfileScreen(),
-
-        //Customer
         'c_home': (context) => C_HomeScreen(),
         'c_map': (context) => C_MapScreen(),
         'c_schedule': (context) => C_ScheduleScreen(),
         'c_payment': (context) => C_PaymentScreen(),
-
         'c_about_us': (context) => C_AboutUs(),
         'c_notification': (context) => C_NotificationScreen(),
         'c_profile': (context) => C_ProfileScreen(),
@@ -130,13 +102,15 @@ class _WebsocketMultipleState extends State<WebsocketMultiple> {
   @override
   void initState() {
     super.initState();
-    channel = IOWebSocketChannel.connect('ws://192.168.254.187:8080'); // Connect to server
+    channel = IOWebSocketChannel.connect(
+        'ws://192.168.254.187:8080'); // Connect to server
 
     // Listen for incoming messages
     channel.stream.listen((message) {
       final decodedMessage = jsonDecode(message);
       setState(() {
-        messages.add('Received ${decodedMessage['type']} message: ${decodedMessage['content']}');
+        messages.add(
+            'Received ${decodedMessage['type']} message: ${decodedMessage['content']}');
       });
     });
   }
@@ -152,7 +126,8 @@ class _WebsocketMultipleState extends State<WebsocketMultiple> {
 
   @override
   void dispose() {
-    channel.sink.close(); // Close WebSocket connection when the widget is disposed
+    channel.sink
+        .close(); // Close WebSocket connection when the widget is disposed
     super.dispose();
   }
 
@@ -175,7 +150,8 @@ class _WebsocketMultipleState extends State<WebsocketMultiple> {
             onSubmitted: (text) => sendMessage('chat', text),
           ),
           ElevatedButton(
-            onPressed: () => sendMessage('notification', 'New notification from client!'),
+            onPressed: () =>
+                sendMessage('notification', 'New notification from client!'),
             child: Text('Send Notification'),
           ),
           ElevatedButton(
@@ -219,6 +195,10 @@ class _TokenCheckState extends State<TokenCheck> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          Text(
+            'NO INTERNET CONNECTION',
+            style: TextStyle(color: white, fontSize: 20),
+          ),
           Center(
             child: Image.asset('assets/truck.png'),
           ),
@@ -226,7 +206,7 @@ class _TokenCheckState extends State<TokenCheck> {
               onPressed: () {
                 deleteTokens();
               },
-              child: Text('delete token')),
+              child: Text('Delete token')),
         ],
       ),
     );

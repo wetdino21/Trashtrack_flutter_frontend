@@ -1321,12 +1321,16 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime now = DateTime.now();
-    final DateTime firstDate = DateTime(now.year);
+    //final DateTime firstDate = DateTime(now.year, now.month, now.day);
+    final DateTime firstDate = now.hour < 15 // 12 AM and 3 PM
+        ? DateTime(now.year, now.month, now.day)
+        : DateTime(now.year, now.month, now.day + 1);
+    final DateTime initialDate = now.hour < 15 ? DateTime.now() : firstDate;
     final DateTime lastDate = DateTime(now.year + 1, 12, 31);
 
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: initialDate,
       firstDate: firstDate,
       lastDate: lastDate, // Use the current year + 1
       builder: (BuildContext context, Widget? child) {

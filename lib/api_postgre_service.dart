@@ -189,7 +189,7 @@ Future<String?> loginAccount(
     }),
   );
 
-  if (response.statusCode == 200 || response.statusCode == 201) {
+  if (response.statusCode == 200) {
     //store token to storage
     final responseData = jsonDecode(response.body);
     final String accessToken = responseData['accessToken'];
@@ -198,11 +198,7 @@ Future<String?> loginAccount(
     //await storeDataInHive(context); // store data to local
 
     print('Login successfully');
-    if (response.statusCode == 200) {
-      return 'customer'; // No error
-    } else if (response.statusCode == 201) {
-      return 'hauler'; // No error
-    }
+    return 'success'; // No error
   } else if (response.statusCode == 202) {
     // Store data in Hive
     final responseData = jsonDecode(response.body);
@@ -259,20 +255,20 @@ Future<String?> updateForgotPassword(String email, String newPassword) async {
 
 //user update
 Future<String?> userUpdate(
-  BuildContext context,
-  int bookId,
-  String fname,
-  String mname,
-  String lname,
-  String email,
-  Uint8List? photoBytes,
-  String contact,
-  String province,
-  String city,
-  String brgy,
-  String street,
-  String postal,
-) async {
+    BuildContext context,
+    int bookId,
+    String fname,
+    String mname,
+    String lname,
+    String email,
+    Uint8List? photoBytes,
+    String contact,
+    String province,
+    String city,
+    String brgy,
+    String street,
+    String postal,
+    String address) async {
   Map<String, String?> tokens = await getTokens();
   String? accessToken = tokens['access_token'];
   if (accessToken == null) {
@@ -300,6 +296,7 @@ Future<String?> userUpdate(
         'brgy': brgy,
         'street': street,
         'postal': postal,
+        'address': address,
       }),
     );
 
@@ -319,8 +316,21 @@ Future<String?> userUpdate(
         print('Access token expired. Attempting to refresh...');
         String? refreshMsg = await refreshAccessToken();
         if (refreshMsg == null) {
-          return await userUpdate(context, bookId, fname, mname, lname, email,
-              photoBytes, contact, province, city, brgy, street, postal);
+          return await userUpdate(
+              context,
+              bookId,
+              fname,
+              mname,
+              lname,
+              email,
+              photoBytes,
+              contact,
+              province,
+              city,
+              brgy,
+              street,
+              postal,
+              address);
         }
       } else if (response.statusCode == 403) {
         // Access token is invalid. Logout
@@ -676,8 +686,70 @@ Future<String?> bookingCancel(BuildContext context, int bookId) async {
   return null;
 }
 
+//fetch_pending_booking pickup
+Future<Map<String, List<Map<String, dynamic>>>?> fetchPendingBooking() async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+
+  if (accessToken == null) {
+    print('No access token available. User needs to log in.');
+    await deleteTokens();
+    return null;
+  }
+
+  // try {
+  final response = await http.post(
+    Uri.parse('$baseUrl/fetch_pickup_booking'),
+    headers: {
+      'Authorization': 'Bearer $accessToken',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    //print(response.body);
+    //return List<Map<String, dynamic>>.from(jsonDecode(response.body));
+    Map<String, dynamic> data = jsonDecode(response.body);
+
+    // Extract 'booking' and 'wasteTypes' from the response
+    List<Map<String, dynamic>> bookingList =
+        List<Map<String, dynamic>>.from(data['booking']);
+    List<Map<String, dynamic>> wasteTypeList =
+        List<Map<String, dynamic>>.from(data['wasteTypes']);
+
+    // Optionally: Combine them if needed or pass them individually
+    return {'booking': bookingList, 'wasteTypes': wasteTypeList};
+  } else {
+    if (response.statusCode == 401) {
+      // Access token might be expired, attempt to refresh it
+      print('Access token expired. Attempting to refresh...');
+      String? refreshMsg = await refreshAccessToken();
+      if (refreshMsg == null) {
+        return await fetchPendingBooking();
+      } else {
+        // Refresh token is invalid or expired, logout the user
+        await deleteTokens(); // Logout user
+        return null;
+      }
+    } else if (response.statusCode == 403) {
+      // Access token is invalid. logout
+      print('Access token invalid. Attempting to logout...');
+      await deleteTokens(); // Logout user
+    } else if (response.statusCode == 404) {
+      print('No booking found');
+      return null;
+    }
+
+    //showErrorSnackBar(context, response.body);
+    print('Response: ${response.body}');
+    return null;
+  }
+  // } catch (e) {
+  //   print(e);
+  // }
+  //return null;
+}
+
 //deactivate
-//booking update
 Future<String?> deactivateUser(BuildContext context, String email) async {
   Map<String, String?> tokens = await getTokens();
   String? accessToken = tokens['access_token'];
@@ -832,7 +904,7 @@ Future<String?> binding_google(BuildContext context, String? email) async {
 
       //showErrorSnackBar(context, response.body);
     }
-    print('Update Booking is not successful!');
+    print('Failed to Bind account with google!');
     return response.body;
   } catch (e) {
     print(e.toString());

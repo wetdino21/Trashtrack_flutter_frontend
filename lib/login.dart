@@ -53,7 +53,7 @@ class _LoginPageState extends State<LoginPage> {
                       if (didPop) {
                         return;
                       }
-                       Navigator.pushNamed(context, 'splash');
+                      Navigator.pushNamed(context, 'splash');
                     },
                     child: Container()),
                 Container(
@@ -236,16 +236,9 @@ class _LoginPageState extends State<LoginPage> {
 
                               // If there's an error, show it in a SnackBar
                               if (dbMessage != null) {
-                                if (dbMessage == 'customer') {
-                                  ScaffoldMessenger.of(context)
-                                      .clearSnackBars();
+                                if (dbMessage == 'success') {
                                   Navigator.pushReplacementNamed(
                                       context, '/mainApp');
-                                } else if (dbMessage == 'hauler') {
-                                  ScaffoldMessenger.of(context)
-                                      .clearSnackBars();
-                                  Navigator.pushReplacementNamed(
-                                      context, 'home');
                                 } else if (dbMessage == '202') {
                                   Navigator.pushNamed(context, 'deactivated');
                                 } else if (dbMessage == '203') {
@@ -323,7 +316,7 @@ class _LoginPageState extends State<LoginPage> {
                                 padding: EdgeInsets.symmetric(
                                     vertical: 10.0, horizontal: 35.0),
                               ),
-                              icon: Image.asset(  
+                              icon: Image.asset(
                                 'assets/Brands.png',
                                 height: 24.0,
                               ),

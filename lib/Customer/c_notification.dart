@@ -130,11 +130,19 @@ class _C_NotificationScreenState extends State<C_NotificationScreen>
                   );
                 })
             : notifications == null
-                ? Center(
-                    child: Text(
-                    'No available notification.\n\n\n\n',
-                    style: TextStyle(color: accentColor, fontSize: 20),
-                  ))
+                ? Container(
+                    height: double.infinity,
+                     alignment: Alignment.center,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.notifications_off, color: whiteSoft, size: 100),
+                        Text(
+                          'No available notification.\n\n\n\n',
+                          style: TextStyle(color: whiteSoft, fontSize: 20),
+                        ),
+                      ],
+                    ))
                 : ListView.builder(
                     padding: const EdgeInsets.all(5),
                     itemCount: notifications!.length,
@@ -142,9 +150,7 @@ class _C_NotificationScreenState extends State<C_NotificationScreen>
                       final notification = notifications![index];
                       final bool status = notification['notif_read'] ==
                           true; // Ensure this is a boolean
-                      String showStatus = status
-                          ? 'Read'
-                          : 'Sent'; 
+                      String showStatus = status ? 'Read' : 'Sent';
 
                       final Color statusColor = status
                           ? Colors.white54

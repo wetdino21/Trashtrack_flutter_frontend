@@ -1,10 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:trashtrack/main.dart';
+import 'package:trashtrack/styles.dart';
+import 'package:trashtrack/user_hive_data.dart';
 
-class C_BottomNavBar extends StatelessWidget {
+class C_BottomNavBar extends StatefulWidget {
   final int currentIndex;
   final Function(int) onTap;
 
   C_BottomNavBar({required this.currentIndex, required this.onTap});
+
+  @override
+  State<C_BottomNavBar> createState() => _C_BottomNavBarState();
+}
+
+class _C_BottomNavBarState extends State<C_BottomNavBar> {
+  //user data
+  Map<String, dynamic>? userData;
+  String user = 'customer';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  void _loadData() async {
+    final data = await userDataFromHive();
+    setState(() {
+      userData = data;
+      user = data['user'];
+      print(user);
+    });
+  }
 
   void _onItemTapped(BuildContext context, int index) {
     switch (index) {
@@ -41,34 +69,38 @@ class C_BottomNavBar extends StatelessWidget {
       ),
       child: BottomNavigationBar(
         backgroundColor: const Color.fromARGB(255, 21, 8, 44),
-        currentIndex: currentIndex,
+        currentIndex: widget.currentIndex,
         items: [
           BottomNavigationBarItem(
-            icon: currentIndex == 0
+            icon: widget.currentIndex == 0
                 ? Icon(Icons.home)
                 : Icon(Icons.home_outlined),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon:
-                currentIndex == 1 ? Icon(Icons.map) : Icon(Icons.map_outlined),
+            icon: widget.currentIndex == 1
+                ? Icon(Icons.map)
+                : Icon(Icons.map_outlined),
             label: 'Map',
           ),
           BottomNavigationBarItem(
-            icon: currentIndex == 2
+            icon: widget.currentIndex == 2
                 ? Icon(Icons.calendar_month)
                 : Icon(Icons.calendar_month_outlined),
             label: 'Schedule',
           ),
           BottomNavigationBarItem(
-            icon: currentIndex == 3
-                ? Icon(Icons.payment)
-                : Icon(Icons.payment_outlined),
-            label: 'Payment',
+            icon: widget.currentIndex == 3 && user == 'customer'
+                ? Icon(
+                    user == 'customer' ? Icons.payment : Icons.directions_car)
+                : Icon(user == 'customer'
+                    ? Icons.payment_outlined
+                    : Icons.directions_car_filled_outlined),
+            label: user == 'customer' ? 'Payment' : 'Vehicle',
           ),
         ],
         // onTap: (index) => _onItemTapped(context, index),
-         onTap: onTap,  // Pass the selected index to the callback function
+        onTap: widget.onTap, // Pass the selected index to the callback function
         selectedItemColor: Colors.green,
         unselectedItemColor: Colors.white,
         type: BottomNavigationBarType.fixed,

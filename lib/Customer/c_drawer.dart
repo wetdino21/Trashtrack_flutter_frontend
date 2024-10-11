@@ -3,6 +3,7 @@ import 'package:trashtrack/Customer/c_home.dart';
 import 'package:trashtrack/Customer/c_profile.dart';
 import 'package:trashtrack/Customer/c_settings.dart';
 import 'package:trashtrack/Customer/c_about_us.dart';
+import 'package:trashtrack/Customer/c_waste_info.dart';
 import 'package:trashtrack/privacy_policy.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:trashtrack/terms_conditions.dart';
@@ -148,6 +149,20 @@ class _C_DrawerState extends State<C_Drawer> {
                   //     }
                   //   },
                   // ),
+
+                  // Waste info
+                  ListTile(
+                    leading: _buildIcon(Icons.view_list),
+                    title: Text('Waste Collection Types'),
+                    selectedColor: Colors.green,
+                    tileColor: selectedIndexs == 2 ? Colors.black12 : null,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => C_WasteInfo()),
+                      );
+                    },
+                  ),
                   // About Us
                   ListTile(
                     leading: _buildIcon(Icons.account_circle),

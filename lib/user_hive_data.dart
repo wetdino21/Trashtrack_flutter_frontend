@@ -3,8 +3,10 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:trashtrack/Customer/c_api_cus_data.dart'; // For imageBytes if applicable
 import 'dart:convert';
-
 import 'package:trashtrack/styles.dart';
+
+// import 'package:logger/logger.dart';
+// final Logger logger = Logger();
 
 Future<void> storeDataInHive(BuildContext context) async {
   // Fetch data from the API or another source
@@ -17,11 +19,13 @@ Future<void> storeDataInHive(BuildContext context) async {
 // Determine the prefix based on the data
     String prefix;
     String usertype = 'type';
+    String address = '';
     if (data.containsKey('cus_id')) {
       prefix = 'cus_';
     } else if (data.containsKey('emp_id')) {
       prefix = 'emp_';
       usertype = 'role';
+      address = data['emp_address'];
       print(data['emp_role']);
     } else {
       // Handle cases where neither cus_id nor haul_id is found
@@ -29,6 +33,8 @@ Future<void> storeDataInHive(BuildContext context) async {
     }
 
     // Extract data fields with the appropriate prefix
+    final String? user = data['user'];
+
     final int? id = data['${prefix}id'];
     final String? fname = data['${prefix}fname'];
     final String? mname = data['${prefix}mname'];
@@ -53,6 +59,7 @@ Future<void> storeDataInHive(BuildContext context) async {
     var box = await Hive.openBox('mybox');
 
     // Store data in Hive
+    await box.put('user', user);
     await box.put('id', id);
     await box.put('fname', fname);
     await box.put('mname', mname);
@@ -68,28 +75,31 @@ Future<void> storeDataInHive(BuildContext context) async {
     await box.put('type', type);
     await box.put('auth', auth);
     await box.put('profile', imageBytes);
+    await box.put('address', address);
 
-    //notification count
-    List<Map<String, dynamic>>? notifications;
-    int unreadCount = 0;
-    try {
-      final notifData = await fetchCusNotifications();
-      if (notifData != null) {
-        notifications = notifData;
-        // Count unread notifications
-        unreadCount = notifications.where((notification) {
-          return notification['notif_read'] == false;
-        }).length;
-      } else {
-        print('NOTIFICATION USER DATA IS NULL');
+    if (user == 'customer') {
+      //notification count
+      List<Map<String, dynamic>>? notifications;
+      int unreadCount = 0;
+      try {
+        final notifData = await fetchCusNotifications();
+        if (notifData != null) {
+          notifications = notifData;
+          // Count unread notifications
+          unreadCount = notifications.where((notification) {
+            return notification['notif_read'] == false;
+          }).length;
+        } else {
+          print('NOTIFICATION USER DATA IS NULL');
+        }
+      } catch (e) {
+        showErrorSnackBar(context, e.toString());
       }
-    } catch (e) {
-      showErrorSnackBar(context, e.toString());
+
+      await box.put('notif_count', unreadCount);
+
+      print('Data has been saved to Hive.');
     }
-
-    await box.put('notif_count', unreadCount);
-
-    print('Data has been saved to Hive.');
   }
 }
 
@@ -126,6 +136,7 @@ Future<Map<String, dynamic>> userDataFromHive() async {
 
   // Retrieve data from Hive
   final Map<String, dynamic> data = {
+    'user': box.get('user'),
     'id': box.get('id'),
     'fname': box.get('fname'),
     'mname': box.get('mname'),
@@ -141,6 +152,7 @@ Future<Map<String, dynamic>> userDataFromHive() async {
     'type': box.get('type'),
     'auth': box.get('auth'),
     'profile': box.get('profile'),
+    'address': box.get('address'),
   };
   // Optionally, print a message or handle UI updates
   print('Data has been retrieved from Hive.');

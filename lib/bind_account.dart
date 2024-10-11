@@ -268,57 +268,62 @@ class _BindWithGoogleScreenState extends State<BindWithGoogleScreen> {
                           TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 20),
-                    Text(
-                      'Note: This will update your current email with the selected new email.',
-                      style: TextStyle(color: Colors.red),
-                    ),
-                    SizedBox(height: 20),
                     if (_accountDetails != null)
-                      InkWell(
-                        onTap: () async {
-                          String? errorBinding = await binding_google(
-                              context, _accountDetails!.email);
-
-                          // If there's an error, show it in a SnackBar
-                          if (errorBinding == 'success') {
-                            //showSuccessSnackBar(context, 'Saved Changes');
-                            setState(() {
-                              isLoading = false;
-                            });
-
-                            userModel!.setBindGoogle(
-                                'TRASHTRACK_GOOGLE', _accountDetails!.email);
-
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => BindWithNothing(),
-                              ),
-                            );
-                          } else {
-                            showErrorSnackBar(context,
-                                'Something went wrong. Please try again later.');
-                            setState(() {
-                              isLoading = false;
-                              //Navigator.pop(context);
-                            });
-                          }
-                        },
-                        child: Container(
-                          alignment: Alignment.center,
-                          padding: EdgeInsets.all(10.0),
-                          decoration: BoxDecoration(
-                              color: Colors.green,
-                              borderRadius: BorderRadius.circular(10.0),
-                              boxShadow: shadowColor),
-                          child: Text(
-                            'Confirm',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 25,
-                                fontWeight: FontWeight.bold),
+                      Column(
+                        children: [
+                          SizedBox(height: 20),
+                          Text(
+                            'Note: This will update your current email with the selected new email.',
+                            style: TextStyle(color: Colors.red),
                           ),
-                        ),
+                          SizedBox(height: 10),
+                          InkWell(
+                            onTap: () async {
+                              String? errorBinding = await binding_google(
+                                  context, _accountDetails!.email);
+
+                              // If there's an error, show it in a SnackBar
+                              if (errorBinding == 'success') {
+                                //showSuccessSnackBar(context, 'Saved Changes');
+                                setState(() {
+                                  isLoading = false;
+                                });
+
+                                userModel!.setBindGoogle('TRASHTRACK_GOOGLE',
+                                    _accountDetails!.email);
+
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => BindWithNothing(),
+                                  ),
+                                );
+                              } else {
+                                showErrorSnackBar(context,
+                                    'Something went wrong. Please try again later.');
+                                setState(() {
+                                  isLoading = false;
+                                  //Navigator.pop(context);
+                                });
+                              }
+                            },
+                            child: Container(
+                              alignment: Alignment.center,
+                              padding: EdgeInsets.all(10.0),
+                              decoration: BoxDecoration(
+                                  color: Colors.green,
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  boxShadow: shadowColor),
+                              child: Text(
+                                'Confirm',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 25,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                   ],
                 ),
@@ -592,17 +597,16 @@ class _BindWithTrashTrackScreenState extends State<BindWithTrashTrackScreen> {
                                 boxShadow: shadowColor),
                             child: ListTile(
                               contentPadding: EdgeInsets.all(8.0),
-                              leading: Container(
-                                  padding: EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(100),
-                                  ),
-                                  child: Container(
-                                    child: CircleAvatar(
+                              leading: userModel!.profile != null
+                                  ? CircleAvatar(
                                       backgroundImage:
                                           MemoryImage(userModel!.profile!),
-                                    ),
-                                  )),
+                                    )
+                                  : ClipOval(
+                                      child: Container(
+                                          padding: EdgeInsets.all(8),
+                                          color: Colors.white,
+                                          child: Icon(Icons.person, size: 40))),
                               title: userModel!.email != null
                                   ? Text(
                                       userModel!.email ?? '',

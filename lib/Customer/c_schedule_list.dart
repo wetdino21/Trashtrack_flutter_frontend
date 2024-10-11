@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:trashtrack/Customer/c_map.dart';
+import 'package:trashtrack/mainApp.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:intl/intl.dart';
 import 'package:trashtrack/Customer/c_Schedule.dart';
@@ -11,8 +12,9 @@ import 'dart:async';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:trashtrack/user_hive_data.dart';
 
-class C_ScheduleCardList extends StatelessWidget {
+class C_ScheduleCardList extends StatefulWidget {
   final int bookId;
   final String date; //September 15, 2024 (Mon);
   final String dateCreated; // Sept. 10, 2024
@@ -28,18 +30,47 @@ class C_ScheduleCardList extends StatelessWidget {
   });
 
   @override
+  State<C_ScheduleCardList> createState() => _C_ScheduleCardListState();
+}
+
+class _C_ScheduleCardListState extends State<C_ScheduleCardList> {
+  String? user;
+
+  @override
+  void initState() {
+    super.initState();
+    _dbData();
+  }
+
+  // Fetch user data from the server
+  Future<void> _dbData() async {
+    try {
+      final data = await userDataFromHive();
+      if (!mounted) return null;
+      setState(() {
+        user = data['user'];
+      });
+    } catch (e) {}
+  }
+
+  @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => C_ScheduleDetails(bookId: bookId)));
+        if (user == 'customer') {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      C_ScheduleDetails(bookId: widget.bookId)));
+        } else {
+          
+        }
       },
       splashColor: Colors.green,
       highlightColor: Colors.green.withOpacity(0.2),
       child: Container(
-        padding: EdgeInsets.all(10),
+        padding: EdgeInsets.only(bottom: 20, left: 10, right: 10),
         //color: boxColor,
         // decoration: BoxDecoration(
         //   borderRadius: BorderRadius.circular(10),
@@ -72,16 +103,18 @@ class C_ScheduleCardList extends StatelessWidget {
                     Row(
                       children: [
                         Icon(
-                            status == 'Cancelled' || status == 'Collected'
+                            widget.status == 'Cancelled' ||
+                                    widget.status == 'Collected'
                                 ? Icons.history
-                                : Icons.calendar_today,
-                            size: status == 'Cancelled' || status == 'Collected'
+                                : Icons.calendar_month,
+                            size: widget.status == 'Cancelled' ||
+                                    widget.status == 'Collected'
                                 ? 35
                                 : 25,
                             color: Colors.white),
                         SizedBox(width: 10.0),
                         Text(
-                          date,
+                          widget.date,
                           style: TextStyle(color: Colors.white, fontSize: 23.0),
                         ),
                       ],
@@ -89,7 +122,7 @@ class C_ScheduleCardList extends StatelessWidget {
                     Align(
                       alignment: Alignment.center,
                       child: Text(
-                        wasteType,
+                        widget.wasteType,
                         style: TextStyle(color: Colors.white70, fontSize: 16.0),
                       ),
                     ),
@@ -110,19 +143,19 @@ class C_ScheduleCardList extends StatelessWidget {
                         width: 5,
                       ),
                       Text(
-                        dateCreated,
+                        widget.dateCreated,
                         style: TextStyle(color: Colors.grey, fontSize: 12.0),
                       ),
                     ],
                   ),
                   Text(
-                    status,
+                    widget.status,
                     style: TextStyle(
-                      color: status == 'Pending'
+                      color: widget.status == 'Pending'
                           ? Colors.orange
-                          : status == 'Ongoing'
+                          : widget.status == 'Ongoing'
                               ? Colors.green
-                              : status == 'Cancelled'
+                              : widget.status == 'Cancelled'
                                   ? Colors.red
                                   : Colors.blue,
                       fontSize: 18.0,
@@ -627,10 +660,10 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                   String? dbMessage =
                       await bookingCancel(context, bookingData!['bk_id']);
                   if (dbMessage == 'success')
-                    Navigator.pushReplacement(
+                    Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => C_ScheduleScreen()));
+                            builder: (context) => MainApp(selectedIndex: 2)));
                   else
                     showErrorSnackBar(
                         context, 'Somthing\'s wrong. Please try again later.');
@@ -721,13 +754,15 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                         onPressed: () async {
                           //Navigator.push(context, MaterialPageRoute(builder: (context) => C_MapScreen()));
                           bool onLocation = await checkLocationPermission();
-                          if (onLocation)
+                          if (onLocation) {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => C_MapScreen(
+                                    builder: (context) => MainApp(
+                                        selectedIndex: 1,
                                         pickupPoint: LatLng(
                                             10.25702151, 123.85040322))));
+                          }
                         },
                         child: Container(
                           padding: EdgeInsets.all(10),
@@ -1106,7 +1141,9 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                                               .start,
                                                       children: [
                                                         Row(
-                                                           crossAxisAlignment: CrossAxisAlignment.start,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
                                                           children: [
                                                             Expanded(
                                                               child: Text(
@@ -1893,7 +1930,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                   boxShadow: shadowColor),
               child: Row(
                 children: [
-                  Icon(Icons.calendar_today, color: Colors.green),
+                  Icon(Icons.calendar_month, color: Colors.green),
                   SizedBox(width: 10.0),
                   Text(
                     _selectedDate == null

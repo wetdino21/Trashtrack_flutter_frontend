@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:trashtrack/Customer/c_waste_info.dart';
 import 'package:trashtrack/Customer/c_booking.dart';
 import 'package:trashtrack/api_token.dart';
+import 'package:trashtrack/booking_list.dart';
 import 'package:trashtrack/data_model.dart';
 import 'package:trashtrack/styles.dart';
 
@@ -16,6 +17,8 @@ class C_HomeScreen extends StatefulWidget {
 
 class _C_HomeScreenState extends State<C_HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  String? user;
 
   //user data
   Map<String, dynamic>? userData;
@@ -74,6 +77,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
       if (!mounted) return null;
       setState(() {
         userData = data;
+        user = data['user'];
         isLoading = false;
 
         // // Decode base64 image only if it exists
@@ -218,7 +222,9 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                                       ),
                                       SizedBox(height: 10.0),
                                       Text(
-                                        'Ready to keep things tidy? Schedule your garbage pickup today!',
+                                        user == 'customer'
+                                            ? 'Ready to keep things tidy? Schedule your garbage pickup today!'
+                                            : 'Another waste collection day? Drive safe!',
                                         style: TextStyle(
                                           fontSize: 14.0,
                                         ),
@@ -271,13 +277,23 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                                               boxShadow: shadowColor),
                                           child: ElevatedButton(
                                             onPressed: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      RequestPickupScreen(),
-                                                ),
-                                              );
+                                              if (user == 'customer') {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        RequestPickupScreen(),
+                                                  ),
+                                                );
+                                              } else {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        Booking_List(),
+                                                  ),
+                                                );
+                                              }
                                             },
                                             style: ElevatedButton.styleFrom(
                                               backgroundColor: deepPurple,
@@ -290,7 +306,9 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                                                   horizontal: 30.0),
                                             ),
                                             child: Text(
-                                              'Request Pickup Now',
+                                              user == 'customer'
+                                                  ? 'Request Pickup Now'
+                                                  : 'Pickup',
                                               style: TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 18.0,
@@ -304,44 +322,44 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                                 ),
 
                                 ////
-                                SizedBox(height: 20.0),
-                                Text(
-                                  '  Waste Collection Info',
-                                  style: TextStyle(
-                                    color: white,
-                                    fontSize: 18.0,
-                                  ),
-                                ),
-                                SizedBox(height: 5.0),
+                                // SizedBox(height: 20.0),
+                                // Text(
+                                //   '  Waste Collection Info',
+                                //   style: TextStyle(
+                                //     color: white,
+                                //     fontSize: 18.0,
+                                //   ),
+                                // ),
+                                // SizedBox(height: 5.0),
 
-                                GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  C_WasteInfo()));
-                                    },
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: white,
-                                        boxShadow: shadowMidColor,
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: ListTile(
-                                        contentPadding: EdgeInsets.all(10),
-                                        leading: Icon(
-                                          Icons.view_list,
-                                          color: deepPurple,
-                                        ),
-                                        title: Text(
-                                          'Type of Waste',
-                                          style: TextStyle(
-                                            fontSize: 18.0,
-                                          ),
-                                        ),
-                                      ),
-                                    )),
+                                // GestureDetector(
+                                //     onTap: () {
+                                //       Navigator.push(
+                                //           context,
+                                //           MaterialPageRoute(
+                                //               builder: (context) =>
+                                //                   C_WasteInfo()));
+                                //     },
+                                //     child: Container(
+                                //       decoration: BoxDecoration(
+                                //         color: white,
+                                //         boxShadow: shadowMidColor,
+                                //         borderRadius: BorderRadius.circular(10),
+                                //       ),
+                                //       child: ListTile(
+                                //         contentPadding: EdgeInsets.all(10),
+                                //         leading: Icon(
+                                //           Icons.view_list,
+                                //           color: deepPurple,
+                                //         ),
+                                //         title: Text(
+                                //           'Type of Waste',
+                                //           style: TextStyle(
+                                //             fontSize: 18.0,
+                                //           ),
+                                //         ),
+                                //       ),
+                                //     )),
 
                                 /////
                                 SizedBox(height: 20.0),
@@ -364,7 +382,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                                   children: [
                                     StatisticBox(
                                       icon: Icons.schedule,
-                                      title: 'Total Requests',
+                                      title: user == 'customer'? 'Total Requests': 'Total Pickup',
                                       value: '150',
                                       iconColor: accentColor,
                                     ),

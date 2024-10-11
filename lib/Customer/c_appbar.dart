@@ -29,10 +29,11 @@ class C_CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class C_CustomAppBarState extends State<C_CustomAppBar> {
+  String user = 'customer';
   Uint8List? imageBytes;
   UserModel? userModel;
   int totalNotif = 0;
-  late WebSocketChannel channel;
+  WebSocketChannel? channel;
 
   //live notif
   //late NotificationService notificationService;
@@ -45,7 +46,7 @@ class C_CustomAppBarState extends State<C_CustomAppBar> {
   void initState() {
     super.initState();
     loadProfileNotif();
-     connectWebSocket();
+    connectWebSocket();
   }
 
   @override
@@ -57,7 +58,7 @@ class C_CustomAppBarState extends State<C_CustomAppBar> {
 
   @override
   void dispose() {
-    channel.sink.close();
+    if (channel != null) channel!.sink.close();
     //notificationService.closeConnection();
     super.dispose();
   }
@@ -76,27 +77,35 @@ class C_CustomAppBarState extends State<C_CustomAppBar> {
     String ipAddress = extractIpAddress(baseUrl);
     //192.168.254.187
     final data = await userDataFromHive();
-    if (data['id'] != null) {
-      channel = WebSocketChannel.connect(
-        Uri.parse('ws://${ipAddress}:8080?userId=${data['id'].toString()}'),
-        //Uri.parse('ws://192.168.254.187:8080?userId=${data['id'].toString()}'),
-      );
-      channel.stream.listen((message) {
-        final notification = json.decode(message);
-        if (notification.containsKey('unread_count')) {
-          var unreadCount = notification['unread_count'];
-          setState(() {
-            //totalNotif = unreadCount; //same output
-            totalNotif = int.tryParse(unreadCount) ?? 0;
-          });
-        }
-      }, onError: (error) {
-        print('WebSocket error: $error');
-      }, onDone: () {
-        print('WebSocket connection closed');
-      });
-    } else {
-      print('Failed to retrieve user ID for WebSocket connection');
+    setState(() {
+      user = data['user'];
+    });
+
+    if (data['user'] == 'customer') {
+      //if customer then notif
+
+      if (data['id'] != null) {
+        channel = WebSocketChannel.connect(
+          Uri.parse('ws://${ipAddress}:8080?userId=${data['id'].toString()}'),
+          //Uri.parse('ws://192.168.254.187:8080?userId=${data['id'].toString()}'),
+        );
+        channel!.stream.listen((message) {
+          final notification = json.decode(message);
+          if (notification.containsKey('unread_count')) {
+            var unreadCount = notification['unread_count'];
+            setState(() {
+              //totalNotif = unreadCount; //same output
+              totalNotif = int.tryParse(unreadCount) ?? 0;
+            });
+          }
+        }, onError: (error) {
+          print('WebSocket error: $error');
+        }, onDone: () {
+          print('WebSocket connection closed');
+        });
+      } else {
+        print('Failed to retrieve user ID for WebSocket connection');
+      }
     }
   }
 
@@ -106,9 +115,9 @@ class C_CustomAppBarState extends State<C_CustomAppBar> {
       imageBytes = data['profile'];
     });
 
-     final box = await Hive.openBox('mybox');
+    final box = await Hive.openBox('mybox');
     if (box.get('notif_count') == null) {
-      showErrorSnackBar(context, '1111111111 ');
+      //showErrorSnackBar(context, '1111111111 ');
     } else {
       setState(() {
         totalNotif = box.get('notif_count');
@@ -122,7 +131,6 @@ class C_CustomAppBarState extends State<C_CustomAppBar> {
     //     totalNotif = box.get('notif_count');
     //   });
     // }
-
   }
 
   @override
@@ -140,64 +148,65 @@ class C_CustomAppBarState extends State<C_CustomAppBar> {
         ),
       ),
       actions: [
-        Stack(
-          children: [
-            // ListView.builder(
-            //   itemCount: notifications.length,
-            //   itemBuilder: (context, index) {
-            //     return ListTile(
-            //       title: Text(notifications[index]),
-            //     );
-            //   },
-            // ),
-            InkWell(
-              onTap: () {
-                Navigator.pushNamed(context, 'c_notification');
-              },
-              borderRadius: BorderRadius.circular(50),
-              child: Container(
-                margin: EdgeInsets.all(5),
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: deepPurple,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.notifications,
-                  color: Colors.white,
-                  size: 30,
+        if (user == 'customer')
+          Stack(
+            children: [
+              // ListView.builder(
+              //   itemCount: notifications.length,
+              //   itemBuilder: (context, index) {
+              //     return ListTile(
+              //       title: Text(notifications[index]),
+              //     );
+              //   },
+              // ),
+              InkWell(
+                onTap: () {
+                  Navigator.pushNamed(context, 'c_notification');
+                },
+                borderRadius: BorderRadius.circular(50),
+                child: Container(
+                  margin: EdgeInsets.all(5),
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: deepPurple,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.notifications,
+                    color: Colors.white,
+                    size: 30,
+                  ),
                 ),
               ),
-            ),
 
-            //notif counts
-            if (totalNotif > 0)
-              Positioned(
-                  right: 0,
-                  child: Container(
-                      height: 20,
-                      width: 20,
-                      child: Container(
-                        padding: const EdgeInsets.all(1.0),
-                        decoration: BoxDecoration(
-                            color: white,
-                            borderRadius: BorderRadius.circular(100)),
-                        child: CircleAvatar(
-                            backgroundColor: Colors.red,
-                            child: Text(
-                              totalNotif >= 99 ? '99+' : '${totalNotif}',
-                              style: TextStyle(
-                                  color: white,
-                                  fontSize: totalNotif <= 9
-                                      ? 12
-                                      : totalNotif <= 99
-                                          ? 10
-                                          : 8),
-                            )),
-                      )))
-          ],
-        ),
+              //notif counts
+              if (totalNotif > 0)
+                Positioned(
+                    right: 0,
+                    child: Container(
+                        height: 20,
+                        width: 20,
+                        child: Container(
+                          padding: const EdgeInsets.all(1.0),
+                          decoration: BoxDecoration(
+                              color: white,
+                              borderRadius: BorderRadius.circular(100)),
+                          child: CircleAvatar(
+                              backgroundColor: Colors.red,
+                              child: Text(
+                                totalNotif >= 99 ? '99+' : '${totalNotif}',
+                                style: TextStyle(
+                                    color: white,
+                                    fontSize: totalNotif <= 9
+                                        ? 12
+                                        : totalNotif <= 99
+                                            ? 10
+                                            : 8),
+                              )),
+                        )))
+            ],
+          ),
         InkWell(
           onTap: () {
             Navigator.pushNamed(context, 'c_profile');

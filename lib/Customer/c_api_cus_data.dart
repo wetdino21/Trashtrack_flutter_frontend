@@ -41,7 +41,6 @@ Future<Map<String, dynamic>?> fetchCusData(BuildContext context) async {
 
     return jsonDecode(response.body);
   } else {
-    showErrorSnackBar(context, 'User not found!');
     if (response.statusCode == 401) {
       // Access token might be expired, attempt to refresh it
       print('Access token expired. Attempting to refresh...');

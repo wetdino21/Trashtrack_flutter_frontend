@@ -10,26 +10,27 @@ import 'package:trashtrack/Customer/c_payment.dart';
 import 'package:trashtrack/data_model.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:trashtrack/user_hive_data.dart';
+import 'package:logger/logger.dart';
+import 'package:latlong2/latlong.dart';
 
 class MainApp extends StatefulWidget {
   final int? selectedIndex;
+  LatLng? pickupPoint;
 
-  MainApp({this.selectedIndex});
+  MainApp({this.selectedIndex, this.pickupPoint});
 
   @override
   _MainAppState createState() => _MainAppState();
 }
 
 class _MainAppState extends State<MainApp> {
+  final Logger logger = Logger();
+  //user data
+  Map<String, dynamic>? userData;
+  String? user;
+
   int _selectedIndex = 0;
   bool Loading = false;
-  // Define pages here
-  final List<Widget> _pages = [
-    C_HomeScreen(),
-    C_MapScreen(),
-    C_ScheduleScreen(),
-    C_PaymentScreen(),
-  ];
 
   @override
   void initState() {
@@ -41,7 +42,30 @@ class _MainAppState extends State<MainApp> {
     }
   }
 
+  // // Define pages
+  List<Widget> get _pages {
+    return [
+      C_HomeScreen(),
+      C_MapScreen(
+        pickupPoint: widget.pickupPoint,
+      ),
+      C_ScheduleScreen(),
+      C_PaymentScreen(),
+    ];
+  }
+  // final List<Widget> _pages = [
+  //   C_HomeScreen(),
+  //   C_MapScreen(),
+  //   C_ScheduleScreen(),
+  //   C_PaymentScreen(),
+  // ];
+
   void _onItemTapped(int index) {
+    if (index != 1) {
+      setState(() {
+        widget.pickupPoint = null; // Reset pickupPoint
+      });
+    }
     setState(() {
       _selectedIndex = index; // Update the selected index when tapped
     });
@@ -57,15 +81,20 @@ class _MainAppState extends State<MainApp> {
       await storeDataInHive(context); // user data
 
       final data = await userDataFromHive();
+
       Provider.of<UserModel>(context, listen: false).setUserData(
-          data['id'].toString(),
-          data['fname'],
-          data['lname'],
-          data['email'],
-          data['auth'],
-          data['profile']);
+        newId: data['id'].toString(),
+        newFname: data['fname'],
+        newLname: data['lname'],
+        newEmail: data['email'],
+        newAuth: data['auth'],
+        newProfile: data['profile'],
+      );
 
       setState(() {
+        //userData = data; //isnt used
+        String? usertype = data['user'];
+        user = usertype;
         Loading = false;
       });
     } catch (e) {
@@ -79,7 +108,7 @@ class _MainAppState extends State<MainApp> {
   Widget build(BuildContext context) {
     return Loading
         ? Scaffold(
-          backgroundColor: deepPurple,
+            backgroundColor: deepPurple,
             body: Stack(
               children: [
                 Positioned.fill(
@@ -107,9 +136,10 @@ class _MainAppState extends State<MainApp> {
                         ? 'Map'
                         : _selectedIndex == 2
                             ? 'Schedule'
-                            : 'Payment'), // Update title based on the page
-            body: _pages[
-                _selectedIndex], // Change the body based on selected index
+                            : user == 'hauler'
+                                ? 'Vehicle'
+                                : 'Payment'),
+            body: _pages[_selectedIndex],
             bottomNavigationBar: C_BottomNavBar(
               currentIndex: _selectedIndex,
               onTap: _onItemTapped,

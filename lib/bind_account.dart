@@ -558,233 +558,239 @@ class _BindWithTrashTrackScreenState extends State<BindWithTrashTrackScreen> {
         backgroundColor: deepPurple,
         foregroundColor: Colors.white,
       ),
-      body: Stack(
-        children: [
-          ListView(
-            children: [
-              Text(
-                'Bind Account',
-                style: TextStyle(
-                  fontSize: 28,
-                  color: white,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 20),
-              Text(
-                'You are logged in with Google',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: white,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              userModel != null
-                  ? Container(
-                      margin: EdgeInsets.all(10.0),
-                      padding: EdgeInsets.all(10.0),
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10.0),
-                          boxShadow: shadowBigColor),
-                      child: Column(
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                                color: deepGreen, // Background color
-                                borderRadius: BorderRadius.circular(10.0),
-                                boxShadow: shadowColor),
-                            child: ListTile(
-                              contentPadding: EdgeInsets.all(8.0),
-                              leading: userModel!.profile != null
-                                  ? CircleAvatar(
-                                      backgroundImage:
-                                          MemoryImage(userModel!.profile!),
-                                    )
-                                  : ClipOval(
-                                      child: Container(
-                                          padding: EdgeInsets.all(8),
-                                          color: Colors.white,
-                                          child: Icon(Icons.person, size: 40))),
-                              title: userModel!.email != null
-                                  ? Text(
-                                      userModel!.email ?? '',
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold),
-                                    )
-                                  : Text('No email available'),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  : Container(),
-              Container(
-                margin: EdgeInsets.all(10.0),
-                padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 50),
-                decoration: BoxDecoration(
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: Stack(
+          children: [
+            ListView(
+              children: [
+                Text(
+                  'Bind Account',
+                  style: TextStyle(
+                    fontSize: 28,
                     color: white,
-                    borderRadius: BorderRadius.circular(10.0),
-                    boxShadow: shadowBigColor),
-                child: Column(
-                  children: [
-                    Text(
-                      'To access TrashTrack using both Google and Email/Password, please set a password.',
-                      style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey[800]),
-                    ),
-                    Divider(),
-                    SizedBox(height: 20),
-                    Text(
-                      'Create a Password',
-                      style: TextStyle(
-                        fontSize: 28,
-                        color: deepGreen,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(height: 20),
-                    Container(
-                      decoration: BoxDecoration(boxShadow: shadowColor),
-                      child: TextFormField(
-                        controller: _passwordController,
-                        obscureText: _isObscured,
-                        decoration: InputDecoration(
-                          labelText: 'Password',
-                          labelStyle: TextStyle(color: Colors.grey[600]),
-                          filled: true,
-                          fillColor: white,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                            borderSide: BorderSide.none,
-                          ),
-                          prefixIcon: Icon(Icons.lock, color: deepPurple),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _isObscured
-                                  ? Icons.visibility_off
-                                  : Icons.visibility,
-                              color: deepPurple,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _isObscured = !_isObscured;
-                              });
-                            },
-                          ),
-                        ),
-                        onChanged: (value) {
-                          setState(() {
-                            passvalidator = _validatePassword(value);
-                          });
-                        },
-                      ),
-                    ),
-                    SizedBox(height: 5),
-                    _validator(passvalidator),
-                    SizedBox(height: 20),
-                    Container(
-                      decoration: BoxDecoration(boxShadow: shadowColor),
-                      child: TextFormField(
-                        controller: _confirmPasswordController,
-                        obscureText: _isObscured2,
-                        decoration: InputDecoration(
-                          labelText: 'Confirm Password',
-                          labelStyle: TextStyle(color: Colors.grey[600]),
-                          filled: true,
-                          fillColor: white,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                            borderSide: BorderSide.none,
-                          ),
-                          prefixIcon: Icon(Icons.lock, color: deepPurple),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _isObscured2
-                                  ? Icons.visibility_off
-                                  : Icons.visibility,
-                              color: deepPurple,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _isObscured2 = !_isObscured2;
-                              });
-                            },
-                          ),
-                        ),
-                        onChanged: (value) {
-                          setState(() {
-                            confirmpassvalidator =
-                                _validateConfirmPassword(value);
-                          });
-                        },
-                      ),
-                    ),
-                    SizedBox(height: 5),
-                    _validator(confirmpassvalidator),
-                    SizedBox(height: 20),
-                    InkWell(
-                      onTap: () async {
-                        if ((_passwordController.text.isEmpty ||
-                                passvalidator != '') ||
-                            (_confirmPasswordController.text.isEmpty ||
-                                confirmpassvalidator != '') ||
-                            (_passwordController.text !=
-                                _confirmPasswordController.text)) {
-                          setState(() {
-                            passvalidator =
-                                _validatePassword(_passwordController.text);
-                            confirmpassvalidator = _validateConfirmPassword(
-                                _confirmPasswordController.text);
-                          });
-                        } else {
-                          _resendCode();
-                          setState(() {
-                            _currentStep++;
-                          });
-                        }
-                      },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 70.0, vertical: 10),
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 20),
+                Text(
+                  'You are logged in with Google',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                userModel != null
+                    ? Container(
+                        margin: EdgeInsets.all(10.0),
+                        padding: EdgeInsets.all(10.0),
                         decoration: BoxDecoration(
-                            color: deepGreen,
+                            color: Colors.white,
                             borderRadius: BorderRadius.circular(10.0),
-                            boxShadow: shadowColor),
-                        child: Center(
-                          child: Text(
-                            'Done',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 25,
-                                fontWeight: FontWeight.bold),
+                            boxShadow: shadowBigColor),
+                        child: Column(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                  color: deepGreen, // Background color
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  boxShadow: shadowColor),
+                              child: ListTile(
+                                contentPadding: EdgeInsets.all(8.0),
+                                leading: userModel!.profile != null
+                                    ? CircleAvatar(
+                                        backgroundImage:
+                                            MemoryImage(userModel!.profile!),
+                                      )
+                                    : ClipOval(
+                                        child: Container(
+                                            padding: EdgeInsets.all(8),
+                                            color: Colors.white,
+                                            child:
+                                                Icon(Icons.person, size: 40))),
+                                title: userModel!.email != null
+                                    ? Text(
+                                        userModel!.email ?? '',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold),
+                                      )
+                                    : Text('No email available'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : Container(),
+                Container(
+                  margin: EdgeInsets.all(10.0),
+                  padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 50),
+                  decoration: BoxDecoration(
+                      color: white,
+                      borderRadius: BorderRadius.circular(10.0),
+                      boxShadow: shadowBigColor),
+                  child: Column(
+                    children: [
+                      Text(
+                        'To access TrashTrack using both Google and Email/Password, please set a password.',
+                        style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey[800]),
+                      ),
+                      Divider(),
+                      SizedBox(height: 20),
+                      Text(
+                        'Create a Password',
+                        style: TextStyle(
+                          fontSize: 28,
+                          color: deepGreen,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 20),
+                      Container(
+                        decoration: BoxDecoration(boxShadow: shadowColor),
+                        child: TextFormField(
+                          controller: _passwordController,
+                          obscureText: _isObscured,
+                          decoration: InputDecoration(
+                            labelText: 'Password',
+                            labelStyle: TextStyle(color: Colors.grey[600]),
+                            filled: true,
+                            fillColor: white,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                              borderSide: BorderSide.none,
+                            ),
+                            prefixIcon: Icon(Icons.lock, color: deepPurple),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _isObscured
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                                color: deepPurple,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _isObscured = !_isObscured;
+                                });
+                              },
+                            ),
+                          ),
+                          onChanged: (value) {
+                            setState(() {
+                              passvalidator = _validatePassword(value);
+                            });
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 5),
+                      _validator(passvalidator),
+                      SizedBox(height: 20),
+                      Container(
+                        decoration: BoxDecoration(boxShadow: shadowColor),
+                        child: TextFormField(
+                          controller: _confirmPasswordController,
+                          obscureText: _isObscured2,
+                          decoration: InputDecoration(
+                            labelText: 'Confirm Password',
+                            labelStyle: TextStyle(color: Colors.grey[600]),
+                            filled: true,
+                            fillColor: white,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                              borderSide: BorderSide.none,
+                            ),
+                            prefixIcon: Icon(Icons.lock, color: deepPurple),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _isObscured2
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                                color: deepPurple,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _isObscured2 = !_isObscured2;
+                                });
+                              },
+                            ),
+                          ),
+                          onChanged: (value) {
+                            setState(() {
+                              confirmpassvalidator =
+                                  _validateConfirmPassword(value);
+                            });
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 5),
+                      _validator(confirmpassvalidator),
+                      SizedBox(height: 20),
+                      InkWell(
+                        onTap: () async {
+                          if ((_passwordController.text.isEmpty ||
+                                  passvalidator != '') ||
+                              (_confirmPasswordController.text.isEmpty ||
+                                  confirmpassvalidator != '') ||
+                              (_passwordController.text !=
+                                  _confirmPasswordController.text)) {
+                            setState(() {
+                              passvalidator =
+                                  _validatePassword(_passwordController.text);
+                              confirmpassvalidator = _validateConfirmPassword(
+                                  _confirmPasswordController.text);
+                            });
+                          } else {
+                            _resendCode();
+                            setState(() {
+                              _currentStep++;
+                            });
+                          }
+                        },
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 70.0, vertical: 10),
+                          decoration: BoxDecoration(
+                              color: deepGreen,
+                              borderRadius: BorderRadius.circular(10.0),
+                              boxShadow: shadowColor),
+                          child: Center(
+                            child: Text(
+                              'Done',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.bold),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-          if (isLoading)
-            Positioned.fill(
-                child: InkWell(
-              child: Center(
-                child: CircularProgressIndicator(
-                  color: Colors.green,
-                  strokeWidth: 10,
-                  strokeAlign: 2,
-                  backgroundColor: Colors.deepPurple,
+              ],
+            ),
+            if (isLoading)
+              Positioned.fill(
+                  child: InkWell(
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.green,
+                    strokeWidth: 10,
+                    strokeAlign: 2,
+                    backgroundColor: Colors.deepPurple,
+                  ),
                 ),
-              ),
-            )),
-        ],
+              )),
+          ],
+        ),
       ),
     );
   }
@@ -803,231 +809,238 @@ class _BindWithTrashTrackScreenState extends State<BindWithTrashTrackScreen> {
             },
             icon: Icon(Icons.arrow_back)),
       ),
-      body: Stack(
-        children: [
-          ListView(
-            children: [
-              SizedBox(height: 50),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Container(
-                  padding: EdgeInsets.all(16.0),
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10.0),
-                      boxShadow: shadowBigColor),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Icon(Icons.email, color: deepPurple, size: 100),
-                      Text(
-                        'Check your email',
-                        style: TextStyle(
-                          fontSize: 28,
-                          color: Colors.grey[700],
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(height: 20),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(
-                            'We\'ve sent the code to',
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: Colors.black54,
-                            ),
-                            textAlign: TextAlign.center,
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: Stack(
+          children: [
+            ListView(
+              children: [
+                SizedBox(height: 50),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Container(
+                    padding: EdgeInsets.all(16.0),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10.0),
+                        boxShadow: shadowBigColor),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Icon(Icons.email, color: deepPurple, size: 100),
+                        Text(
+                          'Check your email',
+                          style: TextStyle(
+                            fontSize: 28,
+                            color: Colors.grey[700],
+                            fontWeight: FontWeight.bold,
                           ),
-                          Text(
-                            widget.email,
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: deepPurple,
-                            ),
-                            textAlign: TextAlign.center,
-                            softWrap: true,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: List.generate(6, (index) {
-                          return SizedBox(
-                            width: 50,
-                            child: Container(
-                              decoration: BoxDecoration(boxShadow: shadowColor),
-                              child: TextFormField(
-                                cursorColor: deepGreen,
-                                controller: _codeControllers[index],
-                                keyboardType: TextInputType
-                                    .number, // Accept characters instead of numbers
-                                textInputAction: TextInputAction
-                                    .next, // Moves focus to next field
-                                maxLength: 1,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 24),
-                                decoration: InputDecoration(
-                                  counterText: '',
-                                  filled: true,
-                                  fillColor: deepPurple,
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: deepGreen,
-                                      width: 2.0,
-                                    ),
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                ),
-                                onChanged: (value) {
-                                  // Convert input to uppercase
-                                  final upperCaseValue = value.toUpperCase();
-                                  if (upperCaseValue.length == 1) {
-                                    _codeControllers[index].text =
-                                        upperCaseValue;
-                                    _codeControllers[index].selection =
-                                        TextSelection.fromPosition(
-                                      TextPosition(
-                                          offset: upperCaseValue.length),
-                                    );
-
-                                    // Automatically move focus to the next field
-                                    if (index < 5) {
-                                      FocusScope.of(context).nextFocus();
-                                    } else {
-                                      // Close the keyboard when the last textbox is filled
-                                      FocusScope.of(context).unfocus();
-                                    }
-                                  }
-                                  //print(enteredCode);
-                                },
-                              ),
-                            ),
-                          );
-                        }),
-                      ),
-                      SizedBox(height: 20),
-                      Text(
-                        'Code expires in: ${_formatTimer(_timerSeconds)}',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: _timerSeconds > 0 ? Colors.orange : Colors.red,
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          TextButton(
-                            onPressed: () {
-                              _resendCode();
-                            },
-                            child: Text(
-                              'Resend Code?',
+                        SizedBox(height: 20),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              'We\'ve sent the code to',
                               style: TextStyle(
-                                color: Colors.blue,
-                                fontSize: 16.0,
-                                decoration: TextDecoration.underline,
-                                decorationColor: Colors.blue,
+                                fontSize: 15,
+                                color: Colors.black54,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            Text(
+                              widget.email,
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: deepPurple,
+                              ),
+                              textAlign: TextAlign.center,
+                              softWrap: true,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: List.generate(6, (index) {
+                            return SizedBox(
+                              width: 50,
+                              child: Container(
+                                decoration:
+                                    BoxDecoration(boxShadow: shadowColor),
+                                child: TextFormField(
+                                  cursorColor: deepGreen,
+                                  controller: _codeControllers[index],
+                                  keyboardType: TextInputType
+                                      .number, // Accept characters instead of numbers
+                                  textInputAction: TextInputAction
+                                      .next, // Moves focus to next field
+                                  maxLength: 1,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 24),
+                                  decoration: InputDecoration(
+                                    counterText: '',
+                                    filled: true,
+                                    fillColor: deepPurple,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: deepGreen,
+                                        width: 2.0,
+                                      ),
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                  ),
+                                  onChanged: (value) {
+                                    // Convert input to uppercase
+                                    final upperCaseValue = value.toUpperCase();
+                                    if (upperCaseValue.length == 1) {
+                                      _codeControllers[index].text =
+                                          upperCaseValue;
+                                      _codeControllers[index].selection =
+                                          TextSelection.fromPosition(
+                                        TextPosition(
+                                            offset: upperCaseValue.length),
+                                      );
+
+                                      // Automatically move focus to the next field
+                                      if (index < 5) {
+                                        FocusScope.of(context).nextFocus();
+                                      } else {
+                                        // Close the keyboard when the last textbox is filled
+                                        FocusScope.of(context).unfocus();
+                                      }
+                                    }
+                                    //print(enteredCode);
+                                  },
+                                ),
+                              ),
+                            );
+                          }),
+                        ),
+                        SizedBox(height: 20),
+                        Text(
+                          'Code expires in: ${_formatTimer(_timerSeconds)}',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color:
+                                _timerSeconds > 0 ? Colors.orange : Colors.red,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            TextButton(
+                              onPressed: () {
+                                _resendCode();
+                              },
+                              child: Text(
+                                'Resend Code?',
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                  fontSize: 16.0,
+                                  decoration: TextDecoration.underline,
+                                  decorationColor: Colors.blue,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 20),
-                      InkWell(
-                        onTap: () async {
-                          String? error = _validateCode();
-                          if (error == null) {
-                            updateEnteredCode(); //to update stored enteredCode
-                            print(enteredCode);
-                            String? errorMessage = await verifyEmailCode(
-                                widget.email, enteredCode);
-                            if (errorMessage != null) {
-                              showErrorSnackBar(context, errorMessage);
-                            } else {
-                              setState(() {
-                                isLoading = true;
-                              });
-                              String? errorBinding = await binding_trashtrack(
-                                  context, _passwordController.text);
-
-                              // If there's an error, show it in a SnackBar
-                              if (errorBinding == 'success') {
-                                //showSuccessSnackBar(context, 'Saved Changes');
-                                setState(() {
-                                  isLoading = false;
-                                });
-
-                                userModel!
-                                    .setBindTrashtrack('TRASHTRACK_GOOGLE');
-
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => BindWithNothing(),
-                                  ),
-                                );
+                          ],
+                        ),
+                        SizedBox(height: 20),
+                        InkWell(
+                          onTap: () async {
+                            String? error = _validateCode();
+                            if (error == null) {
+                              updateEnteredCode(); //to update stored enteredCode
+                              print(enteredCode);
+                              String? errorMessage = await verifyEmailCode(
+                                  widget.email, enteredCode);
+                              if (errorMessage != null) {
+                                showErrorSnackBar(context, errorMessage);
                               } else {
-                                showErrorSnackBar(context,
-                                    'Something went wrong. Please try again later.');
                                 setState(() {
-                                  isLoading = false;
-                                  //Navigator.pop(context);
+                                  isLoading = true;
                                 });
+                                String? errorBinding = await binding_trashtrack(
+                                    context, _passwordController.text);
+
+                                // If there's an error, show it in a SnackBar
+                                if (errorBinding == 'success') {
+                                  //showSuccessSnackBar(context, 'Saved Changes');
+                                  setState(() {
+                                    isLoading = false;
+                                  });
+
+                                  userModel!
+                                      .setBindTrashtrack('TRASHTRACK_GOOGLE');
+
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => BindWithNothing(),
+                                    ),
+                                  );
+                                } else {
+                                  showErrorSnackBar(context,
+                                      'Something went wrong. Please try again later.');
+                                  setState(() {
+                                    isLoading = false;
+                                    //Navigator.pop(context);
+                                  });
+                                }
                               }
+                            } else {
+                              showErrorSnackBar(context, error);
                             }
-                          } else {
-                            showErrorSnackBar(context, error);
-                          }
-                        },
-                        child: Container(
-                          alignment: Alignment.center,
-                          padding: EdgeInsets.all(16.0),
-                          decoration: BoxDecoration(
-                              color: Colors.green,
-                              borderRadius: BorderRadius.circular(10.0),
-                              boxShadow: shadowColor),
-                          child: Text(
-                            'Verify',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 25,
-                                fontWeight: FontWeight.bold),
+                          },
+                          child: Container(
+                            alignment: Alignment.center,
+                            padding: EdgeInsets.all(16.0),
+                            decoration: BoxDecoration(
+                                color: Colors.green,
+                                borderRadius: BorderRadius.circular(10.0),
+                                boxShadow: shadowColor),
+                            child: Text(
+                              'Verify',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.bold),
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          if (isloading)
-            Positioned.fill(
-                child: InkWell(
-              child: Center(
-                child: CircularProgressIndicator(
-                  color: Colors.green,
-                  strokeWidth: 10,
-                  strokeAlign: 2,
-                  backgroundColor: Colors.deepPurple,
+              ],
+            ),
+            if (isloading)
+              Positioned.fill(
+                  child: InkWell(
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.green,
+                    strokeWidth: 10,
+                    strokeAlign: 2,
+                    backgroundColor: Colors.deepPurple,
+                  ),
                 ),
-              ),
-            )),
-        ],
+              )),
+          ],
+        ),
       ),
     );
   }

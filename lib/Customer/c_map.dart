@@ -741,7 +741,7 @@ class _C_MapScreenState extends State<C_MapScreen> {
                     Marker(
                         point: _currentLocation!,
                         builder: (ctx) => Icon(Icons.location_on,
-                            color: Colors.red, size: 40),
+                            color: Colors.red, size: 40, shadows: shadowColor),
                         rotate: true),
                   ],
                 ),
@@ -754,7 +754,7 @@ class _C_MapScreenState extends State<C_MapScreen> {
                         height: 80.0,
                         point: selectedPoint!,
                         builder: (ctx) => Icon(Icons.location_pin,
-                            color: Colors.red, size: 40),
+                            color: Colors.red, size: 40, shadows: shadowColor),
                         rotate: true),
                   ],
                 ),
@@ -767,8 +767,12 @@ class _C_MapScreenState extends State<C_MapScreen> {
                       width: 80.0,
                       height: 80.0,
                       point: startPoint!,
-                      builder: (ctx) => Icon(Icons.location_pin,
-                          color: Colors.green, size: 40),
+                      builder: (ctx) => Column(
+                        children: [
+                          Icon(Icons.location_pin,
+                              color: Colors.green, size: 40, shadows: shadowColor),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -782,7 +786,11 @@ class _C_MapScreenState extends State<C_MapScreen> {
                       height: 80.0,
                       point: destinationPoint!,
                       builder: (ctx) =>
-                          Icon(Icons.location_pin, color: Colors.red, size: 40),
+                          Column(
+                            children: [
+                              Icon(Icons.location_pin, color: Colors.red, size: 40, shadows: shadowColor),
+                            ],
+                          ),
                     ),
                   ],
                 ),

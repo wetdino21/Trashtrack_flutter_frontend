@@ -28,7 +28,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
   //Uint8List? imageBytes;
   //late Object _obj;
   final Object _obj = Object(
-    scale: Vector3(12.0, 12.0, 12.0),
+    scale: Vector3(11.0, 11.0, 11.0),
     //position: Vector3(0, 0, 0),
     rotation: Vector3(0, -90, 0), // Start sideways
     fileName: 'assets/objects/base.obj',
@@ -239,33 +239,42 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Icon(
-                                                Icons.arrow_left,
-                                                color: deepPurple,
-                                              ),
-                                              Container(
-                                                height: 200,
-                                                width: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.7,
-                                                child: Cube(
-                                                  onSceneCreated:
-                                                      (Scene scene) {
-                                                    // scene.world.add(Object(
-                                                    //     scale: Vector3(
-                                                    //         12.0, 12.0, 12.0),
-                                                    //     position: Vector3(0, 0, 0),
-                                                    //     rotation:
-                                                    //         Vector3(0, -90, 0),
-                                                    //     fileName:
-                                                    //         'assets/objects/base.obj'));
-                                                    scene.world.add(_obj);
-                                                  },
+                                              Expanded(
+                                                flex: 1,
+                                                child: Icon(
+                                                  Icons.arrow_left,
+                                                  color: deepPurple,
                                                 ),
                                               ),
-                                              Icon(Icons.arrow_right,
-                                                  color: deepPurple),
+                                              Expanded(
+                                                 flex: 8,
+                                                child: Container(
+                                                  height: 200,
+                                                  // width: MediaQuery.of(context)
+                                                  //         .size
+                                                  //         .width *
+                                                  //     0.7,
+                                                  child: Cube(
+                                                    onSceneCreated:
+                                                        (Scene scene) {
+                                                      // scene.world.add(Object(
+                                                      //     scale: Vector3(
+                                                      //         12.0, 12.0, 12.0),
+                                                      //     position: Vector3(0, 0, 0),
+                                                      //     rotation:
+                                                      //         Vector3(0, -90, 0),
+                                                      //     fileName:
+                                                      //         'assets/objects/base.obj'));
+                                                      scene.world.add(_obj);
+                                                    },
+                                                  ),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                 flex: 1,
+                                                child: Icon(Icons.arrow_right,
+                                                    color: deepPurple),
+                                              ),
                                             ],
                                           ),
                                         ),
@@ -460,7 +469,6 @@ class StatisticBox extends StatelessWidget {
         boxShadow: shadowMidColor,
         borderRadius: BorderRadius.circular(10.0),
       ),
-      padding: EdgeInsets.all(16.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -471,12 +479,10 @@ class StatisticBox extends StatelessWidget {
             size: 30.0,
           ),
           SizedBox(height: 10.0),
-          Center(
-            child: Text(
-              title,
-              style: TextStyle(
-                fontSize: 14.0,
-              ),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 14.0,
             ),
           ),
           SizedBox(height: 5.0),

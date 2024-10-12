@@ -66,145 +66,150 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: deepGreen,
-      body: Stack(
-        children: [
-          ListView(
-            children: [
-              SizedBox(height: 50),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Form(
-                  key: _formKey,
-                  child: Center(
-                    child: Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 16.0, vertical: 100),
-                      decoration: BoxDecoration(
-                          color: white,
-                          borderRadius: BorderRadius.circular(15.0),
-                          boxShadow: shadowBigColor),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Text(
-                            'Password Recovery',
-                            style: TextStyle(
-                              fontSize: 28,
-                              color: deepPurple,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          SizedBox(height: 20),
-                          Text(
-                            'Please enter your email associated with the account.',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.black54,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          SizedBox(height: 20),
-                          Container(
-                            decoration: BoxDecoration(boxShadow: shadowColor),
-                            child: TextFormField(
-                              controller: _emailController,
-                              decoration: InputDecoration(
-                                labelText: 'Email',
-                                labelStyle: TextStyle(color: Colors.grey),
-                                filled: true,
-                                fillColor: white,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                  borderSide: BorderSide.none,
-                                ),
-                                prefixIcon:
-                                    Icon(Icons.email, color: deepPurple),
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: Stack(
+          children: [
+            ListView(
+              children: [
+                SizedBox(height: 50),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Form(
+                    key: _formKey,
+                    child: Center(
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 16.0, vertical: 100),
+                        decoration: BoxDecoration(
+                            color: white,
+                            borderRadius: BorderRadius.circular(15.0),
+                            boxShadow: shadowBigColor),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              'Password Recovery',
+                              style: TextStyle(
+                                fontSize: 28,
+                                color: deepPurple,
+                                fontWeight: FontWeight.bold,
                               ),
-                              onChanged: (value) {
-                                setState(() {
-                                  emailvalidator = _validateEmail(value);
-                                });
-                              },
+                              textAlign: TextAlign.center,
                             ),
-                          ),
-                          _validator(emailvalidator),
-                          SizedBox(height: 20),
-                          InkWell(
-                            onTap: () async {
-                              if (_emailController.text.isEmpty ||
-                                  emailvalidator != '') {
-                                setState(() {
-                                  emailvalidator =
-                                      _validateEmail(_emailController.text);
-                                });
-                              } else {
-                                setState(() {
-                                  isLoading = true;
-                                });
-
-                                String? errorMessage =
-                                    await sendEmailCodeForgotPass(
-                                        _emailController.text);
-                                if (errorMessage != null) {
-                                  showErrorSnackBar(context, errorMessage);
+                            SizedBox(height: 20),
+                            Text(
+                              'Please enter your email associated with the account.',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.black54,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(height: 20),
+                            Container(
+                              decoration: BoxDecoration(boxShadow: shadowColor),
+                              child: TextFormField(
+                                controller: _emailController,
+                                decoration: InputDecoration(
+                                  labelText: 'Email',
+                                  labelStyle: TextStyle(color: Colors.grey),
+                                  filled: true,
+                                  fillColor: white,
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  prefixIcon:
+                                      Icon(Icons.email, color: deepPurple),
+                                ),
+                                onChanged: (value) {
                                   setState(() {
-                                    isLoading = false;
+                                    emailvalidator = _validateEmail(value);
+                                  });
+                                },
+                              ),
+                            ),
+                            _validator(emailvalidator),
+                            SizedBox(height: 20),
+                            InkWell(
+                              onTap: () async {
+                                if (_emailController.text.isEmpty ||
+                                    emailvalidator != '') {
+                                  setState(() {
+                                    emailvalidator =
+                                        _validateEmail(_emailController.text);
                                   });
                                 } else {
                                   setState(() {
-                                    isLoading = false;
+                                    isLoading = true;
                                   });
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          VerifyEmailForgotPassScreen(
-                                              email: _emailController.text),
-                                    ),
-                                  );
+
+                                  String? errorMessage =
+                                      await sendEmailCodeForgotPass(
+                                          _emailController.text);
+                                  if (errorMessage != null) {
+                                    showErrorSnackBar(context, errorMessage);
+                                    setState(() {
+                                      isLoading = false;
+                                    });
+                                  } else {
+                                    setState(() {
+                                      isLoading = false;
+                                    });
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            VerifyEmailForgotPassScreen(
+                                                email: _emailController.text),
+                                      ),
+                                    );
+                                  }
                                 }
-                              }
-                            },
-                            child: Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 70.0, vertical: 10),
-                                decoration: BoxDecoration(
-                                    color: Colors.green,
-                                    borderRadius: BorderRadius.circular(10.0),
-                                    boxShadow: shadowColor),
-                                child: Center(
-                                  child: const Text(
-                                    'Next',
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 25,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                )),
-                          ),
-                        ],
+                              },
+                              child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 70.0, vertical: 10),
+                                  decoration: BoxDecoration(
+                                      color: Colors.green,
+                                      borderRadius: BorderRadius.circular(10.0),
+                                      boxShadow: shadowColor),
+                                  child: Center(
+                                    child: const Text(
+                                      'Next',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 25,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  )),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          if (isLoading)
-            Positioned.fill(
-                child: InkWell(
-              child: Center(
-                child: CircularProgressIndicator(
-                  color: Colors.green,
-                  strokeWidth: 10,
-                  strokeAlign: 2,
-                  backgroundColor: Colors.deepPurple,
+              ],
+            ),
+            if (isLoading)
+              Positioned.fill(
+                  child: InkWell(
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.green,
+                    strokeWidth: 10,
+                    strokeAlign: 2,
+                    backgroundColor: Colors.deepPurple,
+                  ),
                 ),
-              ),
-            )),
-        ],
+              )),
+          ],
+        ),
       ),
     );
   }
@@ -322,210 +327,217 @@ class _VerifyEmailForgotPassScreenState
         backgroundColor: deepGreen,
         foregroundColor: white,
       ),
-      body: Stack(
-        children: [
-          ListView(
-            children: [
-              SizedBox(height: 50),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Container(
-                  padding: EdgeInsets.all(16.0),
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(15.0),
-                      boxShadow: shadowBigColor),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Icon(Icons.email, color: deepPurple, size: 100),
-                      Text(
-                        'Check your email',
-                        style: TextStyle(
-                          fontSize: 28,
-                          color: Colors.grey[700],
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(height: 20),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(
-                            'We\'ve sent the code to',
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: Colors.black54,
-                            ),
-                            textAlign: TextAlign.center,
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: Stack(
+          children: [
+            ListView(
+              children: [
+                SizedBox(height: 50),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Container(
+                    padding: EdgeInsets.all(16.0),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15.0),
+                        boxShadow: shadowBigColor),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Icon(Icons.email, color: deepPurple, size: 100),
+                        Text(
+                          'Check your email',
+                          style: TextStyle(
+                            fontSize: 28,
+                            color: Colors.grey[700],
+                            fontWeight: FontWeight.bold,
                           ),
-                          Text(
-                            widget.email,
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: deepPurple,
-                            ),
-                            textAlign: TextAlign.center,
-                            softWrap: true,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: List.generate(6, (index) {
-                          return SizedBox(
-                            width: 50,
-                            child: Container(
-                              decoration: BoxDecoration(boxShadow: shadowColor),
-                              child: TextFormField(
-                                cursorColor: deepGreen,
-                                controller: _codeControllers[index],
-                                keyboardType: TextInputType
-                                    .number, // Accept characters instead of numbers
-                                textInputAction: TextInputAction
-                                    .next, // Moves focus to next field
-                                maxLength: 1,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 24),
-                                decoration: InputDecoration(
-                                  counterText: '',
-                                  filled: true,
-                                  fillColor: deepPurple,
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: deepGreen,
-                                      width: 2.0,
-                                    ),
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                ),
-                                onChanged: (value) {
-                                  // Convert input to uppercase
-                                  final upperCaseValue = value.toUpperCase();
-                                  if (upperCaseValue.length == 1) {
-                                    _codeControllers[index].text =
-                                        upperCaseValue;
-                                    _codeControllers[index].selection =
-                                        TextSelection.fromPosition(
-                                      TextPosition(
-                                          offset: upperCaseValue.length),
-                                    );
-
-                                    // Automatically move focus to the next field
-                                    if (index < 5) {
-                                      FocusScope.of(context).nextFocus();
-                                    } else {
-                                      // Close the keyboard when the last textbox is filled
-                                      FocusScope.of(context).unfocus();
-                                    }
-                                  }
-                                  //print(enteredCode);
-                                },
-                              ),
-                            ),
-                          );
-                        }),
-                      ),
-                      SizedBox(height: 20),
-                      Text(
-                        'Code expires in: ${_formatTimer(_timerSeconds)}',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: _timerSeconds > 0 ? Colors.orange : Colors.red,
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          TextButton(
-                            onPressed: () {
-                              _resendCode();
-                            },
-                            child: Text(
-                              'Resend Code?',
+                        SizedBox(height: 20),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              'We\'ve sent the code to',
                               style: TextStyle(
-                                color: Colors.blue,
-                                fontSize: 16.0,
-                                decoration: TextDecoration.underline,
-                                decorationColor: Colors.blue,
+                                fontSize: 15,
+                                color: Colors.black54,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            Text(
+                              widget.email,
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: deepPurple,
+                              ),
+                              textAlign: TextAlign.center,
+                              softWrap: true,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: List.generate(6, (index) {
+                            return SizedBox(
+                              width: 50,
+                              child: Container(
+                                decoration:
+                                    BoxDecoration(boxShadow: shadowColor),
+                                child: TextFormField(
+                                  cursorColor: deepGreen,
+                                  controller: _codeControllers[index],
+                                  keyboardType: TextInputType
+                                      .number, // Accept characters instead of numbers
+                                  textInputAction: TextInputAction
+                                      .next, // Moves focus to next field
+                                  maxLength: 1,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 24),
+                                  decoration: InputDecoration(
+                                    counterText: '',
+                                    filled: true,
+                                    fillColor: deepPurple,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: deepGreen,
+                                        width: 2.0,
+                                      ),
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                  ),
+                                  onChanged: (value) {
+                                    // Convert input to uppercase
+                                    final upperCaseValue = value.toUpperCase();
+                                    if (upperCaseValue.length == 1) {
+                                      _codeControllers[index].text =
+                                          upperCaseValue;
+                                      _codeControllers[index].selection =
+                                          TextSelection.fromPosition(
+                                        TextPosition(
+                                            offset: upperCaseValue.length),
+                                      );
+
+                                      // Automatically move focus to the next field
+                                      if (index < 5) {
+                                        FocusScope.of(context).nextFocus();
+                                      } else {
+                                        // Close the keyboard when the last textbox is filled
+                                        FocusScope.of(context).unfocus();
+                                      }
+                                    }
+                                    //print(enteredCode);
+                                  },
+                                ),
+                              ),
+                            );
+                          }),
+                        ),
+                        SizedBox(height: 20),
+                        Text(
+                          'Code expires in: ${_formatTimer(_timerSeconds)}',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color:
+                                _timerSeconds > 0 ? Colors.orange : Colors.red,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            TextButton(
+                              onPressed: () {
+                                _resendCode();
+                              },
+                              child: Text(
+                                'Resend Code?',
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                  fontSize: 16.0,
+                                  decoration: TextDecoration.underline,
+                                  decorationColor: Colors.blue,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 20),
-                      InkWell(
-                        onTap: () async {
-                          String? error = _validateCode();
-                          if (error == null) {
-                            updateEnteredCode(); //to update stored enteredCode
-                            print(enteredCode);
-                            String? errorMessage = await verifyEmailCode(
-                                widget.email, enteredCode);
-                            if (errorMessage != null) {
-                              showErrorSnackBar(context, errorMessage);
+                          ],
+                        ),
+                        SizedBox(height: 20),
+                        InkWell(
+                          onTap: () async {
+                            String? error = _validateCode();
+                            if (error == null) {
+                              updateEnteredCode(); //to update stored enteredCode
+                              print(enteredCode);
+                              String? errorMessage = await verifyEmailCode(
+                                  widget.email, enteredCode);
+                              if (errorMessage != null) {
+                                showErrorSnackBar(context, errorMessage);
+                              } else {
+                                showSuccessSnackBar(
+                                    context, 'Successful Email Verification');
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ResetPasswordScreen(
+                                        email: widget.email),
+                                  ),
+                                );
+                              }
                             } else {
-                              showSuccessSnackBar(
-                                  context, 'Successful Email Verification');
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      ResetPasswordScreen(email: widget.email),
-                                ),
-                              );
+                              showErrorSnackBar(context, error);
                             }
-                          } else {
-                            showErrorSnackBar(context, error);
-                          }
-                        },
-                        child: Container(
-                          alignment: Alignment.center,
-                          padding: EdgeInsets.all(16.0),
-                          decoration: BoxDecoration(
-                              color: Colors.green,
-                              borderRadius: BorderRadius.circular(10.0),
-                              boxShadow: shadowColor),
-                          child: Text(
-                            'Verify',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 25,
-                                fontWeight: FontWeight.bold),
+                          },
+                          child: Container(
+                            alignment: Alignment.center,
+                            padding: EdgeInsets.all(16.0),
+                            decoration: BoxDecoration(
+                                color: Colors.green,
+                                borderRadius: BorderRadius.circular(10.0),
+                                boxShadow: shadowColor),
+                            child: Text(
+                              'Verify',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.bold),
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          if (isloading)
-            Positioned.fill(
-                child: InkWell(
-              child: Center(
-                child: CircularProgressIndicator(
-                  color: Colors.green,
-                  strokeWidth: 10,
-                  strokeAlign: 2,
-                  backgroundColor: Colors.deepPurple,
+              ],
+            ),
+            if (isloading)
+              Positioned.fill(
+                  child: InkWell(
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.green,
+                    strokeWidth: 10,
+                    strokeAlign: 2,
+                    backgroundColor: Colors.deepPurple,
+                  ),
                 ),
-              ),
-            )),
-        ],
+              )),
+          ],
+        ),
       ),
     );
   }

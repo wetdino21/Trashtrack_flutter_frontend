@@ -771,302 +771,312 @@ class _CreateAccState extends State<CreateAcc> {
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
-          child: Container(
-            margin: EdgeInsets.all(20.0),
-            padding: EdgeInsets.all(20.0),
-            decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20.0),
-                boxShadow: shadowBigColor),
-            child: Column(
-              //crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(height: 60),
-                const Text(
-                  'Please enter your account details below!',
-                  style: TextStyle(
-                      color: Colors.grey, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 10),
-                _buildTextField(
-                  controller: _emailController,
-                  hintText: 'Email',
-                  keyboardType: TextInputType.emailAddress,
-                  icon: Icons.email,
-                  // validator: (value) {
-                  //   if (value == null || value.isEmpty) {
-                  //     return 'Please enter your email';
-                  //   }
-                  //   final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-                  //   if (!emailRegex.hasMatch(value)) {
-                  //     return 'Please enter a valid email';
-                  //   }
-                  //   return null;
-                  // },
-                  onChanged: (value) {
-                    setState(() {
-                      emailvalidator = _validateEmail(
-                          value); // Trigger validation on text change
-                      emailChanged = true;
-                    });
-                  },
-                ),
-                _validator(emailvalidator),
-                const SizedBox(height: 10),
-                _buildTextField(
-                  controller: _passController,
-                  hintText: 'Password',
-                  obscureText: !_passwordVisible,
-                  icon: Icons.lock_outline,
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _passwordVisible
-                          ? Icons.visibility
-                          : Icons.visibility_off,
-                      color: deepPurple,
-                    ),
-                    onPressed: () {
+          child: GestureDetector(
+            onTap: () {
+              FocusScope.of(context).unfocus();
+            },
+            child: Container(
+              margin: EdgeInsets.all(20.0),
+              padding: EdgeInsets.all(20.0),
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20.0),
+                  boxShadow: shadowBigColor),
+              child: Column(
+                //crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 60),
+                  const Text(
+                    'Please enter your account details below!',
+                    style: TextStyle(
+                        color: Colors.grey, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+                  _buildTextField(
+                    controller: _emailController,
+                    hintText: 'Email',
+                    keyboardType: TextInputType.emailAddress,
+                    icon: Icons.email,
+                    // validator: (value) {
+                    //   if (value == null || value.isEmpty) {
+                    //     return 'Please enter your email';
+                    //   }
+                    //   final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+                    //   if (!emailRegex.hasMatch(value)) {
+                    //     return 'Please enter a valid email';
+                    //   }
+                    //   return null;
+                    // },
+                    onChanged: (value) {
                       setState(() {
-                        _passwordVisible = !_passwordVisible;
+                        emailvalidator = _validateEmail(
+                            value); // Trigger validation on text change
+                        emailChanged = true;
                       });
                     },
                   ),
-                  // validator: (value) {
-                  //   if (value == null || value.isEmpty) {
-                  //     return 'Please enter your password';
-                  //   }
-                  //   if (value.length < 8) {
-                  //     return 'Password must be at least 8 characters long';
-                  //   }
-                  //   final hasLetter = RegExp(r'[a-zA-Z]').hasMatch(value);
-                  //   final hasNumber = RegExp(r'[0-9]').hasMatch(value);
-                  //   if (!hasLetter || !hasNumber) {
-                  //     return 'Password must contain both letters and numbers';
-                  //   }
-                  //   // if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
-                  //   //   return 'Password must contain a special character';
-                  //   // }
-                  //   return null;
-                  // },
-                  onChanged: (value) {
-                    setState(() {
-                      passvalidator = _validatePassword(
-                          value); // Trigger validation on text change
-                    });
-                  },
-                ),
-                _validator(passvalidator),
-                const SizedBox(height: 10),
-                _buildTextField(
-                  controller: _repassController,
-                  hintText: 'Confirm Password',
-                  obscureText: !_confirmPasswordVisible,
-                  icon: Icons.lock,
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _confirmPasswordVisible
-                          ? Icons.visibility
-                          : Icons.visibility_off,
-                      color: deepPurple,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _confirmPasswordVisible = !_confirmPasswordVisible;
-                      });
-                    },
-                  ),
-                  // validator: (value) {
-                  //   if (value == null || value.isEmpty) {
-                  //     return 'Please confirm your password';
-                  //   }
-                  //   if (value != _passController.text) {
-                  //     return 'Passwords do not match';
-                  //   }
-                  //   return null;
-                  // },
-                  onChanged: (value) {
-                    setState(() {
-                      confpassvalidator = _validateConfirmPassword(
-                          value); // Trigger validation on text change
-                    });
-                  },
-                ),
-                _validator(confpassvalidator),
-                // Checkbox terms
-                const SizedBox(height: 20),
-                Center(
-                  child: InkWell(
-                    onTap: () async {
-                      // Check if any validation error or email sending error exists
-                      if ((_emailController.text.isEmpty ||
-                              emailvalidator.isNotEmpty) ||
-                          (_passController.text.isEmpty ||
-                              passvalidator.isNotEmpty) ||
-                          (_repassController.text.isEmpty ||
-                              confpassvalidator.isNotEmpty) ||
-                          (_passController.text != _repassController.text)) {
-                        setState(() {
-                          emailvalidator =
-                              _validateEmail(_emailController.text);
-                          passvalidator =
-                              _validatePassword(_passController.text);
-                          confpassvalidator =
-                              _validateConfirmPassword(_repassController.text);
-                        });
-                        // Show any existing error message
-                      } else if (_emailController.text.isNotEmpty) {
-                        String? errorMessage =
-                            await emailCheck(_emailController.text);
-                        // Show any existing error message
-                        if (errorMessage != null &&
-                            _emailController.text.isNotEmpty) {
-                          setState(() {
-                            emailvalidator = errorMessage;
-                          });
-                        } else {
-                          // If no errors, proceed with incrementing the step
-                          if (_currentStep < 3) {
-                            setState(() {
-                              _currentStep = 2;
-                            });
-                          }
-                        }
-                      }
-                    },
-                    child: Container(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 70.0, vertical: 10),
-                        decoration: BoxDecoration(
-                            color: Colors.green,
-                            borderRadius: BorderRadius.circular(20.0),
-                            boxShadow: shadowColor),
-                        child: const Text(
-                          'Continue',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 25,
-                              fontWeight: FontWeight.bold),
-                        )),
-                  ),
-                ),
-                Center(
-                  child: Column(
-                    children: [
-                      SizedBox(height: 10.0),
-                      Text(
-                        'Or continue with',
-                        style: TextStyle(color: Colors.white70, fontSize: 16.0),
+                  _validator(emailvalidator),
+                  const SizedBox(height: 10),
+                  _buildTextField(
+                    controller: _passController,
+                    hintText: 'Password',
+                    obscureText: !_passwordVisible,
+                    icon: Icons.lock_outline,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _passwordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off,
+                        color: deepPurple,
                       ),
-                      SizedBox(height: 10.0),
-                      ElevatedButton.icon(
-                        onPressed: () async {
-                          //handleGoogleSignUp(context);
-                          GoogleAccountDetails? accountDetails =
-                              await handleGoogleSignUp(context);
-                          if (accountDetails != null) {
-                            if (_emailController.text.isNotEmpty ||
-                                _passController.text.isNotEmpty ||
-                                _repassController.text.isNotEmpty ||
-                                _fnameController.text.isNotEmpty ||
-                                _mnameController.text.isNotEmpty ||
-                                _lnameController.text.isNotEmpty ||
-                                _fnameController.text.isNotEmpty ||
-                                _contactController.text.isNotEmpty ||
-                                _selectedProvinceName != null ||
-                                _selectedCityMunicipalityName != null ||
-                                _selectedBarangayName != null ||
-                                _streetController.text.isNotEmpty ||
-                                _postalController.text.isNotEmpty) {
-                              _showGoogleSignInConfirmationDialog(
-                                  context, accountDetails);
-                            } else {
-                              _currentStep++;
-                              isGoogle = true;
+                      onPressed: () {
+                        setState(() {
+                          _passwordVisible = !_passwordVisible;
+                        });
+                      },
+                    ),
+                    // validator: (value) {
+                    //   if (value == null || value.isEmpty) {
+                    //     return 'Please enter your password';
+                    //   }
+                    //   if (value.length < 8) {
+                    //     return 'Password must be at least 8 characters long';
+                    //   }
+                    //   final hasLetter = RegExp(r'[a-zA-Z]').hasMatch(value);
+                    //   final hasNumber = RegExp(r'[0-9]').hasMatch(value);
+                    //   if (!hasLetter || !hasNumber) {
+                    //     return 'Password must contain both letters and numbers';
+                    //   }
+                    //   // if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
+                    //   //   return 'Password must contain a special character';
+                    //   // }
+                    //   return null;
+                    // },
+                    onChanged: (value) {
+                      setState(() {
+                        passvalidator = _validatePassword(
+                            value); // Trigger validation on text change
+                      });
+                    },
+                  ),
+                  _validator(passvalidator),
+                  const SizedBox(height: 10),
+                  _buildTextField(
+                    controller: _repassController,
+                    hintText: 'Confirm Password',
+                    obscureText: !_confirmPasswordVisible,
+                    icon: Icons.lock,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _confirmPasswordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off,
+                        color: deepPurple,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _confirmPasswordVisible = !_confirmPasswordVisible;
+                        });
+                      },
+                    ),
+                    // validator: (value) {
+                    //   if (value == null || value.isEmpty) {
+                    //     return 'Please confirm your password';
+                    //   }
+                    //   if (value != _passController.text) {
+                    //     return 'Passwords do not match';
+                    //   }
+                    //   return null;
+                    // },
+                    onChanged: (value) {
+                      setState(() {
+                        confpassvalidator = _validateConfirmPassword(
+                            value); // Trigger validation on text change
+                      });
+                    },
+                  ),
+                  _validator(confpassvalidator),
+                  // Checkbox terms
+                  const SizedBox(height: 20),
+                  Center(
+                    child: InkWell(
+                      onTap: () async {
+                        // Check if any validation error or email sending error exists
+                        if ((_emailController.text.isEmpty ||
+                                emailvalidator.isNotEmpty) ||
+                            (_passController.text.isEmpty ||
+                                passvalidator.isNotEmpty) ||
+                            (_repassController.text.isEmpty ||
+                                confpassvalidator.isNotEmpty) ||
+                            (_passController.text != _repassController.text)) {
+                          setState(() {
+                            emailvalidator =
+                                _validateEmail(_emailController.text);
+                            passvalidator =
+                                _validatePassword(_passController.text);
+                            confpassvalidator = _validateConfirmPassword(
+                                _repassController.text);
+                          });
+                          // Show any existing error message
+                        } else if (_emailController.text.isNotEmpty) {
+                          String? errorMessage =
+                              await emailCheck(_emailController.text);
+                          // Show any existing error message
+                          if (errorMessage != null &&
+                              _emailController.text.isNotEmpty) {
+                            setState(() {
+                              emailvalidator = errorMessage;
+                            });
+                          } else {
+                            // If no errors, proceed with incrementing the step
+                            if (_currentStep < 3) {
                               setState(() {
-                                _accountDetails =
-                                    accountDetails; //to store the google acc details
-                                handleSignOut();
-                                print('isGoogle: {$isGoogle}');
-                                _fnameController.text = _accountDetails!.fname;
-                                _lnameController.text = _accountDetails!.lname;
+                                _currentStep = 2;
                               });
                             }
                           }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: deepPurple,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30.0),
-                            side: BorderSide(color: Colors.white54, width: 2.0),
-                          ),
+                        }
+                      },
+                      child: Container(
                           padding: EdgeInsets.symmetric(
-                              vertical: 10.0, horizontal: 35.0),
-                        ),
-                        icon: Image.asset(
-                          'assets/Brands.png',
-                          height: 24.0,
-                        ),
-                        label: Text(
-                          'Google',
-                          style: TextStyle(color: Colors.white, fontSize: 18.0),
-                        ),
-                      ),
-                    ],
+                              horizontal: 70.0, vertical: 10),
+                          decoration: BoxDecoration(
+                              color: Colors.green,
+                              borderRadius: BorderRadius.circular(20.0),
+                              boxShadow: shadowColor),
+                          child: const Text(
+                            'Continue',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 25,
+                                fontWeight: FontWeight.bold),
+                          )),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                Center(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Already have an account?',
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 16,
+                  Center(
+                    child: Column(
+                      children: [
+                        SizedBox(height: 10.0),
+                        Text(
+                          'Or continue with',
+                          style:
+                              TextStyle(color: Colors.white70, fontSize: 16.0),
                         ),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          _backToSignIn();
-                          // if (_emailController.text.isNotEmpty ||
-                          //     _passController.text.isNotEmpty ||
-                          //     _repassController.text.isNotEmpty ||
-                          //     _fnameController.text.isNotEmpty ||
-                          //     _mnameController.text.isNotEmpty ||
-                          //     _lnameController.text.isNotEmpty ||
-                          //     _fnameController.text.isNotEmpty ||
-                          //     _contactController.text.isNotEmpty ||
-                          //     _selectedProvinceName != null ||
-                          //     _selectedCityMunicipalityName != null ||
-                          //     _selectedBarangayName != null ||
-                          //     _streetController.text.isNotEmpty ||
-                          //     _postalController.text.isNotEmpty) {
-                          //   _showSignInConfirmationDialog(context);
-                          // } else {
-                          //   Navigator.pushNamed(context, 'login');
-                          // }
-                        },
-                        style: TextButton.styleFrom(
-                          padding: EdgeInsets.zero,
-                        ),
-                        child: const Text(
-                          'Sign in',
-                          style: TextStyle(
-                            color: Colors.green,
-                            fontSize: 16,
-                            fontStyle: FontStyle.italic,
-                            decoration: TextDecoration.underline,
-                            decorationColor: Colors.green,
+                        SizedBox(height: 10.0),
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            //handleGoogleSignUp(context);
+                            GoogleAccountDetails? accountDetails =
+                                await handleGoogleSignUp(context);
+                            if (accountDetails != null) {
+                              if (_emailController.text.isNotEmpty ||
+                                  _passController.text.isNotEmpty ||
+                                  _repassController.text.isNotEmpty ||
+                                  _fnameController.text.isNotEmpty ||
+                                  _mnameController.text.isNotEmpty ||
+                                  _lnameController.text.isNotEmpty ||
+                                  _fnameController.text.isNotEmpty ||
+                                  _contactController.text.isNotEmpty ||
+                                  _selectedProvinceName != null ||
+                                  _selectedCityMunicipalityName != null ||
+                                  _selectedBarangayName != null ||
+                                  _streetController.text.isNotEmpty ||
+                                  _postalController.text.isNotEmpty) {
+                                _showGoogleSignInConfirmationDialog(
+                                    context, accountDetails);
+                              } else {
+                                _currentStep++;
+                                isGoogle = true;
+                                setState(() {
+                                  _accountDetails =
+                                      accountDetails; //to store the google acc details
+                                  handleSignOut();
+                                  print('isGoogle: {$isGoogle}');
+                                  _fnameController.text =
+                                      _accountDetails!.fname;
+                                  _lnameController.text =
+                                      _accountDetails!.lname;
+                                });
+                              }
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: deepPurple,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30.0),
+                              side:
+                                  BorderSide(color: Colors.white54, width: 2.0),
+                            ),
+                            padding: EdgeInsets.symmetric(
+                                vertical: 10.0, horizontal: 35.0),
+                          ),
+                          icon: Image.asset(
+                            'assets/Brands.png',
+                            height: 24.0,
+                          ),
+                          label: Text(
+                            'Google',
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 18.0),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 20),
+                  Center(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Already have an account?',
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 16,
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            _backToSignIn();
+                            // if (_emailController.text.isNotEmpty ||
+                            //     _passController.text.isNotEmpty ||
+                            //     _repassController.text.isNotEmpty ||
+                            //     _fnameController.text.isNotEmpty ||
+                            //     _mnameController.text.isNotEmpty ||
+                            //     _lnameController.text.isNotEmpty ||
+                            //     _fnameController.text.isNotEmpty ||
+                            //     _contactController.text.isNotEmpty ||
+                            //     _selectedProvinceName != null ||
+                            //     _selectedCityMunicipalityName != null ||
+                            //     _selectedBarangayName != null ||
+                            //     _streetController.text.isNotEmpty ||
+                            //     _postalController.text.isNotEmpty) {
+                            //   _showSignInConfirmationDialog(context);
+                            // } else {
+                            //   Navigator.pushNamed(context, 'login');
+                            // }
+                          },
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                          ),
+                          child: const Text(
+                            'Sign in',
+                            style: TextStyle(
+                              color: Colors.green,
+                              fontSize: 16,
+                              fontStyle: FontStyle.italic,
+                              decoration: TextDecoration.underline,
+                              decorationColor: Colors.green,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -1222,264 +1232,324 @@ class _CreateAccState extends State<CreateAcc> {
         leadingWidth: 70,
       ),
       body: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.all(15),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                isGoogle == true
-                    ? Column(
-                        children: [
-                          Text(
-                            'with Google Authentication',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          InkWell(
-                            onTap: () async {
-                              //handleGoogleSignUp(context);
-                              GoogleAccountDetails? accountDetails =
-                                  await handleGoogleSignUp(context);
-                              if (accountDetails != null) {
-                                setState(() {
-                                  _accountDetails =
-                                      accountDetails; //to store the google acc details
-                                  handleSignOut();
-                                  print('isGoogle: {$isGoogle}');
-                                  _fnameController.text =
-                                      _accountDetails!.fname;
-                                  _lnameController.text =
-                                      _accountDetails!.lname;
-                                });
-                              }
-                            },
-                            child: Container(
-                              padding: EdgeInsets.all(10.0),
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10.0),
-                                  boxShadow: shadowBigColor),
+        child: GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: Container(
+            padding: const EdgeInsets.all(15),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  isGoogle == true
+                      ? Column(
+                          children: [
+                            Text(
+                              'with Google Authentication',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            InkWell(
+                              onTap: () async {
+                                //handleGoogleSignUp(context);
+                                GoogleAccountDetails? accountDetails =
+                                    await handleGoogleSignUp(context);
+                                if (accountDetails != null) {
+                                  setState(() {
+                                    _accountDetails =
+                                        accountDetails; //to store the google acc details
+                                    handleSignOut();
+                                    print('isGoogle: {$isGoogle}');
+                                    _fnameController.text =
+                                        _accountDetails!.fname;
+                                    _lnameController.text =
+                                        _accountDetails!.lname;
+                                  });
+                                }
+                              },
                               child: Container(
+                                padding: EdgeInsets.all(10.0),
                                 decoration: BoxDecoration(
-                                    color: Colors.green, // Background color
-                                    borderRadius: BorderRadius.circular(
-                                        10.0), // Border radius
-                                    boxShadow: shadowColor),
-                                child: ListTile(
-                                  contentPadding: EdgeInsets.all(
-                                      8.0), // Padding inside the container
-                                  leading: _accountDetails != null
-                                      ? (_accountDetails!.photoBytes != null
-                                          ? ClipOval(
-                                              child: Image.memory(
-                                                _accountDetails!.photoBytes!,
-                                              ),
-                                            )
-                                          : ClipOval(
-                                              child: Container(
-                                                  padding: EdgeInsets.all(8),
-                                                  color: Colors.white,
-                                                  child: Icon(Icons.person,
-                                                      size: 40))))
-                                      : SizedBox(),
-                                  title: _accountDetails != null
-                                      ? Text(
-                                          _accountDetails!.email,
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold),
-                                        )
-                                      : Text('No email available'),
-                                  trailing: Icon(
-                                    Icons.file_upload_outlined,
                                     color: Colors.white,
-                                    size: 30,
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    boxShadow: shadowBigColor),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      color: Colors.green, // Background color
+                                      borderRadius: BorderRadius.circular(
+                                          10.0), // Border radius
+                                      boxShadow: shadowColor),
+                                  child: ListTile(
+                                    contentPadding: EdgeInsets.all(
+                                        8.0), // Padding inside the container
+                                    leading: _accountDetails != null
+                                        ? (_accountDetails!.photoBytes != null
+                                            ? ClipOval(
+                                                child: Image.memory(
+                                                  _accountDetails!.photoBytes!,
+                                                ),
+                                              )
+                                            : ClipOval(
+                                                child: Container(
+                                                    padding: EdgeInsets.all(8),
+                                                    color: Colors.white,
+                                                    child: Icon(Icons.person,
+                                                        size: 40))))
+                                        : SizedBox(),
+                                    title: _accountDetails != null
+                                        ? Text(
+                                            _accountDetails!.email,
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold),
+                                          )
+                                        : Text('No email available'),
+                                    trailing: Icon(
+                                      Icons.file_upload_outlined,
+                                      color: Colors.white,
+                                      size: 30,
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
-                      )
-                    : SizedBox(),
-                const SizedBox(height: 20),
-                Container(
-                  padding: EdgeInsets.all(16.0),
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(15.0),
-                      boxShadow: shadowBigColor),
-                  child: Column(
-                    children: [
-                      Center(
-                          child: Text(
-                        'Personal Information',
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: greytitleColor),
-                      )),
-                      const SizedBox(height: 20),
-                      _buildTextField(
-                        controller: _fnameController,
-                        hintText: 'First Name',
-                        icon: Icons.person,
-                        onChanged: (value) {
-                          setState(() {
-                            fnamevalidator = _validateFname(
-                                value); // Trigger validation on text change
-                          });
-                        },
-                      ),
-                      _validator(fnamevalidator),
-                      const SizedBox(height: 15),
-                      _buildTextField(
-                        controller: _mnameController,
-                        hintText: 'Middle Name (Optional)',
-                        icon: Icons.person_outline,
-                        onChanged: (value) {
-                          setState(() {
-                            mnamevalidator = _validateMname(
-                                value); // Trigger validation on text change
-                          });
-                        },
-                      ),
-                      _validator(mnamevalidator),
-                      const SizedBox(height: 15),
-                      _buildTextField(
-                        controller: _lnameController,
-                        hintText: 'Last Name',
-                        icon: Icons.person,
-                        onChanged: (value) {
-                          setState(() {
-                            lnamevalidator = _validateLname(
-                                value); // Trigger validation on text change
-                          });
-                        },
-                      ),
-                      _validator(lnamevalidator),
-                      const SizedBox(height: 15),
-                      _buildNumberField(
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          LengthLimitingTextInputFormatter(10),
-                        ],
-                      ),
-                      _validator(contactvalidator),
-                      const SizedBox(height: 15),
-                      Center(
-                          child: Text(
-                        'Complete Address',
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: greytitleColor),
-                      )),
-                      const SizedBox(height: 20),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '  Province/City or Municipality/Barangay',
-                            style:
-                                TextStyle(fontSize: 16, color: greytitleColor),
-                          ),
-                          InkWell(
-                            onTap: () {
-                              setState(() {
-                                _ddlOpen = !_ddlOpen;
-                                _ddlClicked = true;
-                              });
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.all(5),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: 5.0, horizontal: 15),
-                                    decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
-                                        boxShadow: shadowColor),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        // Show selected values
-                                        Expanded(
-                                          child: Text(
-                                            _selectedProvinceName == null
-                                                ? 'Select Province'
-                                                : _selectedCityMunicipalityName ==
-                                                        null
-                                                    ? '${_selectedProvinceName} / '
-                                                    : _selectedBarangayName ==
-                                                            null
-                                                        ? '${_selectedProvinceName} / ${_selectedCityMunicipalityName} / '
-                                                        : '${_selectedProvinceName} / '
-                                                            '${_selectedCityMunicipalityName} / '
-                                                            '${_selectedBarangayName}',
-                                            style: TextStyle(
-                                                fontSize: 16.0,
-                                                color: _selectedProvinceName ==
-                                                        null
-                                                    ? Colors.grey
-                                                    : Colors.black),
-                                            overflow: TextOverflow
-                                                .visible, // Allow wrapping
-                                            softWrap:
-                                                true, // Enable soft wrapping
+                          ],
+                        )
+                      : SizedBox(),
+                  const SizedBox(height: 20),
+                  Container(
+                    padding: EdgeInsets.all(16.0),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15.0),
+                        boxShadow: shadowBigColor),
+                    child: Column(
+                      children: [
+                        Center(
+                            child: Text(
+                          'Personal Information',
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: greytitleColor),
+                        )),
+                        const SizedBox(height: 20),
+                        _buildTextField(
+                          controller: _fnameController,
+                          hintText: 'First Name',
+                          icon: Icons.person,
+                          onChanged: (value) {
+                            setState(() {
+                              fnamevalidator = _validateFname(
+                                  value); // Trigger validation on text change
+                            });
+                          },
+                        ),
+                        _validator(fnamevalidator),
+                        const SizedBox(height: 15),
+                        _buildTextField(
+                          controller: _mnameController,
+                          hintText: 'Middle Name (Optional)',
+                          icon: Icons.person_outline,
+                          onChanged: (value) {
+                            setState(() {
+                              mnamevalidator = _validateMname(
+                                  value); // Trigger validation on text change
+                            });
+                          },
+                        ),
+                        _validator(mnamevalidator),
+                        const SizedBox(height: 15),
+                        _buildTextField(
+                          controller: _lnameController,
+                          hintText: 'Last Name',
+                          icon: Icons.person,
+                          onChanged: (value) {
+                            setState(() {
+                              lnamevalidator = _validateLname(
+                                  value); // Trigger validation on text change
+                            });
+                          },
+                        ),
+                        _validator(lnamevalidator),
+                        const SizedBox(height: 15),
+                        _buildNumberField(
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            LengthLimitingTextInputFormatter(10),
+                          ],
+                        ),
+                        _validator(contactvalidator),
+                        const SizedBox(height: 15),
+                        Center(
+                            child: Text(
+                          'Complete Address',
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: greytitleColor),
+                        )),
+                        const SizedBox(height: 20),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '  Province/City or Municipality/Barangay',
+                              style: TextStyle(
+                                  fontSize: 16, color: greytitleColor),
+                            ),
+                            InkWell(
+                              onTap: () {
+                                setState(() {
+                                  _ddlOpen = !_ddlOpen;
+                                  _ddlClicked = true;
+                                });
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(5),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: 5.0, horizontal: 15),
+                                      decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                          boxShadow: shadowColor),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          // Show selected values
+                                          Expanded(
+                                            child: Text(
+                                              _selectedProvinceName == null
+                                                  ? 'Select Province'
+                                                  : _selectedCityMunicipalityName ==
+                                                          null
+                                                      ? '${_selectedProvinceName} / '
+                                                      : _selectedBarangayName ==
+                                                              null
+                                                          ? '${_selectedProvinceName} / ${_selectedCityMunicipalityName} / '
+                                                          : '${_selectedProvinceName} / '
+                                                              '${_selectedCityMunicipalityName} / '
+                                                              '${_selectedBarangayName}',
+                                              style: TextStyle(
+                                                  fontSize: 16.0,
+                                                  color:
+                                                      _selectedProvinceName ==
+                                                              null
+                                                          ? Colors.grey
+                                                          : Colors.black),
+                                              overflow: TextOverflow
+                                                  .visible, // Allow wrapping
+                                              softWrap:
+                                                  true, // Enable soft wrapping
+                                            ),
+                                          ),
+                                          _selectedProvinceName != null
+                                              ? IconButton(
+                                                  icon: Icon(
+                                                    Icons.clear,
+                                                    color: Colors.deepPurple,
+                                                  ),
+                                                  onPressed: () {
+                                                    //close
+                                                    _loadProvinces();
+                                                    setState(() {
+                                                      _provinces = [];
+                                                      _citiesMunicipalities =
+                                                          [];
+                                                      _barangays = [];
+
+                                                      _showCityMunicipalityDropdown =
+                                                          false;
+                                                      _showBarangayDropdown =
+                                                          false;
+
+                                                      _selectedProvinceName =
+                                                          null;
+                                                      _selectedCityMunicipalityName =
+                                                          null;
+                                                      _selectedBarangayName =
+                                                          null;
+                                                    });
+                                                  })
+                                              : IconButton(
+                                                  highlightColor:
+                                                      Colors.transparent,
+                                                  onPressed: () {
+                                                    //null
+                                                  },
+                                                  icon: Icon(
+                                                    Icons.clear,
+                                                    color: Colors.transparent,
+                                                  ),
+                                                ),
+                                        ],
+                                      ),
+                                    ),
+                                    if (_ddlOpen)
+                                      if (_showProvinceDropdown)
+                                        Container(
+                                          height: 100,
+                                          margin: EdgeInsets.symmetric(
+                                              horizontal: 10),
+                                          decoration: BoxDecoration(
+                                              color: Colors.deepPurple
+                                                  .withOpacity(0.7),
+                                              borderRadius:
+                                                  BorderRadius.vertical(
+                                                      bottom:
+                                                          Radius.circular(15)),
+                                              boxShadow: shadowColor),
+                                          child: ListView.builder(
+                                            itemCount: _provinces.length,
+                                            itemBuilder: (context, index) {
+                                              final city = _provinces[index];
+
+                                              return InkWell(
+                                                onTap: () async {
+                                                  setState(() {
+                                                    _showProvinceDropdown =
+                                                        false;
+                                                    _showCityMunicipalityDropdown =
+                                                        true;
+                                                    _loadCitiesMunicipalities(city[
+                                                        'code']); // Load barangays for the selected city
+
+                                                    _selectedProvinceName = city[
+                                                        'name']; // Set by name
+                                                  });
+                                                },
+                                                child: Container(
+                                                  padding: EdgeInsets.symmetric(
+                                                      vertical: 10,
+                                                      horizontal: 15),
+                                                  decoration: BoxDecoration(
+                                                    border: Border(
+                                                        bottom: BorderSide(
+                                                            color: Colors.grey
+                                                                .shade300)),
+                                                  ),
+                                                  child: Text(
+                                                    city[
+                                                        'name'], // Display the name
+                                                    style: TextStyle(
+                                                        fontSize: 16,
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                              );
+                                            },
                                           ),
                                         ),
-                                        _selectedProvinceName != null
-                                            ? IconButton(
-                                                icon: Icon(
-                                                  Icons.clear,
-                                                  color: Colors.deepPurple,
-                                                ),
-                                                onPressed: () {
-                                                  //close
-                                                  _loadProvinces();
-                                                  setState(() {
-                                                    _provinces = [];
-                                                    _citiesMunicipalities = [];
-                                                    _barangays = [];
-
-                                                    _showCityMunicipalityDropdown =
-                                                        false;
-                                                    _showBarangayDropdown =
-                                                        false;
-
-                                                    _selectedProvinceName =
-                                                        null;
-                                                    _selectedCityMunicipalityName =
-                                                        null;
-                                                    _selectedBarangayName =
-                                                        null;
-                                                  });
-                                                })
-                                            : IconButton(
-                                                highlightColor:
-                                                    Colors.transparent,
-                                                onPressed: () {
-                                                  //null
-                                                },
-                                                icon: Icon(
-                                                  Icons.clear,
-                                                  color: Colors.transparent,
-                                                ),
-                                              ),
-                                      ],
-                                    ),
-                                  ),
-                                  if (_ddlOpen)
-                                    if (_showProvinceDropdown)
+                                    if (_showCityMunicipalityDropdown)
                                       Container(
-                                        height: 100,
+                                        height: 400,
                                         margin: EdgeInsets.symmetric(
                                             horizontal: 10),
                                         decoration: BoxDecoration(
@@ -1489,21 +1559,21 @@ class _CreateAccState extends State<CreateAcc> {
                                                 bottom: Radius.circular(15)),
                                             boxShadow: shadowColor),
                                         child: ListView.builder(
-                                          itemCount: _provinces.length,
+                                          itemCount:
+                                              _citiesMunicipalities.length,
                                           itemBuilder: (context, index) {
-                                            final city = _provinces[index];
+                                            final city =
+                                                _citiesMunicipalities[index];
 
                                             return InkWell(
                                               onTap: () async {
                                                 setState(() {
-                                                  _showProvinceDropdown = false;
                                                   _showCityMunicipalityDropdown =
-                                                      true;
-                                                  _loadCitiesMunicipalities(city[
-                                                      'code']); // Load barangays for the selected city
-
-                                                  _selectedProvinceName = city[
-                                                      'name']; // Set by name
+                                                      false;
+                                                  _showBarangayDropdown = true;
+                                                  _loadBarangays(city['code']);
+                                                  _selectedCityMunicipalityName =
+                                                      city['name'];
                                                 });
                                               },
                                               child: Container(
@@ -1528,351 +1598,304 @@ class _CreateAccState extends State<CreateAcc> {
                                           },
                                         ),
                                       ),
-                                  if (_showCityMunicipalityDropdown)
-                                    Container(
-                                      height: 400,
-                                      margin:
-                                          EdgeInsets.symmetric(horizontal: 10),
-                                      decoration: BoxDecoration(
-                                          color: Colors.deepPurple
-                                              .withOpacity(0.7),
-                                          borderRadius: BorderRadius.vertical(
-                                              bottom: Radius.circular(15)),
-                                          boxShadow: shadowColor),
-                                      child: ListView.builder(
-                                        itemCount: _citiesMunicipalities.length,
-                                        itemBuilder: (context, index) {
-                                          final city =
-                                              _citiesMunicipalities[index];
 
-                                          return InkWell(
-                                            onTap: () async {
-                                              setState(() {
-                                                _showCityMunicipalityDropdown =
-                                                    false;
-                                                _showBarangayDropdown = true;
-                                                _loadBarangays(city['code']);
-                                                _selectedCityMunicipalityName =
-                                                    city['name'];
-                                              });
-                                            },
-                                            child: Container(
-                                              padding: EdgeInsets.symmetric(
-                                                  vertical: 10, horizontal: 15),
-                                              decoration: BoxDecoration(
-                                                border: Border(
-                                                    bottom: BorderSide(
-                                                        color: Colors
-                                                            .grey.shade300)),
-                                              ),
-                                              child: Text(
-                                                city[
-                                                    'name'], // Display the name
-                                                style: TextStyle(
-                                                    fontSize: 16,
-                                                    color: Colors.white),
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ),
+                                    //brgy ddl
+                                    if (_showBarangayDropdown)
+                                      Container(
+                                        height: 400,
+                                        margin: EdgeInsets.symmetric(
+                                            horizontal: 10),
+                                        decoration: BoxDecoration(
+                                            color: Colors.deepPurple
+                                                .withOpacity(0.7),
+                                            borderRadius: BorderRadius.vertical(
+                                                bottom: Radius.circular(15)),
+                                            boxShadow: shadowColor),
+                                        child: ListView.builder(
+                                          itemCount: _barangays.length,
+                                          itemBuilder: (context, index) {
+                                            final city = _barangays[index];
 
-                                  //brgy ddl
-                                  if (_showBarangayDropdown)
-                                    Container(
-                                      height: 400,
-                                      margin:
-                                          EdgeInsets.symmetric(horizontal: 10),
-                                      decoration: BoxDecoration(
-                                          color: Colors.deepPurple
-                                              .withOpacity(0.7),
-                                          borderRadius: BorderRadius.vertical(
-                                              bottom: Radius.circular(15)),
-                                          boxShadow: shadowColor),
-                                      child: ListView.builder(
-                                        itemCount: _barangays.length,
-                                        itemBuilder: (context, index) {
-                                          final city = _barangays[index];
-
-                                          return InkWell(
-                                            onTap: () async {
-                                              setState(() {
-                                                _showBarangayDropdown = false;
-                                                _selectedBarangayName =
-                                                    city['name'];
-                                              });
-                                            },
-                                            child: Container(
-                                              padding: EdgeInsets.symmetric(
-                                                  vertical: 10, horizontal: 15),
-                                              decoration: BoxDecoration(
-                                                border: Border(
-                                                    bottom: BorderSide(
-                                                        color: Colors
-                                                            .grey.shade300)),
+                                            return InkWell(
+                                              onTap: () async {
+                                                setState(() {
+                                                  _showBarangayDropdown = false;
+                                                  _selectedBarangayName =
+                                                      city['name'];
+                                                });
+                                              },
+                                              child: Container(
+                                                padding: EdgeInsets.symmetric(
+                                                    vertical: 10,
+                                                    horizontal: 15),
+                                                decoration: BoxDecoration(
+                                                  border: Border(
+                                                      bottom: BorderSide(
+                                                          color: Colors
+                                                              .grey.shade300)),
+                                                ),
+                                                child: Text(
+                                                  city[
+                                                      'name'], // Display the name
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      color: Colors.white),
+                                                ),
                                               ),
-                                              child: Text(
-                                                city[
-                                                    'name'], // Display the name
-                                                style: TextStyle(
-                                                    fontSize: 16,
-                                                    color: Colors.white),
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    )
-                                ],
+                                            );
+                                          },
+                                        ),
+                                      )
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                      if (_ddlClicked)
-                        if (_selectedProvinceName == null ||
-                            _selectedCityMunicipalityName == null ||
-                            _selectedBarangayName == null)
-                          Text(
-                            'Please select your adrress.',
-                            style: TextStyle(color: Colors.red),
-                          ),
-                      const SizedBox(height: 20),
-                      // const SizedBox(height: 15),
-                      // // Dropdown for Province
-                      // _buildDropdown(
-                      //   selectedValue: _selectedProvince,
-                      //   items: _provinces,
-                      //   hintText: 'Province',
-                      //   icon: Icons.location_city,
-                      //   onChanged: (value) {
-                      //     setState(() {
-                      //       _selectedProvince = value;
-                      //       provincevalidator = _validateProvince(value);
-                      //       final selectedProvince = _provinces
-                      //           .firstWhere((item) => item['code'] == value);
-                      //       _selectedProvinceName = selectedProvince['name'];
-                      //     });
-                      //     _loadCitiesMunicipalities(value!);
-                      //   },
-                      // ),
-                      // _validator(provincevalidator),
-                      // SizedBox(height: 15),
-                      // // Dropdown for City/Municipality
-                      // _buildDropdown(
-                      //   selectedValue: _selectedCityMunicipality,
-                      //   items: _citiesMunicipalities,
-                      //   hintText: 'City/Municipality',
-                      //   icon: Icons.apartment,
-                      //   onChanged: (value) {
-                      //     setState(() {
-                      //       _selectedCityMunicipality = value;
-                      //       cityvalidator = _validateCity(value);
-                      //       final selectedCity = _citiesMunicipalities
-                      //           .firstWhere((item) => item['code'] == value);
-                      //       _selectedCityMunicipalityName =
-                      //           selectedCity['name'];
-                      //     });
-                      //     _loadBarangays(value!);
-                      //   },
-                      // ),
-                      // _validator(cityvalidator),
-                      // SizedBox(height: 15),
-                      // // Dropdown for Barangay
-                      // _buildDropdown(
-                      //   selectedValue: _selectedBarangay,
-                      //   items: _barangays,
-                      //   hintText: 'Barangay',
-                      //   icon: Icons.maps_home_work,
-                      //   onChanged: (value) {
-                      //     setState(() {
-                      //       _selectedBarangay = value;
-                      //       brgyvalidator = _validateBrgy(value);
-                      //       final selectedBarangay = _barangays
-                      //           .firstWhere((item) => item['code'] == value);
-                      //       _selectedBarangayName = selectedBarangay['name'];
-                      //       print(_selectedBarangayName);
-                      //     });
-                      //   },
-                      // ),
-                      // _validator(brgyvalidator),
-                      // const SizedBox(height: 15),
-                      _buildTextField(
-                        controller: _streetController,
-                        hintText: 'Street Name, Building, House No.',
-                        icon: Icons.home,
-                        onChanged: (value) {
-                          setState(() {
-                            streetvalidator = _validateStreet(
-                                value); // Trigger validation on text change
-                          });
-                        },
-                      ),
-                      _validator(streetvalidator),
-                      const SizedBox(height: 15),
-                      _buildTextField(
-                        controller: _postalController,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          LengthLimitingTextInputFormatter(4),
-                        ],
-                        hintText: 'Postal Code',
-                        icon: Icons.local_post_office,
-                        onChanged: (value) {
-                          setState(() {
-                            postalvalidator = _validatePostalCode(
-                                value); // Trigger validation on text change
-                            print(_postalController.text);
-                          });
-                        },
-                      ),
-                      _validator(postalvalidator),
-                      const SizedBox(height: 15),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Checkbox(
-                            value: _acceptTerms,
-                            activeColor: Colors.green,
-                            onChanged: (bool? newValue) {
-                              setState(() {
-                                _acceptTerms = newValue ?? false;
-                              });
-                            },
-                          ),
-                          Text(
-                            'I accept the ',
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pushNamed(context, 'terms');
-                            },
-                            style: TextButton.styleFrom(
-                              padding: EdgeInsets.zero,
+                          ],
+                        ),
+                        if (_ddlClicked)
+                          if (_selectedProvinceName == null ||
+                              _selectedCityMunicipalityName == null ||
+                              _selectedBarangayName == null)
+                            Text(
+                              'Please select your adrress.',
+                              style: TextStyle(color: Colors.red),
                             ),
-                            child: Text(
-                              'terms and conditions.',
-                              style: TextStyle(
-                                color: Colors.green,
-                                decoration: TextDecoration.underline,
-                                decorationColor: Colors.green,
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                      const SizedBox(height: 15),
-                      Center(
-                        child: InkWell(
-                          onTap: () async {
-                            _ddlClicked = true;
-
-                            if ((_fnameController.text.isEmpty ||
-                                    fnamevalidator.isNotEmpty) ||
-                                (mnamevalidator.isNotEmpty) ||
-                                (_lnameController.text.isEmpty ||
-                                    lnamevalidator.isNotEmpty) ||
-                                (_contactController.text.isEmpty ||
-                                    contactvalidator.isNotEmpty) ||
-                                (_selectedProvinceName == null ||
-                                    provincevalidator.isNotEmpty) ||
-                                (_selectedCityMunicipalityName == null ||
-                                    cityvalidator.isNotEmpty) ||
-                                (_selectedBarangayName == null ||
-                                    brgyvalidator.isNotEmpty) ||
-                                (_streetController.text.isEmpty ||
-                                    streetvalidator.isNotEmpty) ||
-                                (_postalController.text.isEmpty ||
-                                    postalvalidator.isNotEmpty)) {
-                              setState(() {
-                                fnamevalidator =
-                                    _validateFname(_fnameController.text);
-                                mnamevalidator =
-                                    _validateMname(_mnameController.text);
-                                lnamevalidator =
-                                    _validateLname(_lnameController.text);
-                                contactvalidator =
-                                    _validateContact(_contactController.text);
-                                provincevalidator =
-                                    _validateProvince(_selectedProvinceName);
-                                cityvalidator = _validateCity(
-                                    _selectedCityMunicipalityName);
-                                brgyvalidator =
-                                    _validateBrgy(_selectedBarangayName);
-                                streetvalidator =
-                                    _validateStreet(_streetController.text);
-                                postalvalidator =
-                                    _validatePostalCode(_postalController.text);
-                              });
-                            } else if (_contactController.text.isNotEmpty) {
-                              String? dbContactMsg =
-                                  await contactCheck(_contactController.text);
-                              // Show any existing error message
-                              if (dbContactMsg != null) {
+                        const SizedBox(height: 20),
+                        // const SizedBox(height: 15),
+                        // // Dropdown for Province
+                        // _buildDropdown(
+                        //   selectedValue: _selectedProvince,
+                        //   items: _provinces,
+                        //   hintText: 'Province',
+                        //   icon: Icons.location_city,
+                        //   onChanged: (value) {
+                        //     setState(() {
+                        //       _selectedProvince = value;
+                        //       provincevalidator = _validateProvince(value);
+                        //       final selectedProvince = _provinces
+                        //           .firstWhere((item) => item['code'] == value);
+                        //       _selectedProvinceName = selectedProvince['name'];
+                        //     });
+                        //     _loadCitiesMunicipalities(value!);
+                        //   },
+                        // ),
+                        // _validator(provincevalidator),
+                        // SizedBox(height: 15),
+                        // // Dropdown for City/Municipality
+                        // _buildDropdown(
+                        //   selectedValue: _selectedCityMunicipality,
+                        //   items: _citiesMunicipalities,
+                        //   hintText: 'City/Municipality',
+                        //   icon: Icons.apartment,
+                        //   onChanged: (value) {
+                        //     setState(() {
+                        //       _selectedCityMunicipality = value;
+                        //       cityvalidator = _validateCity(value);
+                        //       final selectedCity = _citiesMunicipalities
+                        //           .firstWhere((item) => item['code'] == value);
+                        //       _selectedCityMunicipalityName =
+                        //           selectedCity['name'];
+                        //     });
+                        //     _loadBarangays(value!);
+                        //   },
+                        // ),
+                        // _validator(cityvalidator),
+                        // SizedBox(height: 15),
+                        // // Dropdown for Barangay
+                        // _buildDropdown(
+                        //   selectedValue: _selectedBarangay,
+                        //   items: _barangays,
+                        //   hintText: 'Barangay',
+                        //   icon: Icons.maps_home_work,
+                        //   onChanged: (value) {
+                        //     setState(() {
+                        //       _selectedBarangay = value;
+                        //       brgyvalidator = _validateBrgy(value);
+                        //       final selectedBarangay = _barangays
+                        //           .firstWhere((item) => item['code'] == value);
+                        //       _selectedBarangayName = selectedBarangay['name'];
+                        //       print(_selectedBarangayName);
+                        //     });
+                        //   },
+                        // ),
+                        // _validator(brgyvalidator),
+                        // const SizedBox(height: 15),
+                        _buildTextField(
+                          controller: _streetController,
+                          hintText: 'Street Name, Building, House No.',
+                          icon: Icons.home,
+                          onChanged: (value) {
+                            setState(() {
+                              streetvalidator = _validateStreet(
+                                  value); // Trigger validation on text change
+                            });
+                          },
+                        ),
+                        _validator(streetvalidator),
+                        const SizedBox(height: 15),
+                        _buildTextField(
+                          controller: _postalController,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            LengthLimitingTextInputFormatter(4),
+                          ],
+                          hintText: 'Postal Code',
+                          icon: Icons.local_post_office,
+                          onChanged: (value) {
+                            setState(() {
+                              postalvalidator = _validatePostalCode(
+                                  value); // Trigger validation on text change
+                              print(_postalController.text);
+                            });
+                          },
+                        ),
+                        _validator(postalvalidator),
+                        const SizedBox(height: 15),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Checkbox(
+                              value: _acceptTerms,
+                              activeColor: Colors.green,
+                              onChanged: (bool? newValue) {
                                 setState(() {
-                                  contactvalidator = dbContactMsg;
+                                  _acceptTerms = newValue ?? false;
                                 });
-                              } else {
-                                // If no errors, proceed with incrementing the step
-                                if (_currentStep < 3) {
-                                  if (_acceptTerms) {
-                                    if (isGoogle) {
-                                      await createGoogleAccount(
-                                          context,
-                                          _accountDetails?.email ?? '',
-                                          _accountDetails?.photoBytes != null
-                                              ? _accountDetails!.photoBytes!
-                                              : null,
-                                          _fnameController.text,
-                                          _mnameController.text,
-                                          _lnameController.text,
-                                          ('0' + _contactController.text),
-                                          _selectedProvinceName!,
-                                          _selectedCityMunicipalityName!,
-                                          _selectedBarangayName!,
-                                          _streetController.text,
-                                          _postalController.text);
+                              },
+                            ),
+                            Text(
+                              'I accept the ',
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pushNamed(context, 'terms');
+                              },
+                              style: TextButton.styleFrom(
+                                padding: EdgeInsets.zero,
+                              ),
+                              child: Text(
+                                'terms and conditions.',
+                                style: TextStyle(
+                                  color: Colors.green,
+                                  decoration: TextDecoration.underline,
+                                  decorationColor: Colors.green,
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                        const SizedBox(height: 15),
+                        Center(
+                          child: InkWell(
+                            onTap: () async {
+                              _ddlClicked = true;
+
+                              if ((_fnameController.text.isEmpty ||
+                                      fnamevalidator.isNotEmpty) ||
+                                  (mnamevalidator.isNotEmpty) ||
+                                  (_lnameController.text.isEmpty ||
+                                      lnamevalidator.isNotEmpty) ||
+                                  (_contactController.text.isEmpty ||
+                                      contactvalidator.isNotEmpty) ||
+                                  (_selectedProvinceName == null ||
+                                      provincevalidator.isNotEmpty) ||
+                                  (_selectedCityMunicipalityName == null ||
+                                      cityvalidator.isNotEmpty) ||
+                                  (_selectedBarangayName == null ||
+                                      brgyvalidator.isNotEmpty) ||
+                                  (_streetController.text.isEmpty ||
+                                      streetvalidator.isNotEmpty) ||
+                                  (_postalController.text.isEmpty ||
+                                      postalvalidator.isNotEmpty)) {
+                                setState(() {
+                                  fnamevalidator =
+                                      _validateFname(_fnameController.text);
+                                  mnamevalidator =
+                                      _validateMname(_mnameController.text);
+                                  lnamevalidator =
+                                      _validateLname(_lnameController.text);
+                                  contactvalidator =
+                                      _validateContact(_contactController.text);
+                                  provincevalidator =
+                                      _validateProvince(_selectedProvinceName);
+                                  cityvalidator = _validateCity(
+                                      _selectedCityMunicipalityName);
+                                  brgyvalidator =
+                                      _validateBrgy(_selectedBarangayName);
+                                  streetvalidator =
+                                      _validateStreet(_streetController.text);
+                                  postalvalidator = _validatePostalCode(
+                                      _postalController.text);
+                                });
+                              } else if (_contactController.text.isNotEmpty) {
+                                String? dbContactMsg =
+                                    await contactCheck(_contactController.text);
+                                // Show any existing error message
+                                if (dbContactMsg != null) {
+                                  setState(() {
+                                    contactvalidator = dbContactMsg;
+                                  });
+                                } else {
+                                  // If no errors, proceed with incrementing the step
+                                  if (_currentStep < 3) {
+                                    if (_acceptTerms) {
+                                      if (isGoogle) {
+                                        await createGoogleAccount(
+                                            context,
+                                            _accountDetails?.email ?? '',
+                                            _accountDetails?.photoBytes != null
+                                                ? _accountDetails!.photoBytes!
+                                                : null,
+                                            _fnameController.text,
+                                            _mnameController.text,
+                                            _lnameController.text,
+                                            ('0' + _contactController.text),
+                                            _selectedProvinceName!,
+                                            _selectedCityMunicipalityName!,
+                                            _selectedBarangayName!,
+                                            _streetController.text,
+                                            _postalController.text);
+                                      } else {
+                                        setState(() {
+                                          if (emailChanged == true) {
+                                            emailChanged = false;
+                                            _resendCode();
+                                          }
+                                          _currentStep++;
+                                        });
+                                      }
                                     } else {
-                                      setState(() {
-                                        if (emailChanged == true) {
-                                          emailChanged = false;
-                                          _resendCode();
-                                        }
-                                        _currentStep++;
-                                      });
+                                      showErrorSnackBar(context,
+                                          'You must accept the terms and conditions');
                                     }
-                                  } else {
-                                    showErrorSnackBar(context,
-                                        'You must accept the terms and conditions');
                                   }
                                 }
                               }
-                            }
-                          },
-                          child: Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 70.0, vertical: 10),
-                              decoration: BoxDecoration(
-                                  color: Colors.green,
-                                  borderRadius: BorderRadius.circular(15.0),
-                                  boxShadow: shadowColor),
-                              child: Text(
-                                isGoogle ? 'Done' : 'Next',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 25,
-                                    fontWeight: FontWeight.bold),
-                              )),
+                            },
+                            child: Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 70.0, vertical: 10),
+                                decoration: BoxDecoration(
+                                    color: Colors.green,
+                                    borderRadius: BorderRadius.circular(15.0),
+                                    boxShadow: shadowColor),
+                                child: Text(
+                                  isGoogle ? 'Done' : 'Next',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 25,
+                                      fontWeight: FontWeight.bold),
+                                )),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 20),
-                    ],
-                  ),
-                )
-              ],
+                        const SizedBox(height: 20),
+                      ],
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
         ),
@@ -1927,208 +1950,214 @@ class _CreateAccState extends State<CreateAcc> {
         children: [
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Container(
-              padding: EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(15.0),
-                  boxShadow: shadowBigColor),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Icon(Icons.email, color: deepPurple, size: 100),
-                  Text(
-                    'Check your email',
-                    style: TextStyle(
-                      fontSize: 28,
-                      color: Colors.grey[700],
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 20),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        'We\'ve sent the code to',
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: Colors.black54,
-                        ),
-                        textAlign: TextAlign.center,
+            child: GestureDetector(
+              onTap: () {
+                FocusScope.of(context).unfocus();
+              },
+              child: Container(
+                padding: EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(15.0),
+                    boxShadow: shadowBigColor),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Icon(Icons.email, color: deepPurple, size: 100),
+                    Text(
+                      'Check your email',
+                      style: TextStyle(
+                        fontSize: 28,
+                        color: Colors.grey[700],
+                        fontWeight: FontWeight.bold,
                       ),
-                      Text(
-                        _emailController.text,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: deepPurple,
-                        ),
-                        textAlign: TextAlign.center,
-                        softWrap: true,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: List.generate(6, (index) {
-                      return SizedBox(
-                        width: 50,
-                        child: Container(
-                          decoration: BoxDecoration(boxShadow: shadowColor),
-                          child: TextFormField(
-                            cursorColor: deepGreen,
-                            controller: _codeControllers[index],
-                            keyboardType: TextInputType
-                                .number, // Accept characters instead of numbers
-                            textInputAction: TextInputAction
-                                .next, // Moves focus to next field
-                            maxLength: 1,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.white, fontSize: 24),
-                            decoration: InputDecoration(
-                              counterText: '',
-                              filled: true,
-                              fillColor: deepPurple,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                                borderSide: BorderSide.none,
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: deepGreen,
-                                  width: 2.0,
-                                ),
-                                borderRadius: BorderRadius.circular(10.0),
-                              ),
-                            ),
-                            onChanged: (value) {
-                              // Convert input to uppercase
-                              final upperCaseValue = value.toUpperCase();
-                              if (upperCaseValue.length == 1) {
-                                _codeControllers[index].text = upperCaseValue;
-                                _codeControllers[index].selection =
-                                    TextSelection.fromPosition(
-                                  TextPosition(offset: upperCaseValue.length),
-                                );
-
-                                // Automatically move focus to the next field
-                                if (index < 5) {
-                                  FocusScope.of(context).nextFocus();
-                                } else {
-                                  // Close the keyboard when the last textbox is filled
-                                  FocusScope.of(context).unfocus();
-                                }
-                              }
-                              //print(enteredCode);
-                            },
-                          ),
-                        ),
-                      );
-                    }),
-                  ),
-                  SizedBox(height: 20),
-                  Text(
-                    'Code expires in: ${_formatTimer(_timerSeconds)}',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: _timerSeconds > 0 ? Colors.orange : Colors.red,
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          _resendCode();
-                        },
-                        child: Text(
-                          'Resend Code?',
+                    SizedBox(height: 20),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          'We\'ve sent the code to',
                           style: TextStyle(
-                            color: Colors.blue,
-                            fontSize: 16.0,
-                            decoration: TextDecoration.underline,
-                            decorationColor: Colors.blue,
+                            fontSize: 15,
+                            color: Colors.black54,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        Text(
+                          _emailController.text,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: deepPurple,
+                          ),
+                          textAlign: TextAlign.center,
+                          softWrap: true,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: List.generate(6, (index) {
+                        return SizedBox(
+                          width: 50,
+                          child: Container(
+                            decoration: BoxDecoration(boxShadow: shadowColor),
+                            child: TextFormField(
+                              cursorColor: deepGreen,
+                              controller: _codeControllers[index],
+                              keyboardType: TextInputType
+                                  .number, // Accept characters instead of numbers
+                              textInputAction: TextInputAction
+                                  .next, // Moves focus to next field
+                              maxLength: 1,
+                              textAlign: TextAlign.center,
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 24),
+                              decoration: InputDecoration(
+                                counterText: '',
+                                filled: true,
+                                fillColor: deepPurple,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  borderSide: BorderSide.none,
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: deepGreen,
+                                    width: 2.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                              ),
+                              onChanged: (value) {
+                                // Convert input to uppercase
+                                final upperCaseValue = value.toUpperCase();
+                                if (upperCaseValue.length == 1) {
+                                  _codeControllers[index].text = upperCaseValue;
+                                  _codeControllers[index].selection =
+                                      TextSelection.fromPosition(
+                                    TextPosition(offset: upperCaseValue.length),
+                                  );
+
+                                  // Automatically move focus to the next field
+                                  if (index < 5) {
+                                    FocusScope.of(context).nextFocus();
+                                  } else {
+                                    // Close the keyboard when the last textbox is filled
+                                    FocusScope.of(context).unfocus();
+                                  }
+                                }
+                                //print(enteredCode);
+                              },
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
+                    SizedBox(height: 20),
+                    Text(
+                      'Code expires in: ${_formatTimer(_timerSeconds)}',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: _timerSeconds > 0 ? Colors.orange : Colors.red,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            _resendCode();
+                          },
+                          child: Text(
+                            'Resend Code?',
+                            style: TextStyle(
+                              color: Colors.blue,
+                              fontSize: 16.0,
+                              decoration: TextDecoration.underline,
+                              decorationColor: Colors.blue,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 20),
-                  InkWell(
-                    onTap: () async {
-                      print(_emailController.text);
-                      print(_passController.text);
-                      print(_fnameController.text);
-                      print(_mnameController.text);
-                      print(_lnameController.text);
-                      print(_contactController.text);
-                      print(_selectedProvinceName);
-                      print(_selectedCityMunicipalityName);
-                      print(_selectedBarangayName);
-                      print(_streetController.text);
-                      print(_postalController.text);
-                      String? error = _validateCode();
-                      if (error == null) {
-                        updateEnteredCode(); //to update stored enteredCode
-                        String? errorMessage = await verifyEmailCode(
-                            _emailController.text, enteredCode);
-                        if (errorMessage != null) {
-                          showErrorSnackBar(context, errorMessage);
-                        } else {
-                          // showSuccessSnackBar(
-                          //     context, 'Successful Email Verification');
-                          String? createMessage = await createCustomer(
-                              context,
-                              _emailController.text,
-                              _passController.text,
-                              _fnameController.text,
-                              _mnameController.text,
-                              _lnameController.text,
-                              ('0' + _contactController.text),
-                              _selectedProvinceName,
-                              _selectedCityMunicipalityName,
-                              _selectedBarangayName,
-                              _streetController.text,
-                              _postalController.text);
-                          if (createMessage != null) {
-                            showErrorSnackBar(context, createMessage);
+                      ],
+                    ),
+                    SizedBox(height: 20),
+                    InkWell(
+                      onTap: () async {
+                        print(_emailController.text);
+                        print(_passController.text);
+                        print(_fnameController.text);
+                        print(_mnameController.text);
+                        print(_lnameController.text);
+                        print(_contactController.text);
+                        print(_selectedProvinceName);
+                        print(_selectedCityMunicipalityName);
+                        print(_selectedBarangayName);
+                        print(_streetController.text);
+                        print(_postalController.text);
+                        String? error = _validateCode();
+                        if (error == null) {
+                          updateEnteredCode(); //to update stored enteredCode
+                          String? errorMessage = await verifyEmailCode(
+                              _emailController.text, enteredCode);
+                          if (errorMessage != null) {
+                            showErrorSnackBar(context, errorMessage);
                           } else {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => SuccessVerifyEmail(),
-                              ),
-                            );
+                            // showSuccessSnackBar(
+                            //     context, 'Successful Email Verification');
+                            String? createMessage = await createCustomer(
+                                context,
+                                _emailController.text,
+                                _passController.text,
+                                _fnameController.text,
+                                _mnameController.text,
+                                _lnameController.text,
+                                ('0' + _contactController.text),
+                                _selectedProvinceName,
+                                _selectedCityMunicipalityName,
+                                _selectedBarangayName,
+                                _streetController.text,
+                                _postalController.text);
+                            if (createMessage != null) {
+                              showErrorSnackBar(context, createMessage);
+                            } else {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => SuccessVerifyEmail(),
+                                ),
+                              );
+                            }
                           }
+                        } else {
+                          showErrorSnackBar(context, error);
                         }
-                      } else {
-                        showErrorSnackBar(context, error);
-                      }
-                    },
-                    child: Container(
-                      alignment: Alignment.center,
-                      padding: EdgeInsets.all(16.0),
-                      decoration: BoxDecoration(
-                          color: Colors.green,
-                          borderRadius: BorderRadius.circular(10.0),
-                          boxShadow: shadowColor),
-                      child: Text(
-                        'Verify',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold),
+                      },
+                      child: Container(
+                        alignment: Alignment.center,
+                        padding: EdgeInsets.all(16.0),
+                        decoration: BoxDecoration(
+                            color: Colors.green,
+                            borderRadius: BorderRadius.circular(10.0),
+                            boxShadow: shadowColor),
+                        child: Text(
+                          'Verify',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

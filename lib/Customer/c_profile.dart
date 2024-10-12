@@ -752,67 +752,72 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
     //final userModel = Provider.of<UserModel>(context);
     return Scaffold(
       backgroundColor: deepGreen,
-      body: Stack(
-        children: [
-          Column(
-            children: [
-              Expanded(
-                child: _currentStep == 1 ? _firstPage() : _secondPage(),
-              ),
-              // PopScope(
-              //     canPop: false,
-              //     onPopInvokedWithResult: (didPop, result) async {
-              //       if (didPop) {
-              //         return;
-              //       }
-              //       // _backToSignIn();
-              //     },
-              //     child: Container()),
-            ],
-          ),
-          if (isPanelOpen)
-            Positioned.fill(
-              child: InkWell(
-                onTap: () {
-                  _panelController.close();
-                  setState(() {
-                    isPanelOpen = false;
-                  });
-                },
-                child: Container(
-                  color: Colors.black.withOpacity(0.3),
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: Stack(
+          children: [
+            Column(
+              children: [
+                Expanded(
+                  child: _currentStep == 1 ? _firstPage() : _secondPage(),
                 ),
-              ),
+                // PopScope(
+                //     canPop: false,
+                //     onPopInvokedWithResult: (didPop, result) async {
+                //       if (didPop) {
+                //         return;
+                //       }
+                //       // _backToSignIn();
+                //     },
+                //     child: Container()),
+              ],
             ),
-          SlidingUpPanel(
-            controller: _panelController,
-            minHeight: 0, // Start closed
-            maxHeight: MediaQuery.of(context).size.height * 0.3,
-            panel: _panelContent(),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-            onPanelClosed: () {
-              setState(() {
-                isPanelOpen = false;
-              });
-            },
-          ),
-          //  if (_panelController.isPanelOpen)
-          //   Positioned.fill(child: GestureDetector(onTap: () {
-          //     _panelController.close();
-          //   })),
-          if (isLoading)
-            Positioned.fill(
+            if (isPanelOpen)
+              Positioned.fill(
                 child: InkWell(
-              child: Center(
-                child: CircularProgressIndicator(
-                  color: Colors.green,
-                  strokeWidth: 10,
-                  strokeAlign: 2,
-                  backgroundColor: Colors.deepPurple,
+                  onTap: () {
+                    _panelController.close();
+                    setState(() {
+                      isPanelOpen = false;
+                    });
+                  },
+                  child: Container(
+                    color: Colors.black.withOpacity(0.3),
+                  ),
                 ),
               ),
-            )),
-        ],
+            SlidingUpPanel(
+              controller: _panelController,
+              minHeight: 0, // Start closed
+              maxHeight: MediaQuery.of(context).size.height * 0.3,
+              panel: _panelContent(),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              onPanelClosed: () {
+                setState(() {
+                  isPanelOpen = false;
+                });
+              },
+            ),
+            //  if (_panelController.isPanelOpen)
+            //   Positioned.fill(child: GestureDetector(onTap: () {
+            //     _panelController.close();
+            //   })),
+            if (isLoading)
+              Positioned.fill(
+                  child: InkWell(
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.green,
+                    strokeWidth: 10,
+                    strokeAlign: 2,
+                    backgroundColor: Colors.deepPurple,
+                  ),
+                ),
+              )),
+          ],
+        ),
       ),
     );
   }
@@ -846,10 +851,12 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                           },
                           child: Container()),
                       Container(
-                        width: double.infinity,
+                        //width: double.infinity,
                         margin: EdgeInsets.all(20),
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 100, vertical: 20),
+                        padding: _isEditing
+                            ? EdgeInsets.symmetric(
+                                horizontal: 100, vertical: 20)
+                            : EdgeInsets.zero,
                         decoration: BoxDecoration(
                             color: Colors.grey[200],
                             boxShadow: shadowBigColor,
@@ -939,35 +946,54 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                               ),
                             ),
                             if (!_isEditing)
-                              InkWell(
-                                onTap: () {
-                                  setState(() {
-                                    _isEditing = true;
-                                  });
-                                },
-                                child: Container(
-                                  margin: EdgeInsets.all(5),
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 10),
-                                  decoration: BoxDecoration(
-                                      boxShadow: shadowColor,
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: Colors.deepPurple),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.edit_outlined,
-                                        color: Colors.white,
+                              Row(
+                                children: [
+                                  Expanded(flex: 3, child: Container()),
+                                  Expanded(
+                                    flex: 7,
+                                    child: InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          _isEditing = true;
+                                        });
+                                      },
+                                      child: Container(
+                                        margin: EdgeInsets.all(5),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 20, vertical: 10),
+                                        decoration: BoxDecoration(
+                                            boxShadow: shadowColor,
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            color: Colors.deepPurple),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Expanded(
+                                              flex: 2,
+                                              child: Icon(
+                                                Icons.edit_outlined,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                            Expanded(
+                                              flex: 5,
+                                              child: Text(
+                                                'Edit Profile',
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                      Text(
-                                        'Edit Profile',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ],
+                                    ),
                                   ),
-                                ),
+                                  Expanded(flex: 3, child: Container()),
+                                ],
                               ),
                           ],
                         ),

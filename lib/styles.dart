@@ -15,7 +15,10 @@ Color? greytitleColor = Colors.grey[700];
 Color darkRed = Color(0xFFB00020);
 Color whiteSoft = Colors.white.withOpacity(0.5);
 Color white = Colors.white;
+Color black = Colors.black;
 Color blackSoft = Colors.grey[600]!;
+Color grey = Colors.grey[600]!;
+Color greySoft = Colors.grey[400]!;
 
 List<BoxShadow> shadowColor = [
   BoxShadow(

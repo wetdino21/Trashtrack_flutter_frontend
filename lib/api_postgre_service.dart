@@ -429,8 +429,8 @@ Future<void> updateProfile(
 //booking
 Future<String?> booking(
     BuildContext context,
-    int id,
-    DateTime date,
+    String fullname,
+    String contact,
     String province,
     String city,
     String brgy,
@@ -438,6 +438,7 @@ Future<String?> booking(
     String postal,
     double latitude,
     double longitude,
+    DateTime date,
     List<Map<String, dynamic>> selectedWasteTypes) async {
   Map<String, String?> tokens = await getTokens();
   String? accessToken = tokens['access_token'];
@@ -454,8 +455,8 @@ Future<String?> booking(
         'Content-Type': 'application/json',
       },
       body: jsonEncode({
-        'id': id,
-        'date': date.toIso8601String(),
+        'fullname': fullname,
+        'contact': contact,
         'province': province,
         'city': city,
         'brgy': brgy,
@@ -463,6 +464,7 @@ Future<String?> booking(
         'postal': postal,
         'latitude': latitude,
         'longitude': longitude,
+        'date': date.toIso8601String(),
         'wasteTypes': selectedWasteTypes,
       }),
     );
@@ -476,8 +478,8 @@ Future<String?> booking(
         print('Access token expired. Attempting to refresh...');
         String? refreshMsg = await refreshAccessToken();
         if (refreshMsg == null) {
-          return await booking(context, id, date, province, city, brgy, street,
-              postal, longitude, latitude, selectedWasteTypes);
+          return await booking(context, fullname, contact, province, city, brgy,
+              street, postal, latitude, longitude, date, selectedWasteTypes);
         }
       } else if (response.statusCode == 403) {
         // Access token is invalid. logout
@@ -567,7 +569,8 @@ Future<Map<String, List<Map<String, dynamic>>>?> fetchBookingData(
 Future<String?> bookingUpdate(
     BuildContext context,
     int bookId,
-    DateTime date,
+    String fullname,
+    String contact,
     String province,
     String city,
     String brgy,
@@ -575,6 +578,7 @@ Future<String?> bookingUpdate(
     String postal,
     double latitude,
     double longitude,
+    DateTime date,
     List<Map<String, dynamic>> selectedWasteTypes) async {
   Map<String, String?> tokens = await getTokens();
   String? accessToken = tokens['access_token'];
@@ -592,7 +596,8 @@ Future<String?> bookingUpdate(
       },
       body: jsonEncode({
         'bookingId': bookId,
-        'date': date.toIso8601String(),
+        'fullname': fullname,
+        'contact': contact,
         'province': province,
         'city': city,
         'brgy': brgy,
@@ -600,6 +605,7 @@ Future<String?> bookingUpdate(
         'postal': postal,
         'latitude': latitude,
         'longitude': longitude,
+        'date': date.toIso8601String(),
         'wasteTypes': selectedWasteTypes,
       }),
     );
@@ -607,14 +613,29 @@ Future<String?> bookingUpdate(
     if (response.statusCode == 200) {
       showSuccessSnackBar(context, 'Saved Changes');
       return 'success';
+    } else if (response.statusCode == 409) {
+      showErrorSnackBar(context, 'Unable to update booking, Already ongoing!');
+      return 'ongoing';
     } else {
       if (response.statusCode == 401) {
         // Access token might be expired, attempt to refresh it
         print('Access token expired. Attempting to refresh...');
         String? refreshMsg = await refreshAccessToken();
         if (refreshMsg == null) {
-          return await bookingUpdate(context, bookId, date, province, city,
-              brgy, street, postal, latitude, longitude, selectedWasteTypes);
+          return await bookingUpdate(
+              context,
+              bookId,
+              fullname,
+              contact,
+              province,
+              city,
+              brgy,
+              street,
+              postal,
+              latitude,
+              longitude,
+              date,
+              selectedWasteTypes);
         }
       } else if (response.statusCode == 403) {
         // Access token is invalid. logout

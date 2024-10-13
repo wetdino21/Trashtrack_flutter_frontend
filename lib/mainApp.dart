@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:trashtrack/Customer/c_Schedule.dart';
-import 'package:trashtrack/Customer/c_appbar.dart';
-import 'package:trashtrack/Customer/c_bottom_nav_bar.dart';
-import 'package:trashtrack/Customer/c_drawer.dart';
-import 'package:trashtrack/Customer/c_home.dart';
+import 'package:trashtrack/appbar.dart';
+import 'package:trashtrack/bottom_nav_bar.dart';
+import 'package:trashtrack/drawer.dart';
+import 'package:trashtrack/home.dart';
 import 'package:trashtrack/Customer/c_map.dart';
 import 'package:trashtrack/Customer/c_payment.dart';
 import 'package:trashtrack/data_model.dart';
@@ -16,8 +16,9 @@ import 'package:latlong2/latlong.dart';
 class MainApp extends StatefulWidget {
   final int? selectedIndex;
   LatLng? pickupPoint;
+  int? bookID;
 
-  MainApp({this.selectedIndex, this.pickupPoint});
+  MainApp({this.selectedIndex, this.pickupPoint, this.bookID});
 
   @override
   _MainAppState createState() => _MainAppState();
@@ -48,6 +49,7 @@ class _MainAppState extends State<MainApp> {
       C_HomeScreen(),
       C_MapScreen(
         pickupPoint: widget.pickupPoint,
+        bookID: widget.bookID,
       ),
       C_ScheduleScreen(),
       C_PaymentScreen(),
@@ -64,6 +66,7 @@ class _MainAppState extends State<MainApp> {
     if (index != 1) {
       setState(() {
         widget.pickupPoint = null; // Reset pickupPoint
+        widget.bookID = null;
       });
     }
     setState(() {
@@ -98,6 +101,7 @@ class _MainAppState extends State<MainApp> {
         Loading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         Loading = false;
       });

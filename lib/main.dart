@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:trashtrack/Customer/c_appbar.dart';
+import 'package:trashtrack/appbar.dart';
 import 'package:trashtrack/api_network.dart';
 import 'package:trashtrack/data_model.dart';
 
 //Customer library
 import 'package:trashtrack/Customer/c_Schedule.dart';
-import 'package:trashtrack/Customer/c_about_us.dart';
+import 'package:trashtrack/about_us.dart';
 import 'package:trashtrack/change_pass.dart';
-import 'package:trashtrack/Customer/c_home.dart';
+import 'package:trashtrack/home.dart';
 import 'package:trashtrack/Customer/c_map.dart';
 import 'package:trashtrack/Customer/c_notification.dart';
 import 'package:trashtrack/Customer/c_payment.dart';
-import 'package:trashtrack/Customer/c_profile.dart';
+import 'package:trashtrack/profile.dart';
 
 import 'package:trashtrack/api_token.dart';
 

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:trashtrack/Customer/c_waste_info.dart';
+import 'package:trashtrack/waste_info.dart';
 import 'package:trashtrack/Customer/c_booking.dart';
 import 'package:trashtrack/api_token.dart';
-import 'package:trashtrack/booking_list.dart';
+import 'package:trashtrack/booking_pending_list.dart';
 import 'package:trashtrack/data_model.dart';
 import 'package:trashtrack/styles.dart';
 
@@ -317,7 +317,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                                             child: Text(
                                               user == 'customer'
                                                   ? 'Request Pickup Now'
-                                                  : 'Pickup',
+                                                  : 'Go to Pickup',
                                               style: TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 18.0,

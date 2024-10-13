@@ -3,14 +3,32 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:http/http.dart' as http;
+import 'package:trashtrack/api_postgre_service.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:geolocator/geolocator.dart';
 import 'dart:async';
 
+import 'package:trashtrack/user_hive_data.dart';
+
+///
+LocationSettings locationSettings = AndroidSettings(
+    accuracy: LocationAccuracy.high,
+    distanceFilter: 3,
+    forceLocationManager: false,
+    intervalDuration: const Duration(seconds: 3),
+    foregroundNotificationConfig: const ForegroundNotificationConfig(
+      notificationText:
+          "TrashTrack is using geolocator. To stop the this, close the location on app or close the app.",
+      notificationTitle: "Streaming your current location",
+      enableWakeLock: true,
+    ));
+
+//
 class C_MapScreen extends StatefulWidget {
   final LatLng? pickupPoint;
+  final int? bookID;
 
-  C_MapScreen({this.pickupPoint});
+  C_MapScreen({this.pickupPoint, this.bookID});
 
   @override
   _C_MapScreenState createState() => _C_MapScreenState();
@@ -61,17 +79,18 @@ class _C_MapScreenState extends State<C_MapScreen> {
   bool destinationfound = true;
   bool startIsSearching = false;
   bool destinationIsSearching = false;
-
+  String? user;
   //bool isLocationOn = false;
   //Timer? _locationCheckTimer;
 
   @override
   void initState() {
     super.initState();
-    if (widget.pickupPoint != null) {
-      print('finding route');
-      pickUpDirection();
-    }
+    _dbData();
+    // if (widget.pickupPoint != null) {
+    //   print('finding route');
+    //   pickUpDirection();
+    // }
 
     //startRealTimeLocationCheck();
   }
@@ -87,6 +106,24 @@ class _C_MapScreenState extends State<C_MapScreen> {
 
     print('mappppp disposeeee');
     super.dispose();
+  }
+
+  // Fetch user data from the server
+  Future<void> _dbData() async {
+    try {
+      final data = await userDataFromHive();
+      if (!mounted) return null;
+      setState(() {
+        user = data['user'];
+      });
+      if (widget.pickupPoint != null) {
+        if (user == 'customer') {
+          viewHaulerDirection();
+        } else {
+          pickUpDirection();
+        }
+      }
+    } catch (e) {}
   }
 
 //LOCATION PERMISSION
@@ -113,19 +150,37 @@ class _C_MapScreenState extends State<C_MapScreen> {
         return;
       }
 
-      LocationSettings locationSettings = LocationSettings(
-        accuracy: LocationAccuracy.high, // Specify accuracy
-        distanceFilter: 10, // Update when the user moves 10 meters
-      );
+      // LocationSettings locationSettings = AndroidSettings(
+      //     accuracy: LocationAccuracy.high,
+      //     distanceFilter: 3,
+      //     forceLocationManager: true,
+      //     intervalDuration: const Duration(seconds: 10),
+      //     foregroundNotificationConfig: const ForegroundNotificationConfig(
+      //       notificationText:
+      //           "TrashTrack is using geolocator. To stop the this, close the location on app or close the app.",
+      //       notificationTitle: "Streaming your current location",
+      //       enableWakeLock: true,
+      //     ));
+      // LocationSettings locationSettings = LocationSettings(
+      //   accuracy: LocationAccuracy.high, // Specify accuracy
+      //   distanceFilter: 3, // Update when the user moves 10 meters
+      // );
+
       //////real time current position
       _startPositionStream = Geolocator.getPositionStream(
         locationSettings: locationSettings,
       ).listen(
         (Position position) async {
+          //update everyime latlong change
+          await updateHaulLatLong(
+              widget.bookID!, position.latitude, position.longitude);
+          //
           String? getCurrentName =
               await getPlaceName(position.latitude, position.longitude);
           String? getDestiantionName = await getPlaceName(
               widget.pickupPoint!.latitude, widget.pickupPoint!.longitude);
+
+          if (!mounted) return;
           setState(() {
             _startController.text = getCurrentName!;
             startPoint = LatLng(position.latitude, position.longitude);
@@ -143,6 +198,75 @@ class _C_MapScreenState extends State<C_MapScreen> {
             isSelectingDirections = true;
             startLocStreaming = true;
           });
+        },
+        onError: (error) async {
+          print('Error occurred in location stream: $error');
+        },
+      );
+    } catch (e) {
+      print('fail to get current location!');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  // View Hauler Route
+  Future<void> viewHaulerDirection() async {
+    try {
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission != LocationPermission.whileInUse &&
+            permission != LocationPermission.always) {
+          return; // Location services are not enabled
+        }
+      }
+
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        await Geolocator.openAppSettings();
+        return;
+      }
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        // Optionally, open the location settings:
+        await Geolocator.openLocationSettings();
+        return;
+      }
+
+      //////real time current position
+      _startPositionStream = Geolocator.getPositionStream(
+        locationSettings: locationSettings,
+      ).listen(
+        (Position position) async {
+          final data = await fetchAllLatLong(widget.bookID!);
+          print(data);
+          if (data != null) {
+            String? getCurrentName =
+                await getPlaceName(data['cus_lat'], data['cus_long']);
+            String? getDestiantionName =
+                await getPlaceName(data['haul_lat'], data['haul_long']);
+
+            if (!mounted) return;
+            setState(() {
+              _startController.text = getCurrentName!;
+              startPoint = LatLng(data['cus_lat'], data['cus_long']);
+              if (!startLocStreaming)
+                _mapController.move(startPoint!, _mapController.zoom);
+
+              startLocStreaming = true;
+              destinationPoint = LatLng(data['haul_lat'], data['haul_long']);
+              //destinationPoint = widget.pickupPoint;
+              fetchRoutes(startPoint!, destinationPoint!);
+
+              _startController.text = getCurrentName;
+              _destinationController.text = getDestiantionName!;
+              isSelectingDirections = true;
+              startLocStreaming = true;
+            });
+          }
         },
         onError: (error) async {
           print('Error occurred in location stream: $error');
@@ -538,7 +662,7 @@ class _C_MapScreenState extends State<C_MapScreen> {
 
       // LocationSettings locationSettings = LocationSettings(
       //   accuracy: LocationAccuracy.high, // Specify accuracy
-      //   distanceFilter: 10, // Update when the user moves 10 meters
+      //   distanceFilter: 3, // Update when the user moves 10 meters
       // );
 
       // _positionStream = Geolocator.getPositionStream(
@@ -560,10 +684,10 @@ class _C_MapScreenState extends State<C_MapScreen> {
       //     //_drawRoute(_currentLocation!, _staticDestination);
       //   });
       // });
-      LocationSettings locationSettings = LocationSettings(
-        accuracy: LocationAccuracy.high, // Specify accuracy
-        distanceFilter: 3, // Update when the user moves 10 meters
-      );
+      // LocationSettings locationSettings = LocationSettings(
+      //   accuracy: LocationAccuracy.high, // Specify accuracy
+      //   distanceFilter: 3, // Update when the user moves 10 meters
+      // );
       //////real time current position
       _positionStream = Geolocator.getPositionStream(
         locationSettings: locationSettings,
@@ -639,10 +763,10 @@ class _C_MapScreenState extends State<C_MapScreen> {
         return;
       }
 
-      LocationSettings locationSettings = LocationSettings(
-        accuracy: LocationAccuracy.high, // Specify accuracy
-        distanceFilter: 3,
-      );
+      // LocationSettings locationSettings = LocationSettings(
+      //   accuracy: LocationAccuracy.high, // Specify accuracy
+      //   distanceFilter: 3,
+      // );
       //////real time current position
       _startPositionStream = Geolocator.getPositionStream(
         locationSettings: locationSettings,
@@ -770,7 +894,9 @@ class _C_MapScreenState extends State<C_MapScreen> {
                       builder: (ctx) => Column(
                         children: [
                           Icon(Icons.location_pin,
-                              color: Colors.green, size: 40, shadows: shadowColor),
+                              color: Colors.green,
+                              size: 40,
+                              shadows: shadowColor),
                         ],
                       ),
                     ),
@@ -785,12 +911,14 @@ class _C_MapScreenState extends State<C_MapScreen> {
                       width: 80.0,
                       height: 80.0,
                       point: destinationPoint!,
-                      builder: (ctx) =>
-                          Column(
-                            children: [
-                              Icon(Icons.location_pin, color: Colors.red, size: 40, shadows: shadowColor),
-                            ],
-                          ),
+                      builder: (ctx) => Column(
+                        children: [
+                          Icon(Icons.location_pin,
+                              color: Colors.red,
+                              size: 40,
+                              shadows: shadowColor),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -874,20 +1002,20 @@ class _C_MapScreenState extends State<C_MapScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        SizedBox(
-                          height: 10,
-                        ),
+                      
                         (!startIsSearching && !destinationIsSearching) ||
                                 startIsSearching ||
                                 !destinationIsSearching
                             ? Row(
                                 children: [
-                                  Icon(Icons.location_on, color: Colors.green),
+                                  Icon(Icons.location_on, color: Colors.green, shadows: shadowColor),
                                   SizedBox(width: 3),
                                   Expanded(
                                     child: Container(
-                                      padding: EdgeInsets.only(left: 15),
+                                      padding: EdgeInsets.only(left: 15,),
                                       decoration: BoxDecoration(
+                                        color: white,
+                                        boxShadow: shadowColor,
                                           borderRadius:
                                               BorderRadius.circular(5),
                                           border: Border.all(
@@ -935,12 +1063,14 @@ class _C_MapScreenState extends State<C_MapScreen> {
                                 !startIsSearching
                             ? Row(
                                 children: [
-                                  Icon(Icons.location_on, color: Colors.red),
+                                  Icon(Icons.location_on, color: Colors.red, shadows: shadowColor),
                                   SizedBox(width: 3),
                                   Expanded(
                                     child: Container(
                                       padding: EdgeInsets.only(left: 15),
                                       decoration: BoxDecoration(
+                                        color: white,
+                                        boxShadow: shadowColor,
                                           borderRadius:
                                               BorderRadius.circular(5),
                                           border: Border.all(

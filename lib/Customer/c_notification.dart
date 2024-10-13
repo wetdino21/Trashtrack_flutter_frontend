@@ -138,7 +138,7 @@ class _C_NotificationScreenState extends State<C_NotificationScreen>
                       children: [
                         Icon(Icons.notifications_off, color: whiteSoft, size: 100),
                         Text(
-                          'No available notification.\n\n\n\n',
+                          'No notification at this time\n\n\n\n',
                           style: TextStyle(color: whiteSoft, fontSize: 20),
                         ),
                       ],

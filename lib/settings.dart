@@ -221,13 +221,6 @@ class _C_SettingsScreenState extends State<C_SettingsScreen> {
               style: TextStyle(color: Colors.white)),
           actions: [
             TextButton(
-              onPressed: () {
-                //showErrorSnackBar(context, userData.email!);
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancel', style: TextStyle(color: Colors.white)),
-            ),
-            TextButton(
               onPressed: () async {
                 String? deactMsg =
                     await deactivateUser(context, userModel!.email!);
@@ -244,6 +237,13 @@ class _C_SettingsScreenState extends State<C_SettingsScreen> {
                 }
               },
               child: Text('Yes', style: TextStyle(color: Colors.white)),
+            ),
+            TextButton(
+              onPressed: () {
+                //showErrorSnackBar(context, userData.email!);
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel', style: TextStyle(color: Colors.white)),
             ),
           ],
         );

@@ -22,11 +22,9 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
 
   //user data
   Map<String, dynamic>? userData;
-  //Box<dynamic>? userData;
   bool isLoading = true;
   String? errorMessage;
-  //Uint8List? imageBytes;
-  //late Object _obj;
+
   final Object _obj = Object(
     scale: Vector3(11.0, 11.0, 11.0),
     //position: Vector3(0, 0, 0),
@@ -38,26 +36,12 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
-    // if (!mounted) return null;
-    // _obj = Object(
-    //   scale: Vector3(12.0, 12.0, 12.0),
-    //   //position: Vector3(0, 0, 0),
-    //   rotation: Vector3(0, -90, 0), // Start sideways
-    //   fileName: 'assets/objects/base.obj',
-    // );
     userModel = Provider.of<UserModel>(context); // Access provider here
   }
 
   @override
   void initState() {
     super.initState();
-    // _obj = Object(
-    //   scale: Vector3(12.0, 12.0, 12.0),
-    //   //position: Vector3(0, 0, 0),
-    //   rotation: Vector3(0, -90, 0), // Start sideways
-    //   fileName: 'assets/objects/base.obj',
-    // );
     _dbData();
   }
 
@@ -69,9 +53,6 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
 // Fetch user data from the server
   Future<void> _dbData() async {
     try {
-      //await storeDataInHive(context);
-
-      //final data = await Hive.openBox('mybox');
       final data = await userDataFromHive();
       // final data = await fetchCusData(context);
       if (!mounted) return null;
@@ -79,32 +60,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
         userData = data;
         user = data['user'];
         isLoading = false;
-
-        // // Decode base64 image only if it exists
-        // if (userData?['profileImage'] != null) {
-        //   imageBytes = base64Decode(userData!['profileImage']);
-        // }
       });
-
-      // Provider.of<UserModel>(context, listen: false).setUserData(data['id'].toString(), data['fname'],
-      //     data['lname'], data['email'], data['auth'], data['profile']);
-
-      //if online provider
-      // final data2 = await fetchCusData(context);
-      // if (data2 != null) {
-      //   Provider.of<UserModel>(context, listen: false).setUserData(
-      //     data2['cus_fname'],
-      //     data2['cus_lname'],
-      //     data2['cus_email'],
-      //     data2['profileImage'] != null
-      //         ? base64Decode(data2['profileImage'])
-      //         : null,
-      //   );
-      // } else {
-      //   showErrorSnackBar(context, 'errorMessage');
-      // }
-
-      //await data.close();
     } catch (e) {
       // setState(() {
       //   errorMessage = e.toString();
@@ -112,13 +68,6 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
       // });
     }
   }
-
-  // @override
-  // void didChangeDependencies() {
-  //   super.didChangeDependencies();
-  //   // Refresh the app bar when dependencies change
-  //   appbarKey.currentState?.loadProfileImage();
-  // }
 
 //////////////////////////////////
   @override
@@ -167,39 +116,12 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                             //   });
                             // }),
 
-                            // Stack(
-                            //   children: [
-                            //     Container(
-                            //       color: white,
-                            //       height: 200,
-                            //       width: 200,
-                            //     ),
-                            //     Positioned(
-                            //       top: 0,
-                            //       bottom: 0,
-                            //       child: Image.asset('assets/pin.png'))
-                            //   ]
-                            // ),
-
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 SizedBox(
                                   height: 20,
                                 ),
-                                // ElevatedButton(
-                                //     onPressed: () async {
-                                //       bool onLocation =
-                                //           await checkLocationPermission();
-                                //       if (onLocation)
-                                //         Navigator.push(
-                                //             context,
-                                //             MaterialPageRoute(
-                                //                 builder: (context) => C_MapScreen(
-                                //                     pickupPoint: LatLng(10.25702151,
-                                //                         123.85040322))));
-                                //     },
-                                //     child: Text('Go To Map')),
                                 // Welcome Container
                                 Container(
                                   padding: EdgeInsets.all(16.0),
@@ -247,31 +169,19 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                                                 ),
                                               ),
                                               Expanded(
-                                                 flex: 8,
+                                                flex: 8,
                                                 child: Container(
                                                   height: 200,
-                                                  // width: MediaQuery.of(context)
-                                                  //         .size
-                                                  //         .width *
-                                                  //     0.7,
                                                   child: Cube(
                                                     onSceneCreated:
                                                         (Scene scene) {
-                                                      // scene.world.add(Object(
-                                                      //     scale: Vector3(
-                                                      //         12.0, 12.0, 12.0),
-                                                      //     position: Vector3(0, 0, 0),
-                                                      //     rotation:
-                                                      //         Vector3(0, -90, 0),
-                                                      //     fileName:
-                                                      //         'assets/objects/base.obj'));
                                                       scene.world.add(_obj);
                                                     },
                                                   ),
                                                 ),
                                               ),
                                               Expanded(
-                                                 flex: 1,
+                                                flex: 1,
                                                 child: Icon(Icons.arrow_right,
                                                     color: deepPurple),
                                               ),
@@ -330,46 +240,6 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                                   ),
                                 ),
 
-                                ////
-                                // SizedBox(height: 20.0),
-                                // Text(
-                                //   '  Waste Collection Info',
-                                //   style: TextStyle(
-                                //     color: white,
-                                //     fontSize: 18.0,
-                                //   ),
-                                // ),
-                                // SizedBox(height: 5.0),
-
-                                // GestureDetector(
-                                //     onTap: () {
-                                //       Navigator.push(
-                                //           context,
-                                //           MaterialPageRoute(
-                                //               builder: (context) =>
-                                //                   C_WasteInfo()));
-                                //     },
-                                //     child: Container(
-                                //       decoration: BoxDecoration(
-                                //         color: white,
-                                //         boxShadow: shadowMidColor,
-                                //         borderRadius: BorderRadius.circular(10),
-                                //       ),
-                                //       child: ListTile(
-                                //         contentPadding: EdgeInsets.all(10),
-                                //         leading: Icon(
-                                //           Icons.view_list,
-                                //           color: deepPurple,
-                                //         ),
-                                //         title: Text(
-                                //           'Type of Waste',
-                                //           style: TextStyle(
-                                //             fontSize: 18.0,
-                                //           ),
-                                //         ),
-                                //       ),
-                                //     )),
-
                                 /////
                                 SizedBox(height: 20.0),
                                 Text(
@@ -390,13 +260,15 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                                   mainAxisSpacing: 10.0,
                                   children: [
                                     StatisticBox(
-                                      icon: Icons.schedule,
-                                      title: user == 'customer'? 'Total Requests': 'Total Pickup',
-                                      value: '150',
+                                      icon: Icons.access_time_filled,
+                                      title: user == 'customer'
+                                          ? 'Total Requests'
+                                          : 'Total Pickup',
+                                      value: userModel!.totalRequest.toString()??  '150',
                                       iconColor: accentColor,
                                     ),
                                     StatisticBox(
-                                      icon: Icons.delete_outline,
+                                      icon: Icons.delete,
                                       title: 'Total Tons Collected',
                                       value: '75',
                                       iconColor: accentColor,
@@ -467,7 +339,7 @@ class StatisticBox extends StatelessWidget {
       decoration: BoxDecoration(
         color: white,
         boxShadow: shadowMidColor,
-        borderRadius: BorderRadius.circular(10.0),
+        borderRadius: BorderRadius.circular(50),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -476,7 +348,8 @@ class StatisticBox extends StatelessWidget {
           Icon(
             icon,
             color: deepPurple,
-            size: 30.0,
+            size: 50.0,
+            shadows: shadowColor,
           ),
           SizedBox(height: 10.0),
           Text(

@@ -995,6 +995,7 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details>
                                 builder: (context) => MainApp(
                                     selectedIndex: 1,
                                     bookID: widget.bookId,
+                                    bookStatus: bookingData!['bk_status'],
                                     pickupPoint: LatLng(selectedPoint!.latitude,
                                         selectedPoint!.longitude))));
                       }

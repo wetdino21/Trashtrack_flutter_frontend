@@ -152,8 +152,8 @@ class _C_DrawerState extends State<C_Drawer> {
 
                   // Waste info
                   ListTile(
-                    leading: _buildIcon(Icons.view_list),
-                    title: Text('Waste Collection Types'),
+                    leading: _buildIcon(Icons.article_outlined),
+                    title: Text('Service Guidelines'),
                     selectedColor: Colors.green,
                     tileColor: selectedIndexs == 2 ? Colors.black12 : null,
                     onTap: () {

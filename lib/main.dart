@@ -52,7 +52,7 @@ void main() async {
 //   runApp(MyApp());
 //   // runApp(const MyApp());
 // }
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>(); // for logout complex
 
 class MyApp extends StatelessWidget {
   @override

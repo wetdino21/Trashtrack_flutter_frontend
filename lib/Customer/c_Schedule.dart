@@ -20,6 +20,9 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
 
   List<Map<String, dynamic>>? bookingList;
   List<Map<String, dynamic>>? bookingWasteList;
+  List<Map<String, dynamic>>? bookingListHistory;
+  List<Map<String, dynamic>>? bookingWasteListHistory;
+
   bool isLoading = false;
   int selectedPage = 0;
   late PageController _pageController;
@@ -99,6 +102,8 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
         setState(() {
           bookingList = data!['booking'];
           bookingWasteList = data['wasteTypes'];
+          bookingListHistory = data['booking2'];
+          bookingWasteListHistory = data['wasteTypes2'];
 
           if (bookingList != null) {
             var filteredCurrent = bookingList!.where((booking) {
@@ -497,74 +502,62 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                                           return SizedBox.shrink();
                                         }
 
-                                        if (booking['bk_status'] == 'Pending' ||
-                                            booking['bk_status'] == 'Ongoing') {
-                                          int book_Id = booking['bk_id'];
-                                          DateTime dbdate = DateTime.parse(
-                                                  booking['bk_date'] ?? '')
-                                              .toLocal();
-                                          final String date =
-                                              DateFormat('MMM dd, yyyy (EEEE)')
-                                                  .format(dbdate);
+                                        int book_Id = booking['bk_id'];
+                                        DateTime dbdate = DateTime.parse(
+                                                booking['bk_date'] ?? '')
+                                            .toLocal();
+                                        final String date =
+                                            DateFormat('MMM dd, yyyy (EEEE)')
+                                                .format(dbdate);
 
-                                          DateTime dbdateCreated =
-                                              DateTime.parse(booking[
-                                                          'bk_created_at'] ??
-                                                      '')
-                                                  .toLocal();
-                                          final String dateCreated =
-                                              DateFormat('MMM dd, yyyy hh:mm a')
-                                                  .format(dbdateCreated);
+                                        DateTime dbdateCreated = DateTime.parse(
+                                                booking['bk_created_at'] ?? '')
+                                            .toLocal();
+                                        final String dateCreated =
+                                            DateFormat('MMM dd, yyyy hh:mm a')
+                                                .format(dbdateCreated);
 
-                                          // Filter waste types for the current booking's bk_id
-                                          String wasteTypes = '';
-                                          if (bookingWasteList != null) {
-                                            List<Map<String, dynamic>>
-                                                filteredWasteList =
-                                                bookingWasteList!
-                                                    .where((waste) {
-                                              return waste['bk_id'] ==
-                                                  booking['bk_id'];
-                                            }).toList();
+                                        // Filter waste types for the current booking's bk_id
+                                        String wasteTypes = '';
+                                        if (bookingWasteList != null) {
+                                          List<Map<String, dynamic>>
+                                              filteredWasteList =
+                                              bookingWasteList!.where((waste) {
+                                            return waste['bk_id'] ==
+                                                booking['bk_id'];
+                                          }).toList();
 
-                                            // Build the waste types string
-                                            int count = 0;
-                                            for (var waste
-                                                in filteredWasteList) {
-                                              count++;
-                                              wasteTypes +=
-                                                  waste['bw_name'] + ', ';
-                                              if (count == 2) break;
-                                            }
-
-                                            // Remove the trailing comma and space
-                                            if (wasteTypes.isNotEmpty) {
-                                              if (filteredWasteList.length >
-                                                  2) {
-                                                wasteTypes =
-                                                    wasteTypes + '. . .';
-                                              } else {
-                                                wasteTypes =
-                                                    wasteTypes.substring(0,
-                                                        wasteTypes.length - 2);
-                                              }
-                                            }
+                                          // Build the waste types string
+                                          int count = 0;
+                                          for (var waste in filteredWasteList) {
+                                            count++;
+                                            wasteTypes +=
+                                                waste['bw_name'] + ', ';
+                                            if (count == 2) break;
                                           }
 
-                                          final String status =
-                                              booking['bk_status'] ??
-                                                  'No status';
-
-                                          // Pass the extracted data to the C_CurrentScheduleCard widget
-                                          return C_ScheduleCardList(
-                                            bookId: book_Id,
-                                            date: date,
-                                            dateCreated: dateCreated,
-                                            wasteType: wasteTypes,
-                                            status: status,
-                                          );
+                                          // Remove the trailing comma and space
+                                          if (wasteTypes.isNotEmpty) {
+                                            if (filteredWasteList.length > 2) {
+                                              wasteTypes = wasteTypes + '. . .';
+                                            } else {
+                                              wasteTypes = wasteTypes.substring(
+                                                  0, wasteTypes.length - 2);
+                                            }
+                                          }
                                         }
-                                        return Container();
+
+                                        final String status =
+                                            booking['bk_status'] ?? 'No status';
+
+                                        // Pass the extracted data to the C_CurrentScheduleCard widget
+                                        return C_ScheduleCardList(
+                                          bookId: book_Id,
+                                          date: date,
+                                          dateCreated: dateCreated,
+                                          wasteType: wasteTypes,
+                                          status: status,
+                                        );
                                       },
                                     ),
                     ),
@@ -622,7 +615,8 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                                   },
                                 );
                               })
-                          : bookingList == null || !containHistory
+                          : (bookingList == null || !containHistory) &&
+                                  bookingListHistory == null
                               ? ListView(
                                   children: [
                                     Column(
@@ -741,87 +735,73 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                                       },
                                     )
                                   : ListView.builder(
-                                      itemCount: bookingList?.length == null
+                                      itemCount: bookingListHistory?.length == null
                                           ? 0
-                                          : bookingList!.length,
+                                          : bookingListHistory!.length,
                                       itemBuilder: (context, index) {
                                         // Safely retrieve the booking details from bookingList
-                                        final booking = bookingList?[index];
+                                        final booking = bookingListHistory?[index];
 
                                         if (booking == null) {
                                           return SizedBox.shrink();
                                         }
 
-                                        if (booking['bk_status'] ==
-                                                'Cancelled' ||
-                                            booking['bk_status'] ==
-                                                'Collected') {
-                                          int book_Id = booking['bk_id'];
-                                          DateTime dbdate = DateTime.parse(
-                                                  booking['bk_date'] ?? '')
-                                              .toLocal();
-                                          final String date =
-                                              DateFormat('MMM dd, yyyy (EEEE)')
-                                                  .format(dbdate);
+                                        int book_Id = booking['bk_id'];
+                                        DateTime dbdate = DateTime.parse(
+                                                booking['bk_date'] ?? '')
+                                            .toLocal();
+                                        final String date =
+                                            DateFormat('MMM dd, yyyy (EEEE)')
+                                                .format(dbdate);
 
-                                          DateTime dbdateCreated =
-                                              DateTime.parse(booking[
-                                                          'bk_created_at'] ??
-                                                      '')
-                                                  .toLocal();
-                                          final String dateCreated =
-                                              DateFormat('MMM dd, yyyy hh:mm a')
-                                                  .format(dbdateCreated);
+                                        DateTime dbdateCreated = DateTime.parse(
+                                                booking['bk_created_at'] ?? '')
+                                            .toLocal();
+                                        final String dateCreated =
+                                            DateFormat('MMM dd, yyyy hh:mm a')
+                                                .format(dbdateCreated);
 
-                                          // Filter waste types for the current booking's bk_id
-                                          String wasteTypes = '';
-                                          if (bookingWasteList != null) {
-                                            List<Map<String, dynamic>>
-                                                filteredWasteList =
-                                                bookingWasteList!
-                                                    .where((waste) {
-                                              return waste['bk_id'] ==
-                                                  booking['bk_id'];
-                                            }).toList();
+                                        // Filter waste types for the current booking's bk_id
+                                        String wasteTypes = '';
+                                        if (bookingWasteListHistory != null) {
+                                          List<Map<String, dynamic>>
+                                              filteredWasteList =
+                                              bookingWasteListHistory!.where((waste) {
+                                            return waste['bk_id'] ==
+                                                booking['bk_id'];
+                                          }).toList();
 
-                                            // Build the waste types string
-                                            int count = 0;
-                                            for (var waste
-                                                in filteredWasteList) {
-                                              count++;
-                                              wasteTypes +=
-                                                  waste['bw_name'] + ', ';
-                                              if (count == 2) break;
-                                            }
-
-                                            // Remove the trailing comma and space
-                                            if (wasteTypes.isNotEmpty) {
-                                              if (filteredWasteList.length >
-                                                  2) {
-                                                wasteTypes =
-                                                    wasteTypes + '. . .';
-                                              } else {
-                                                wasteTypes =
-                                                    wasteTypes.substring(0,
-                                                        wasteTypes.length - 2);
-                                              }
-                                            }
+                                          // Build the waste types string
+                                          int count = 0;
+                                          for (var waste in filteredWasteList) {
+                                            count++;
+                                            wasteTypes +=
+                                                waste['bw_name'] + ', ';
+                                            if (count == 2) break;
                                           }
 
-                                          final String status =
-                                              booking['bk_status'] ??
-                                                  'No status';
-
-                                          // Pass the extracted data to the C_CurrentScheduleCard widget
-                                          return C_ScheduleCardList(
-                                            bookId: book_Id,
-                                            date: date,
-                                            dateCreated: dateCreated,
-                                            wasteType: wasteTypes,
-                                            status: status,
-                                          );
+                                          // Remove the trailing comma and space
+                                          if (wasteTypes.isNotEmpty) {
+                                            if (filteredWasteList.length > 2) {
+                                              wasteTypes = wasteTypes + '. . .';
+                                            } else {
+                                              wasteTypes = wasteTypes.substring(
+                                                  0, wasteTypes.length - 2);
+                                            }
+                                          }
                                         }
-                                        return Container();
+
+                                        final String status =
+                                            booking['bk_status'] ?? 'No status';
+
+                                        // Pass the extracted data to the C_CurrentScheduleCard widget
+                                        return C_ScheduleCardList(
+                                          bookId: book_Id,
+                                          date: date,
+                                          dateCreated: dateCreated,
+                                          wasteType: wasteTypes,
+                                          status: status,
+                                        );
                                       },
                                     ),
                     ),

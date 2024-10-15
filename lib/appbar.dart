@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
@@ -29,6 +30,7 @@ class C_CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class C_CustomAppBarState extends State<C_CustomAppBar> {
+  final AudioService _audioService = AudioService(); //from modal
   String user = 'customer';
   Uint8List? imageBytes;
   UserModel? userModel;
@@ -53,22 +55,25 @@ class C_CustomAppBarState extends State<C_CustomAppBar> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     userModel = Provider.of<UserModel>(context); // Access provider here
+
+    if (userModel!.notifCount != null) {
+      totalNotif = userModel!.notifCount!;
+    }
+
     // connectWebSocket();
   }
 
   @override
   void dispose() {
     if (channel != null) channel!.sink.close();
+    _audioService.dispose();
     //notificationService.closeConnection();
     super.dispose();
   }
-  // @override
-  // void dispose() {
-  //   // channel.sink.close();
 
-  //   print('notiff disposeeee');
-  //   super.dispose();
-  // }
+  Future<void> _playSound() async {
+    await _audioService.playNotifSound(); // Use the service to play sound
+  }
 
   Future<void> connectWebSocket() async {
     String baseUrl = globalUrl();
@@ -96,6 +101,8 @@ class C_CustomAppBarState extends State<C_CustomAppBar> {
             setState(() {
               //totalNotif = unreadCount; //same output
               totalNotif = int.tryParse(unreadCount) ?? 0;
+              userModel!.setUserData(newNotifCount: totalNotif);
+              _playSound();
             });
           }
         }, onError: (error) {
@@ -115,14 +122,14 @@ class C_CustomAppBarState extends State<C_CustomAppBar> {
       imageBytes = data['profile'];
     });
 
-    final box = await Hive.openBox('mybox');
-    if (box.get('notif_count') == null) {
-      //showErrorSnackBar(context, '1111111111 ');
-    } else {
-      setState(() {
-        totalNotif = box.get('notif_count');
-      });
-    }
+    // final box = await Hive.openBox('mybox');
+    // if (box.get('notif_count') == null) {
+    //   //showErrorSnackBar(context, '1111111111 ');
+    // } else {
+    //   setState(() {
+    //     totalNotif = box.get('notif_count');
+    //   });
+    // }
     // final box = await Hive.openBox('mybox');
     // if (box.get('notif_count') == null) {
     //   showErrorSnackBar(context, '1111111111 ');

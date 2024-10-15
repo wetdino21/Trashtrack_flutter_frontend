@@ -63,7 +63,8 @@ dependencies:
   web_socket_channel: ^3.0.1
   #flutter_launcher_icons: ^0.14.1
   logger: ^2.4.0
-
+  audioplayers: ^6.1.0
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -108,6 +109,7 @@ flutter:
     - assets/dance.gif
 
     - assets/objects/
+    - assets/sound/
 
     - assets/icon/trashtrack_icon.png
 

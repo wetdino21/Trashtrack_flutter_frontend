@@ -25,16 +25,18 @@ LocationSettings locationSettings = AndroidSettings(
 
 //
 class C_MapScreen extends StatefulWidget {
-  final LatLng? pickupPoint;
-  final int? bookID;
+  LatLng? pickupPoint;
+  int? bookID;
+  String? bookStatus;
 
-  C_MapScreen({this.pickupPoint, this.bookID});
+  C_MapScreen({this.pickupPoint, this.bookID, this.bookStatus});
 
   @override
   _C_MapScreenState createState() => _C_MapScreenState();
 }
 
-class _C_MapScreenState extends State<C_MapScreen> {
+class _C_MapScreenState extends State<C_MapScreen>
+    with SingleTickerProviderStateMixin {
   final GlobalKey<_C_MapScreenState> _mapScreenKey =
       GlobalKey<_C_MapScreenState>();
   bool hideScreen = false;
@@ -80,8 +82,18 @@ class _C_MapScreenState extends State<C_MapScreen> {
   bool startIsSearching = false;
   bool destinationIsSearching = false;
   String? user;
+  bool zoomOnce = false;
+  bool findingRoute = false;
+  double arrivalDistance = 0;
   //bool isLocationOn = false;
   //Timer? _locationCheckTimer;
+  late AnimationController _controller;
+  late Animation<Color?> _colorTweenArrival;
+  late Animation<Color?> _colorTween1;
+  late Animation<Color?> _colorTween2;
+  late Animation<Color?> _colorTween3;
+  late Animation<Color?> _colorTween4;
+  late Animation<Color?> _colorTween5;
 
   @override
   void initState() {
@@ -91,7 +103,58 @@ class _C_MapScreenState extends State<C_MapScreen> {
     //   print('finding route');
     //   pickUpDirection();
     // }
+    _controller = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    )..repeat(reverse: true); // The animation will repeat back and forth
 
+    _colorTweenArrival = ColorTween(
+      begin: Colors.blue,
+      end: Colors.yellow,
+    ).animate(_controller);
+
+    _colorTween1 = ColorTween(
+      begin: Colors.grey,
+      end: Colors.transparent,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Interval(0.8, 1.0), // 80% to 100%
+    ));
+
+    _colorTween2 = ColorTween(
+      begin: Colors.grey,
+      end: Colors.transparent,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Interval(0.6, 1.0), // 60% to 80%
+    ));
+
+    _colorTween3 = ColorTween(
+      begin: Colors.grey,
+      end: Colors.transparent,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Interval(0.4, 1.0), // 40% to 60%
+    ));
+
+    _colorTween4 = ColorTween(
+      begin: Colors.grey,
+      end: Colors.transparent,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Interval(0.2, 1.0), // 20% to 40%
+    ));
+
+    _colorTween5 = ColorTween(
+      begin: Colors.grey,
+      end: Colors.transparent,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Interval(0.0, 1.0), // 0% to 20% of the total duration
+    ));
+
+    // Start the animation
+    // _controller.forward();
     //startRealTimeLocationCheck();
   }
 
@@ -104,6 +167,8 @@ class _C_MapScreenState extends State<C_MapScreen> {
     _startFocusNode.dispose();
     _destinationFocusNode.dispose();
 
+    TickerCanceled;
+    _controller.dispose();
     print('mappppp disposeeee');
     super.dispose();
   }
@@ -116,7 +181,11 @@ class _C_MapScreenState extends State<C_MapScreen> {
       setState(() {
         user = data['user'];
       });
+      //showErrorSnackBar(context, widget.bookStatus??'');
       if (widget.pickupPoint != null) {
+        setState(() {
+          findingRoute = true;
+        });
         if (user == 'customer') {
           viewHaulerDirection();
         } else {
@@ -393,12 +462,27 @@ class _C_MapScreenState extends State<C_MapScreen> {
     }
   }
 
-  Future<void> fetchRoutes(LatLng start, LatLng destination) async {
-    if (!startLocStreaming)
-      setState(() {
-        isLoading = true;
-      });
+  //zoom when route is available
+  void zoomToFit(
+      MapController mapController, LatLng start, LatLng destination) {
+    LatLngBounds bounds = LatLngBounds.fromPoints([start, destination]);
 
+    // Set the map to fit within the bounds with padding
+    var padding = const EdgeInsets.all(50.0); // Adjust padding as necessary
+    mapController.fitBounds(bounds,
+        options: FitBoundsOptions(padding: padding));
+  }
+
+  //fetch route
+  Future<void> fetchRoutes(LatLng start, LatLng destination) async {
+    // if (!startLocStreaming)
+    //   setState(() {
+    //     isLoading = true;
+    //   });
+
+    setState(() {
+      if (!zoomOnce) findingRoute = true;
+    });
     int retryCount = 0;
     const int maxRetries = 10;
 
@@ -449,32 +533,51 @@ class _C_MapScreenState extends State<C_MapScreen> {
               nearestDuration = formatDuration(routeDurations[0]);
               nearestDistance = formatDistance(routeDistances[0]);
               nearestRoute = 1;
+              arrivalDistance = routeDistances[0];
             } else {
               if (routeDurations[0] < routeDurations[1]) {
                 nearestDuration = formatDuration(routeDurations[0]);
                 nearestDistance = formatDistance(routeDistances[0]);
                 nearestRoute = 1;
+                arrivalDistance = routeDistances[0];
               } else {
                 nearestDuration = formatDuration(routeDurations[1]);
                 nearestDistance = formatDistance(routeDistances[1]);
                 nearestRoute = 2;
+                arrivalDistance = routeDistances[1];
               }
+            }
+            // Zoom to fit start and destination points
+            if (!zoomOnce) {
+              zoomOnce = true;
+              zoomToFit(_mapController, start, destination);
+
+              findingRoute = false;
+              isLoading = false;
             }
           });
         } else {
           retryCount++; //retry
           setState(() {
+            findingRoute = false;
+            isLoading = false;
             nearestDuration = 'Loading . . .';
             nearestDistance = '';
           });
           print('Failed to load routes');
         }
       } catch (e) {
+        if (!mounted) return null;
+        setState(() {
+          findingRoute = false;
+          isLoading = false;
+        });
         retryCount++; //retry
         print('Failed to load routes: ${e}');
       } finally {
         if (!mounted) return null;
         setState(() {
+          findingRoute = false;
           isLoading = false;
         });
       }
@@ -484,6 +587,10 @@ class _C_MapScreenState extends State<C_MapScreen> {
   void resetSelection() {
     setState(() {
       //foundRoute = false;
+      widget.pickupPoint = null;
+      widget.bookID = null;
+      widget.bookStatus = null;
+
       hideScreen = false;
       _currentLocation = null; // current location
       currentLocStreaming = false;
@@ -1002,20 +1109,23 @@ class _C_MapScreenState extends State<C_MapScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                      
                         (!startIsSearching && !destinationIsSearching) ||
                                 startIsSearching ||
                                 !destinationIsSearching
                             ? Row(
                                 children: [
-                                  Icon(Icons.location_on, color: Colors.green, shadows: shadowColor),
+                                  Icon(Icons.location_on,
+                                      color: Colors.green,
+                                      shadows: shadowColor),
                                   SizedBox(width: 3),
                                   Expanded(
                                     child: Container(
-                                      padding: EdgeInsets.only(left: 15,),
+                                      padding: EdgeInsets.only(
+                                        left: 15,
+                                      ),
                                       decoration: BoxDecoration(
-                                        color: white,
-                                        boxShadow: shadowColor,
+                                          color: white,
+                                          boxShadow: shadowColor,
                                           borderRadius:
                                               BorderRadius.circular(5),
                                           border: Border.all(
@@ -1063,14 +1173,15 @@ class _C_MapScreenState extends State<C_MapScreen> {
                                 !startIsSearching
                             ? Row(
                                 children: [
-                                  Icon(Icons.location_on, color: Colors.red, shadows: shadowColor),
+                                  Icon(Icons.location_on,
+                                      color: Colors.red, shadows: shadowColor),
                                   SizedBox(width: 3),
                                   Expanded(
                                     child: Container(
                                       padding: EdgeInsets.only(left: 15),
                                       decoration: BoxDecoration(
-                                        color: white,
-                                        boxShadow: shadowColor,
+                                          color: white,
+                                          boxShadow: shadowColor,
                                           borderRadius:
                                               BorderRadius.circular(5),
                                           border: Border.all(
@@ -1352,9 +1463,65 @@ class _C_MapScreenState extends State<C_MapScreen> {
                   bottom: MediaQuery.of(context).size.height * 0.2,
                   right: 0,
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
+                      //arrival notif
+                      if (user == 'hauler' &&
+                          widget.bookStatus == 'Ongoing' &&
+                          arrivalDistance < 200)
+                        AnimatedBuilder(
+                            animation: _controller,
+                            builder: (context, child) {
+                              return Container(
+                                margin: EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: _colorTweenArrival.value,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Container(
+                                    margin: EdgeInsets.all(7),
+                                    padding: EdgeInsets.all(5.0),
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(10),
+                                        boxShadow: shadowColor),
+                                    child: InkWell(
+                                      onTap: () async {
+                                        if (!isLoading) {
+                                          String? msgArrival =
+                                              await arrivalNotify(
+                                                  widget.bookID!);
+                                          if (msgArrival == 'success') {
+                                            showSuccessSnackBar(context,
+                                                'Sent arrival notif to customer');
+                                          } else {
+                                            showErrorSnackBar(context,
+                                                'Something went wrong. Please try again Later');
+                                          }
+                                        }
+                                      },
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            selectedCurrentName != null
+                                                ? Icons.close
+                                                : Icons.notification_add,
+                                            color: Colors.blue,
+                                            size: 35,
+                                          ),
+                                          Text(' Arrived',
+                                              style: TextStyle(
+                                                  color: blackSoft,
+                                                  fontWeight: FontWeight.bold))
+                                        ],
+                                      ),
+                                    )),
+                              );
+                            }),
+
                       //current location btn
                       Container(
+                          margin: EdgeInsets.all(15),
                           padding: EdgeInsets.all(14.0),
                           decoration: BoxDecoration(
                               color: Colors.white,
@@ -1401,6 +1568,9 @@ class _C_MapScreenState extends State<C_MapScreen> {
                                         true; // Switch to directions mode
                                   });
                                 }
+                              } else {
+                                //added
+                                resetSelection();
                               }
                             },
                             child: Icon(
@@ -1427,6 +1597,59 @@ class _C_MapScreenState extends State<C_MapScreen> {
                     backgroundColor: Colors.deepPurple,
                   ),
                 ),
+              ),
+            ),
+          if (findingRoute)
+            Positioned.fill(
+              child: InkWell(
+                onTap: () {},
+                child: Center(
+                    child: Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  color: white,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.map_outlined, color: greySoft, size: 70),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('Finding Fastest Route',
+                              style: TextStyle(fontSize: 20, color: greySoft)),
+                        ],
+                      ),
+                      AnimatedBuilder(
+                          animation: _controller,
+                          builder: (context, child) {
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Icon(Icons.location_pin,
+                                    color: blackSoft, size: 35),
+                                Icon(Icons.circle,
+                                    color: _colorTween1.value, size: 15),
+                                SizedBox(width: 20),
+                                Icon(Icons.circle,
+                                    color: _colorTween2.value, size: 15),
+                                SizedBox(width: 20),
+                                Icon(Icons.circle,
+                                    color: _colorTween3.value, size: 15),
+                                SizedBox(width: 20),
+                                Icon(Icons.circle,
+                                    color: _colorTween4.value, size: 15),
+                                SizedBox(width: 20),
+                                Icon(Icons.circle,
+                                    color: _colorTween5.value, size: 15),
+                                Icon(Icons.location_pin,
+                                    color: blackSoft, size: 35)
+                              ],
+                            );
+                          }),
+                    ],
+                  ),
+                )),
               ),
             ),
         ],

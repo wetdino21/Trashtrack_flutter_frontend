@@ -1020,7 +1020,7 @@ Future<Map<String, List<Map<String, dynamic>>>?> fetchCurrentPickup() async {
 
   // try {
   final response = await http.post(
-    Uri.parse('$baseUrl/fetch_current_pickup'),
+    Uri.parse('$baseUrl/fetch_hauler_pickup'),
     headers: {
       'Authorization': 'Bearer $accessToken',
     },
@@ -1036,9 +1036,18 @@ Future<Map<String, List<Map<String, dynamic>>>?> fetchCurrentPickup() async {
         List<Map<String, dynamic>>.from(data['booking']);
     List<Map<String, dynamic>> wasteTypeList =
         List<Map<String, dynamic>>.from(data['wasteTypes']);
+    List<Map<String, dynamic>> bookingList2 =
+        List<Map<String, dynamic>>.from(data['booking2']);
+    List<Map<String, dynamic>> wasteTypeList2 =
+        List<Map<String, dynamic>>.from(data['wasteTypes2']);
 
     // Optionally: Combine them if needed or pass them individually
-    return {'booking': bookingList, 'wasteTypes': wasteTypeList};
+    return {
+      'booking': bookingList,
+      'wasteTypes': wasteTypeList,
+      'booking2': bookingList2,
+      'wasteTypes2': wasteTypeList2
+    };
   } else {
     if (response.statusCode == 401) {
       // Access token might be expired, attempt to refresh it
@@ -1308,5 +1317,166 @@ Future<String?> reactivate() async {
   } else {
     print('Error response: ${response.body}');
     return response.body;
+  }
+}
+
+// arrival notif
+Future<String?> arrivalNotify(int bookID) async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+
+  if (accessToken == null) {
+    print('No access token available. User needs to log in.');
+    await deleteTokens();
+    return null;
+  }
+
+  try {
+    final response = await http.post(
+      Uri.parse('$baseUrl/arrival_notif'), // Updated endpoint
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({'bk_id': bookID}),
+    );
+
+    if (response.statusCode == 200) {
+      return 'success';
+    } else {
+      if (response.statusCode == 401) {
+        // Access token might be expired, attempt to refresh it
+        print('Access token expired. Attempting to refresh...');
+        String? refreshMsg = await refreshAccessToken();
+        if (refreshMsg == null) {
+          return await arrivalNotify(bookID);
+        } else {
+          // Refresh token is invalid or expired, logout the user
+          await deleteTokens(); // Logout user
+          return null;
+        }
+      } else if (response.statusCode == 403) {
+        // Access token is invalid. Logout
+        print('Access token invalid. Attempting to logout...');
+        await deleteTokens(); // Logout user
+      } else if (response.statusCode == 404) {
+        print('notify arrival failed');
+        return null;
+      }
+
+      print('Response: ${response.body}');
+      return null;
+    }
+  } catch (e) {
+    print('Error occurred: $e'); // Handle exceptions
+    return null;
+  }
+}
+
+// read notification
+Future<String?> readNotif(int notif_id) async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+
+  if (accessToken == null) {
+    print('No access token available. User needs to log in.');
+    await deleteTokens();
+    return null;
+  }
+
+  try {
+    final response = await http.post(
+      Uri.parse('$baseUrl/read_notification'), // Updated endpoint
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({'notif_id': notif_id}),
+    );
+
+    if (response.statusCode == 200) {
+      return 'success';
+    } else {
+      if (response.statusCode == 401) {
+        // Access token might be expired, attempt to refresh it
+        print('Access token expired. Attempting to refresh...');
+        String? refreshMsg = await refreshAccessToken();
+        if (refreshMsg == null) {
+          return await readNotif(notif_id);
+        } else {
+          // Refresh token is invalid or expired, logout the user
+          await deleteTokens(); // Logout user
+          return null;
+        }
+      } else if (response.statusCode == 403) {
+        // Access token is invalid. Logout
+        print('Access token invalid. Attempting to logout...');
+        await deleteTokens(); // Logout user
+      } else if (response.statusCode == 404) {
+        return null;
+      }
+
+      print('Response: ${response.body}');
+      return null;
+    }
+  } catch (e) {
+    print('Error occurred: $e'); // Handle exceptions
+    return null;
+  }
+}
+
+// total request cus
+Future<int?> totalPickupRequest() async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+
+  if (accessToken == null) {
+    print('No access token available. User needs to log in.');
+    await deleteTokens();
+    return null;
+  }
+
+  try {
+    final response = await http.post(
+      Uri.parse('$baseUrl/total_pickup_request'), // Updated endpoint
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final responseBody = jsonDecode(response.body);
+      if (responseBody != null && responseBody['total'] != null) {
+        return int.tryParse(
+            responseBody['total'].toString()); // Ensure it's an int
+      }
+      return null;
+    } else {
+      if (response.statusCode == 401) {
+        // Access token might be expired, attempt to refresh it
+        print('Access token expired. Attempting to refresh...');
+        String? refreshMsg = await refreshAccessToken();
+        if (refreshMsg == null) {
+          return await totalPickupRequest();
+        } else {
+          // Refresh token is invalid or expired, logout the user
+          await deleteTokens(); // Logout user
+          return null;
+        }
+      } else if (response.statusCode == 403) {
+        // Access token is invalid. Logout
+        print('Access token invalid. Attempting to logout...');
+        await deleteTokens(); // Logout user
+      } else if (response.statusCode == 404) {
+        return null;
+      }
+
+      print('Response: ${response.body}');
+      return null;
+    }
+  } catch (e) {
+    print('Error occurred: $e'); // Handle exceptions
+    return null;
   }
 }

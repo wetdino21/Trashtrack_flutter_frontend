@@ -464,9 +464,9 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
           // isLoading = false;
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to load waste categories')),
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text('Failed to load waste categories')),
+        // );
       }
     } catch (e) {
       if (!mounted) return;
@@ -632,6 +632,10 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
 
 ////
   void _confirmDiscardUpdateBooking() {
+    if (bookingWasteList == null) {
+      Navigator.of(context).pop();
+      return;
+    }
     // check if nothing change
     bool isWasteEqual = const DeepCollectionEquality().equals(
       _selectedWasteTypes,
@@ -2039,105 +2043,105 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                       ),
                                     ),
                               _labelValidator(wasteCatValidator),
-
-                              Container(
-                                padding: EdgeInsets.all(10),
-                                margin: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: Colors.grey[200],
-                                    boxShadow: shadowBigColor),
-                                child: Container(
+                              if (bookingData!['bk_status'] == 'Pending' || bookingData!['bk_status'] == 'Ongoing')
+                                Container(
                                   padding: EdgeInsets.all(10),
+                                  margin: EdgeInsets.all(10),
                                   decoration: BoxDecoration(
-                                      color: Colors.white,
                                       borderRadius: BorderRadius.circular(10),
-                                      boxShadow: shadowColor),
-                                  child: Column(
-                                    children: [
-                                      Center(
-                                          child: Text(
-                                        'Payment later with',
-                                        style: TextStyle(color: grey),
-                                      )),
-                                      Image.asset('assets/paymongo.png'),
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(5),
-                                            child: ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                child: Container(
-                                                    height: 50,
-                                                    width: 50,
-                                                    child: Image.asset(
-                                                      'assets/visa.png',
-                                                      scale: 2,
-                                                    ))),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(5),
-                                            child: ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                child: Container(
-                                                    height: 50,
-                                                    width: 50,
-                                                    child: Image.asset(
-                                                      'assets/gcash.png',
-                                                      scale: 2,
-                                                    ))),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(5),
-                                            child: ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                child: Container(
-                                                    height: 50,
-                                                    width: 50,
-                                                    child: Image.asset(
-                                                      'assets/paymaya.png',
-                                                      scale: 2,
-                                                    ))),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(5),
-                                            child: ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                child: Container(
-                                                    height: 50,
-                                                    width: 50,
-                                                    child: Image.asset(
-                                                      'assets/grabpay.png',
-                                                      scale: 2,
-                                                    ))),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(5),
-                                            child: ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                child: Container(
-                                                    height: 50,
-                                                    width: 50,
-                                                    child: Image.asset(
-                                                      'assets/methods.png',
-                                                      scale: 2,
-                                                    ))),
-                                          ),
-                                        ],
-                                      )
-                                    ],
+                                      color: Colors.grey[200],
+                                      boxShadow: shadowBigColor),
+                                  child: Container(
+                                    padding: EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(10),
+                                        boxShadow: shadowColor),
+                                    child: Column(
+                                      children: [
+                                        Center(
+                                            child: Text(
+                                          'Payment later with Cash /with',
+                                          style: TextStyle(color: grey),
+                                        )),
+                                        Image.asset('assets/paymongo.png'),
+                                        Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.all(5),
+                                              child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  child: Container(
+                                                      height: 50,
+                                                      width: 50,
+                                                      child: Image.asset(
+                                                        'assets/visa.png',
+                                                        scale: 2,
+                                                      ))),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.all(5),
+                                              child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  child: Container(
+                                                      height: 50,
+                                                      width: 50,
+                                                      child: Image.asset(
+                                                        'assets/gcash.png',
+                                                        scale: 2,
+                                                      ))),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.all(5),
+                                              child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  child: Container(
+                                                      height: 50,
+                                                      width: 50,
+                                                      child: Image.asset(
+                                                        'assets/paymaya.png',
+                                                        scale: 2,
+                                                      ))),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.all(5),
+                                              child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  child: Container(
+                                                      height: 50,
+                                                      width: 50,
+                                                      child: Image.asset(
+                                                        'assets/grabpay.png',
+                                                        scale: 2,
+                                                      ))),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.all(5),
+                                              child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  child: Container(
+                                                      height: 50,
+                                                      width: 50,
+                                                      child: Image.asset(
+                                                        'assets/methods.png',
+                                                        scale: 2,
+                                                      ))),
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
                               SizedBox(height: 10),
 
                               _isEditing

@@ -153,6 +153,7 @@ Future<Map<String, dynamic>> userDataFromHive() async {
     'auth': box.get('auth'),
     'profile': box.get('profile'),
     'address': box.get('address'),
+    'notif_count': box.get('notif_count'),
   };
   // Optionally, print a message or handle UI updates
   print('Data has been retrieved from Hive.');

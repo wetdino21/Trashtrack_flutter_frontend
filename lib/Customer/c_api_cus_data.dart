@@ -78,7 +78,7 @@ Future<String?> fetchProfile(BuildContext context) async {
   }
 
   final response = await http.post(
-    Uri.parse('$baseUrl/customer/fetch_profile'),
+    Uri.parse('$baseUrl/fetch_profile'),
     headers: {
       'Authorization': 'Bearer $accessToken',
     },

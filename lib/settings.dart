@@ -33,10 +33,10 @@ class _C_SettingsScreenState extends State<C_SettingsScreen> {
       ),
       body: ListView(
         children: [
-          SizedBox(height: 20),
           Container(
             margin: EdgeInsets.all(16.0),
             //padding: EdgeInsets.all(10.0),
+            height: MediaQuery.of(context).size.height * 0.8,
             decoration: boxDecorationBig,
             child: Material(
               color: Colors.transparent,

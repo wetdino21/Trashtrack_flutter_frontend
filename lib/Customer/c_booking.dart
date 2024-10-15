@@ -1368,7 +1368,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                 children: [
                                   Center(
                                       child: Text(
-                                    'Payment later with',
+                                    'Payment later with Cash /with',
                                     style: TextStyle(color: Colors.grey),
                                   )),
                                   Image.asset('assets/paymongo.png'),
@@ -1724,6 +1724,10 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
   }
 
   void _backFromBooking() {
+    if (userData == null) {
+      Navigator.of(context).pop();
+      return;
+    }
     if (_fullnameController.text !=
             ((userData!['cus_fname']) +
                 ' ' +

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -1896,24 +1897,75 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
       final Uint8List? imageBytes) {
     return Scaffold(
       appBar: AppBar(),
-      body: Center(
-        child: imageFile != null
-            ? Image.file(File(imageFile.path))
-            : imageBytes != null
-                ? Image.memory(imageBytes)
-                : Container(
-                    padding: EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                        color: deepPurple,
-                        borderRadius: BorderRadius.circular(100)),
-                    child: Icon(
-                      Icons.person,
-                      size: 100,
-                      color: white,
-                    ),
-                  ),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Container(
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                // Blurred background
+                imageFile != null
+                    ? Image.file(
+                        File(imageFile.path),
+                        fit: BoxFit.cover,
+                      )
+                    : imageBytes != null
+                        ? Image.memory(
+                            imageBytes,
+                            fit: BoxFit.cover,
+                          )
+                        : Container(),
+                BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                  child: Container(),
+                ),
+              ],
+            ),
+          ),
+          // Center content with the image or icon
+          Center(
+            child: Container(
+              child: imageFile != null
+                  ? Image.file(File(imageFile.path))
+                  : imageBytes != null
+                      ? Image.memory(imageBytes)
+                      : Container(
+                          padding: EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                              color: Colors.deepPurple,
+                              borderRadius: BorderRadius.circular(100)),
+                          child: Icon(
+                            Icons.person,
+                            size: 100,
+                            color: Colors.white,
+                          ),
+                        ),
+            ),
+          ),
+        ],
       ),
     );
+    // return Scaffold(
+    //   appBar: AppBar(),
+    //   body: Center(
+    //     child: imageFile != null
+    //         ? Image.file(File(imageFile.path))
+    //         : imageBytes != null
+    //             ? Image.memory(imageBytes)
+    //             : Container(
+    //                 padding: EdgeInsets.all(20),
+    //                 decoration: BoxDecoration(
+    //                     color: deepPurple,
+    //                     borderRadius: BorderRadius.circular(100)),
+    //                 child: Icon(
+    //                   Icons.person,
+    //                   size: 100,
+    //                   color: white,
+    //                 ),
+    //               ),
+    //   ),
+    // );
   }
 
   Widget _buildTextField({

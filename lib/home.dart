@@ -25,12 +25,13 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
   bool isLoading = true;
   String? errorMessage;
 
-  final Object _obj = Object(
-    scale: Vector3(11.0, 11.0, 11.0),
-    //position: Vector3(0, 0, 0),
-    rotation: Vector3(0, -90, 0), // Start sideways
-    fileName: 'assets/objects/base.obj',
-  );
+  // final Object _obj = Object(
+  //   scale: Vector3(11.0, 11.0, 11.0),
+  //   //position: Vector3(0, 0, 0),
+  //   rotation: Vector3(0, -90, 0), // Start sideways
+  //   fileName: 'assets/objects/base.obj',
+  // );
+  Object? _obj;
   UserModel? userModel;
 
   @override
@@ -43,10 +44,12 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
   void initState() {
     super.initState();
     _dbData();
+    _objLoad();
   }
 
   @override
   void dispose() {
+    _obj!.remove(_obj!);
     super.dispose();
   }
 
@@ -66,6 +69,20 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
       //   errorMessage = e.toString();
       //   isLoading = false;
       // });
+    }
+  }
+
+  // Fetch user data from the server
+  Future<void> _objLoad() async {
+    try {
+      _obj = Object(
+        scale: Vector3(11.0, 11.0, 11.0),
+        //position: Vector3(0, 0, 0),
+        rotation: Vector3(0, -90, 0), // Start sideways
+        fileName: 'assets/objects/base.obj',
+      );
+    } catch (e) {
+      print(e.toString());
     }
   }
 
@@ -127,7 +144,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                                   padding: EdgeInsets.all(16.0),
                                   decoration: BoxDecoration(
                                       color: Colors.white,
-                                      borderRadius: BorderRadius.circular(10.0),
+                                      borderRadius: BorderRadius.circular(20.0),
                                       boxShadow: shadowBigColor),
                                   child: Column(
                                     crossAxisAlignment:
@@ -171,14 +188,16 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                                               Expanded(
                                                 flex: 8,
                                                 child: Container(
-                                                  height: 200,
-                                                  child: Cube(
-                                                    onSceneCreated:
-                                                        (Scene scene) {
-                                                      scene.world.add(_obj);
-                                                    },
-                                                  ),
-                                                ),
+                                                    height: 200,
+                                                    child: _obj != null
+                                                        ? Cube(
+                                                            onSceneCreated:
+                                                                (Scene scene) {
+                                                              scene.world
+                                                                  .add(_obj!);
+                                                            },
+                                                          )
+                                                        : Container()),
                                               ),
                                               Expanded(
                                                 flex: 1,
@@ -264,7 +283,9 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                                       title: user == 'customer'
                                           ? 'Total Requests'
                                           : 'Total Pickup',
-                                      value: userModel!.totalRequest.toString()??  '150',
+                                      value:
+                                          userModel!.totalRequest.toString() ??
+                                              '150',
                                       iconColor: accentColor,
                                     ),
                                     StatisticBox(
@@ -339,7 +360,7 @@ class StatisticBox extends StatelessWidget {
       decoration: BoxDecoration(
         color: white,
         boxShadow: shadowMidColor,
-        borderRadius: BorderRadius.circular(50),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

@@ -11,8 +11,8 @@ import 'package:trashtrack/Customer/c_payment.dart';
 import 'package:trashtrack/data_model.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:trashtrack/user_hive_data.dart';
-import 'package:logger/logger.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:trashtrack/vehicle.dart';
 
 class MainApp extends StatefulWidget {
   final int? selectedIndex;
@@ -28,7 +28,6 @@ class MainApp extends StatefulWidget {
 
 class _MainAppState extends State<MainApp> {
   final AudioService _audioService = AudioService(); //from modal
-  final Logger logger = Logger();
   //user data
   Map<String, dynamic>? userData;
   String? user;
@@ -101,7 +100,13 @@ class _MainAppState extends State<MainApp> {
           bookID: widget.bookID,
           bookStatus: widget.bookStatus),
       C_ScheduleScreen(),
-      C_PaymentScreen(),
+      user == null
+          ? Container()
+          : user == 'customer'
+              ? C_PaymentScreen()
+              : user == 'hauler'
+                  ? VehicleScreen()
+                  : Container(),
     ];
   }
   // final List<Widget> _pages = [
@@ -163,7 +168,9 @@ class _MainAppState extends State<MainApp> {
                             : user == 'hauler'
                                 ? 'Vehicle'
                                 : 'Payment'),
-            body: _pages[_selectedIndex],
+            body: Loading
+                ? const CircularProgressIndicator()
+                : _pages[_selectedIndex],
             bottomNavigationBar: C_BottomNavBar(
               currentIndex: _selectedIndex,
               onTap: _onItemTapped,

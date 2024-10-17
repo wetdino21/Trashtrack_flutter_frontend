@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:trashtrack/api_network.dart';
@@ -16,6 +18,13 @@ Future<void> _launchPaymentUrl(String url) async {
     throw Exception('Could not launch $uri');
   }
 }
+
+// Future<void> _launchPaymentUrl(String url) async {
+//   final Uri uri = Uri.parse(url);
+//   if (!await launchUrl(uri, mode: LaunchMode.inAppWebView)) {
+//     throw Exception('Could not launch $uri');
+//   }
+// }
 
 // Function to create payment intent and get checkout URL
 Future<void> launchPaymentLink(BuildContext context) async {
@@ -50,7 +59,7 @@ Future<void> launchPaymentLink(BuildContext context) async {
       final checkoutUrl = data['checkoutUrl'];
       if (checkoutUrl != null) {
         // Open the checkout URL
-        await _launchPaymentUrl(checkoutUrl);
+        //await _launchPaymentUrl(checkoutUrl);
       } else {
         throw Exception('No checkout URL in the response');
       }
@@ -83,19 +92,20 @@ Future<void> launchPaymentLink(BuildContext context) async {
   }
 }
 
-Future<void> launchPaymentLink2(BuildContext context) async {
+//final
+Future<String?> launchPaymentLinkSession(BuildContext context) async {
   final tokens = await getTokens();
   String? accessToken = tokens['access_token'];
   if (accessToken == null) {
     print('No access token available. User needs to log in.');
     await deleteTokens(); // Logout user
-    return;
+    return null;
   }
 
   try {
     // API call to backend to create payment intent
     final response = await http.post(
-      Uri.parse('$baseUrl/payment_link2'), // Backend endpoint
+      Uri.parse('$baseUrl/payment_link_Session'), // Backend endpoint
       headers: {
         'Authorization': 'Bearer $accessToken',
         'Content-Type': 'application/json',
@@ -107,13 +117,18 @@ Future<void> launchPaymentLink2(BuildContext context) async {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-
-      // Get the checkoutUrl from the response
       final checkoutUrl = data['checkoutUrl'];
-      print(checkoutUrl);
-      if (checkoutUrl != null) {
-        // Open the checkout URL
-        await _launchPaymentUrl(checkoutUrl);
+      final sessionId = data['sessionId'];
+
+      if (data != null) {
+        if (checkoutUrl != null) {
+          // Open the checkout URL
+          await _launchPaymentUrl(checkoutUrl);
+          //fetch
+          return sessionId;
+        } else {
+          throw Exception('No checkout URL in the response');
+        }
       } else {
         throw Exception('No checkout URL in the response');
       }
@@ -123,7 +138,7 @@ Future<void> launchPaymentLink2(BuildContext context) async {
         print('Access token expired. Attempting to refresh...');
         String? refreshMsg = await refreshAccessToken();
         if (refreshMsg == null) {
-          return await launchPaymentLink2(context);
+          return await launchPaymentLinkSession(context);
         }
       } else if (response.statusCode == 403) {
         // Access token is invalid. Logout
@@ -137,10 +152,10 @@ Future<void> launchPaymentLink2(BuildContext context) async {
       }
     }
     print('Unable to access the link!');
-    return;
+    return null;
   } catch (error) {
     print('Error: $error');
-    showErrorSnackBar(context, 'Error payment link');
+    return null;
   }
   // finally {
   //   setState(() {
@@ -148,21 +163,19 @@ Future<void> launchPaymentLink2(BuildContext context) async {
   //   });
   // }
 }
+//////////////////////////
 
-/////
-Future<void> checkPaymentStatus(
-    BuildContext context, String paymentIntentId) async {
+Future<String?> checkPaymentStatus(String sessionId) async {
   final tokens = await getTokens();
   String? accessToken = tokens['access_token'];
   if (accessToken == null) {
     print('No access token available. User needs to log in.');
     await deleteTokens(); // Logout user
-    return;
+    return null;
   }
-
   try {
     final response = await http.get(
-      Uri.parse('$baseUrl/payment_status/$paymentIntentId'),
+      Uri.parse('$baseUrl/payment_status/$sessionId'),
       headers: {
         'Authorization': 'Bearer $accessToken',
         'Content-Type': 'application/json',
@@ -172,26 +185,134 @@ Future<void> checkPaymentStatus(
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final paymentStatus = data['status'];
-      print(paymentStatus);
+
       if (paymentStatus == 'paid') {
-        print('Payment successful');
-      } else if (paymentStatus == 'failed') {
-        print('Payment failed');
+        return 'success';
+      } else {
+        return 'failed';
       }
     } else {
-      throw Exception('Failed to fetch payment status');
+      if (response.statusCode == 401) {
+        // Access token might be expired, attempt to refresh it
+        print('Access token expired. Attempting to refresh...');
+        String? refreshMsg = await refreshAccessToken();
+        if (refreshMsg == null) {
+          return await checkPaymentStatus(sessionId);
+        }
+      } else if (response.statusCode == 403) {
+        // Access token is invalid. Logout
+        print('Access token invalid. Attempting to logout...');
+        await deleteTokens(); // Logout user
+      } else {
+        print('Error updating user: ${response.body}');
+      }
     }
   } catch (error) {
-    print('Error: $error');
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('Error checking payment status'),
-    ));
+    print('Error checking payment status: $error');
+    //showErrorSnackBar(context, 'Error checking payment status');
   }
+  return null;
 }
 
+// Future<void> launchPaymentLinkSession(BuildContext context) async {
+//   final tokens = await getTokens();
+//   String? accessToken = tokens['access_token'];
+//   if (accessToken == null) {
+//     print('No access token available. User needs to log in.');
+//     await deleteTokens(); // Logout user
+//     return;
+//   }
+
+//   try {
+//     final response = await http.post(
+//       Uri.parse('$baseUrl/payment_link_Session'),
+//       headers: {
+//         'Authorization': 'Bearer $accessToken',
+//         'Content-Type': 'application/json',
+//       },
+//       body: jsonEncode({
+//         'amount': 10000, // 100.00 PHP (amount in centavos)
+//       }),
+//     );
+
+//     if (response.statusCode == 200) {
+//       final data = jsonDecode(response.body);
+//       final checkoutUrl = data['checkoutUrl'];
+//       final sessionId = data['sessionId'];
+
+//       if (data != null) {
+//         await _launchPaymentUrl(checkoutUrl, sessionId);
+
+//         // Poll for payment status
+//         //await checkPaymentStatus(sessionId);
+//       } else {
+//         throw Exception('No checkout URL in the response');
+//       }
+//     } else {
+//       if (response.statusCode == 401) {
+//         print('Access token expired. Attempting to refresh...');
+//         String? refreshMsg = await refreshAccessToken();
+//         if (refreshMsg == null) {
+//           return await launchPaymentLinkSession(context);
+//         }
+//       } else if (response.statusCode == 403) {
+//         print('Access token invalid. Attempting to logout...');
+//         showErrorSnackBar(
+//             context, 'Active time has been expired. Please login again.');
+//         await deleteTokens(); // Logout user
+//       } else {
+//         print('Error updating user: ${response.body}');
+//         showErrorSnackBar(context, 'Error updating user: ${response.body}');
+//       }
+//     }
+//   } catch (error) {
+//     print('Error: $error');
+//     showErrorSnackBar(context, 'Error payment link');
+//   }
+// }
+
+/////
+// Future<void> checkPaymentStatus(
+//     BuildContext context, String paymentIntentId) async {
+//   final tokens = await getTokens();
+//   String? accessToken = tokens['access_token'];
+//   if (accessToken == null) {
+//     print('No access token available. User needs to log in.');
+//     await deleteTokens(); // Logout user
+//     return;
+//   }
+
+//   try {
+//     final response = await http.get(
+//       Uri.parse('$baseUrl/payment_link_status/$paymentIntentId'),
+//       headers: {
+//         'Authorization': 'Bearer $accessToken',
+//         'Content-Type': 'application/json',
+//       },
+//     );
+
+//     if (response.statusCode == 200) {
+//       final data = jsonDecode(response.body);
+//       final paymentStatus = data['status'];
+//       print(paymentStatus);
+//       if (paymentStatus == 'paid') {
+//         print('Payment successful');
+//       } else if (paymentStatus == 'failed') {
+//         print('Payment failed');
+//       }
+//     } else {
+//       throw Exception('Failed to fetch payment status');
+//     }
+//   } catch (error) {
+//     print('Error: $error');
+//     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+//       content: Text('Error checking payment status'),
+//     ));
+//   }
+// }
 
 //
- // Initialize App Links for deep linking
+// Initialize App Links for deep linking
 // Future<void> initAppLinks(BuildContext context) async {
 //   final appLinks = AppLinks();
 
@@ -214,7 +335,7 @@ Future<void> checkPaymentStatus(
 //   if (link != null) {
 //     // Convert the Uri to a string for comparison
 //     String linkString = link.toString();
-    
+
 //     if (linkString.contains('/success')){
 //       print('successss');
 //       ScaffoldMessenger.of(context).showSnackBar(
@@ -228,7 +349,3 @@ Future<void> checkPaymentStatus(
 //     }
 //   }
 // }
-
-
-
-

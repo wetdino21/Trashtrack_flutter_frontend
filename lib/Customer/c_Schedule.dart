@@ -171,19 +171,24 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  padding: EdgeInsets.all(20.0),
-                  margin: EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    color: white,
-                    borderRadius: BorderRadius.circular(20.0),
+                if (user != null)
+                  Container(
+                    padding: EdgeInsets.all(20.0),
+                    margin: EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      color: white,
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    child: Text(
+                      user == 'customer'
+                          ? 'Book now?'
+                          : user == 'hauler'
+                              ? 'Pickup Waste?'
+                              : '',
+                      style: TextStyle(
+                          fontSize: 16.0, fontWeight: FontWeight.bold),
+                    ),
                   ),
-                  child: Text(
-                    user == 'customer' ? 'Book now?' : 'Pickup Waste?',
-                    style:
-                        TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-                  ),
-                ),
                 Center(
                   child: Container(
                     decoration: BoxDecoration(boxShadow: shadowColor),
@@ -735,12 +740,14 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                                       },
                                     )
                                   : ListView.builder(
-                                      itemCount: bookingListHistory?.length == null
-                                          ? 0
-                                          : bookingListHistory!.length,
+                                      itemCount:
+                                          bookingListHistory?.length == null
+                                              ? 0
+                                              : bookingListHistory!.length,
                                       itemBuilder: (context, index) {
                                         // Safely retrieve the booking details from bookingList
-                                        final booking = bookingListHistory?[index];
+                                        final booking =
+                                            bookingListHistory?[index];
 
                                         if (booking == null) {
                                           return SizedBox.shrink();
@@ -766,7 +773,8 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                                         if (bookingWasteListHistory != null) {
                                           List<Map<String, dynamic>>
                                               filteredWasteList =
-                                              bookingWasteListHistory!.where((waste) {
+                                              bookingWasteListHistory!
+                                                  .where((waste) {
                                             return waste['bk_id'] ==
                                                 booking['bk_id'];
                                           }).toList();

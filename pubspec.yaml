@@ -65,6 +65,11 @@ dependencies:
   logger: ^2.4.0
   audioplayers: ^6.1.0
 
+  path_provider: ^2.1.4
+  #pdf_viewer_plugin: ^2.0.1
+  open_file: ^3.5.9
+  permission_handler: ^11.3.1
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

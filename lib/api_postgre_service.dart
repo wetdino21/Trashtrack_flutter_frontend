@@ -1480,3 +1480,98 @@ Future<int?> totalPickupRequest() async {
     return null;
   }
 }
+
+//fetch billing
+Future<List<Map<String, dynamic>>?> fetchBill() async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+
+  if (accessToken == null) {
+    print('No access token available. User needs to log in.');
+    await deleteTokens();
+    return null;
+  }
+
+  final response = await http.post(
+    Uri.parse('$baseUrl/fetch_bill'),
+    headers: {
+      'Authorization': 'Bearer $accessToken',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    List<dynamic> decodedList = jsonDecode(response.body);
+    return decodedList.map((item) => item as Map<String, dynamic>).toList();
+  } else {
+    if (response.statusCode == 401) {
+      // Access token might be expired, attempt to refresh it
+      print('Access token expired. Attempting to refresh...');
+      String? refreshMsg = await refreshAccessToken();
+      if (refreshMsg == null) {
+        return await fetchBill();
+      } else {
+        // Refresh token is invalid or expired, logout the user
+        await deleteTokens(); // Logout user
+        return null;
+      }
+    } else if (response.statusCode == 403) {
+      // Access token is invalid. logout
+      print('Access token invalid. Attempting to logout...');
+      await deleteTokens(); // Logout user
+    } else if (response.statusCode == 404) {
+      print('No notification found');
+      return null;
+    }
+
+    print('Response: ${response.body}');
+    return null;
+  }
+}
+
+//fetch billing
+Future<Map<String, dynamic>?> fetchBillDetails(int billId) async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+
+  if (accessToken == null) {
+    print('No access token available. User needs to log in.');
+    await deleteTokens();
+    return null;
+  }
+
+  final response = await http.post(
+    Uri.parse('$baseUrl/fetch_bill_details'),
+    headers: {
+      'Authorization': 'Bearer $accessToken',
+      'Content-Type': 'application/json',
+    },
+    body: jsonEncode({'billId': billId}),
+  );
+
+  if (response.statusCode == 200) {
+    return jsonDecode(response.body);
+  } else {
+    if (response.statusCode == 401) {
+      // Access token might be expired, attempt to refresh it
+      print('Access token expired. Attempting to refresh...');
+      String? refreshMsg = await refreshAccessToken();
+      if (refreshMsg == null) {
+        return await fetchBillDetails(billId);
+      } else {
+        // Refresh token is invalid or expired, logout the user
+        await deleteTokens(); // Logout user
+        return null;
+      }
+    } else if (response.statusCode == 403) {
+      // Access token is invalid. logout
+      print('Access token invalid. Attempting to logout...');
+      await deleteTokens(); // Logout user
+    } else if (response.statusCode == 404) {
+      print('No notification found');
+      return null;
+    }
+
+    print('Response: ${response.body}');
+    return null;
+  }
+}

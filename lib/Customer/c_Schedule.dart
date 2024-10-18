@@ -60,6 +60,7 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
   void dispose() {
     TickerCanceled;
     _controller.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
@@ -236,7 +237,7 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                 decoration: BoxDecoration(
                   color: white,
                   boxShadow: shadowMidColor,
-                  borderRadius: BorderRadius.circular(5.0),
+                  borderRadius: BorderRadius.circular(50),
                 ),
                 child: Row(
                   children: [
@@ -249,7 +250,7 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                             backgroundColor:
                                 selectedPage == 0 ? Colors.deepPurple : white,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(5.0),
+                              borderRadius: BorderRadius.horizontal(left: Radius.circular(50)),
                             ),
                           ),
                           child: Text(
@@ -272,7 +273,7 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                             backgroundColor:
                                 selectedPage == 1 ? Colors.deepPurple : white,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(5.0),
+                              borderRadius: BorderRadius.horizontal(right: Radius.circular(50)),
                             ),
                           ),
                           child: Text(

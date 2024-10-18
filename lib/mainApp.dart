@@ -19,6 +19,7 @@ class MainApp extends StatefulWidget {
   LatLng? pickupPoint;
   int? bookID;
   String? bookStatus;
+  bool _isDelayed = false;
 
   MainApp({this.selectedIndex, this.pickupPoint, this.bookID, this.bookStatus});
 
@@ -34,6 +35,8 @@ class _MainAppState extends State<MainApp> {
 
   int _selectedIndex = 0;
   bool Loading = false;
+  bool _isDelayed = false;
+  bool firstLoad = true;
 
   @override
   void initState() {
@@ -117,6 +120,38 @@ class _MainAppState extends State<MainApp> {
   // ];
 
   void _onItemTapped(int index) {
+    if (firstLoad) {
+      Future.delayed(Duration(milliseconds: 700), () {
+        setState(() {
+          firstLoad = false;
+        });
+      });
+    }
+
+    if (_isDelayed) return; // If delayed, prevent action
+
+    if (index == 0) {
+      _isDelayed = true;
+      _playSound();
+      setState(() {
+        _selectedIndex = index;
+      });
+      Future.delayed(Duration(milliseconds: 700), () {
+        setState(() {
+          _isDelayed = false;
+        });
+      });
+    } else {
+      // Normal behavior for other indices
+      if (_selectedIndex != index) {
+        _playSound();
+        setState(() {
+          _selectedIndex = index;
+        });
+      }
+    }
+
+    // Reset data if index is not 1
     if (index != 1) {
       setState(() {
         widget.pickupPoint = null; // Reset pickupPoint
@@ -124,14 +159,24 @@ class _MainAppState extends State<MainApp> {
         widget.bookStatus = null;
       });
     }
-
-    if (_selectedIndex != index) {
-      _playSound();
-      setState(() {
-        _selectedIndex = index; // Update the selected index when tapped
-      });
-    }
   }
+
+  // void _onItemTapped(int index) {
+  //   if (index != 1) {
+  //     setState(() {
+  //       widget.pickupPoint = null; // Reset pickupPoint
+  //       widget.bookID = null;
+  //       widget.bookStatus = null;
+  //     });
+  //   }
+
+  //   if (_selectedIndex != index) {
+  //     _playSound();
+  //     setState(() {
+  //       _selectedIndex = index; // Update the selected index when tapped
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {

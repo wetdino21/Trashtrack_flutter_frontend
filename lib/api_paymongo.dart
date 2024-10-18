@@ -93,7 +93,7 @@ Future<void> launchPaymentLink(BuildContext context) async {
 }
 
 //final
-Future<String?> launchPaymentLinkSession(BuildContext context) async {
+Future<String?> launchPaymentLinkSession(int? gb_id) async {
   final tokens = await getTokens();
   String? accessToken = tokens['access_token'];
   if (accessToken == null) {
@@ -112,6 +112,7 @@ Future<String?> launchPaymentLinkSession(BuildContext context) async {
       },
       body: jsonEncode({
         'amount': 10000, // 100.00 PHP (amount in centavos)
+        'gb_id': gb_id
       }),
     );
 
@@ -138,17 +139,16 @@ Future<String?> launchPaymentLinkSession(BuildContext context) async {
         print('Access token expired. Attempting to refresh...');
         String? refreshMsg = await refreshAccessToken();
         if (refreshMsg == null) {
-          return await launchPaymentLinkSession(context);
+          return await launchPaymentLinkSession(gb_id);
         }
       } else if (response.statusCode == 403) {
         // Access token is invalid. Logout
         print('Access token invalid. Attempting to logout...');
-        showErrorSnackBar(
-            context, 'Active time has been expired. Please login again.');
+        //showErrorSnackBar(context, 'Active time has been expired. Please login again.');
         await deleteTokens(); // Logout user
       } else {
         print('Error updating user: ${response.body}');
-        showErrorSnackBar(context, 'Error updating user: ${response.body}');
+        // showErrorSnackBar(context, 'Error updating user: ${response.body}');
       }
     }
     print('Unable to access the link!');

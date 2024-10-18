@@ -25,13 +25,13 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
   bool isLoading = true;
   String? errorMessage;
 
-  // final Object _obj = Object(
-  //   scale: Vector3(11.0, 11.0, 11.0),
-  //   //position: Vector3(0, 0, 0),
-  //   rotation: Vector3(0, -90, 0), // Start sideways
-  //   fileName: 'assets/objects/base.obj',
-  // );
-  Object? _obj;
+  final Object _obj = Object(
+    scale: Vector3(11.0, 11.0, 11.0),
+    //position: Vector3(0, 0, 0),
+    rotation: Vector3(0, -90, 0), // Start sideways
+    fileName: 'assets/objects/base.obj',
+  );
+  //Object? _obj;
   UserModel? userModel;
 
   @override
@@ -44,14 +44,13 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
   void initState() {
     super.initState();
     _dbData();
-    _objLoad();
+    //_objLoad();
   }
 
-  @override
-  void dispose() {
-    _obj!.remove(_obj!);
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   super.dispose();
+  // }
 
 // Fetch user data from the server
   Future<void> _dbData() async {
@@ -72,19 +71,20 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
     }
   }
 
-  // Fetch user data from the server
-  Future<void> _objLoad() async {
-    try {
-      _obj = Object(
-        scale: Vector3(11.0, 11.0, 11.0),
-        //position: Vector3(0, 0, 0),
-        rotation: Vector3(0, -90, 0), // Start sideways
-        fileName: 'assets/objects/base.obj',
-      );
-    } catch (e) {
-      print(e.toString());
-    }
-  }
+  // // Fetch user data from the server
+  // Future<void> _objLoad() async {
+  //   try {
+  //     if (!mounted) return;
+  //     _obj = Object(
+  //       scale: Vector3(11.0, 11.0, 11.0),
+  //       //position: Vector3(0, 0, 0),
+  //       rotation: Vector3(0, -90, 0), // Start sideways
+  //       fileName: 'assets/objects/base.obj',
+  //     );
+  //   } catch (e) {
+  //     print(e.toString());
+  //   }
+  // }
 
 //////////////////////////////////
   @override
@@ -189,15 +189,12 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                                                 flex: 8,
                                                 child: Container(
                                                     height: 200,
-                                                    child: _obj != null
-                                                        ? Cube(
-                                                            onSceneCreated:
-                                                                (Scene scene) {
-                                                              scene.world
-                                                                  .add(_obj!);
-                                                            },
-                                                          )
-                                                        : Container()),
+                                                    child: Cube(
+                                                      onSceneCreated:
+                                                          (Scene scene) {
+                                                        scene.world.add(_obj);
+                                                      },
+                                                    )),
                                               ),
                                               Expanded(
                                                 flex: 1,
@@ -283,9 +280,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                                       title: user == 'customer'
                                           ? 'Total Requests'
                                           : 'Total Pickup',
-                                      value:
-                                          userModel!.totalRequest.toString() ??
-                                              '150',
+                                      value: userModel!.totalRequest.toString(),
                                       iconColor: accentColor,
                                     ),
                                     StatisticBox(

@@ -52,7 +52,8 @@ void main() async {
 //   runApp(MyApp());
 //   // runApp(const MyApp());
 // }
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>(); // for logout complex
+final GlobalKey<NavigatorState> navigatorKey =
+    GlobalKey<NavigatorState>(); // for logout complex
 
 class MyApp extends StatelessWidget {
   @override
@@ -63,6 +64,7 @@ class MyApp extends StatelessWidget {
       //initialRoute: initialRoute,
       home: TokenCheck(), // final firt route
       //home: StoreNetwork(), // for testing with network
+      //home: PdfDownloader(), //for testing
 
       //home: WebsocketMultiple(), //for testing
       //home: WebSocketExample(), //for testing
@@ -213,7 +215,6 @@ class _TokenCheckState extends State<TokenCheck> {
   }
 }
 
-
 // class WebSocketExample extends StatefulWidget {
 //   @override
 //   _WebSocketExampleState createState() => _WebSocketExampleState();
@@ -224,7 +225,6 @@ class _TokenCheckState extends State<TokenCheck> {
 //   WebSocketChannel channel = WebSocketChannel.connect(
 //     Uri.parse('ws://192.168.254.187:8080'),
 //   );
-
 
 //   @override
 //   void dispose() {
@@ -271,3 +271,5 @@ class _TokenCheckState extends State<TokenCheck> {
 //     );
 //   }
 // }
+
+

@@ -22,47 +22,51 @@ Future<Map<String, dynamic>?> fetchCusData(BuildContext context) async {
     return null;
   }
 
-  final response = await http.post(
-    Uri.parse('$baseUrl/fetch_data'),
-    headers: {
-      'Authorization': 'Bearer $accessToken',
-    },
-  );
-  if (response.statusCode == 200) {
-    // final data = jsonDecode(response.body);
+  try {
+    final response = await http.post(
+      Uri.parse('$baseUrl/fetch_data'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+    if (response.statusCode == 200) {
+      // final data = jsonDecode(response.body);
 
-    // // Access the provider and update the user data
-    // Provider.of<UserModel>(context, listen: false).setUserData(
-    //   data['cus_fname'],
-    //   data['cus_lname'],
-    //   data['cus_email'],
-    //   data['profileImage'] != null ? base64Decode(data['profileImage']) : null,
-    // );
+      // // Access the provider and update the user data
+      // Provider.of<UserModel>(context, listen: false).setUserData(
+      //   data['cus_fname'],
+      //   data['cus_lname'],
+      //   data['cus_email'],
+      //   data['profileImage'] != null ? base64Decode(data['profileImage']) : null,
+      // );
 
-    return jsonDecode(response.body);
-  } else {
-    if (response.statusCode == 401) {
-      // Access token might be expired, attempt to refresh it
-      print('Access token expired. Attempting to refresh...');
-      String? refreshMsg = await refreshAccessToken();
-      if (refreshMsg == null) {
-        return await fetchCusData(context);
-      } else {
-        // Refresh token is invalid or expired, logout the user
-        await deleteTokens(); // Logout user
-        return null;
-      }
-    } else if (response.statusCode == 403) {
-      // Access token is invalid. logout
-      print('Access token invalid. Attempting to logout...');
-      await deleteTokens(); // Logout use
+      return jsonDecode(response.body);
     } else {
-      print('Response: ${response.body}');
-    }
+      if (response.statusCode == 401) {
+        // Access token might be expired, attempt to refresh it
+        print('Access token expired. Attempting to refresh...');
+        String? refreshMsg = await refreshAccessToken();
+        if (refreshMsg == null) {
+          return await fetchCusData(context);
+        } else {
+          // Refresh token is invalid or expired, logout the user
+          await deleteTokens(); // Logout user
+          return null;
+        }
+      } else if (response.statusCode == 403) {
+        // Access token is invalid. logout
+        print('Access token invalid. Attempting to logout...');
+        await deleteTokens(); // Logout use
+      } else {
+        print('Response: ${response.body}');
+      }
 
-    //error user not found
-    showErrorSnackBar(context, '${response.body} in fetching data');
-    return null;
+      //error user not found
+      showErrorSnackBar(context, '${response.body} in fetching data');
+      return null;
+    }
+  } catch (e) {
+    print(e.toString());
   }
 }
 

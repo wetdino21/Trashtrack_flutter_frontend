@@ -9,97 +9,102 @@ import 'package:trashtrack/styles.dart';
 // final Logger logger = Logger();
 
 Future<void> storeDataInHive(BuildContext context) async {
-  // Fetch data from the API or another source
-  final data = await fetchCusData(context);
+  try {
+    // Fetch data from the API or another source
+    final data = await fetchCusData(context);
 
-  if (data == null) {
-    //showErrorSnackBar(context, 'nulllllllllllllllllllllll');
-    print('FETCH USER DATA IS NULL');
-  } else {
-// Determine the prefix based on the data
-    String prefix;
-    String usertype = 'type';
-    String address = '';
-    if (data.containsKey('cus_id')) {
-      prefix = 'cus_';
-    } else if (data.containsKey('emp_id')) {
-      prefix = 'emp_';
-      usertype = 'role';
-      address = data['emp_address'];
-      print(data['emp_role']);
+    if (data == null) {
+      //showErrorSnackBar(context, 'nulllllllllllllllllllllll');
+      print('FETCH USER DATA IS NULL');
     } else {
-      // Handle cases where neither cus_id nor haul_id is found
-      throw Exception('Invalid data format');
-    }
-
-    // Extract data fields with the appropriate prefix
-    final String? user = data['user'];
-
-    final int? id = data['${prefix}id'];
-    final String? fname = data['${prefix}fname'];
-    final String? mname = data['${prefix}mname'];
-    final String? lname = data['${prefix}lname'];
-    final String? contact = data['${prefix}contact'];
-    final String? province = prefix == 'cus_' ? data['${prefix}province'] : '';
-    final String? city = prefix == 'cus_' ? data['${prefix}city'] : '';
-    final String? brgy = prefix == 'cus_' ? data['${prefix}brgy'] : '';
-    final String? street = prefix == 'cus_' ? data['${prefix}street'] : '';
-    final String? postal = prefix == 'cus_' ? data['${prefix}postal'] : '';
-
-    final String? type = data['${prefix}${usertype}']; //type /role
-    final String? status = data['${prefix}status'];
-//////////////
-    final String? email = data['${prefix}email'];
-    final String? auth = data['${prefix}auth_method'];
-    final Uint8List? imageBytes = data['profileImage'] != null
-        ? base64Decode(data['profileImage'])
-        : null;
-
-    // Open Hive box
-    var box = await Hive.openBox('mybox');
-
-    // Store data in Hive
-    await box.put('user', user);
-    await box.put('id', id);
-    await box.put('fname', fname);
-    await box.put('mname', mname);
-    await box.put('lname', lname);
-    await box.put('contact', contact);
-    await box.put('province', province);
-    await box.put('city', city);
-    await box.put('brgy', brgy);
-    await box.put('street', street);
-    await box.put('postal', postal);
-    await box.put('email', email);
-    await box.put('status', status);
-    await box.put('type', type);
-    await box.put('auth', auth);
-    await box.put('profile', imageBytes);
-    await box.put('address', address);
-
-    if (user == 'customer') {
-      //notification count
-      List<Map<String, dynamic>>? notifications;
-      int unreadCount = 0;
-      try {
-        final notifData = await fetchCusNotifications();
-        if (notifData != null) {
-          notifications = notifData;
-          // Count unread notifications
-          unreadCount = notifications.where((notification) {
-            return notification['notif_read'] == false;
-          }).length;
-        } else {
-          print('NOTIFICATION USER DATA IS NULL');
-        }
-      } catch (e) {
-        showErrorSnackBar(context, e.toString());
+// Determine the prefix based on the data
+      String prefix;
+      String usertype = 'type';
+      String address = '';
+      if (data.containsKey('cus_id')) {
+        prefix = 'cus_';
+      } else if (data.containsKey('emp_id')) {
+        prefix = 'emp_';
+        usertype = 'role';
+        address = data['emp_address'];
+        print(data['emp_role']);
+      } else {
+        // Handle cases where neither cus_id nor haul_id is found
+        throw Exception('Invalid data format');
       }
 
-      await box.put('notif_count', unreadCount);
+      // Extract data fields with the appropriate prefix
+      final String? user = data['user'];
 
-      print('Data has been saved to Hive.');
+      final int? id = data['${prefix}id'];
+      final String? fname = data['${prefix}fname'];
+      final String? mname = data['${prefix}mname'];
+      final String? lname = data['${prefix}lname'];
+      final String? contact = data['${prefix}contact'];
+      final String? province =
+          prefix == 'cus_' ? data['${prefix}province'] : '';
+      final String? city = prefix == 'cus_' ? data['${prefix}city'] : '';
+      final String? brgy = prefix == 'cus_' ? data['${prefix}brgy'] : '';
+      final String? street = prefix == 'cus_' ? data['${prefix}street'] : '';
+      final String? postal = prefix == 'cus_' ? data['${prefix}postal'] : '';
+
+      final String? type = data['${prefix}${usertype}']; //type /role
+      final String? status = data['${prefix}status'];
+//////////////
+      final String? email = data['${prefix}email'];
+      final String? auth = data['${prefix}auth_method'];
+      final Uint8List? imageBytes = data['profileImage'] != null
+          ? base64Decode(data['profileImage'])
+          : null;
+
+      // Open Hive box
+      var box = await Hive.openBox('mybox');
+
+      // Store data in Hive
+      await box.put('user', user);
+      await box.put('id', id);
+      await box.put('fname', fname);
+      await box.put('mname', mname);
+      await box.put('lname', lname);
+      await box.put('contact', contact);
+      await box.put('province', province);
+      await box.put('city', city);
+      await box.put('brgy', brgy);
+      await box.put('street', street);
+      await box.put('postal', postal);
+      await box.put('email', email);
+      await box.put('status', status);
+      await box.put('type', type);
+      await box.put('auth', auth);
+      await box.put('profile', imageBytes);
+      await box.put('address', address);
+
+      if (user == 'customer') {
+        //notification count
+        List<Map<String, dynamic>>? notifications;
+        int unreadCount = 0;
+        try {
+          final notifData = await fetchCusNotifications();
+          if (notifData != null) {
+            notifications = notifData;
+            // Count unread notifications
+            unreadCount = notifications.where((notification) {
+              return notification['notif_read'] == false;
+            }).length;
+          } else {
+            print('NOTIFICATION USER DATA IS NULL');
+          }
+        } catch (e) {
+          showErrorSnackBar(context, e.toString());
+        }
+
+        await box.put('notif_count', unreadCount);
+
+        print('Data has been saved to Hive.');
+      }
     }
+  } catch (e) {
+    print(e.toString());
   }
 }
 

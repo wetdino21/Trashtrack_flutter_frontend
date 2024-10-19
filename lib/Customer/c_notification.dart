@@ -171,10 +171,10 @@ class _C_NotificationScreenState extends State<C_NotificationScreen>
                       String showStatus = status ? 'Read' : 'Sent';
 
                       final Color statusColor = status
-                          ? Colors.white54
+                          ? greySoft
                           : Colors.green; // Color for the status text
                       final Color boxColor = status
-                          ? Colors.black
+                          ? white
                           : deepPurple; // Color for the notification box
 
                       return GestureDetector(
@@ -249,10 +249,10 @@ class NotificationCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('$dateTime', style: TextStyle(color: Colors.white60)),
+                Text('$dateTime', style: TextStyle(color: greySoft)),
                 Text(
                   title,
-                  style: TextStyle(color: Colors.white, fontSize: 16),
+                  style: TextStyle(color: status == 'Read'? blackSoft :white, fontSize: 16),
                   maxLines: 1,
                   softWrap: true,
                 ),
@@ -260,7 +260,7 @@ class NotificationCard extends StatelessWidget {
                   Align(
                       alignment: Alignment.bottomRight,
                       child: Text('$status',
-                          style: TextStyle(color: Colors.white60))),
+                          style: TextStyle(color: greySoft))),
               ],
             ),
           ),

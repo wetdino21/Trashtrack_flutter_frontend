@@ -1575,3 +1575,60 @@ Future<Map<String, dynamic>?> fetchBillDetails(int billId) async {
     return null;
   }
 }
+
+//fetch billing
+Future<List<Map<String, dynamic>>?> fetchVehicles() async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+
+  if (accessToken == null) {
+    print('No access token available. User needs to log in.');
+    await deleteTokens();
+    return null;
+  }
+
+  try {
+    final response = await http.post(
+      Uri.parse('$baseUrl/fetch_all_vehicles'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = jsonDecode(response.body);
+
+      // Cast the list of dynamic to a list of Map<String, dynamic>
+      List<Map<String, dynamic>> vehicles =
+          List<Map<String, dynamic>>.from(data);
+
+      return vehicles;
+    } else {
+      if (response.statusCode == 401) {
+        // Access token might be expired, attempt to refresh it
+        print('Access token expired. Attempting to refresh...');
+        String? refreshMsg = await refreshAccessToken();
+        if (refreshMsg == null) {
+          return await fetchVehicles();
+        } else {
+          // Refresh token is invalid or expired, logout the user
+          await deleteTokens(); // Logout user
+          return null;
+        }
+      } else if (response.statusCode == 403) {
+        // Access token is invalid. logout
+        print('Access token invalid. Attempting to logout...');
+        await deleteTokens(); // Logout user
+      } else if (response.statusCode == 404) {
+        print('No notification found');
+        return null;
+      }
+
+      print('Response: ${response.body}');
+      return null;
+    }
+  } catch (e) {
+    print(e.toString());
+    return null;
+  }
+}

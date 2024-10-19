@@ -161,46 +161,50 @@ Future<String?> sendEmailCodeTrashtrackBind(String email) async {
 Future<String?> sendEmailCodeForgotPass(String email) async {
   final baseUrl = Uri.parse('$BaseUrl/send_code_forgotpass');
 
-  final response = await http.post(
-    baseUrl,
-    headers: {'Content-Type': 'application/json'},
-    body: jsonEncode({
-      'email': email,
-    }),
-  );
+  try {
+    final response = await http.post(
+      baseUrl,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'email': email,
+      }),
+    );
 
-  if (response.statusCode == 200) {
-    print('Good Email');
-    return null; // No error, return null
-  } else if (response.statusCode == 400) {
-    print('No associated account with this email.');
+    if (response.statusCode == 200) {
+      print('Good Email');
+      return null; // No error, return null
+    } else if (response.statusCode == 400) {
+      print('No associated account with this email.');
 
-    return 'No associated account with this email.'; // Return the error message from the server
-  } else if (response.statusCode == 429) {
-    print('Too many requests. Please try again later.');
+      return 'No associated account with this email.'; // Return the error message from the server
+    } else if (response.statusCode == 429) {
+      print('Too many requests. Please try again later.');
 
-    // Parse the JSON response body
-    final Map<String, dynamic> responseBody = jsonDecode(response.body);
+      // Parse the JSON response body
+      final Map<String, dynamic> responseBody = jsonDecode(response.body);
 
-    // Get the timeremain value
-    final int timeremain = responseBody['timeremain'] ?? 0;
+      // Get the timeremain value
+      final int timeremain = responseBody['timeremain'] ?? 0;
 
-    // Convert timeremain from milliseconds to seconds (or minutes, if needed)
-    final int secondsRemaining = (timeremain / 1000).ceil();
+      // Convert timeremain from milliseconds to seconds (or minutes, if needed)
+      final int secondsRemaining = (timeremain / 1000).ceil();
 
-    // Show the remaining time in the message
-    return 'Too many requests try again later for $secondsRemaining seconds.';
-    //return 'Too many requests try again later for 1 minute.'; // Return the error message from the server
-  } else {
-    //print('Error response: ${response.body}');
+      // Show the remaining time in the message
+      return 'Too many requests try again later for $secondsRemaining seconds.';
+      //return 'Too many requests try again later for 1 minute.'; // Return the error message from the server
+    } else {
+      //print('Error response: ${response.body}');
+      print('Failed to send verification code');
+      return 'error';
+    }
+  } catch (e) {
     print('Failed to send verification code');
-    return 'error';
+    return 'No Internet Connection';
   }
 }
 
 // verify code ForgotPass
-Future<String?> verifyEmailCode(
-    String email, String inputCode) async {
+Future<String?> verifyEmailCode(String email, String inputCode) async {
   final baseUrl = Uri.parse('$BaseUrl/verify_code');
 
   final response = await http.post(
@@ -218,7 +222,7 @@ Future<String?> verifyEmailCode(
   } else if (response.statusCode == 404) {
     print('No verification record found!');
 
-    return 'No associated account with this email!'; 
+    return 'No associated account with this email!';
   } else if (response.statusCode == 400) {
     print('Verification code has expired!');
 
@@ -226,7 +230,7 @@ Future<String?> verifyEmailCode(
   } else if (response.statusCode == 401) {
     print('Incorrect verification code!');
 
-    return 'Incorrect verification code!'; 
+    return 'Incorrect verification code!';
   } else if (response.statusCode == 429) {
     print('Too many failed attempts. Please request a new code.');
     return 'Too many failed attempts. Please request a new code.';

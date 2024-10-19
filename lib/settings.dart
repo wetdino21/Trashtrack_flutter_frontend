@@ -102,17 +102,18 @@ class _C_SettingsScreenState extends State<C_SettingsScreen> {
                     leading: _buildIcon(Icons.lock),
                     title: Text('Change password'),
                     onTap: () {
-                      if (userModel!.auth == 'GOOGLE') {
-                        _showNoPassConfirmDialog(context);
-                      } else {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                ChangePassword(email: userModel!.email!),
-                          ),
-                        );
-                      }
+                      _showChangePassConfirmDialog(context);
+                      // if (userModel!.auth == 'GOOGLE') {
+                      //   _showNoPassConfirmDialog(context);
+                      // } else {
+                      //   Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //       builder: (context) =>
+                      //           ChangePassword(email: userModel!.email!),
+                      //     ),
+                      //   );
+                      // }
                     },
                   ),
                   ListTile(
@@ -176,6 +177,48 @@ class _C_SettingsScreenState extends State<C_SettingsScreen> {
                         BindWithTrashTrackScreen(email: userModel!.email!),
                   ),
                 );
+              },
+              child: Text('Yes', style: TextStyle(color: Colors.white)),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  //show no pass
+  void _showChangePassConfirmDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.deepPurple,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(20.0))),
+          title:
+              Text('Change Password?', style: TextStyle(color: Colors.white)),
+          content: Text('This will send email verification for security.',
+              style: TextStyle(color: Colors.white)),
+          actions: [
+            TextButton(
+              onPressed: () {
+                if (userModel!.auth == 'GOOGLE') {
+                  _showNoPassConfirmDialog(context);
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          ChangePassword(email: userModel!.email!),
+                    ),
+                  );
+                }
               },
               child: Text('Yes', style: TextStyle(color: Colors.white)),
             ),

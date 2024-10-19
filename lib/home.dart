@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:trashtrack/waste_info.dart';
 import 'package:trashtrack/Customer/c_booking.dart';
 import 'package:trashtrack/api_token.dart';
 import 'package:trashtrack/booking_pending_list.dart';
@@ -33,7 +32,8 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
   );
   //Object? _obj;
   UserModel? userModel;
-
+  Offset position = Offset(50, 150); // Initial position
+  bool objDragged = false;
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -85,6 +85,23 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
   //     print(e.toString());
   //   }
   // }
+
+  void _loadObject(Scene scene) {
+    if (!mounted) return;
+
+    try {
+      // Attempt to load the object
+      if (!mounted) return;
+      scene.world.add(Object(
+        scale: Vector3(11.0, 11.0, 11.0),
+        rotation: Vector3(0, -90, 0), // Start sideways
+        fileName: 'assets/objects/base.obj',
+      ));
+    } catch (e) {
+      print("Error loading object: $e");
+      showErrorSnackBar(context, e.toString());
+    }
+  }
 
 //////////////////////////////////
   @override
@@ -189,12 +206,15 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
                                                 flex: 8,
                                                 child: Container(
                                                     height: 200,
-                                                    child: Cube(
-                                                      onSceneCreated:
-                                                          (Scene scene) {
-                                                        scene.world.add(_obj);
-                                                      },
-                                                    )),
+                                                    child: !objDragged
+                                                        ? Cube(
+                                                            onSceneCreated:
+                                                                (Scene scene) {
+                                                              scene.world
+                                                                  .add(_obj);
+                                                            },
+                                                          )
+                                                        : SizedBox()),
                                               ),
                                               Expanded(
                                                 flex: 1,
@@ -326,6 +346,50 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
             //       ),
             //     ),
             //   ),
+
+            // // The draggable widget
+            // Positioned(
+            //   left: position.dx,
+            //   top: position.dy,
+            //   child: LongPressDraggable(
+            //     feedback: Container(
+            //       width: 300,
+            //       height: 200,
+            //       color: Colors.green.withOpacity(0.7),
+            //       //child: Center(child: Text('Dragging')),
+            //     ),
+            //     child: Container(
+            //       color: Colors.transparent,
+            //       width: 300,
+            //       height: 200,
+            //       child: objDragged
+            //           ? Cube(
+            //               onSceneCreated: (Scene scene) {
+            //                 _loadObject(scene);
+            //               },
+            //             )
+            //           : Align(
+            //             alignment: Alignment.topCenter,
+            //             child: Text(
+            //                 'Long Drag Me',
+            //                 style: TextStyle(
+            //                   color: deepPurple,
+            //                   fontSize: 18.0,
+            //                 ),
+            //               ),
+            //           ),
+            //     ),
+            //     onDragEnd: (details) {
+            //       setState(() {
+            //         objDragged = true;
+            //         position = Offset(
+            //           details.offset.dx,
+            //           details.offset.dy - 100,
+            //         );
+            //       });
+            //     },
+            //   ),
+            // ),
           ],
         ),
         // bottomNavigationBar: C_BottomNavBar(

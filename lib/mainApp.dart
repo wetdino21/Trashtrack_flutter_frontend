@@ -64,7 +64,7 @@ class _MainAppState extends State<MainApp> {
       await storeDataInHive(context); // user data
       final totalRequest = await totalPickupRequest();
       final data = await userDataFromHive();
-
+      
       Provider.of<UserModel>(context, listen: false).setUserData(
         newId: data['id'].toString(),
         newFname: data['fname'],
@@ -132,10 +132,12 @@ class _MainAppState extends State<MainApp> {
 
     if (index == 0) {
       _isDelayed = true;
-      _playSound();
-      setState(() {
-        _selectedIndex = index;
-      });
+      if (_selectedIndex != index) {
+        _playSound();
+        setState(() {
+          _selectedIndex = index;
+        });
+      }
       Future.delayed(Duration(milliseconds: 700), () {
         setState(() {
           _isDelayed = false;

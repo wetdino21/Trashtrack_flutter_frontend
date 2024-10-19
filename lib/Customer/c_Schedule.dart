@@ -250,7 +250,8 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                             backgroundColor:
                                 selectedPage == 0 ? Colors.deepPurple : white,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.horizontal(left: Radius.circular(50)),
+                              borderRadius: BorderRadius.horizontal(
+                                  left: Radius.circular(50)),
                             ),
                           ),
                           child: Text(
@@ -273,7 +274,8 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                             backgroundColor:
                                 selectedPage == 1 ? Colors.deepPurple : white,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.horizontal(right: Radius.circular(50)),
+                              borderRadius: BorderRadius.horizontal(
+                                  right: Radius.circular(50)),
                             ),
                           ),
                           child: Text(
@@ -334,52 +336,8 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                         await _fetchBookingData();
                       },
                       child: isLoading
-                          ? AnimatedBuilder(
-                              animation: _controller,
-                              builder: (context, child) {
-                                return ListView.builder(
-                                  padding: const EdgeInsets.all(5),
-                                  itemCount: 6,
-                                  itemBuilder: (context, index) {
-                                    return Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        SizedBox(
-                                          height: 20,
-                                        ),
-                                        Container(
-                                          height: 30,
-                                          width: 300,
-                                          padding: EdgeInsets.all(10),
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            //color: Colors.white.withOpacity(.6),
-                                            color: index % 2 == 0
-                                                ? _colorTween.value
-                                                : _colorTween2.value,
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 5,
-                                        ),
-                                        Container(
-                                          height: 70,
-                                          padding: EdgeInsets.all(10),
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            color: index % 2 == 0
-                                                ? _colorTween.value
-                                                : _colorTween2.value,
-                                          ),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
-                              })
+                          ? LoadingAnimation(
+                              _controller, _colorTween, _colorTween2)
                           : bookingList == null || !containCurrent
                               ? ListView(
                                   children: [
@@ -575,52 +533,8 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                         await _fetchBookingData();
                       },
                       child: isLoading
-                          ? AnimatedBuilder(
-                              animation: _controller,
-                              builder: (context, child) {
-                                return ListView.builder(
-                                  padding: const EdgeInsets.all(5),
-                                  itemCount: 6,
-                                  itemBuilder: (context, index) {
-                                    return Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        SizedBox(
-                                          height: 20,
-                                        ),
-                                        Container(
-                                          height: 30,
-                                          width: 300,
-                                          padding: EdgeInsets.all(10),
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            //color: Colors.white.withOpacity(.6),
-                                            color: index % 2 == 0
-                                                ? _colorTween.value
-                                                : _colorTween2.value,
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 5,
-                                        ),
-                                        Container(
-                                          height: 70,
-                                          padding: EdgeInsets.all(10),
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            color: index % 2 == 0
-                                                ? _colorTween.value
-                                                : _colorTween2.value,
-                                          ),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
-                              })
+                          ? LoadingAnimation(
+                              _controller, _colorTween, _colorTween2)
                           : (bookingList == null || !containHistory) &&
                                   bookingListHistory == null
                               ? ListView(

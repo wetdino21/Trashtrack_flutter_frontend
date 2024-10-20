@@ -1,5 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+
+void console(message) {
+  if (kDebugMode) {
+    print(message);
+  }
+}
 
 final Logger logger = Logger();
 //final Color backgroundColor = Color(0xFF001E00);

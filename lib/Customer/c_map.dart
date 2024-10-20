@@ -161,6 +161,7 @@ class _C_MapScreenState extends State<C_MapScreen>
   @override
   void dispose() {
     _stopLocationUpdates(); // Stop location updates when the widget is disposed
+
     _mapController.dispose();
     _startController.dispose();
     _destinationController.dispose();
@@ -352,12 +353,12 @@ class _C_MapScreenState extends State<C_MapScreen>
 
   void _stopLocationUpdates() {
     if (_positionStream != null) {
-      _positionStream?.cancel();
+      _positionStream!.cancel();
       _positionStream = null;
       print('Single Current Stream is now off!');
     }
     if (_startPositionStream != null) {
-      _startPositionStream?.cancel();
+      _startPositionStream!.cancel();
       _startPositionStream = null;
       print('Direction Current Stream is now off!');
     }

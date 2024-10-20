@@ -46,6 +46,19 @@ class _MainAppState extends State<MainApp> {
     if (widget.selectedIndex != null) {
       _selectedIndex = widget.selectedIndex!;
     }
+
+    //load all resource
+    if (firstLoad && _selectedIndex == 0) {
+      Future.delayed(const Duration(seconds: 3), () {
+        setState(() {
+          firstLoad = false;
+        });
+      });
+    }
+
+    if (_selectedIndex != 0) {
+      firstLoad = false;
+    }
   }
 
   @override
@@ -64,7 +77,7 @@ class _MainAppState extends State<MainApp> {
       await storeDataInHive(context); // user data
       final totalRequest = await totalPickupRequest();
       final data = await userDataFromHive();
-      
+
       Provider.of<UserModel>(context, listen: false).setUserData(
         newId: data['id'].toString(),
         newFname: data['fname'],
@@ -120,14 +133,6 @@ class _MainAppState extends State<MainApp> {
   // ];
 
   void _onItemTapped(int index) {
-    if (firstLoad) {
-      Future.delayed(Duration(milliseconds: 700), () {
-        setState(() {
-          firstLoad = false;
-        });
-      });
-    }
-
     if (_isDelayed) return; // If delayed, prevent action
 
     if (index == 0) {
@@ -138,7 +143,7 @@ class _MainAppState extends State<MainApp> {
           _selectedIndex = index;
         });
       }
-      Future.delayed(Duration(milliseconds: 700), () {
+      Future.delayed(const Duration(milliseconds: 700), () {
         setState(() {
           _isDelayed = false;
         });
@@ -182,28 +187,11 @@ class _MainAppState extends State<MainApp> {
 
   @override
   Widget build(BuildContext context) {
-    return Loading
-        ? Scaffold(
-            backgroundColor: deepPurple,
-            body: Stack(
-              children: [
-                Positioned.fill(
-                  child: InkWell(
-                    onTap: () {},
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        color: Colors.green,
-                        strokeWidth: 10,
-                        strokeAlign: 2,
-                        backgroundColor: Colors.deepPurple,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          )
-        : Scaffold(
+    return Scaffold(
+        body: Stack(
+      children: [
+        if (!Loading)
+          Scaffold(
             drawer: C_Drawer(),
             appBar: C_CustomAppBar(
                 title: _selectedIndex == 0
@@ -222,6 +210,104 @@ class _MainAppState extends State<MainApp> {
               currentIndex: _selectedIndex,
               onTap: _onItemTapped,
             ),
-          );
+          ),
+        if (Loading || firstLoad)
+          Scaffold(
+            backgroundColor: deepPurple,
+            body: Stack(
+              children: [
+                Positioned.fill(
+                  child: InkWell(
+                    onTap: () {},
+                    child: Center(
+                      child: Stack(
+                        //mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ClipOval(
+                              child: Image.asset(
+                                  'assets/icon/trashtrack_icon.png',
+                                  scale: 10)),
+                          Positioned.fill(
+                            child: CircularProgressIndicator(
+                              color: Colors.green,
+                              strokeWidth: 10,
+                              strokeAlign: 5,
+                              backgroundColor: Colors.deepPurple,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          )
+      ],
+    ));
+    // Scaffold(
+    //   drawer: C_Drawer(),
+    //   appBar: C_CustomAppBar(
+    //       title: _selectedIndex == 0
+    //           ? 'Home'
+    //           : _selectedIndex == 1
+    //               ? 'Map'
+    //               : _selectedIndex == 2
+    //                   ? 'Schedule'
+    //                   : user == 'hauler'
+    //                       ? 'Vehicle'
+    //                       : 'Payment'),
+    //   body:
+    //       Loading ? const CircularProgressIndicator() : _pages[_selectedIndex],
+    //   bottomNavigationBar: C_BottomNavBar(
+    //     currentIndex: _selectedIndex,
+    //     onTap: _onItemTapped,
+    //   ),
+    // );
   }
+
+  // @override
+  // Widget build(BuildContext context) {
+  //   return Loading || firstLoad
+  //       ? Scaffold(
+  //           backgroundColor: deepPurple,
+  //           body: Stack(
+  //             children: [
+  //               Positioned.fill(
+  //                 child: InkWell(
+  //                   onTap: () {},
+  //                   child: Center(
+  //                     child: CircularProgressIndicator(
+  //                       color: Colors.green,
+  //                       strokeWidth: 10,
+  //                       strokeAlign: 2,
+  //                       backgroundColor: Colors.deepPurple,
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         )
+  //       : Scaffold(
+  //           drawer: C_Drawer(),
+  //           appBar: C_CustomAppBar(
+  //               title: _selectedIndex == 0
+  //                   ? 'Home'
+  //                   : _selectedIndex == 1
+  //                       ? 'Map'
+  //                       : _selectedIndex == 2
+  //                           ? 'Schedule'
+  //                           : user == 'hauler'
+  //                               ? 'Vehicle'
+  //                               : 'Payment'),
+  //           body: Loading
+  //               ? const CircularProgressIndicator()
+  //               : _pages[_selectedIndex],
+  //           bottomNavigationBar: C_BottomNavBar(
+  //             currentIndex: _selectedIndex,
+  //             onTap: _onItemTapped,
+  //           ),
+  //         );
+  // }
 }

@@ -27,7 +27,7 @@ Future<void> storeDataInHive(BuildContext context) async {
         prefix = 'emp_';
         usertype = 'role';
         address = data['emp_address'];
-        print(data['emp_role']);
+        //print(data['emp_role']);
       } else {
         // Handle cases where neither cus_id nor haul_id is found
         throw Exception('Invalid data format');
@@ -100,7 +100,7 @@ Future<void> storeDataInHive(BuildContext context) async {
 
         await box.put('notif_count', unreadCount);
 
-        print('Data has been saved to Hive.');
+        //print('Data has been saved to Hive.');
       }
     }
   } catch (e) {
@@ -161,7 +161,7 @@ Future<Map<String, dynamic>> userDataFromHive() async {
     'notif_count': box.get('notif_count'),
   };
   // Optionally, print a message or handle UI updates
-  print('Data has been retrieved from Hive.');
+  //print('Data has been retrieved from Hive.');
 
   //await box.close();
   return data;

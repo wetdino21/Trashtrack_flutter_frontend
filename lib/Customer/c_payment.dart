@@ -5,13 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:trashtrack/api_network.dart';
 import 'package:trashtrack/api_paymongo.dart';
 import 'package:trashtrack/api_postgre_service.dart';
+import 'package:trashtrack/api_token.dart';
 import 'package:trashtrack/mainApp.dart';
 import 'package:trashtrack/styles.dart';
 
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
-//import 'package:permission_handler/permission_handler.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:intl/intl.dart';
 
 class C_PaymentScreen extends StatefulWidget {
@@ -419,7 +420,7 @@ class _C_PaymentScreenState extends State<C_PaymentScreen>
                             'Pending',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: selectedPage == 0 ? blackSoft : white,
+                              color: selectedPage == 0 ? deepPurple : white,
                             ),
                           ),
                         ),
@@ -553,7 +554,7 @@ class C_PaymentHistoryDetails extends StatefulWidget {
 }
 
 class _C_PaymentHistoryDetailsState extends State<C_PaymentHistoryDetails>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late AnimationController _controller;
   late Animation<Color?> _colorTween;
   late Animation<Color?> _colorTween2;
@@ -568,6 +569,7 @@ class _C_PaymentHistoryDetailsState extends State<C_PaymentHistoryDetails>
   int selectedPage = 0;
   late PageController _pageController;
   Map<String, dynamic>? billDetails;
+  bool refreshStatus = false;
 
   @override
   void initState() {
@@ -592,6 +594,8 @@ class _C_PaymentHistoryDetailsState extends State<C_PaymentHistoryDetails>
       begin: Colors.grey,
       end: Colors.white,
     ).animate(_controller);
+
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
@@ -599,7 +603,22 @@ class _C_PaymentHistoryDetailsState extends State<C_PaymentHistoryDetails>
     TickerCanceled;
     _controller.dispose();
     _pageController.dispose();
+
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (refreshStatus) {
+      if (state == AppLifecycleState.resumed) {
+        _fetchBillDataDetails();
+        setState(() {
+          refreshStatus = false;
+        });
+      }
+    }
   }
 
   void onPageSelected(int pageIndex) {
@@ -650,8 +669,6 @@ class _C_PaymentHistoryDetailsState extends State<C_PaymentHistoryDetails>
         title: Text('Payment Details',
             style: TextStyle(
                 color: white, fontSize: 25, fontWeight: FontWeight.bold)),
-        // leading: SizedBox(width: 0),
-        // leadingWidth: 0,
       ),
       body: Stack(
         children: [
@@ -665,10 +682,6 @@ class _C_PaymentHistoryDetailsState extends State<C_PaymentHistoryDetails>
                       return;
                     }
                     Navigator.pop(context, true);
-                    // Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //         builder: (context) => MainApp(selectedIndex: 3)));
                   },
                   child: Container()),
               //
@@ -733,35 +746,29 @@ class _C_PaymentHistoryDetailsState extends State<C_PaymentHistoryDetails>
                                                 InkWell(
                                                   onTap: () async {
                                                     setState(() {
+                                                      refreshStatus = true;
                                                       isLoading = true;
                                                     });
                                                     String? sessionId =
                                                         await launchPaymentLinkSession(
                                                       billDetails!['gb_id'],
                                                     );
-                                                    //
-                                                    if (sessionId != null) {
-                                                      Navigator.push(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                              builder: (context) =>
-                                                                  PaymentBacktoApp(
-                                                                      gb_id: widget
-                                                                          .gb_id))).then(
-                                                          (value) {
-                                                        if (value == true) {
-                                                          _fetchBillDataDetails();
-                                                        }
-                                                      });
-                                                      // Navigator.push(
-                                                      //   context,
-                                                      //   MaterialPageRoute(
-                                                      //     builder: (context) =>
-                                                      //         PaymentBacktoApp(
-                                                      //             gb_id: widget.gb_id),
-                                                      //   )
-                                                      // );
-                                                    }
+                                                    // //
+                                                    // if (sessionId != null) {
+                                                    //   Navigator.push(
+                                                    //       context,
+                                                    //       MaterialPageRoute(
+                                                    //           builder: (context) =>
+                                                    //               PaymentBacktoApp(
+                                                    //                   gb_id: widget
+                                                    //                       .gb_id))).then(
+                                                    //       (value) {
+                                                    //     if (value == true) {
+                                                    //       _fetchBillDataDetails();
+                                                    //     }
+                                                    //   });
+
+                                                    // }
                                                     setState(() {
                                                       isLoading = false;
                                                     });
@@ -803,8 +810,11 @@ class _C_PaymentHistoryDetailsState extends State<C_PaymentHistoryDetails>
                                     ),
                                     InkWell(
                                       onTap: () {
-                                        _downloadPdf();
-                                        _showDownloadDialog(context);
+                                        setState(() {
+                                          refreshStatus = false;
+                                        });
+                                        _downloadPdf(
+                                            context, billDetails!['gb_id']);
                                       },
                                       child: Container(
                                         padding: EdgeInsets.all(10.0),
@@ -863,200 +873,41 @@ class _C_PaymentHistoryDetailsState extends State<C_PaymentHistoryDetails>
       ),
     );
   }
-
-  void _showDownloadDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        bool removedDialog = false;
-
-        Timer(Duration(seconds: 2), () {
-          if (!removedDialog) {
-            Navigator.of(context).pop(); // Close the dialog safely
-          }
-        });
-
-        return PopScope(
-          canPop: false,
-          onPopInvokedWithResult: (didPop, result) async {
-            if (didPop) {
-              return;
-            }
-            removedDialog = true;
-            Navigator.pop(context);
-          },
-          child: AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15.0),
-            ),
-            content: Container(
-              height: 150,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.picture_as_pdf,
-                    color: Colors.red,
-                    size: 50,
-                  ),
-                  SizedBox(height: 20),
-                  Text(
-                    'Bill downloaded successfully!',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    'Your bill is ready for viewing.',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class PaymentBacktoApp extends StatefulWidget {
-  final int gb_id;
-  const PaymentBacktoApp({super.key, required this.gb_id});
-
-  @override
-  State<PaymentBacktoApp> createState() => _PaymentBacktoAppState();
-}
-
-class _PaymentBacktoAppState extends State<PaymentBacktoApp> {
-  @override
-  void initState() {
-    super.initState();
-    // _dbData();
-  }
-
-  @override
-  void dispose() {
-    print('disposeeee payment');
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: deepGreen,
-      appBar: AppBar(
-        backgroundColor: deepGreen,
-        foregroundColor: Colors.white,
-        // leading: SizedBox(width: 0),
-        // leadingWidth: 0,
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            PopScope(
-                canPop: false,
-                onPopInvokedWithResult: (didPop, result) async {
-                  if (didPop) {
-                    return;
-                  }
-                  Navigator.pop(context, true);
-                  // Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(
-                  //         builder: (context) =>
-                  //             C_PaymentHistoryDetails(gb_id: widget.gb_id)));
-                },
-                child: Container()),
-            Container(
-              padding: EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              C_PaymentHistoryDetails(gb_id: widget.gb_id),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      padding: EdgeInsets.all(10.0),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Center(
-                            child: Text(
-                              'Go Back to App',
-                              style:
-                                  TextStyle(color: Colors.grey, fontSize: 16.0),
-                            ),
-                          ),
-                          Center(
-                            child: Text(
-                              'Okay',
-                              style:
-                                  TextStyle(color: Colors.grey, fontSize: 16.0),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
 
 // class PaymentBacktoApp extends StatefulWidget {
-//   final sessionId;
 //   final int gb_id;
-//   const PaymentBacktoApp(
-//       {super.key, required this.sessionId, required this.gb_id});
+//   const PaymentBacktoApp({super.key, required this.gb_id});
 
 //   @override
 //   State<PaymentBacktoApp> createState() => _PaymentBacktoAppState();
 // }
 
-// class _PaymentBacktoAppState extends State<PaymentBacktoApp> {
+// class _PaymentBacktoAppState extends State<PaymentBacktoApp>
+//     with WidgetsBindingObserver {
 //   @override
 //   void initState() {
 //     super.initState();
+//     WidgetsBinding.instance.addObserver(this);
 //     // _dbData();
 //   }
 
 //   @override
 //   void dispose() {
 //     print('disposeeee payment');
+//     WidgetsBinding.instance.removeObserver(this);
 //     super.dispose();
+//   }
+
+//   @override
+//   void didChangeAppLifecycleState(AppLifecycleState state) {
+//     super.didChangeAppLifecycleState(state);
+
+//     if (state == AppLifecycleState.resumed) {
+//       console('message1111111111111111111111111111111');
+//     } else {
+//       console('message222222222222222222222222222222222222');
+//     }
 //   }
 
 //   @override
@@ -1066,8 +917,8 @@ class _PaymentBacktoAppState extends State<PaymentBacktoApp> {
 //       appBar: AppBar(
 //         backgroundColor: deepGreen,
 //         foregroundColor: Colors.white,
-//         leading: SizedBox(width: 0),
-//         leadingWidth: 0,
+//         // leading: SizedBox(width: 0),
+//         // leadingWidth: 0,
 //       ),
 //       body: SingleChildScrollView(
 //         padding: EdgeInsets.all(16.0),
@@ -1079,7 +930,12 @@ class _PaymentBacktoAppState extends State<PaymentBacktoApp> {
 //                   if (didPop) {
 //                     return;
 //                   }
-//                   Navigator.pop(context);
+//                   Navigator.pop(context, true);
+//                   // Navigator.push(
+//                   //     context,
+//                   //     MaterialPageRoute(
+//                   //         builder: (context) =>
+//                   //             C_PaymentHistoryDetails(gb_id: widget.gb_id)));
 //                 },
 //                 child: Container()),
 //             Container(
@@ -1091,13 +947,35 @@ class _PaymentBacktoAppState extends State<PaymentBacktoApp> {
 //               child: Column(
 //                 crossAxisAlignment: CrossAxisAlignment.start,
 //                 children: [
-//                   Text(widget.sessionId),
 //                   InkWell(
 //                     onTap: () {
-//                       checkPaymentStatus(widget.sessionId);
+//                       Navigator.pop(context, true);
 //                     },
 //                     child: Container(
-//                       child: Image.asset('assets/paymongo.png'),
+//                       padding: EdgeInsets.all(10.0),
+//                       decoration: BoxDecoration(
+//                         color: Colors.white,
+//                         borderRadius: BorderRadius.circular(10),
+//                       ),
+//                       child: Column(
+//                         crossAxisAlignment: CrossAxisAlignment.center,
+//                         children: [
+//                           Center(
+//                             child: Text(
+//                               'Go Back to App',
+//                               style:
+//                                   TextStyle(color: Colors.grey, fontSize: 16.0),
+//                             ),
+//                           ),
+//                           Center(
+//                             child: Text(
+//                               'Okay',
+//                               style:
+//                                   TextStyle(color: Colors.grey, fontSize: 16.0),
+//                             ),
+//                           ),
+//                         ],
+//                       ),
 //                     ),
 //                   )
 //                 ],
@@ -1113,34 +991,196 @@ class _PaymentBacktoAppState extends State<PaymentBacktoApp> {
 //   }
 // }
 
-Future<void> _downloadPdf() async {
+Future<void> _downloadPdf(BuildContext context, int bill_Id) async {
   String baseUrl = globalUrl();
   try {
+    // Check permission
+    var status = await Permission.storage.status;
+    if (!status.isGranted) {
+      await Permission.storage.request();
+    }
+
     var dio = Dio();
 
-    // Get the Downloads directory
-    Directory downloadsDirectory = Directory('/storage/emulated/0/Download');
+    Directory? downloadsDirectory = Directory('/storage/emulated/0/Download/trash');
+
+    // Check if the directory exists
+    if (!await downloadsDirectory.exists()) {
+      downloadsDirectory = await getExternalStorageDirectory();
+    }
+
     String formattedDate =
         DateFormat('MMMM dd, yyyy HH-mm-ss').format(DateTime.now());
     String savePath =
-        "${downloadsDirectory.path}/TrashTrack_Bill ($formattedDate).pdf";
+        "${downloadsDirectory!.path}/TrashTrack_Bill ($formattedDate).pdf";
 
-    //Directory? downloadsDirectory = await getExternalStorageDirectory();
-    //String savePath ="${downloadsDirectory?.path}/sample.pdf"; // Ensure this points to the correct Downloads directory
+    Map<String, String?> tokens = await getTokens();
+    String? accessToken = tokens['access_token'];
 
-    // Download the PDF file from the server
-    Response response = await dio.download(
-      '$baseUrl/generate-pdf', // Replace with your backend URL
-      savePath,
+    if (accessToken == null) {
+      print('No access token available. User needs to log in.');
+      await deleteTokens();
+      return;
+    }
+
+    // Send a POST request to download the PDF file
+    Response response = await dio.post(
+      '$baseUrl/generate-pdf',
+      options: Options(
+        responseType: ResponseType.bytes, // Ensure you're getting bytes
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+      ),
+      data: {
+        'billId': bill_Id, // Ensure you pass the correct billId
+      },
     );
 
     if (response.statusCode == 200) {
-      // Open the PDF after downloading
+      _showDownloadDialog(context);
+      // Save the PDF bytes to the file
+      await File(savePath).writeAsBytes(response.data);
       OpenFile.open(savePath);
-
       print(savePath);
+    } else {
+      // Handle specific HTTP response codes
+      if (response.statusCode == 401) {
+        // Access token might be expired, attempt to refresh it
+        print('Access token expired. Attempting to refresh...');
+        String? refreshMsg = await refreshAccessToken();
+        if (refreshMsg == null) {
+          return await _downloadPdf(context, bill_Id);
+        } else {
+          await deleteTokens(); // Logout user
+          return;
+        }
+      } else if (response.statusCode == 403) {
+        // Access token is invalid. Logout
+        print('Access token invalid. Attempting to logout...');
+        await deleteTokens(); // Logout user
+      } else if (response.statusCode == 404) {
+        showErrorSnackBar(context, 'PDF not found');
+        return;
+      }
+
+      showErrorSnackBar(context, 'Unable to download');
     }
   } catch (e) {
-    print("Error downloading PDF: $e");
+    print(e.toString());
+    showErrorSnackBar(context, 'Unable to download $e');
   }
+}
+
+// Future<void> _downloadPdf(BuildContext context) async {
+//   String baseUrl = globalUrl();
+//   try {
+//     //check permission
+//     var status = await Permission.storage.status;
+//     if (!status.isGranted) {
+//       await Permission.storage.request();
+//     } else {
+//       //console('No permission');
+//     }
+
+//     var dio = Dio();
+
+//     Directory? downloadsDirectory;
+//     downloadsDirectory = Directory('/storage/emulated/0/Download');
+//     //Check if the directory does not exists
+//     if (!await downloadsDirectory.exists()) {
+//       downloadsDirectory = await getExternalStorageDirectory();
+//     } else {
+//       //showErrorSnackBar(context, 'Unable to download');
+//       //console('Download folder already exist');
+//     }
+
+//     String formattedDate =
+//         DateFormat('MMMM dd, yyyy HH-mm-ss').format(DateTime.now());
+//     String savePath =
+//         "${downloadsDirectory!.path}/TrashTrack_Bill ($formattedDate).pdf";
+
+//     // Download the PDF file from the server
+//     Response response = await dio.download(
+//       '$baseUrl/generate-pdf', // Replace with your backend URL
+//       savePath,
+//     );
+
+//     if (response.statusCode == 200) {
+//       _showDownloadDialog(context);
+//       // Open the PDF after downloading
+//       OpenFile.open(savePath);
+
+//       print(savePath);
+//     } else {
+//       showErrorSnackBar(context, 'Unable to download');
+//     }
+//   } catch (e) {
+//     print(e.toString());
+//     showErrorSnackBar(context, 'Unable to download $e');
+//   }
+// }
+
+void _showDownloadDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      bool removedDialog = false;
+
+      Timer(const Duration(seconds: 3), () {
+        if (!removedDialog) {
+          Navigator.of(context).pop(); // Close the dialog safely
+        }
+      });
+
+      return PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) async {
+          if (didPop) {
+            return;
+          }
+          removedDialog = true;
+          Navigator.pop(context);
+        },
+        child: AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          content: Container(
+            height: 150,
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.picture_as_pdf,
+                  color: Colors.red,
+                  size: 50,
+                ),
+                SizedBox(height: 20),
+                Text(
+                  'Bill downloaded successfully!',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Your bill is ready for viewing.',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    },
+  );
 }

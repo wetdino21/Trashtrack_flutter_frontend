@@ -1251,657 +1251,623 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details>
                                     onAddress = true;
                                   });
                                 },
-                                child: Container(
-                                  margin: EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                      color: Colors.grey[200],
-                                      borderRadius: BorderRadius.circular(10),
-                                      boxShadow: shadowBigColor),
-                                  child: Column(
-                                    children: [
-                                      Container(
-                                        alignment: Alignment.center,
-                                        width: double.infinity,
-                                        padding: EdgeInsets.all(15),
-                                        decoration: BoxDecoration(
-                                          color: bookingData!['bk_status'] ==
-                                                  'Pending'
-                                              ? Colors.orange
-                                              : bookingData!['bk_status'] ==
-                                                      'Ongoing'
-                                                  ? Colors.green
-                                                  : bookingData!['bk_status'] ==
-                                                          'Cancelled'
-                                                      ? Colors.red
-                                                      : Colors.blue,
-                                          borderRadius: BorderRadius.vertical(
-                                              top: Radius.circular(10)),
-                                        ),
-                                        child: Column(
-                                          children: [
-                                            Text(
-                                              bookingData == null
-                                                  ? 'Loading ...'
-                                                  : bookingData!['bk_status'] ==
-                                                              'Pending' ||
-                                                          bookingData![
-                                                                  'bk_status'] ==
-                                                              'Ongoing'
-                                                      ? 'Request Pickup is ${bookingData!['bk_status']}'
-                                                      //? 'Your Request Pickup is ${bookingData!['bk_status']}'
-                                                      : 'Your Request Pickup was ${bookingData!['bk_status']}',
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 18),
-                                            ),
-                                            bookingData!['bk_status'] ==
-                                                    'Ongoing'
-                                                ? Text(
-                                                    'Today is your waste collection day!',
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                    ),
-                                                  )
-                                                : SizedBox()
-                                          ],
-                                        ),
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      alignment: Alignment.topLeft,
+                                      margin: EdgeInsets.only(left: 20),
+                                      child: Text(
+                                        'BOOKING# ${bookingData!['bk_id'].toString()}',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18),
                                       ),
-                                      Container(
-                                        padding: EdgeInsets.all(10),
-                                        decoration: BoxDecoration(
-                                          //color: Colors.grey[200],
-                                          borderRadius: BorderRadius.vertical(
-                                              bottom: Radius.circular(10)),
-                                        ),
-                                        child: onAddress
-                                            ? Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
+                                    ),
+                                    Container(
+                                      margin: EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                          color: Colors.grey[200],
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          boxShadow: shadowBigColor),
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            alignment: Alignment.center,
+                                            width: double.infinity,
+                                            padding: EdgeInsets.all(15),
+                                            decoration: BoxDecoration(
+                                              color: bookingData![
+                                                          'bk_status'] ==
+                                                      'Pending'
+                                                  ? Colors.orange
+                                                  : bookingData!['bk_status'] ==
+                                                          'Ongoing'
+                                                      ? Colors.green
+                                                      : bookingData![
+                                                                  'bk_status'] ==
+                                                              'Cancelled'
+                                                          ? Colors.red
+                                                          : Colors.blue,
+                                              borderRadius:
+                                                  BorderRadius.vertical(
+                                                      top: Radius.circular(10)),
+                                            ),
+                                            child: Column(
+                                              children: [
+                                                Text(
+                                                  bookingData == null
+                                                      ? 'Loading ...'
+                                                      : bookingData!['bk_status'] ==
+                                                                  'Pending' ||
+                                                              bookingData![
+                                                                      'bk_status'] ==
+                                                                  'Ongoing'
+                                                          ? 'Request Pickup is ${bookingData!['bk_status']}'
+                                                          //? 'Your Request Pickup is ${bookingData!['bk_status']}'
+                                                          : 'Your Request Pickup was ${bookingData!['bk_status']}',
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 18),
+                                                ),
+                                                bookingData!['bk_status'] ==
+                                                        'Ongoing'
+                                                    ? Text(
+                                                        'Today is your waste collection day!',
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                        ),
+                                                      )
+                                                    : SizedBox()
+                                              ],
+                                            ),
+                                          ),
+                                          Container(
+                                            padding: EdgeInsets.all(10),
+                                            decoration: BoxDecoration(
+                                              //color: Colors.grey[200],
+                                              borderRadius:
+                                                  BorderRadius.vertical(
+                                                      bottom:
+                                                          Radius.circular(10)),
+                                            ),
+                                            child: onAddress
+                                                ? Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
                                                     children: [
-                                                      SizedBox(),
-                                                      Container(
-                                                        alignment: Alignment
-                                                            .centerRight,
-                                                        padding: EdgeInsets
-                                                            .symmetric(
-                                                                vertical: 10,
-                                                                horizontal: 10),
-                                                        decoration: BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        5),
-                                                            color: Colors.blue,
-                                                            boxShadow:
-                                                                shadowColor),
-                                                        child: InkWell(
-                                                          onTap: () {
-                                                            setState(() {
-                                                              onAddress = false;
-                                                            });
-                                                          },
-                                                          child: Text(
-                                                            'Minimize',
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .white,
-                                                                fontSize: 12,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold),
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          SizedBox(),
+                                                          Container(
+                                                            alignment: Alignment
+                                                                .centerRight,
+                                                            padding: EdgeInsets
+                                                                .symmetric(
+                                                                    vertical:
+                                                                        10,
+                                                                    horizontal:
+                                                                        10),
+                                                            decoration: BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            5),
+                                                                color:
+                                                                    Colors.blue,
+                                                                boxShadow:
+                                                                    shadowColor),
+                                                            child: InkWell(
+                                                              onTap: () {
+                                                                setState(() {
+                                                                  onAddress =
+                                                                      false;
+                                                                });
+                                                              },
+                                                              child: Text(
+                                                                'Minimize',
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    fontSize:
+                                                                        12,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
+                                                              ),
+                                                            ),
                                                           ),
+                                                        ],
+                                                      ),
+                                                      Center(
+                                                          child: Text(
+                                                        'Information',
+                                                        style: TextStyle(
+                                                            fontSize: 16,
+                                                            color: Colors.grey),
+                                                      )),
+                                                      const SizedBox(
+                                                          height: 20),
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(left: 10),
+                                                        child: Text(
+                                                          'Contact',
+                                                          style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              color:
+                                                                  greytitleColor,
+                                                              fontSize: 16),
                                                         ),
                                                       ),
-                                                    ],
-                                                  ),
-                                                  Center(
-                                                      child: Text(
-                                                    'Information',
-                                                    style: TextStyle(
-                                                        fontSize: 16,
-                                                        color: Colors.grey),
-                                                  )),
-                                                  const SizedBox(height: 20),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            left: 10),
-                                                    child: Text(
-                                                      'Contact',
-                                                      style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: greytitleColor,
-                                                          fontSize: 16),
-                                                    ),
-                                                  ),
-                                                  _buildTextField(
-                                                    controller:
-                                                        _fullnameController,
-                                                    hintText: 'Full Name',
-                                                    onChanged: (value) {
-                                                      setState(() {
-                                                        fullnamevalidator =
-                                                            validateFullname(
-                                                                value);
-                                                        fullname = value!;
-                                                      });
-                                                    },
-                                                  ),
-                                                  _labelValidator(
-                                                      fullnamevalidator),
-                                                  const SizedBox(height: 5),
-                                                  _buildNumberField(
-                                                    inputFormatters: [
-                                                      FilteringTextInputFormatter
-                                                          .digitsOnly,
-                                                      LengthLimitingTextInputFormatter(
-                                                          10),
-                                                    ],
-                                                  ),
-                                                  _labelValidator(
-                                                      contactvalidator),
-                                                  const SizedBox(height: 20),
-                                                  Center(
-                                                      child: Text(
-                                                    'Complete Address',
-                                                    style: TextStyle(
-                                                        fontSize: 16,
-                                                        color: Colors.grey),
-                                                  )),
-                                                  const SizedBox(height: 20),
-                                                  Column(
-                                                    children: [
+                                                      _buildTextField(
+                                                        controller:
+                                                            _fullnameController,
+                                                        hintText: 'Full Name',
+                                                        onChanged: (value) {
+                                                          setState(() {
+                                                            fullnamevalidator =
+                                                                validateFullname(
+                                                                    value);
+                                                            fullname = value!;
+                                                          });
+                                                        },
+                                                      ),
+                                                      _labelValidator(
+                                                          fullnamevalidator),
+                                                      const SizedBox(height: 5),
+                                                      _buildNumberField(
+                                                        inputFormatters: [
+                                                          FilteringTextInputFormatter
+                                                              .digitsOnly,
+                                                          LengthLimitingTextInputFormatter(
+                                                              10),
+                                                        ],
+                                                      ),
+                                                      _labelValidator(
+                                                          contactvalidator),
+                                                      const SizedBox(
+                                                          height: 20),
+                                                      Center(
+                                                          child: Text(
+                                                        'Complete Address',
+                                                        style: TextStyle(
+                                                            fontSize: 16,
+                                                            color: Colors.grey),
+                                                      )),
+                                                      const SizedBox(
+                                                          height: 20),
                                                       Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
                                                         children: [
-                                                          Text(
-                                                            '  Province/City or Municipality/Barangay',
-                                                            style: TextStyle(
-                                                                fontSize: 16,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                color:
-                                                                    greytitleColor),
-                                                          ),
                                                           Column(
                                                             crossAxisAlignment:
                                                                 CrossAxisAlignment
                                                                     .start,
                                                             children: [
-                                                              Container(
-                                                                padding: EdgeInsets
-                                                                    .symmetric(
-                                                                        vertical:
-                                                                            5.0,
-                                                                        horizontal:
-                                                                            15),
-                                                                decoration: BoxDecoration(
-                                                                    color: Colors
-                                                                        .white,
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            10.0),
-                                                                    boxShadow:
-                                                                        shadowColor),
-                                                                child: Row(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .spaceBetween,
-                                                                  children: [
-                                                                    // Show selected values
-                                                                    Expanded(
-                                                                      child:
-                                                                          Text(
-                                                                        _selectedProvinceName ==
-                                                                                null
-                                                                            ? 'Select Province'
-                                                                            : _selectedCityMunicipalityName == null
-                                                                                ? '${_selectedProvinceName} / '
-                                                                                : _selectedBarangayName == null
-                                                                                    ? '${_selectedProvinceName} / ${_selectedCityMunicipalityName} / '
-                                                                                    : '${_selectedProvinceName} / '
-                                                                                        '${_selectedCityMunicipalityName} / '
-                                                                                        '${_selectedBarangayName}',
-                                                                        style: TextStyle(
-                                                                            color: _selectedProvinceName == null
-                                                                                ? greySoft
-                                                                                : black,
-                                                                            fontSize:
-                                                                                16.0),
-                                                                        overflow:
-                                                                            TextOverflow.visible, // Allow wrapping
-                                                                        softWrap:
-                                                                            true, // Enable soft wrapping
-                                                                      ),
-                                                                    ),
-                                                                    IconButton(
-                                                                        icon:
-                                                                            Icon(
-                                                                          Icons
-                                                                              .clear,
-                                                                          color:
-                                                                              Colors.deepPurple,
-                                                                        ),
-                                                                        onPressed:
-                                                                            () {
-                                                                          //close
-                                                                          _loadProvinces();
-                                                                          setState(
-                                                                              () {
-                                                                            _provinces =
-                                                                                [];
-                                                                            _citiesMunicipalities =
-                                                                                [];
-                                                                            _barangays =
-                                                                                [];
-
-                                                                            _showCityMunicipalityDropdown =
-                                                                                false;
-                                                                            _showBarangayDropdown =
-                                                                                false;
-
-                                                                            _selectedProvinceName =
-                                                                                null;
-                                                                            _selectedCityMunicipalityName =
-                                                                                null;
-                                                                            _selectedBarangayName =
-                                                                                null;
-                                                                            address =
-                                                                                '';
-                                                                          });
-                                                                        })
-                                                                  ],
-                                                                ),
+                                                              Text(
+                                                                '  Province/City or Municipality/Barangay',
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        16,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    color:
+                                                                        greytitleColor),
                                                               ),
-                                                              if (_showProvinceDropdown)
-                                                                Container(
-                                                                  height: 100,
-                                                                  margin: EdgeInsets
-                                                                      .symmetric(
-                                                                          horizontal:
-                                                                              10),
-                                                                  decoration: BoxDecoration(
-                                                                      color: Colors
-                                                                          .deepPurple
-                                                                          .withOpacity(
-                                                                              0.7),
-                                                                      borderRadius: BorderRadius.vertical(
-                                                                          bottom: Radius.circular(
-                                                                              15)),
-                                                                      boxShadow:
-                                                                          shadowColor),
-                                                                  child: ListView
-                                                                      .builder(
-                                                                    itemCount:
-                                                                        _provinces
-                                                                            .length,
-                                                                    itemBuilder:
-                                                                        (context,
-                                                                            index) {
-                                                                      final city =
-                                                                          _provinces[
-                                                                              index];
-
-                                                                      return InkWell(
-                                                                        onTap:
-                                                                            () {
-                                                                          setState(
-                                                                              () {
-                                                                            _loadCitiesMunicipalities(city['code']); // Load barangays for the selected city
-
-                                                                            _selectedProvinceName =
-                                                                                city['name']; // Set by name
-                                                                            _showProvinceDropdown =
-                                                                                false;
-                                                                            _showCityMunicipalityDropdown =
-                                                                                true;
-                                                                          });
-                                                                        },
-                                                                        child:
-                                                                            Container(
-                                                                          padding: EdgeInsets.symmetric(
-                                                                              vertical: 10,
-                                                                              horizontal: 15),
-                                                                          decoration:
-                                                                              BoxDecoration(
-                                                                            border:
-                                                                                Border(bottom: BorderSide(color: Colors.grey.shade300)),
-                                                                          ),
-                                                                          child:
-                                                                              Text(
-                                                                            city['name'], // Display the name
-                                                                            style:
-                                                                                TextStyle(fontSize: 16, color: Colors.white),
-                                                                          ),
-                                                                        ),
-                                                                      );
-                                                                    },
-                                                                  ),
-                                                                ),
-                                                              if (_showCityMunicipalityDropdown)
-                                                                Container(
-                                                                  height: 400,
-                                                                  margin: EdgeInsets
-                                                                      .symmetric(
-                                                                          horizontal:
-                                                                              10),
-                                                                  decoration: BoxDecoration(
-                                                                      color: Colors
-                                                                          .deepPurple
-                                                                          .withOpacity(
-                                                                              0.7),
-                                                                      borderRadius: BorderRadius.vertical(
-                                                                          bottom: Radius.circular(
-                                                                              15)),
-                                                                      boxShadow:
-                                                                          shadowColor),
-                                                                  child: ListView
-                                                                      .builder(
-                                                                    itemCount:
-                                                                        _citiesMunicipalities
-                                                                            .length,
-                                                                    itemBuilder:
-                                                                        (context,
-                                                                            index) {
-                                                                      final city =
-                                                                          _citiesMunicipalities[
-                                                                              index];
-
-                                                                      return InkWell(
-                                                                        onTap:
-                                                                            () {
-                                                                          setState(
-                                                                              () {
-                                                                            _loadBarangays(city['code']);
-
-                                                                            _selectedCityMunicipalityName =
-                                                                                city['name'];
-                                                                            _showCityMunicipalityDropdown =
-                                                                                false;
-                                                                            _showBarangayDropdown =
-                                                                                true;
-                                                                          });
-                                                                        },
-                                                                        child:
-                                                                            Container(
-                                                                          padding: EdgeInsets.symmetric(
-                                                                              vertical: 10,
-                                                                              horizontal: 15),
-                                                                          decoration:
-                                                                              BoxDecoration(
-                                                                            border:
-                                                                                Border(bottom: BorderSide(color: Colors.grey.shade300)),
-                                                                          ),
-                                                                          child:
-                                                                              Text(
-                                                                            city['name'], // Display the name
-                                                                            style:
-                                                                                TextStyle(fontSize: 16, color: Colors.white),
-                                                                          ),
-                                                                        ),
-                                                                      );
-                                                                    },
-                                                                  ),
-                                                                ),
-
-                                                              //brgy ddl
-                                                              if (_showBarangayDropdown)
-                                                                Container(
-                                                                  height: 400,
-                                                                  margin: EdgeInsets
-                                                                      .symmetric(
-                                                                          horizontal:
-                                                                              10),
-                                                                  decoration: BoxDecoration(
-                                                                      color: Colors
-                                                                          .deepPurple
-                                                                          .withOpacity(
-                                                                              0.7),
-                                                                      borderRadius: BorderRadius.vertical(
-                                                                          bottom: Radius.circular(
-                                                                              15)),
-                                                                      boxShadow:
-                                                                          shadowColor),
-                                                                  child: ListView
-                                                                      .builder(
-                                                                    itemCount:
-                                                                        _barangays
-                                                                            .length,
-                                                                    itemBuilder:
-                                                                        (context,
-                                                                            index) {
-                                                                      final city =
-                                                                          _barangays[
-                                                                              index];
-
-                                                                      return InkWell(
-                                                                        onTap:
-                                                                            () {
-                                                                          setState(
-                                                                              () {
-                                                                            _selectedBarangayName =
-                                                                                city['name'];
-                                                                            _showBarangayDropdown =
-                                                                                false;
-
-                                                                            address = _selectedBarangayName! +
-                                                                                ', ' +
-                                                                                _selectedCityMunicipalityName! +
-                                                                                ', ' +
-                                                                                _selectedProvinceName!;
-                                                                          });
-                                                                        },
-                                                                        child:
-                                                                            Container(
-                                                                          padding: EdgeInsets.symmetric(
-                                                                              vertical: 10,
-                                                                              horizontal: 15),
-                                                                          decoration:
-                                                                              BoxDecoration(
-                                                                            border:
-                                                                                Border(bottom: BorderSide(color: Colors.grey.shade300)),
-                                                                          ),
-                                                                          child:
-                                                                              Text(
-                                                                            city['name'], // Display the name
-                                                                            style:
-                                                                                TextStyle(fontSize: 16, color: Colors.white),
-                                                                          ),
-                                                                        ),
-                                                                      );
-                                                                    },
-                                                                  ),
-                                                                )
-                                                            ],
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      if (_selectedProvinceName == null ||
-                                                          _selectedCityMunicipalityName ==
-                                                              null ||
-                                                          _selectedBarangayName ==
-                                                              null)
-                                                        Text(
-                                                          'Please select your adrress.',
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.red),
-                                                        ),
-                                                      const SizedBox(height: 5),
-                                                      _buildTextField(
-                                                        controller:
-                                                            _streetController,
-                                                        hintText:
-                                                            'Street Name, Building, House No.',
-                                                        onChanged: (value) {
-                                                          setState(() {
-                                                            streetvalidator =
-                                                                validateStreet(
-                                                                    value); // Trigger validation on text change
-                                                            street = value!;
-                                                          });
-                                                        },
-                                                      ),
-                                                      _labelValidator(
-                                                          streetvalidator),
-                                                      const SizedBox(height: 5),
-                                                      _buildTextField(
-                                                        controller:
-                                                            _postalController,
-                                                        keyboardType:
-                                                            TextInputType
-                                                                .number,
-                                                        inputFormatters: [
-                                                          FilteringTextInputFormatter
-                                                              .digitsOnly,
-                                                          LengthLimitingTextInputFormatter(
-                                                              4),
-                                                        ],
-                                                        hintText: 'Postal Code',
-                                                        onChanged: (value) {
-                                                          setState(() {
-                                                            postalvalidator =
-                                                                validatePostalCode(
-                                                                    value); // Trigger validation on text change
-                                                            postal = value!;
-                                                          });
-                                                        },
-                                                      ),
-                                                      _labelValidator(
-                                                          postalvalidator),
-                                                    ],
-                                                  ),
-                                                ],
-                                              )
-                                            //if not on address
-                                            : IntrinsicHeight(
-                                                child: Container(
-                                                  padding: EdgeInsets.all(5),
-                                                  decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      //color: Colors.white.withOpacity(.6),
-                                                      color: Colors.white,
-                                                      boxShadow: shadowColor),
-                                                  child: Row(
-                                                    // mainAxisAlignment: MainAxisAlignment.start,
-                                                    // crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Expanded(
-                                                          flex: 1,
-                                                          child: Container(
-                                                              height: 35,
-                                                              width: 30,
-                                                              padding: EdgeInsets
-                                                                  .only(
-                                                                      left: 2),
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            50),
-                                                              ),
-                                                              alignment: Alignment
-                                                                  .centerLeft,
-                                                              child: Icon(
-                                                                Icons.pin_drop,
-                                                                size: 30,
-                                                                color: Colors
-                                                                    .green,
-                                                              ))),
-                                                      Expanded(
-                                                          flex: 10,
-                                                          child: Container(
-                                                              padding: EdgeInsets
-                                                                  .only(
-                                                                      left: 10),
-                                                              alignment: Alignment
-                                                                  .centerLeft,
-                                                              child: Column(
+                                                              Column(
                                                                 crossAxisAlignment:
                                                                     CrossAxisAlignment
                                                                         .start,
                                                                 children: [
-                                                                  Row(
+                                                                  Container(
+                                                                    padding: EdgeInsets.symmetric(
+                                                                        vertical:
+                                                                            5.0,
+                                                                        horizontal:
+                                                                            15),
+                                                                    decoration: BoxDecoration(
+                                                                        color: Colors
+                                                                            .white,
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(
+                                                                                10.0),
+                                                                        boxShadow:
+                                                                            shadowColor),
+                                                                    child: Row(
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .spaceBetween,
+                                                                      children: [
+                                                                        // Show selected values
+                                                                        Expanded(
+                                                                          child:
+                                                                              Text(
+                                                                            _selectedProvinceName == null
+                                                                                ? 'Select Province'
+                                                                                : _selectedCityMunicipalityName == null
+                                                                                    ? '${_selectedProvinceName} / '
+                                                                                    : _selectedBarangayName == null
+                                                                                        ? '${_selectedProvinceName} / ${_selectedCityMunicipalityName} / '
+                                                                                        : '${_selectedProvinceName} / '
+                                                                                            '${_selectedCityMunicipalityName} / '
+                                                                                            '${_selectedBarangayName}',
+                                                                            style:
+                                                                                TextStyle(color: _selectedProvinceName == null ? greySoft : black, fontSize: 16.0),
+                                                                            overflow:
+                                                                                TextOverflow.visible, // Allow wrapping
+                                                                            softWrap:
+                                                                                true, // Enable soft wrapping
+                                                                          ),
+                                                                        ),
+                                                                        IconButton(
+                                                                            icon:
+                                                                                Icon(
+                                                                              Icons.clear,
+                                                                              color: Colors.deepPurple,
+                                                                            ),
+                                                                            onPressed:
+                                                                                () {
+                                                                              //close
+                                                                              _loadProvinces();
+                                                                              setState(() {
+                                                                                _provinces = [];
+                                                                                _citiesMunicipalities = [];
+                                                                                _barangays = [];
+
+                                                                                _showCityMunicipalityDropdown = false;
+                                                                                _showBarangayDropdown = false;
+
+                                                                                _selectedProvinceName = null;
+                                                                                _selectedCityMunicipalityName = null;
+                                                                                _selectedBarangayName = null;
+                                                                                address = '';
+                                                                              });
+                                                                            })
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                  if (_showProvinceDropdown)
+                                                                    Container(
+                                                                      height:
+                                                                          100,
+                                                                      margin: EdgeInsets.symmetric(
+                                                                          horizontal:
+                                                                              10),
+                                                                      decoration: BoxDecoration(
+                                                                          color: Colors.deepPurple.withOpacity(
+                                                                              0.7),
+                                                                          borderRadius:
+                                                                              BorderRadius.vertical(bottom: Radius.circular(15)),
+                                                                          boxShadow: shadowColor),
+                                                                      child: ListView
+                                                                          .builder(
+                                                                        itemCount:
+                                                                            _provinces.length,
+                                                                        itemBuilder:
+                                                                            (context,
+                                                                                index) {
+                                                                          final city =
+                                                                              _provinces[index];
+
+                                                                          return InkWell(
+                                                                            onTap:
+                                                                                () {
+                                                                              setState(() {
+                                                                                _loadCitiesMunicipalities(city['code']); // Load barangays for the selected city
+
+                                                                                _selectedProvinceName = city['name']; // Set by name
+                                                                                _showProvinceDropdown = false;
+                                                                                _showCityMunicipalityDropdown = true;
+                                                                              });
+                                                                            },
+                                                                            child:
+                                                                                Container(
+                                                                              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                                                                              decoration: BoxDecoration(
+                                                                                border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
+                                                                              ),
+                                                                              child: Text(
+                                                                                city['name'], // Display the name
+                                                                                style: TextStyle(fontSize: 16, color: Colors.white),
+                                                                              ),
+                                                                            ),
+                                                                          );
+                                                                        },
+                                                                      ),
+                                                                    ),
+                                                                  if (_showCityMunicipalityDropdown)
+                                                                    Container(
+                                                                      height:
+                                                                          400,
+                                                                      margin: EdgeInsets.symmetric(
+                                                                          horizontal:
+                                                                              10),
+                                                                      decoration: BoxDecoration(
+                                                                          color: Colors.deepPurple.withOpacity(
+                                                                              0.7),
+                                                                          borderRadius:
+                                                                              BorderRadius.vertical(bottom: Radius.circular(15)),
+                                                                          boxShadow: shadowColor),
+                                                                      child: ListView
+                                                                          .builder(
+                                                                        itemCount:
+                                                                            _citiesMunicipalities.length,
+                                                                        itemBuilder:
+                                                                            (context,
+                                                                                index) {
+                                                                          final city =
+                                                                              _citiesMunicipalities[index];
+
+                                                                          return InkWell(
+                                                                            onTap:
+                                                                                () {
+                                                                              setState(() {
+                                                                                _loadBarangays(city['code']);
+
+                                                                                _selectedCityMunicipalityName = city['name'];
+                                                                                _showCityMunicipalityDropdown = false;
+                                                                                _showBarangayDropdown = true;
+                                                                              });
+                                                                            },
+                                                                            child:
+                                                                                Container(
+                                                                              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                                                                              decoration: BoxDecoration(
+                                                                                border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
+                                                                              ),
+                                                                              child: Text(
+                                                                                city['name'], // Display the name
+                                                                                style: TextStyle(fontSize: 16, color: Colors.white),
+                                                                              ),
+                                                                            ),
+                                                                          );
+                                                                        },
+                                                                      ),
+                                                                    ),
+
+                                                                  //brgy ddl
+                                                                  if (_showBarangayDropdown)
+                                                                    Container(
+                                                                      height:
+                                                                          400,
+                                                                      margin: EdgeInsets.symmetric(
+                                                                          horizontal:
+                                                                              10),
+                                                                      decoration: BoxDecoration(
+                                                                          color: Colors.deepPurple.withOpacity(
+                                                                              0.7),
+                                                                          borderRadius:
+                                                                              BorderRadius.vertical(bottom: Radius.circular(15)),
+                                                                          boxShadow: shadowColor),
+                                                                      child: ListView
+                                                                          .builder(
+                                                                        itemCount:
+                                                                            _barangays.length,
+                                                                        itemBuilder:
+                                                                            (context,
+                                                                                index) {
+                                                                          final city =
+                                                                              _barangays[index];
+
+                                                                          return InkWell(
+                                                                            onTap:
+                                                                                () {
+                                                                              setState(() {
+                                                                                _selectedBarangayName = city['name'];
+                                                                                _showBarangayDropdown = false;
+
+                                                                                address = _selectedBarangayName! + ', ' + _selectedCityMunicipalityName! + ', ' + _selectedProvinceName!;
+                                                                              });
+                                                                            },
+                                                                            child:
+                                                                                Container(
+                                                                              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                                                                              decoration: BoxDecoration(
+                                                                                border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
+                                                                              ),
+                                                                              child: Text(
+                                                                                city['name'], // Display the name
+                                                                                style: TextStyle(fontSize: 16, color: Colors.white),
+                                                                              ),
+                                                                            ),
+                                                                          );
+                                                                        },
+                                                                      ),
+                                                                    )
+                                                                ],
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          if (_selectedProvinceName == null ||
+                                                              _selectedCityMunicipalityName ==
+                                                                  null ||
+                                                              _selectedBarangayName ==
+                                                                  null)
+                                                            Text(
+                                                              'Please select your adrress.',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .red),
+                                                            ),
+                                                          const SizedBox(
+                                                              height: 5),
+                                                          _buildTextField(
+                                                            controller:
+                                                                _streetController,
+                                                            hintText:
+                                                                'Street Name, Building, House No.',
+                                                            onChanged: (value) {
+                                                              setState(() {
+                                                                streetvalidator =
+                                                                    validateStreet(
+                                                                        value); // Trigger validation on text change
+                                                                street = value!;
+                                                              });
+                                                            },
+                                                          ),
+                                                          _labelValidator(
+                                                              streetvalidator),
+                                                          const SizedBox(
+                                                              height: 5),
+                                                          _buildTextField(
+                                                            controller:
+                                                                _postalController,
+                                                            keyboardType:
+                                                                TextInputType
+                                                                    .number,
+                                                            inputFormatters: [
+                                                              FilteringTextInputFormatter
+                                                                  .digitsOnly,
+                                                              LengthLimitingTextInputFormatter(
+                                                                  4),
+                                                            ],
+                                                            hintText:
+                                                                'Postal Code',
+                                                            onChanged: (value) {
+                                                              setState(() {
+                                                                postalvalidator =
+                                                                    validatePostalCode(
+                                                                        value); // Trigger validation on text change
+                                                                postal = value!;
+                                                              });
+                                                            },
+                                                          ),
+                                                          _labelValidator(
+                                                              postalvalidator),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  )
+                                                //if not on address
+                                                : IntrinsicHeight(
+                                                    child: Container(
+                                                      padding:
+                                                          EdgeInsets.all(5),
+                                                      decoration: BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(10),
+                                                          //color: Colors.white.withOpacity(.6),
+                                                          color: Colors.white,
+                                                          boxShadow:
+                                                              shadowColor),
+                                                      child: Row(
+                                                        // mainAxisAlignment: MainAxisAlignment.start,
+                                                        // crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          Expanded(
+                                                              flex: 1,
+                                                              child: Container(
+                                                                  height: 35,
+                                                                  width: 30,
+                                                                  padding: EdgeInsets
+                                                                      .only(
+                                                                          left:
+                                                                              2),
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            50),
+                                                                  ),
+                                                                  alignment:
+                                                                      Alignment
+                                                                          .centerLeft,
+                                                                  child: Icon(
+                                                                    Icons
+                                                                        .pin_drop,
+                                                                    size: 30,
+                                                                    color: Colors
+                                                                        .green,
+                                                                  ))),
+                                                          Expanded(
+                                                              flex: 10,
+                                                              child: Container(
+                                                                  padding: EdgeInsets
+                                                                      .only(
+                                                                          left:
+                                                                              10),
+                                                                  alignment:
+                                                                      Alignment
+                                                                          .centerLeft,
+                                                                  child: Column(
                                                                     crossAxisAlignment:
                                                                         CrossAxisAlignment
                                                                             .start,
                                                                     children: [
-                                                                      Expanded(
-                                                                        child:
-                                                                            Text(
-                                                                          fullname,
-                                                                          style: TextStyle(
-                                                                              fontWeight: FontWeight.bold,
-                                                                              fontSize: 15),
-                                                                          softWrap:
-                                                                              true,
-                                                                        ),
-                                                                      ),
-                                                                      Expanded(
-                                                                        child: Text(
-                                                                            '| +(63)${contact}',
-                                                                            style:
-                                                                                TextStyle(
-                                                                              color: Colors.grey,
-                                                                              overflow: TextOverflow.ellipsis,
-                                                                            )),
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                  Expanded(
-                                                                      flex: 2,
-                                                                      child:
-                                                                          Text(
-                                                                        '${street} \n${address}, ${postal}',
-                                                                      )),
-                                                                  Expanded(
-                                                                      flex: 1,
-                                                                      child:
-                                                                          Row(
+                                                                      Row(
+                                                                        crossAxisAlignment:
+                                                                            CrossAxisAlignment.start,
                                                                         children: [
-                                                                          SizedBox(
-                                                                            width:
-                                                                                5,
-                                                                          ),
-                                                                          Container(
-                                                                            padding:
-                                                                                EdgeInsets.all(2),
-                                                                            decoration:
-                                                                                BoxDecoration(
-                                                                              borderRadius: BorderRadius.circular(3),
-                                                                              //color: Colors.white.withOpacity(.6),
-                                                                              border: Border.all(color: Colors.green),
-                                                                            ),
+                                                                          Expanded(
                                                                             child:
                                                                                 Text(
-                                                                              'Pickup Address',
-                                                                              style: TextStyle(color: Colors.green),
+                                                                              fullname,
+                                                                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                                                              softWrap: true,
                                                                             ),
                                                                           ),
+                                                                          Expanded(
+                                                                            child: Text('| +(63)${contact}',
+                                                                                style: TextStyle(
+                                                                                  color: Colors.grey,
+                                                                                  overflow: TextOverflow.ellipsis,
+                                                                                )),
+                                                                          ),
                                                                         ],
-                                                                      )),
-                                                                ],
-                                                              ))),
-                                                    ],
+                                                                      ),
+                                                                      Expanded(
+                                                                          flex:
+                                                                              2,
+                                                                          child:
+                                                                              Text(
+                                                                            '${street} \n${address}, ${postal}',
+                                                                          )),
+                                                                      Expanded(
+                                                                          flex:
+                                                                              1,
+                                                                          child:
+                                                                              Row(
+                                                                            children: [
+                                                                              SizedBox(
+                                                                                width: 5,
+                                                                              ),
+                                                                              Container(
+                                                                                padding: EdgeInsets.all(2),
+                                                                                decoration: BoxDecoration(
+                                                                                  borderRadius: BorderRadius.circular(3),
+                                                                                  //color: Colors.white.withOpacity(.6),
+                                                                                  border: Border.all(color: Colors.green),
+                                                                                ),
+                                                                                child: Text(
+                                                                                  'Pickup Address',
+                                                                                  style: TextStyle(color: Colors.green),
+                                                                                ),
+                                                                              ),
+                                                                            ],
+                                                                          )),
+                                                                    ],
+                                                                  ))),
+                                                        ],
+                                                      ),
+                                                    ),
                                                   ),
-                                                ),
-                                              ),
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
                               ),
 

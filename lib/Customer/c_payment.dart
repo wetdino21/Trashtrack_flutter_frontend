@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'dart:io';
-
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:trashtrack/Customer/c_schedule_list.dart';
 import 'package:trashtrack/api_network.dart';
 import 'package:trashtrack/api_paymongo.dart';
 import 'package:trashtrack/api_postgre_service.dart';
 import 'package:trashtrack/api_token.dart';
-import 'package:trashtrack/mainApp.dart';
+import 'package:trashtrack/billing_list.dart';
 import 'package:trashtrack/styles.dart';
 
 import 'package:dio/dio.dart';
@@ -26,23 +27,18 @@ class _C_PaymentScreenState extends State<C_PaymentScreen>
   late Animation<Color?> _colorTween;
   late Animation<Color?> _colorTween2;
 
-  List<Map<String, dynamic>>? bookingList;
-  List<Map<String, dynamic>>? bookingWasteList;
-  List<Map<String, dynamic>>? bookingListHistory;
-  List<Map<String, dynamic>>? bookingWasteListHistory;
-
   bool isLoading = false;
   int selectedPage = 0;
   late PageController _pageController;
   List<Map<String, dynamic>>? billList;
-  String debug = 'nulllllllllll';
+  List<Map<String, dynamic>>? paymentList;
 
   @override
   void initState() {
     super.initState();
 
     //_dbData();
-    _fetchBillData();
+    _fetchBillPaymentData();
     _pageController = PageController(initialPage: selectedPage);
 
     _controller = AnimationController(
@@ -77,20 +73,21 @@ class _C_PaymentScreenState extends State<C_PaymentScreen>
     _pageController.jumpToPage(pageIndex);
   }
 
-  // Fetch bill
-  // Fetch notifications from the server
-  Future<void> _fetchBillData() async {
+  // Fetch data
+  Future<void> _fetchBillPaymentData() async {
     setState(() {
       isLoading = true;
     });
     try {
       final data = await fetchBill();
+      final data2 = await fetchPayment();
       if (!mounted) {
         return;
       }
-      if (data != null) {
+      if (data != null && data2 != null) {
         setState(() {
           billList = data;
+          paymentList = data2;
           isLoading = false;
         });
       } else {
@@ -140,7 +137,7 @@ class _C_PaymentScreenState extends State<C_PaymentScreen>
 
                           RefreshIndicator(
                               onRefresh: () async {
-                                await _fetchBillData();
+                                await _fetchBillPaymentData();
                               },
                               child: isLoading
                                   ? Container(
@@ -197,18 +194,30 @@ class _C_PaymentScreenState extends State<C_PaymentScreen>
 
                                             // Extracting fields from the bill
                                             int? gb_id = bill['gb_id'];
+                                            String bill_id =
+                                                'Bill# ${gb_id.toString()}';
+                                            String booking_id =
+                                                'BOOKING# ${bill['bk_id']?.toString()}';
                                             String status =
                                                 bill['gb_status']?.toString() ??
                                                     '';
-                                            // String date =
-                                            //     bill['gb_date_issued'] ?? '';
-                                            // String time = bill['gb_date_due'] ?? '';
-                                            // String wasteType = 'Food Waste';
-                                            // String paymentType =
-                                            //     bill['gb_note'] ?? '';
-                                            // String amount =
-                                            //     bill['gb_total_sales']?.toString() ??
-                                            //         '';
+                                            DateTime dbDueDate = DateTime.parse(
+                                                    bill['gb_date_due'] ?? '')
+                                                .toLocal();
+                                            String formatdbDueDate = DateFormat(
+                                                    'MMM dd, yyyy hh:mm a')
+                                                .format(dbDueDate);
+                                            String dueDate = formatdbDueDate;
+                                            DateTime dbdateIssue =
+                                                DateTime.parse(bill[
+                                                            'gb_date_issued'] ??
+                                                        '')
+                                                    .toLocal();
+                                            String formatdateIssue = DateFormat(
+                                                    'MMM dd, yyyy hh:mm a')
+                                                .format(dbdateIssue);
+                                            String dateIssued =
+                                                'Issued: $formatdateIssue';
 
                                             return InkWell(
                                               onTap: () {
@@ -217,23 +226,14 @@ class _C_PaymentScreenState extends State<C_PaymentScreen>
                                                       context,
                                                       MaterialPageRoute(
                                                           builder: (context) =>
-                                                              C_PaymentHistoryDetails(
+                                                              C_PaymentDetails(
                                                                   gb_id:
                                                                       gb_id))).then(
                                                       (value) {
                                                     if (value == true) {
-                                                      _fetchBillData();
+                                                      _fetchBillPaymentData();
                                                     }
                                                   });
-
-                                                  // Navigator.push(
-                                                  //   context,
-                                                  //   MaterialPageRoute(
-                                                  //     builder: (context) =>
-                                                  //         C_PaymentHistoryDetails(
-                                                  //             gb_id: gb_id),
-                                                  //   ),
-                                                  // );
                                                 }
                                               },
                                               child: Column(
@@ -241,18 +241,114 @@ class _C_PaymentScreenState extends State<C_PaymentScreen>
                                                   if (index == 0)
                                                     SizedBox(height: 30),
                                                   Container(
-                                                    alignment:
-                                                        Alignment.bottomLeft,
-                                                    color: greySoft,
-                                                    padding: EdgeInsets.all(20),
+                                                    padding: EdgeInsets.all(10),
                                                     margin: EdgeInsets.all(10),
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
+                                                    decoration: BoxDecoration(
+                                                        color: deepPurple,
+                                                        boxShadow:
+                                                            shadowLowColor,
+                                                        borderRadius:
+                                                            borderRadius10),
+                                                    child: Column(
                                                       children: [
-                                                        Text(gb_id.toString()),
-                                                        Text(status),
+                                                        Container(
+                                                          alignment:
+                                                              Alignment.topLeft,
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Text(
+                                                                bill_id,
+                                                                style: TextStyle(
+                                                                    color:
+                                                                        whiteSoft,
+                                                                    fontSize:
+                                                                        14),
+                                                              ),
+                                                              Text(
+                                                                booking_id,
+                                                                style: TextStyle(
+                                                                    color:
+                                                                        whiteSoft,
+                                                                    fontSize:
+                                                                        14),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal:
+                                                                      10),
+                                                          decoration: BoxDecoration(
+                                                              color: white,
+                                                              borderRadius:
+                                                                  borderRadius5,
+                                                              boxShadow:
+                                                                  shadowLowColor),
+                                                          child: Column(
+                                                            children: [
+                                                              Text(
+                                                                'Due Date',
+                                                                style: TextStyle(
+                                                                    color: grey,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    fontSize:
+                                                                        14),
+                                                              ),
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .center,
+                                                                children: [
+                                                                  Icon(
+                                                                    Icons
+                                                                        .calendar_month,
+                                                                    color: grey,
+                                                                  ),
+                                                                  Text(
+                                                                    dueDate,
+                                                                    style: TextStyle(
+                                                                        color:
+                                                                            grey,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .bold,
+                                                                        fontSize:
+                                                                            20),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            Text(
+                                                              dateIssued,
+                                                              style: TextStyle(
+                                                                  color:
+                                                                      whiteSoft,
+                                                                  fontSize: 14),
+                                                            ),
+                                                            Text(
+                                                              status,
+                                                              style: TextStyle(
+                                                                  color:
+                                                                      yellowSoft,
+                                                                  fontSize: 18),
+                                                            ),
+                                                          ],
+                                                        ),
                                                       ],
                                                     ),
                                                   ),
@@ -268,7 +364,7 @@ class _C_PaymentScreenState extends State<C_PaymentScreen>
                           // History Schedule
                           RefreshIndicator(
                             onRefresh: () async {
-                              await _fetchBillData();
+                              await _fetchBillPaymentData();
                             },
                             child: isLoading
                                 ? Container(
@@ -276,8 +372,7 @@ class _C_PaymentScreenState extends State<C_PaymentScreen>
                                     child: LoadingAnimation(
                                         _controller, _colorTween, _colorTween2),
                                   )
-                                : (bookingList == null) &&
-                                        bookingListHistory == null
+                                : (paymentList == null)
                                     ? ListView(
                                         children: [
                                           Column(
@@ -313,81 +408,170 @@ class _C_PaymentScreenState extends State<C_PaymentScreen>
                                         ],
                                       )
                                     : ListView.builder(
-                                        itemCount:
-                                            bookingListHistory?.length == null
-                                                ? 0
-                                                : bookingListHistory!.length,
+                                        itemCount: paymentList?.length ??
+                                            0, // Simplified null check
                                         itemBuilder: (context, index) {
-                                          // Safely retrieve the booking details from bookingList
-                                          final booking =
-                                              bookingListHistory?[index];
+                                          final payment = paymentList?[index];
 
-                                          if (booking == null) {
-                                            return const SizedBox.shrink();
+                                          if (payment == null) {
+                                            return SizedBox
+                                                .shrink(); // Return an empty box if payment is null
                                           }
 
-                                          int book_Id = booking['bk_id'];
-                                          DateTime dbdate = DateTime.parse(
-                                                  booking['bk_date'] ?? '')
+                                          // Extracting fields from the payment
+                                          int? gb_id = payment['gb_id'];
+                                          String bill_id =
+                                              'Bill# ${gb_id.toString()}';
+                                          String booking_id =
+                                              'BOOKING# ${payment['bk_id']?.toString()}';
+                                          String status =
+                                              payment['p_status'].toString();
+                                          if (status.isNotEmpty) {
+                                            status = status.replaceRange(
+                                                0, 1, status[0].toUpperCase());
+                                          }
+
+                                          String amount =
+                                              '₱ ${payment['p_amount'].toString()}';
+                                          String method =
+                                              payment['p_method'].toString();
+                                          DateTime dbdateIssue = DateTime.parse(
+                                                  payment['p_date_paid'] ?? '')
                                               .toLocal();
-                                          final String date =
-                                              DateFormat('MMM dd, yyyy (EEEE)')
-                                                  .format(dbdate);
-
-                                          DateTime dbdateCreated =
-                                              DateTime.parse(booking[
-                                                          'bk_created_at'] ??
-                                                      '')
-                                                  .toLocal();
-                                          final String dateCreated =
+                                          String formatdateIssue =
                                               DateFormat('MMM dd, yyyy hh:mm a')
-                                                  .format(dbdateCreated);
+                                                  .format(dbdateIssue);
+                                          String dateIssued =
+                                              'Paid at: $formatdateIssue';
 
-                                          // Filter waste types for the current booking's bk_id
-                                          String wasteTypes = '';
-                                          if (bookingWasteListHistory != null) {
-                                            List<Map<String, dynamic>>
-                                                filteredWasteList =
-                                                bookingWasteListHistory!
-                                                    .where((waste) {
-                                              return waste['bk_id'] ==
-                                                  booking['bk_id'];
-                                            }).toList();
-
-                                            // Build the waste types string
-                                            int count = 0;
-                                            for (var waste
-                                                in filteredWasteList) {
-                                              count++;
-                                              wasteTypes +=
-                                                  waste['bw_name'] + ', ';
-                                              if (count == 2) break;
-                                            }
-
-                                            // Remove the trailing comma and space
-                                            if (wasteTypes.isNotEmpty) {
-                                              if (filteredWasteList.length >
-                                                  2) {
-                                                wasteTypes = '$wasteTypes. . .';
-                                              } else {
-                                                wasteTypes =
-                                                    wasteTypes.substring(0,
-                                                        wasteTypes.length - 2);
+                                          return InkWell(
+                                            onTap: () {
+                                              if (gb_id != null) {
+                                                Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                C_PaymentDetails(
+                                                                    gb_id:
+                                                                        gb_id)))
+                                                    .then((value) {
+                                                  if (value == true) {
+                                                    _fetchBillPaymentData();
+                                                  }
+                                                });
                                               }
-                                            }
-                                          }
-
-                                          final String status =
-                                              booking['bk_status'] ??
-                                                  'No status';
-
-                                          // Pass the extracted data to the C_CurrentScheduleCard widget
-                                          return C_PaymentHistory(
-                                            date: 'Fri Jun 20',
-                                            time: '8:30 AM',
-                                            wasteType: 'Food Waste',
-                                            paymentType: 'Gcash',
-                                            amount: '350.50',
+                                            },
+                                            child: Column(
+                                              children: [
+                                                if (index == 0)
+                                                  SizedBox(height: 30),
+                                                Container(
+                                                  padding: EdgeInsets.all(10),
+                                                  margin: EdgeInsets.all(10),
+                                                  decoration: BoxDecoration(
+                                                      color: deepPurple,
+                                                      boxShadow: shadowLowColor,
+                                                      borderRadius:
+                                                          borderRadius10),
+                                                  child: Column(
+                                                    children: [
+                                                      Container(
+                                                        alignment:
+                                                            Alignment.topLeft,
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
+                                                              bill_id,
+                                                              style: TextStyle(
+                                                                  color:
+                                                                      whiteSoft,
+                                                                  fontSize: 14),
+                                                            ),
+                                                            Text(
+                                                              booking_id,
+                                                              style: TextStyle(
+                                                                  color:
+                                                                      whiteSoft,
+                                                                  fontSize: 14),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                horizontal: 10),
+                                                        decoration: BoxDecoration(
+                                                            color: white,
+                                                            borderRadius:
+                                                                borderRadius5,
+                                                            boxShadow:
+                                                                shadowLowColor),
+                                                        child: Column(
+                                                          children: [
+                                                            Text(
+                                                              method,
+                                                              style: TextStyle(
+                                                                  color: grey,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  fontSize: 14),
+                                                            ),
+                                                            Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                Text(
+                                                                  amount,
+                                                                  style: TextStyle(
+                                                                      color:
+                                                                          orange,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                      fontSize:
+                                                                          20),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          Text(
+                                                            dateIssued,
+                                                            style: TextStyle(
+                                                                color:
+                                                                    whiteSoft,
+                                                                fontSize: 14),
+                                                          ),
+                                                          Text(
+                                                            status,
+                                                            style: TextStyle(
+                                                                color:
+                                                                    greenSoft,
+                                                                fontSize: 18),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                if (paymentList!.length - 1 ==
+                                                    index)
+                                                  const SizedBox(height: 200)
+                                              ],
+                                            ),
                                           );
                                         },
                                       ),
@@ -455,105 +639,16 @@ class _C_PaymentScreenState extends State<C_PaymentScreen>
   }
 }
 
-class C_PaymentHistory extends StatelessWidget {
-  final String date;
-  final String time;
-  final String wasteType;
-  final String paymentType; // New field
-  final String amount; // New field
-
-  C_PaymentHistory({
-    required this.date,
-    required this.time,
-    required this.wasteType,
-    required this.paymentType, // New parameter
-    required this.amount, // New parameter
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => C_PaymentHistoryDetails(gb_id: ,),
-        //   ),
-        // );
-      },
-      splashColor: Colors.green,
-      highlightColor: Colors.green.withOpacity(0.2),
-      child: Container(
-        padding: EdgeInsets.all(10),
-        margin: EdgeInsets.all(10),
-        color: boxColor,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                // Icon(Icons.history, color: Color(0xFF6AA920)),
-                //SizedBox(width: 10.0),
-                Text(
-                  date,
-                  style: TextStyle(color: Colors.white70, fontSize: 14.0),
-                ),
-                SizedBox(width: 10.0),
-                Text(
-                  time,
-                  style: TextStyle(color: Colors.white38, fontSize: 14.0),
-                ),
-              ],
-            ),
-            SizedBox(height: 10.0),
-            Text(
-              wasteType,
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      'Payment: ',
-                      style: TextStyle(color: Colors.white, fontSize: 14.0),
-                    ),
-                    Text(
-                      '$paymentType',
-                      style:
-                          TextStyle(color: Colors.blueAccent, fontSize: 14.0),
-                    ),
-                  ],
-                ),
-                Text(
-                  '₱$amount',
-                  style: TextStyle(color: Colors.orangeAccent, fontSize: 14.0),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class C_PaymentHistoryDetails extends StatefulWidget {
+class C_PaymentDetails extends StatefulWidget {
   final int gb_id;
 
-  const C_PaymentHistoryDetails({super.key, required this.gb_id});
+  const C_PaymentDetails({super.key, required this.gb_id});
 
   @override
-  State<C_PaymentHistoryDetails> createState() =>
-      _C_PaymentHistoryDetailsState();
+  State<C_PaymentDetails> createState() => _C_PaymentDetailsState();
 }
 
-class _C_PaymentHistoryDetailsState extends State<C_PaymentHistoryDetails>
+class _C_PaymentDetailsState extends State<C_PaymentDetails>
     with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late AnimationController _controller;
   late Animation<Color?> _colorTween;
@@ -697,6 +792,54 @@ class _C_PaymentHistoryDetailsState extends State<C_PaymentHistoryDetails>
                       : billDetails != null
                           ? ListView(
                               children: [
+                                Container(
+                                  alignment: Alignment.topLeft,
+                                  margin: EdgeInsets.only(left: 10),
+                                  child: Text(
+                                    'BILL# ${billDetails!['gb_id'].toString()}',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18),
+                                  ),
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Container(
+                                      alignment: Alignment.topLeft,
+                                      margin: EdgeInsets.only(left: 10),
+                                      child: Text(
+                                        'BOOKING# ${billDetails!['bk_id'].toString()}',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18),
+                                      ),
+                                    ),
+                                    InkWell(
+                                      onTap: () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  C_ScheduleDetails(
+                                                      bookId: billDetails![
+                                                          'bk_id']))),
+                                      child: Text(
+                                        'View Booking',
+                                        style: TextStyle(
+                                          color: blueSoft,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18,
+                                          decoration: TextDecoration.underline,
+                                          decorationColor: blueSoft,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 10),
                                 Column(
                                   children: [
                                     //if (billDetails!['gb_status'] != 'Paid')
@@ -808,42 +951,121 @@ class _C_PaymentHistoryDetailsState extends State<C_PaymentHistoryDetails>
                                     SizedBox(
                                       height: 20,
                                     ),
-                                    InkWell(
-                                      onTap: () {
-                                        setState(() {
-                                          refreshStatus = false;
-                                        });
-                                        _downloadPdf(
-                                            context, billDetails!['gb_id']);
-                                      },
-                                      child: Container(
-                                        padding: EdgeInsets.all(10.0),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            Center(
-                                              child: Text(
-                                                'Download Receipt',
-                                                style: TextStyle(
-                                                    color: Colors.grey,
-                                                    fontSize: 16.0),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: InkWell(
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      BillingList(
+                                                          billId: billDetails![
+                                                              'gb_id']),
+                                                ),
+                                              );
+                                            },
+                                            child: Text(
+                                              'All Bills',
+                                              style: TextStyle(
+                                                color: blueSoft,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 18,
+                                                decoration:
+                                                    TextDecoration.underline,
+                                                decorationColor: blueSoft,
                                               ),
                                             ),
-                                            Container(
-                                              child: Icon(
-                                                Icons.download,
-                                                size: 50,
-                                                color: deepPurple,
-                                              ),
-                                            )
-                                          ],
+                                          ),
                                         ),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Container(
+                                      height: 80,
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            flex: 8,
+                                            child: InkWell(
+                                              onTap: () {
+                                                //
+                                              },
+                                              child: Container(
+                                                padding: EdgeInsets.all(10.0),
+                                                decoration: BoxDecoration(
+                                                    color: Colors.white,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    boxShadow: shadowLowColor),
+                                                child: Center(
+                                                  child: Text(
+                                                    'Pay Now',
+                                                    style: TextStyle(
+                                                      color: deepPurple,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 24,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(width: 10),
+                                          Expanded(
+                                            flex: 2,
+                                            child: InkWell(
+                                              onTap: () {
+                                                setState(() {
+                                                  refreshStatus = false;
+                                                });
+                                                _downloadPdf(context,
+                                                    billDetails!['gb_id']);
+                                              },
+                                              child: Container(
+                                                padding: EdgeInsets.all(5),
+                                                decoration: BoxDecoration(
+                                                    color: Colors.white,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    boxShadow: shadowLowColor),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    Center(
+                                                      child: Text(
+                                                        'Bill',
+                                                        style: TextStyle(
+                                                            color: grey,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 16.0),
+                                                      ),
+                                                    ),
+                                                    Container(
+                                                      child: Icon(
+                                                        Icons.download,
+                                                        size: 40,
+                                                        color: deepPurple,
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ],
@@ -874,6 +1096,201 @@ class _C_PaymentHistoryDetailsState extends State<C_PaymentHistoryDetails>
     );
   }
 }
+
+//dont touch
+Future<void> _uploadPdf(
+    BuildContext context, int bill_Id, Uint8List pdfBytes) async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+
+  if (accessToken == null) {
+    print('No access token available. User needs to log in.');
+    await deleteTokens();
+    return;
+  }
+
+  String baseUrl = globalUrl();
+  var dio = Dio();
+
+  try {
+    // Send a POST request to upload the PDF to the database
+    Response uploadResponse = await dio.post(
+      '$baseUrl/upload_pdf',
+      data: {
+        'billId': bill_Id,
+        'pdfData': pdfBytes, // Send PDF as binary directly
+      },
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+      ),
+    );
+
+    if (uploadResponse.statusCode == 200) {
+      print('PDF uploaded successfully');
+    } else {
+      //showErrorSnackBar(context, 'Failed to upload PDF: ${uploadResponse.statusCode}');
+    }
+  } catch (e) {
+    print(e.toString());
+    //showErrorSnackBar(context, 'Error uploading PDF.');
+  }
+}
+
+//
+Future<void> _downloadPdf(BuildContext context, int bill_Id) async {
+  String baseUrl = globalUrl();
+  try {
+    // Check permission
+    var status = await Permission.storage.status;
+    if (!status.isGranted) {
+      await Permission.storage.request();
+    }
+
+    var dio = Dio();
+
+    Directory? downloadsDirectory =
+        Directory('/storage/emulated/0/Download/trash');
+
+    // Check if the directory exists
+    if (!await downloadsDirectory.exists()) {
+      downloadsDirectory = await getExternalStorageDirectory();
+    }
+
+    String formattedDate =
+        DateFormat('MMMM dd, yyyy HH-mm-ss').format(DateTime.now());
+    String savePath =
+        "${downloadsDirectory!.path}/TrashTrack_Bill ($formattedDate).pdf";
+
+    Map<String, String?> tokens = await getTokens();
+    String? accessToken = tokens['access_token'];
+
+    if (accessToken == null) {
+      print('No access token available. User needs to log in.');
+      await deleteTokens();
+      return;
+    }
+
+    // Send a POST request to download the PDF file
+    Response response = await dio.post(
+      '$baseUrl/generate-pdf',
+      options: Options(
+        responseType: ResponseType.bytes, // Ensure you're getting bytes
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+      ),
+      data: {
+        'billId': bill_Id, // Ensure you pass the correct billId
+      },
+    );
+
+    if (response.statusCode == 200) {
+      //  String? totalAmountStr = response.headers.value('totalAmount');
+      //  print(totalAmountStr);
+      await _uploadPdf(context, bill_Id, response.data);
+      showDownloadDialog(context);
+      // Save the PDF bytes to the file
+      await File(savePath).writeAsBytes(response.data);
+      OpenFile.open(savePath);
+      print(savePath);
+    } else {
+      // Handle specific HTTP response codes
+      if (response.statusCode == 401) {
+        // Access token might be expired, attempt to refresh it
+        print('Access token expired. Attempting to refresh...');
+        String? refreshMsg = await refreshAccessToken();
+        if (refreshMsg == null) {
+          return await _downloadPdf(context, bill_Id);
+        } else {
+          await deleteTokens(); // Logout user
+          return;
+        }
+      } else if (response.statusCode == 403) {
+        // Access token is invalid. Logout
+        print('Access token invalid. Attempting to logout...');
+        await deleteTokens(); // Logout user
+      } else if (response.statusCode == 404) {
+        showErrorSnackBar(context, 'PDF not found');
+        return;
+      }
+
+      showErrorSnackBar(context, 'Try again Later.');
+    }
+  } catch (e) {
+    print(e.toString());
+    showErrorSnackBar(context, 'Try again Later.');
+  }
+}
+
+//
+void showDownloadDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      bool removedDialog = false;
+
+      Timer(const Duration(seconds: 3), () {
+        if (!removedDialog) {
+          Navigator.of(context).pop(); // Close the dialog safely
+        }
+      });
+
+      return PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) async {
+          if (didPop) {
+            return;
+          }
+          removedDialog = true;
+          Navigator.pop(context);
+        },
+        child: AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          content: Container(
+            height: 150,
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.picture_as_pdf,
+                  color: Colors.red,
+                  size: 50,
+                ),
+                SizedBox(height: 20),
+                Text(
+                  'Bill downloaded successfully!',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Your bill is ready for viewing.',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    },
+  );
+}
+
+
 
 // class PaymentBacktoApp extends StatefulWidget {
 //   final int gb_id;
@@ -991,109 +1408,23 @@ class _C_PaymentHistoryDetailsState extends State<C_PaymentHistoryDetails>
 //   }
 // }
 
-Future<void> _downloadPdf(BuildContext context, int bill_Id) async {
-  String baseUrl = globalUrl();
-  try {
-    // Check permission
-    var status = await Permission.storage.status;
-    if (!status.isGranted) {
-      await Permission.storage.request();
-    }
-
-    var dio = Dio();
-
-    Directory? downloadsDirectory = Directory('/storage/emulated/0/Download/trash');
-
-    // Check if the directory exists
-    if (!await downloadsDirectory.exists()) {
-      downloadsDirectory = await getExternalStorageDirectory();
-    }
-
-    String formattedDate =
-        DateFormat('MMMM dd, yyyy HH-mm-ss').format(DateTime.now());
-    String savePath =
-        "${downloadsDirectory!.path}/TrashTrack_Bill ($formattedDate).pdf";
-
-    Map<String, String?> tokens = await getTokens();
-    String? accessToken = tokens['access_token'];
-
-    if (accessToken == null) {
-      print('No access token available. User needs to log in.');
-      await deleteTokens();
-      return;
-    }
-
-    // Send a POST request to download the PDF file
-    Response response = await dio.post(
-      '$baseUrl/generate-pdf',
-      options: Options(
-        responseType: ResponseType.bytes, // Ensure you're getting bytes
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'application/json',
-        },
-      ),
-      data: {
-        'billId': bill_Id, // Ensure you pass the correct billId
-      },
-    );
-
-    if (response.statusCode == 200) {
-      _showDownloadDialog(context);
-      // Save the PDF bytes to the file
-      await File(savePath).writeAsBytes(response.data);
-      OpenFile.open(savePath);
-      print(savePath);
-    } else {
-      // Handle specific HTTP response codes
-      if (response.statusCode == 401) {
-        // Access token might be expired, attempt to refresh it
-        print('Access token expired. Attempting to refresh...');
-        String? refreshMsg = await refreshAccessToken();
-        if (refreshMsg == null) {
-          return await _downloadPdf(context, bill_Id);
-        } else {
-          await deleteTokens(); // Logout user
-          return;
-        }
-      } else if (response.statusCode == 403) {
-        // Access token is invalid. Logout
-        print('Access token invalid. Attempting to logout...');
-        await deleteTokens(); // Logout user
-      } else if (response.statusCode == 404) {
-        showErrorSnackBar(context, 'PDF not found');
-        return;
-      }
-
-      showErrorSnackBar(context, 'Unable to download');
-    }
-  } catch (e) {
-    print(e.toString());
-    showErrorSnackBar(context, 'Unable to download $e');
-  }
-}
-
-// Future<void> _downloadPdf(BuildContext context) async {
+// Future<void> _downloadPdf(BuildContext context, int bill_Id) async {
 //   String baseUrl = globalUrl();
 //   try {
-//     //check permission
+//     // Check permission
 //     var status = await Permission.storage.status;
 //     if (!status.isGranted) {
 //       await Permission.storage.request();
-//     } else {
-//       //console('No permission');
 //     }
 
 //     var dio = Dio();
 
-//     Directory? downloadsDirectory;
-//     downloadsDirectory = Directory('/storage/emulated/0/Download');
-//     //Check if the directory does not exists
+//     Directory? downloadsDirectory =
+//         Directory('/storage/emulated/0/Download/trash');
+
+//     // Check if the directory exists
 //     if (!await downloadsDirectory.exists()) {
 //       downloadsDirectory = await getExternalStorageDirectory();
-//     } else {
-//       //showErrorSnackBar(context, 'Unable to download');
-//       //console('Download folder already exist');
 //     }
 
 //     String formattedDate =
@@ -1101,86 +1432,61 @@ Future<void> _downloadPdf(BuildContext context, int bill_Id) async {
 //     String savePath =
 //         "${downloadsDirectory!.path}/TrashTrack_Bill ($formattedDate).pdf";
 
-//     // Download the PDF file from the server
-//     Response response = await dio.download(
-//       '$baseUrl/generate-pdf', // Replace with your backend URL
-//       savePath,
+//     Map<String, String?> tokens = await getTokens();
+//     String? accessToken = tokens['access_token'];
+
+//     if (accessToken == null) {
+//       print('No access token available. User needs to log in.');
+//       await deleteTokens();
+//       return;
+//     }
+
+//     // Send a POST request to download the PDF file
+//     Response response = await dio.post(
+//       '$baseUrl/generate-pdf',
+//       options: Options(
+//         responseType: ResponseType.bytes, // Ensure you're getting bytes
+//         headers: {
+//           'Authorization': 'Bearer $accessToken',
+//           'Content-Type': 'application/json',
+//         },
+//       ),
+//       data: {
+//         'billId': bill_Id, // Ensure you pass the correct billId
+//       },
 //     );
 
 //     if (response.statusCode == 200) {
-//       _showDownloadDialog(context);
-//       // Open the PDF after downloading
+//       showDownloadDialog(context);
+//       // Save the PDF bytes to the file
+//       await File(savePath).writeAsBytes(response.data);
 //       OpenFile.open(savePath);
-
 //       print(savePath);
 //     } else {
-//       showErrorSnackBar(context, 'Unable to download');
+//       // Handle specific HTTP response codes
+//       if (response.statusCode == 401) {
+//         // Access token might be expired, attempt to refresh it
+//         print('Access token expired. Attempting to refresh...');
+//         String? refreshMsg = await refreshAccessToken();
+//         if (refreshMsg == null) {
+//           return await _downloadPdf(context, bill_Id);
+//         } else {
+//           await deleteTokens(); // Logout user
+//           return;
+//         }
+//       } else if (response.statusCode == 403) {
+//         // Access token is invalid. Logout
+//         print('Access token invalid. Attempting to logout...');
+//         await deleteTokens(); // Logout user
+//       } else if (response.statusCode == 404) {
+//         showErrorSnackBar(context, 'PDF not found');
+//         return;
+//       }
+
+//       showErrorSnackBar(context, 'Try again Later.');
 //     }
 //   } catch (e) {
 //     print(e.toString());
-//     showErrorSnackBar(context, 'Unable to download $e');
+//     showErrorSnackBar(context, 'Try again Later.');
 //   }
 // }
-
-void _showDownloadDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      bool removedDialog = false;
-
-      Timer(const Duration(seconds: 3), () {
-        if (!removedDialog) {
-          Navigator.of(context).pop(); // Close the dialog safely
-        }
-      });
-
-      return PopScope(
-        canPop: false,
-        onPopInvokedWithResult: (didPop, result) async {
-          if (didPop) {
-            return;
-          }
-          removedDialog = true;
-          Navigator.pop(context);
-        },
-        child: AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15.0),
-          ),
-          content: Container(
-            height: 150,
-            child: const Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.picture_as_pdf,
-                  color: Colors.red,
-                  size: 50,
-                ),
-                SizedBox(height: 20),
-                Text(
-                  'Bill downloaded successfully!',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 10),
-                Text(
-                  'Your bill is ready for viewing.',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    },
-  );
-}

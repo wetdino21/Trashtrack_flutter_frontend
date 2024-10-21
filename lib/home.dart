@@ -14,7 +14,11 @@ class C_HomeScreen extends StatefulWidget {
   State<C_HomeScreen> createState() => _C_HomeScreenState();
 }
 
-class _C_HomeScreenState extends State<C_HomeScreen> {
+class _C_HomeScreenState extends State<C_HomeScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<Color?> _colorTween;
+  late Animation<Color?> _colorTween2;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   String? user;
@@ -45,12 +49,30 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
     super.initState();
     _dbData();
     //_objLoad();
+
+    _controller = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    )..repeat(reverse: true); // The animation will repeat back and forth
+
+    // Define a color tween animation that transitions between two colors
+    _colorTween = ColorTween(
+      begin: Colors.white,
+      end: Colors.grey,
+    ).animate(_controller);
+
+    _colorTween2 = ColorTween(
+      begin: Colors.grey,
+      end: Colors.white,
+    ).animate(_controller);
   }
 
-  // @override
-  // void dispose() {
-  //   super.dispose();
-  // }
+  @override
+  void dispose() {
+    TickerCanceled;
+    _controller.dispose();
+    super.dispose();
+  }
 
 // Fetch user data from the server
   Future<void> _dbData() async {
@@ -130,208 +152,203 @@ class _C_HomeScreenState extends State<C_HomeScreen> {
         body: Stack(
           children: [
             RefreshIndicator(
-              onRefresh: _dbData,
-              child:
-                  // isLoading
-                  //     ? Center(child: CircularProgressIndicator())
-                  //     :
-                  userData != null
-                      ? ListView(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 16.0, vertical: 16.0),
-                          children: [
-                            // InkWell(
-                            //   child: Text('data'),
-                            //   onTap: (){
-                            //   setState(() {
-                            //     deepGreen = Colors.grey;
-                            //     deepPurple = Colors.grey;
-                            //     darkPurple = Colors.grey;
-                            //   });
-                            // }),
+                onRefresh: _dbData,
+                child:
+                    // isLoading
+                    //     ? Center(child: CircularProgressIndicator())
+                    //     :
+                    userData == null
+                        ? Container(
+                            padding: EdgeInsets.all(20),
+                            child: LoadingHomeAnimation(
+                                _controller, _colorTween, _colorTween2),
+                          )
+                        : ListView(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 16.0),
+                            children: [
+                              // InkWell(
+                              //   child: Text('data'),
+                              //   onTap: (){
+                              //   setState(() {
+                              //     deepGreen = Colors.grey;
+                              //     deepPurple = Colors.grey;
+                              //     darkPurple = Colors.grey;
+                              //   });
+                              // }),
 
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                // Welcome Container
-                                Container(
-                                  padding: EdgeInsets.all(16.0),
-                                  decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(20.0),
-                                      boxShadow: shadowBigColor),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        //'Welcome ${userData!['cus_fname']}!',
-                                        'Welcome ${userModel!.fname}!',
-                                        style: TextStyle(
-                                          fontSize: 24.0,
-                                          color: deepPurple,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      SizedBox(height: 10.0),
-                                      Text(
-                                        user == 'customer'
-                                            ? 'Ready to keep things tidy? Schedule your garbage pickup today!'
-                                            : 'Another waste collection day? Drive safe!',
-                                        style: TextStyle(
-                                          fontSize: 14.0,
-                                        ),
-                                      ),
-                                      Center(
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10.0),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                  // Welcome Container
+                                  Container(
+                                    padding: EdgeInsets.all(16.0),
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius:
+                                            BorderRadius.circular(20.0),
+                                        boxShadow: shadowBigColor),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          //'Welcome ${userData!['cus_fname']}!',
+                                          'Welcome ${userModel!.fname}!',
+                                          style: TextStyle(
+                                            fontSize: 24.0,
+                                            color: deepPurple,
+                                            fontWeight: FontWeight.bold,
                                           ),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Expanded(
-                                                flex: 1,
-                                                child: Icon(
-                                                  Icons.arrow_left,
-                                                  color: deepPurple,
+                                        ),
+                                        SizedBox(height: 10.0),
+                                        Text(
+                                          user == 'customer'
+                                              ? 'Ready to keep things tidy? Schedule your garbage pickup today!'
+                                              : 'Another waste collection day? Drive safe!',
+                                          style: TextStyle(
+                                            fontSize: 14.0,
+                                          ),
+                                        ),
+                                        Center(
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(10.0),
+                                            ),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Expanded(
+                                                  flex: 1,
+                                                  child: Icon(
+                                                    Icons.arrow_left,
+                                                    color: deepPurple,
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                  flex: 8,
+                                                  child: Container(
+                                                      height: 200,
+                                                      child: !objDragged
+                                                          ? Cube(
+                                                              onSceneCreated:
+                                                                  (Scene
+                                                                      scene) {
+                                                                scene.world
+                                                                    .add(_obj);
+                                                              },
+                                                            )
+                                                          : SizedBox()),
+                                                ),
+                                                Expanded(
+                                                  flex: 1,
+                                                  child: Icon(Icons.arrow_right,
+                                                      color: deepPurple),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(height: 20.0),
+                                        Center(
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                                boxShadow: shadowColor),
+                                            child: ElevatedButton(
+                                              onPressed: () {
+                                                if (user == 'customer') {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          RequestPickupScreen(),
+                                                    ),
+                                                  );
+                                                } else {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          Booking_List(),
+                                                    ),
+                                                  );
+                                                }
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: deepPurple,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10.0),
+                                                ),
+                                                padding: EdgeInsets.symmetric(
+                                                    vertical: 16.0,
+                                                    horizontal: 30.0),
+                                              ),
+                                              child: Text(
+                                                user == 'customer'
+                                                    ? 'Request Pickup Now'
+                                                    : 'Go to Pickup',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 18.0,
                                                 ),
                                               ),
-                                              Expanded(
-                                                flex: 8,
-                                                child: Container(
-                                                    height: 200,
-                                                    child: !objDragged
-                                                        ? Cube(
-                                                            onSceneCreated:
-                                                                (Scene scene) {
-                                                              scene.world
-                                                                  .add(_obj);
-                                                            },
-                                                          )
-                                                        : SizedBox()),
-                                              ),
-                                              Expanded(
-                                                flex: 1,
-                                                child: Icon(Icons.arrow_right,
-                                                    color: deepPurple),
-                                              ),
-                                            ],
+                                            ),
                                           ),
                                         ),
+                                      ],
+                                    ),
+                                  ),
+
+                                  /////
+                                  SizedBox(height: 20.0),
+                                  Text(
+                                    '  Previous waste pickup',
+                                    style: TextStyle(
+                                      color: white,
+                                      fontSize: 18.0,
+                                    ),
+                                  ),
+                                  SizedBox(height: 5.0),
+
+                                  // Statistic Boxes
+                                  GridView.count(
+                                    crossAxisCount: 2,
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    crossAxisSpacing: 10.0,
+                                    mainAxisSpacing: 10.0,
+                                    children: [
+                                      StatisticBox(
+                                        icon: Icons.access_time_filled,
+                                        title: user == 'customer'
+                                            ? 'Total Requests'
+                                            : 'Total Pickup',
+                                        value:
+                                            userModel!.totalRequest.toString(),
+                                        iconColor: accentColor,
                                       ),
-                                      SizedBox(height: 20.0),
-                                      Center(
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                              boxShadow: shadowColor),
-                                          child: ElevatedButton(
-                                            onPressed: () {
-                                              if (user == 'customer') {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        RequestPickupScreen(),
-                                                  ),
-                                                );
-                                              } else {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        Booking_List(),
-                                                  ),
-                                                );
-                                              }
-                                            },
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: deepPurple,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(10.0),
-                                              ),
-                                              padding: EdgeInsets.symmetric(
-                                                  vertical: 16.0,
-                                                  horizontal: 30.0),
-                                            ),
-                                            child: Text(
-                                              user == 'customer'
-                                                  ? 'Request Pickup Now'
-                                                  : 'Go to Pickup',
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 18.0,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
+                                      StatisticBox(
+                                        icon: Icons.delete,
+                                        title: 'Total Tons Collected',
+                                        value: '75',
+                                        iconColor: accentColor,
                                       ),
                                     ],
                                   ),
-                                ),
 
-                                /////
-                                SizedBox(height: 20.0),
-                                Text(
-                                  '  Previous waste pickup',
-                                  style: TextStyle(
-                                    color: white,
-                                    fontSize: 18.0,
-                                  ),
-                                ),
-                                SizedBox(height: 5.0),
-
-                                // Statistic Boxes
-                                GridView.count(
-                                  crossAxisCount: 2,
-                                  shrinkWrap: true,
-                                  physics: NeverScrollableScrollPhysics(),
-                                  crossAxisSpacing: 10.0,
-                                  mainAxisSpacing: 10.0,
-                                  children: [
-                                    StatisticBox(
-                                      icon: Icons.access_time_filled,
-                                      title: user == 'customer'
-                                          ? 'Total Requests'
-                                          : 'Total Pickup',
-                                      value: userModel!.totalRequest.toString(),
-                                      iconColor: accentColor,
-                                    ),
-                                    StatisticBox(
-                                      icon: Icons.delete,
-                                      title: 'Total Tons Collected',
-                                      value: '75',
-                                      iconColor: accentColor,
-                                    ),
-                                  ],
-                                ),
-
-                                SizedBox(height: 20.0),
-                              ],
-                            ),
-                          ],
-                        )
-                      ///// if error
-                      : Positioned.fill(
-                          child: InkWell(
-                            onTap: () {},
-                            child: Center(
-                              child: CircularProgressIndicator(
-                                color: Colors.green,
-                                strokeWidth: 10,
-                                strokeAlign: 2,
-                                backgroundColor: Colors.deepPurple,
+                                  SizedBox(height: 20.0),
+                                ],
                               ),
-                            ),
-                          ),
-                        ),
-            ),
+                            ],
+                          )),
             // if (isLoading)
             //   Positioned.fill(
             //     child: InkWell(

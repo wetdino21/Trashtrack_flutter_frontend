@@ -203,9 +203,7 @@ class _MainAppState extends State<MainApp> {
                             : user == 'hauler'
                                 ? 'Vehicle'
                                 : 'Payment'),
-            body: Loading
-                ? const CircularProgressIndicator()
-                : _pages[_selectedIndex],
+            body: _pages[_selectedIndex],
             bottomNavigationBar: C_BottomNavBar(
               currentIndex: _selectedIndex,
               onTap: _onItemTapped,

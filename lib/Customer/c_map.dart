@@ -1031,10 +1031,11 @@ class _C_MapScreenState extends State<C_MapScreen>
                   ],
                 ),
               ],
-
               // Display distance and duration on the map
               if (routes.isNotEmpty)
-                for (int i = 0; i < routes.length && i < 3; i++)
+                for (int i = routes.length - 1;
+                    i >= 0 && (routes.length - i) <= 3;
+                    i--)
                   for (int j = 0; j < routes[i].length - 1; j++)
                     if (j ==
                         (routes[i].length - 2) ~/
@@ -1082,6 +1083,56 @@ class _C_MapScreenState extends State<C_MapScreen>
                               }),
                         ],
                       ),
+              // // Display distance and duration on the map
+              // if (routes.isNotEmpty)
+              //   for (int i = 0; i < routes.length && i < 3; i++)
+              //     for (int j = 0; j < routes[i].length - 1; j++)
+              //       if (j ==
+              //           (routes[i].length - 2) ~/
+              //               2) // Check if it's the middle segment
+              //         MarkerLayer(
+              //           markers: [
+              //             Marker(
+              //                 rotate: true,
+              //                 width: routeDurations[i] > 360000
+              //                     ? 140
+              //                     : routeDurations[i] > 36000
+              //                         ? 130
+              //                         : routeDurations[i] > 3600
+              //                             ? 120
+              //                             : 100,
+              //                 height: 200,
+              //                 point: LatLng(
+              //                   calculateMidpoint(
+              //                               routes[i][j], routes[i][j + 1])
+              //                           .latitude +
+              //                       0.0001, // Adjust as needed
+              //                   calculateMidpoint(
+              //                           routes[i][j], routes[i][j + 1])
+              //                       .longitude,
+              //                 ),
+              //                 builder: (ctx) {
+              //                   return Column(
+              //                     mainAxisSize: MainAxisSize.min,
+              //                     children: [
+              //                       // Triangular Pin
+              //                       Container(
+              //                         child: RouteMarker(
+              //                           duration:
+              //                               formatDuration(routeDurations[i]),
+              //                           distance:
+              //                               formatDistance(routeDistances[i]),
+              //                           route: i + 1, // Indexing the route
+              //                           nearestRoute:
+              //                               nearestRoute!, // Pass nearestRoute
+              //                         ),
+              //                       ),
+              //                       //arrowButtomBox(),
+              //                     ],
+              //                   );
+              //                 }),
+              //           ],
+              //         ),
             ],
           ),
           // if (isLoading)

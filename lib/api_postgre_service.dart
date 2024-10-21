@@ -1576,6 +1576,177 @@ Future<Map<String, dynamic>?> fetchBillDetails(int billId) async {
   }
 }
 
+//fetch payment
+Future<List<Map<String, dynamic>>?> fetchPayment() async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+
+  if (accessToken == null) {
+    print('No access token available. User needs to log in.');
+    await deleteTokens();
+    return null;
+  }
+
+  final response = await http.post(
+    Uri.parse('$baseUrl/fetch_payment'),
+    headers: {
+      'Authorization': 'Bearer $accessToken',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    List<dynamic> decodedList = jsonDecode(response.body);
+    return decodedList.map((item) => item as Map<String, dynamic>).toList();
+  } else {
+    if (response.statusCode == 401) {
+      // Access token might be expired, attempt to refresh it
+      print('Access token expired. Attempting to refresh...');
+      String? refreshMsg = await refreshAccessToken();
+      if (refreshMsg == null) {
+        return await fetchPayment();
+      } else {
+        // Refresh token is invalid or expired, logout the user
+        await deleteTokens(); // Logout user
+        return null;
+      }
+    } else if (response.statusCode == 403) {
+      // Access token is invalid. logout
+      print('Access token invalid. Attempting to logout...');
+      await deleteTokens(); // Logout user
+    } else if (response.statusCode == 404) {
+      print('No notification found');
+      return null;
+    }
+
+    print('Response: ${response.body}');
+    return null;
+  }
+}
+
+//fetch pdf all bills
+Future<List<Map<String, dynamic>>?> fetchAllPdfBills(int gb_id) async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+
+  if (accessToken == null) {
+    print('No access token available. User needs to log in.');
+    await deleteTokens();
+    return null;
+  }
+
+  final response = await http.post(
+    Uri.parse('$baseUrl/fetch_pdf_bills'),
+    headers: {
+      'Authorization': 'Bearer $accessToken',
+      'Content-Type': 'application/json',
+    },
+    body: jsonEncode({'gb_id': gb_id}),
+  );
+
+  if (response.statusCode == 200) {
+    List<dynamic> decodedList = jsonDecode(response.body);
+
+    // Map each bill to extract and decode the PDF
+    return decodedList.map((item) {
+      String pdfBase64 = item['bd_file'];
+      Uint8List pdfBytes = base64Decode(pdfBase64);
+
+      return {
+        'bd_created_at': item['bd_created_at'],
+        'bd_total_amnt': item['bd_total_amnt'],
+        'bd_file': pdfBytes,
+      };
+    }).toList();
+  } else {
+    if (response.statusCode == 401) {
+      // Access token might be expired, attempt to refresh it
+      print('Access token expired. Attempting to refresh...');
+      String? refreshMsg = await refreshAccessToken();
+      if (refreshMsg == null) {
+        return await fetchPayment();
+      } else {
+        // Refresh token is invalid or expired, logout the user
+        await deleteTokens(); // Logout user
+        return null;
+      }
+    } else if (response.statusCode == 403) {
+      // Access token is invalid. logout
+      print('Access token invalid. Attempting to logout...');
+      await deleteTokens(); // Logout user
+    } else if (response.statusCode == 404) {
+      print('No notification found');
+      return null;
+    }
+
+    print('Response: ${response.body}');
+    return null;
+  }
+}
+
+//fetch pdf all bills
+Future<List<Uint8List>?> fetchPdf(int gb_id) async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+
+  if (accessToken == null) {
+    print('No access token available. User needs to log in.');
+    await deleteTokens();
+    return null;
+  }
+
+  final response = await http.post(
+    Uri.parse('$baseUrl/fetch_pdf'),
+    headers: {
+      'Authorization': 'Bearer $accessToken',
+      'Content-Type': 'application/json',
+    },
+    body: jsonEncode({'gb_id': gb_id}),
+  );
+
+  if (response.statusCode == 200) {
+    List<dynamic> decodedList = jsonDecode(response.body);
+    print('Decoded List: $decodedList');
+
+    List<Uint8List> pdfData = decodedList.map((item) {
+      if (item is Map && item.containsKey('data')) {
+        final byteArray = Uint8List.fromList(List<int>.from(item['data']));
+        print('Byte array: $byteArray'); // Ensure this is printed correctly
+        return byteArray;
+      } else {
+        print('Invalid item: $item');
+        return Uint8List(
+            0); // Return an empty byte array in case of an invalid item
+      }
+    }).toList();
+
+    print('PDF Data: $pdfData');
+    return pdfData;
+  } else {
+    if (response.statusCode == 401) {
+      // Access token might be expired, attempt to refresh it
+      print('Access token expired. Attempting to refresh...');
+      String? refreshMsg = await refreshAccessToken();
+      if (refreshMsg == null) {
+        return await fetchPdf(gb_id);
+      } else {
+        // Refresh token is invalid or expired, logout the user
+        await deleteTokens(); // Logout user
+        return null;
+      }
+    } else if (response.statusCode == 403) {
+      // Access token is invalid. logout
+      print('Access token invalid. Attempting to logout...');
+      await deleteTokens(); // Logout user
+    } else if (response.statusCode == 404) {
+      print('PDF not found');
+      return null;
+    }
+
+    print('Response: ${response.body}');
+    return null;
+  }
+}
+
 //fetch billing
 Future<List<Map<String, dynamic>>?> fetchVehicles() async {
   Map<String, String?> tokens = await getTokens();

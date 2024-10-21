@@ -98,49 +98,10 @@ class _C_NotificationScreenState extends State<C_NotificationScreen>
       body: RefreshIndicator(
         onRefresh: _fetchNotifications,
         child: isLoading
-            ? AnimatedBuilder(
-                animation: _controller,
-                builder: (context, child) {
-                  return ListView.builder(
-                    padding: const EdgeInsets.all(5),
-                    itemCount: 6,
-                    itemBuilder: (context, index) {
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            height: 20,
-                          ),
-                          Container(
-                            height: 30,
-                            width: 300,
-                            padding: EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              //color: Colors.white.withOpacity(.6),
-                              color: index % 2 == 0
-                                  ? _colorTween.value
-                                  : _colorTween2.value,
-                            ),
-                          ),
-                          SizedBox(
-                            height: 5,
-                          ),
-                          Container(
-                            height: 70,
-                            padding: EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: index % 2 == 0
-                                  ? _colorTween.value
-                                  : _colorTween2.value,
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                })
+            ? Container(
+                padding: EdgeInsets.all(10),
+                child: LoadingAnimation(_controller, _colorTween, _colorTween2),
+              )
             : notifications == null
                 ? ListView(
                     children: [
@@ -252,15 +213,17 @@ class NotificationCard extends StatelessWidget {
                 Text('$dateTime', style: TextStyle(color: greySoft)),
                 Text(
                   title,
-                  style: TextStyle(color: status == 'Read'? blackSoft :white, fontSize: 16),
+                  style: TextStyle(
+                      color: status == 'Read' ? blackSoft : white,
+                      fontSize: 16),
                   maxLines: 1,
                   softWrap: true,
                 ),
                 if (status.isNotEmpty)
                   Align(
                       alignment: Alignment.bottomRight,
-                      child: Text('$status',
-                          style: TextStyle(color: greySoft))),
+                      child:
+                          Text('$status', style: TextStyle(color: greySoft))),
               ],
             ),
           ),

@@ -17,15 +17,20 @@ const Color accentColor = Colors.greenAccent;
 const Color iconBoxColor = Color(0xFF001E03);
 Color deepGreen = Color(0xFF388E3C);
 Color deepPurple = Colors.deepPurple;
+Color? pupleSoft = Colors.deepPurple[200];
 Color darkPurple = Color(0xFF3A0F63);
 Color? greytitleColor = Colors.grey[700];
 Color darkRed = Color(0xFFB00020);
-Color whiteSoft = Colors.white.withOpacity(0.5);
+Color whiteSoft = Colors.white70;
 Color white = Colors.white;
 Color black = Colors.black;
 Color blackSoft = Colors.grey[600]!;
 Color grey = Colors.grey[600]!;
 Color greySoft = Colors.grey[400]!;
+Color blueSoft = const Color.fromARGB(255, 152, 222, 255);
+Color orange = Colors.deepOrange;
+Color yellowSoft = Color(0xFFFFD700);
+Color greenSoft = Colors.greenAccent;
 
 List<BoxShadow> shadowColor = [
   BoxShadow(
@@ -256,6 +261,78 @@ Widget LoadingSingleAnimation(AnimationController _controller,
               ),
             ),
           ],
+        );
+      });
+}
+
+Widget LoadingHomeAnimation(AnimationController _controller,
+    Animation<Color?> _colorTween, Animation<Color?> _colorTween2) {
+  return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 10,
+              ),
+              Container(
+                height: 350,
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: _colorTween2.value,
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Container(
+                height: 40,
+                width: 300,
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  //color: Colors.white.withOpacity(.6),
+                  color: _colorTween.value,
+                ),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Container(
+                height: 150,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          //color: Colors.white.withOpacity(.6),
+                          color: _colorTween.value,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Expanded(
+                      child: Container(
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          //color: Colors.white.withOpacity(.6),
+                          color: _colorTween.value,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         );
       });
 }

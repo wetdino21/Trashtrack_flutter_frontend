@@ -168,55 +168,13 @@ class _Booking_ListState extends State<Booking_List>
           Column(
             children: [
               Container(
-                height: MediaQuery.of(context).size.height * .58,
+                height: MediaQuery.of(context).size.height * .8,
                 child: RefreshIndicator(
                   onRefresh: () async {
                     await _fetchBookingData();
                   },
                   child: isLoading
-                      ? AnimatedBuilder(
-                          animation: _controller,
-                          builder: (context, child) {
-                            return ListView.builder(
-                              padding: const EdgeInsets.all(5),
-                              itemCount: 6,
-                              itemBuilder: (context, index) {
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(
-                                      height: 20,
-                                    ),
-                                    Container(
-                                      height: 30,
-                                      width: 300,
-                                      padding: EdgeInsets.all(10),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        //color: Colors.white.withOpacity(.6),
-                                        color: index % 2 == 0
-                                            ? _colorTween.value
-                                            : _colorTween2.value,
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 5,
-                                    ),
-                                    Container(
-                                      height: 70,
-                                      padding: EdgeInsets.all(10),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: index % 2 == 0
-                                            ? _colorTween.value
-                                            : _colorTween2.value,
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          })
+                      ? loadingAnimation(_controller, _colorTween, _colorTween2)
                       : bookingList == null
                           ? ListView(
                               children: [
@@ -311,12 +269,18 @@ class _Booking_ListState extends State<Booking_List>
                                     booking['bk_status'] ?? 'No status';
 
                                 // Pass the extracted data to the C_CurrentScheduleCard widget
-                                return C_ScheduleCardList(
-                                  bookId: book_Id,
-                                  date: date,
-                                  dateCreated: dateCreated,
-                                  wasteType: wasteTypes,
-                                  status: status,
+                                return Column(
+                                  children: [
+                                    C_ScheduleCardList(
+                                      bookId: book_Id,
+                                      date: date,
+                                      dateCreated: dateCreated,
+                                      wasteType: wasteTypes,
+                                      status: status,
+                                    ),
+                                    if (bookingList!.length - 1 == index)
+                                      SizedBox(height: 200),
+                                  ],
                                 );
                               },
                             ),
@@ -410,7 +374,7 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details>
   bool _isEditing = false;
   Color? boxColorTheme = Colors.teal;
   bool _showOptionsBox = false;
-  bool isAcceptLoading = false;
+  bool loadingAction = false;
   @override
   void initState() {
     super.initState();
@@ -1060,185 +1024,8 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details>
                         },
                         child: Container()),
                     isLoading
-                        ? AnimatedBuilder(
-                            animation: _controller,
-                            builder: (context, child) {
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    height: 100,
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      //color: Colors.white.withOpacity(.6),
-                                      color: _colorTween.value,
-                                    ),
-                                    child: Row(
-                                      // mainAxisAlignment: MainAxisAlignment.start,
-                                      // crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Expanded(
-                                            flex: 1,
-                                            child: Container(
-                                              alignment: Alignment.centerLeft,
-                                              child: Container(
-                                                height: 30,
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(50),
-                                                  //color: Colors.white.withOpacity(.6),
-                                                  color: _colorTween2.value,
-                                                ),
-                                              ),
-                                            )),
-                                        Expanded(
-                                            flex: 10,
-                                            child: Container(
-                                                alignment: Alignment.centerLeft,
-                                                child: Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Expanded(
-                                                        flex: 1,
-                                                        child: Container(
-                                                            width: 100,
-                                                            margin:
-                                                                EdgeInsets.all(
-                                                                    3),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          10),
-                                                              //color: Colors.white.withOpacity(.6),
-                                                              color:
-                                                                  _colorTween2
-                                                                      .value,
-                                                            ),
-                                                            child: Text(''))),
-                                                    Expanded(
-                                                        flex: 2,
-                                                        child: Container(
-                                                            width: 250,
-                                                            margin:
-                                                                EdgeInsets.all(
-                                                                    3),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          10),
-                                                              //color: Colors.white.withOpacity(.6),
-                                                              color:
-                                                                  _colorTween2
-                                                                      .value,
-                                                            ),
-                                                            child: Text(''))),
-                                                    Expanded(
-                                                        flex: 1,
-                                                        child: Container(
-                                                            width: 150,
-                                                            margin:
-                                                                EdgeInsets.all(
-                                                                    3),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          10),
-                                                              //color: Colors.white.withOpacity(.6),
-                                                              color:
-                                                                  _colorTween2
-                                                                      .value,
-                                                            ),
-                                                            child: Text(''))),
-                                                  ],
-                                                ))),
-                                      ],
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 20,
-                                  ),
-                                  Container(
-                                    height: 30,
-                                    width: 300,
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      //color: Colors.white.withOpacity(.6),
-                                      color: _colorTween2.value,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Container(
-                                    height: 100,
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: _colorTween2.value,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 20,
-                                  ),
-                                  Container(
-                                    height: 30,
-                                    width: 300,
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      //color: Colors.white.withOpacity(.6),
-                                      color: _colorTween.value,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Container(
-                                    height: 100,
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: _colorTween.value,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 20,
-                                  ),
-                                  Container(
-                                    height: 30,
-                                    width: 300,
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      //color: Colors.white.withOpacity(.6),
-                                      color: _colorTween2.value,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Container(
-                                    height: 100,
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: _colorTween2.value,
-                                    ),
-                                  ),
-                                ],
-                              );
-                            })
+                        ? loadingBookingAnimation(
+                            _controller, _colorTween, _colorTween2)
 
                         // onload dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
                         : Column(
@@ -2459,7 +2246,7 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details>
                     child: InkWell(
                       onTap: () async {
                         setState(() {
-                          isAcceptLoading = true;
+                          loadingAction = true;
                         });
                         bool onLocation = await checkLocationPermission();
                         if (onLocation) {
@@ -2496,7 +2283,7 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details>
                           }
                         }
                         setState(() {
-                          isAcceptLoading = false;
+                          loadingAction = false;
                         });
                       },
                       child: Center(
@@ -2531,20 +2318,7 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details>
                     ),
                   ),
                 ),
-              if (isAcceptLoading)
-                Positioned.fill(
-                  child: InkWell(
-                    onTap: () {},
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        color: Colors.green,
-                        strokeWidth: 10,
-                        strokeAlign: 2,
-                        backgroundColor: Colors.deepPurple,
-                      ),
-                    ),
-                  ),
-                ),
+              if (loadingAction) showLoadingAction(),
             ],
           ),
         ),

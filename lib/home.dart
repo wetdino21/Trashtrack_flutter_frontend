@@ -160,7 +160,7 @@ class _C_HomeScreenState extends State<C_HomeScreen>
                     userData == null
                         ? Container(
                             padding: EdgeInsets.all(20),
-                            child: LoadingHomeAnimation(
+                            child: loadingHomeAnimation(
                                 _controller, _colorTween, _colorTween2),
                           )
                         : ListView(
@@ -258,10 +258,16 @@ class _C_HomeScreenState extends State<C_HomeScreen>
                                         SizedBox(height: 20.0),
                                         Center(
                                           child: Container(
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 16.0,
+                                                horizontal: 30.0),
                                             decoration: BoxDecoration(
-                                                boxShadow: shadowColor),
-                                            child: ElevatedButton(
-                                              onPressed: () {
+                                                color: deepPurple,
+                                                borderRadius:
+                                                    BorderRadius.circular(10.0),
+                                                boxShadow: shadowLowColor),
+                                            child: InkWell(
+                                              onTap: () {
                                                 if (user == 'customer') {
                                                   Navigator.push(
                                                     context,
@@ -280,17 +286,6 @@ class _C_HomeScreenState extends State<C_HomeScreen>
                                                   );
                                                 }
                                               },
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: deepPurple,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10.0),
-                                                ),
-                                                padding: EdgeInsets.symmetric(
-                                                    vertical: 16.0,
-                                                    horizontal: 30.0),
-                                              ),
                                               child: Text(
                                                 user == 'customer'
                                                     ? 'Request Pickup Now'

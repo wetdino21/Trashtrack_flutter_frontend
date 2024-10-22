@@ -22,6 +22,7 @@ class _VehicleScreenState extends State<VehicleScreen>
   String name = '';
   String dateCreated = '';
   String status = '';
+  String dateAssigned = '';
 
   String? user;
   int selectedPage = 1;
@@ -83,16 +84,20 @@ class _VehicleScreenState extends State<VehicleScreen>
           if (matchedVehicle != null) {
             vehicleList!.remove(matchedVehicle);
             currentVehicle = matchedVehicle;
+            plate = 'Plate # + ${currentVehicle!['v_plate']}';
+            capacity =
+                '${currentVehicle!['v_capacity'].toString()} ${currentVehicle!['v_capacity_unit'].toString()}';
 
-            plate = 'Plate # ' + currentVehicle!['v_plate'];
-            capacity = currentVehicle!['v_capacity'].toString() +
-                ' ' +
-                currentVehicle!['v_capacity_unit'].toString();
             name = (currentVehicle!['vtype_name'].toString());
             DateTime dbdateCreated =
                 DateTime.parse(currentVehicle!['v_created_at']).toLocal();
             dateCreated =
                 DateFormat('MMM dd, yyyy hh:mm a').format(dbdateCreated);
+            DateTime dbdateAssigned =
+                DateTime.parse(currentVehicle!['driver_date_assigned_at'])
+                    .toLocal();
+            dateAssigned =
+                DateFormat('MMM dd, yyyy hh:mm a').format(dbdateAssigned);
             status = currentVehicle!['v_status'];
           }
         });
@@ -151,7 +156,7 @@ class _VehicleScreenState extends State<VehicleScreen>
                         child: isLoading
                             ? Container(
                                 padding: EdgeInsets.all(20),
-                                child: LoadingAnimation(
+                                child: loadingAnimation(
                                     _controller, _colorTween, _colorTween2),
                               )
                             : vehicleList == null
@@ -244,11 +249,21 @@ class _VehicleScreenState extends State<VehicleScreen>
                                                           color: whiteSoft,
                                                           fontSize: 16),
                                                     ),
-                                                    Text(
-                                                      capacity,
-                                                      style: TextStyle(
-                                                          color: whiteSoft,
-                                                          fontSize: 20),
+                                                    Row(
+                                                      children: [
+                                                        Icon(
+                                                            Icons
+                                                                .linear_scale_rounded,
+                                                            color: white,
+                                                           ),
+                                                        SizedBox(width: 5),
+                                                        Text(
+                                                          capacity,
+                                                          style: TextStyle(
+                                                              color: whiteSoft,
+                                                              fontSize: 20),
+                                                        ),
+                                                      ],
                                                     ),
                                                   ],
                                                 ),
@@ -260,7 +275,7 @@ class _VehicleScreenState extends State<VehicleScreen>
                                                           color: white,
                                                           fontWeight:
                                                               FontWeight.bold,
-                                                          fontSize: 25),
+                                                          fontSize: 20),
                                                     ),
                                                   ],
                                                 ),
@@ -269,11 +284,22 @@ class _VehicleScreenState extends State<VehicleScreen>
                                                       MainAxisAlignment
                                                           .spaceBetween,
                                                   children: [
-                                                    Text(
-                                                      dateCreated,
-                                                      style: TextStyle(
-                                                          color: whiteSoft,
-                                                          fontSize: 14),
+                                                    Row(
+                                                      children: [
+                                                        Icon(Icons.library_add,
+                                                            color: white,
+                                                            size: 15),
+                                                        SizedBox(width: 5),
+                                                        Text(
+                                                          dateCreated,
+                                                          style: TextStyle(
+                                                              color: whiteSoft,
+                                                              fontSize: 10,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        ),
+                                                      ],
                                                     ),
                                                     Text(
                                                       status,
@@ -301,7 +327,7 @@ class _VehicleScreenState extends State<VehicleScreen>
                         child: isLoading
                             ? Container(
                                 padding: EdgeInsets.all(20),
-                                child: LoadingSingleAnimation(
+                                child: loadingSingleAnimation(
                                     _controller, _colorTween, _colorTween2),
                               )
                             : currentVehicle == null
@@ -354,6 +380,13 @@ class _VehicleScreenState extends State<VehicleScreen>
                                                   fontSize: 20,
                                                   fontWeight: FontWeight.bold),
                                             ),
+                                            Text(
+                                              'Assigned Date $dateAssigned',
+                                              style: TextStyle(
+                                                  color: blackSoft,
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
                                             SizedBox(height: 20),
                                             // Truck image
                                             Container(
@@ -389,6 +422,10 @@ class _VehicleScreenState extends State<VehicleScreen>
                                               label: 'Capacity',
                                               value: capacity,
                                             ),
+                                            // VehicleDetailRow(
+                                            //   label: 'Date Assigned',
+                                            //   value: dateAssigned,
+                                            // ),
                                           ],
                                         ),
                                       ),

@@ -67,6 +67,7 @@ class _CreateAccState extends State<CreateAcc> {
   GoogleAccountDetails? _accountDetails;
 
   bool isloading = false;
+  bool loadingAction = false;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -80,7 +81,7 @@ class _CreateAccState extends State<CreateAcc> {
   @override
   void initState() {
     super.initState();
-    _loadProvinces();
+    //_loadProvinces();
     _startTimer();
     _timer.cancel();
   }
@@ -272,68 +273,10 @@ class _CreateAccState extends State<CreateAcc> {
                     _backToSignIn();
                   },
                   child: Container()),
-              // Padding(
-              //   padding: const EdgeInsets.all(16.0),
-              //   child: Row(
-              //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //     children: [
-              //       if (_currentStep > 1)
-              //         ElevatedButton(
-              //           onPressed: () {
-              //             setState(() {
-              //               _currentStep--;
-              //             });
-              //           },
-              //           style: ElevatedButton.styleFrom(
-              //             backgroundColor: Colors.green,
-              //             shape: RoundedRectangleBorder(
-              //               borderRadius: BorderRadius.circular(10.0),
-              //             ),
-              //             padding: EdgeInsets.symmetric(horizontal: 16.0),
-              //           ),
-              //           child: Text(
-              //             'Back',
-              //             style: TextStyle(color: Colors.white, fontSize: 18.0),
-              //           ),
-              //         )
-              //       else
-              //         Container(),
-              //       _currentStep > 1
-              //           ? ElevatedButton(
-              //               onPressed: () {},
-              //               style: ElevatedButton.styleFrom(
-              //                 backgroundColor: Colors.green,
-              //                 shape: RoundedRectangleBorder(
-              //                   borderRadius: BorderRadius.circular(10.0),
-              //                 ),
-              //                 padding: EdgeInsets.symmetric(horizontal: 16.0),
-              //               ),
-              //               child: Text(
-              //                 _currentStep < 3 ? 'Next' : 'Submit',
-              //                 style: TextStyle(color: Colors.white, fontSize: 18.0),
-              //               ),
-              //             )
-              //           : SizedBox(),
-              //     ],
-              //   ),
-              // ),
-              // SizedBox(
-              //   height: 50,
-              // )
             ],
           ),
-          if (isloading)
-            Positioned.fill(
-                child: InkWell(
-              child: Center(
-                child: CircularProgressIndicator(
-                  color: Colors.green,
-                  strokeWidth: 10,
-                  strokeAlign: 2,
-                  backgroundColor: Colors.deepPurple,
-                ),
-              ),
-            )),
+          if (isloading) showLoadingAction(),
+          if (loadingAction) showLoadingAction(),
         ],
       ),
     );
@@ -348,6 +291,9 @@ class _CreateAccState extends State<CreateAcc> {
           children: [
             GestureDetector(
               onTap: () async {
+                setState(() {
+                  loadingAction = true;
+                });
                 //page 1 to 2
                 if ((_currentStep == 1) && (index + 1 == 2)) {
                   // Check if any validation error or email sending error exists
@@ -570,6 +516,10 @@ class _CreateAccState extends State<CreateAcc> {
                     _currentStep = 2;
                   });
                 }
+
+                setState(() {
+                  loadingAction = false;
+                });
               },
               child: Icon(
                 Icons.circle,
@@ -902,6 +852,9 @@ class _CreateAccState extends State<CreateAcc> {
                   Center(
                     child: InkWell(
                       onTap: () async {
+                        setState(() {
+                          loadingAction = true;
+                        });
                         // Check if any validation error or email sending error exists
                         if ((_emailController.text.isEmpty ||
                                 emailvalidator.isNotEmpty) ||
@@ -937,6 +890,9 @@ class _CreateAccState extends State<CreateAcc> {
                             }
                           }
                         }
+                        setState(() {
+                          loadingAction = false;
+                        });
                       },
                       child: Container(
                           padding: EdgeInsets.symmetric(
@@ -944,7 +900,7 @@ class _CreateAccState extends State<CreateAcc> {
                           decoration: BoxDecoration(
                               color: Colors.green,
                               borderRadius: BorderRadius.circular(20.0),
-                              boxShadow: shadowColor),
+                              boxShadow: shadowLowColor),
                           child: const Text(
                             'Continue',
                             style: TextStyle(
@@ -964,61 +920,73 @@ class _CreateAccState extends State<CreateAcc> {
                               TextStyle(color: Colors.white70, fontSize: 16.0),
                         ),
                         SizedBox(height: 10.0),
-                        ElevatedButton.icon(
-                          onPressed: () async {
-                            //handleGoogleSignUp(context);
-                            GoogleAccountDetails? accountDetails =
-                                await handleGoogleSignUp(context);
-                            if (accountDetails != null) {
-                              if (_emailController.text.isNotEmpty ||
-                                  _passController.text.isNotEmpty ||
-                                  _repassController.text.isNotEmpty ||
-                                  _fnameController.text.isNotEmpty ||
-                                  _mnameController.text.isNotEmpty ||
-                                  _lnameController.text.isNotEmpty ||
-                                  _fnameController.text.isNotEmpty ||
-                                  _contactController.text.isNotEmpty ||
-                                  _selectedProvinceName != null ||
-                                  _selectedCityMunicipalityName != null ||
-                                  _selectedBarangayName != null ||
-                                  _streetController.text.isNotEmpty ||
-                                  _postalController.text.isNotEmpty) {
-                                _showGoogleSignInConfirmationDialog(
-                                    context, accountDetails);
-                              } else {
-                                _currentStep++;
-                                isGoogle = true;
-                                setState(() {
-                                  _accountDetails =
-                                      accountDetails; //to store the google acc details
-                                  handleSignOut();
-                                  print('isGoogle: {$isGoogle}');
-                                  _fnameController.text =
-                                      _accountDetails!.fname;
-                                  _lnameController.text =
-                                      _accountDetails!.lname;
-                                });
+                        Container(
+                          decoration: BoxDecoration(
+                            boxShadow: shadowLowColor,
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                          child: ElevatedButton.icon(
+                            onPressed: () async {
+                              setState(() {
+                                loadingAction = true;
+                              });
+                              //handleGoogleSignUp(context);
+                              GoogleAccountDetails? accountDetails =
+                                  await handleGoogleSignUp(context);
+                              if (accountDetails != null) {
+                                if (_emailController.text.isNotEmpty ||
+                                    _passController.text.isNotEmpty ||
+                                    _repassController.text.isNotEmpty ||
+                                    _fnameController.text.isNotEmpty ||
+                                    _mnameController.text.isNotEmpty ||
+                                    _lnameController.text.isNotEmpty ||
+                                    _fnameController.text.isNotEmpty ||
+                                    _contactController.text.isNotEmpty ||
+                                    _selectedProvinceName != null ||
+                                    _selectedCityMunicipalityName != null ||
+                                    _selectedBarangayName != null ||
+                                    _streetController.text.isNotEmpty ||
+                                    _postalController.text.isNotEmpty) {
+                                  _showGoogleSignInConfirmationDialog(
+                                      context, accountDetails);
+                                } else {
+                                  _currentStep++;
+                                  isGoogle = true;
+                                  setState(() {
+                                    _accountDetails =
+                                        accountDetails; //to store the google acc details
+                                    handleSignOut();
+                                    print('isGoogle: {$isGoogle}');
+                                    _fnameController.text =
+                                        _accountDetails!.fname;
+                                    _lnameController.text =
+                                        _accountDetails!.lname;
+                                  });
+                                }
                               }
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: deepPurple,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30.0),
-                              side:
-                                  BorderSide(color: Colors.white54, width: 2.0),
+                              setState(() {
+                                loadingAction = false;
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: deepPurple,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                                side: BorderSide(
+                                    color: Colors.white54, width: 2.0),
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 10.0, horizontal: 35.0),
                             ),
-                            padding: EdgeInsets.symmetric(
-                                vertical: 10.0, horizontal: 35.0),
-                          ),
-                          icon: Image.asset(
-                            'assets/Brands.png',
-                            height: 24.0,
-                          ),
-                          label: Text(
-                            'Google',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 18.0),
+                            icon: Image.asset(
+                              'assets/Brands.png',
+                              height: 24.0,
+                            ),
+                            label: Text(
+                              'Google',
+                              style: TextStyle(
+                                  color: Colors.white, fontSize: 18.0),
+                            ),
                           ),
                         ),
                       ],
@@ -1400,10 +1368,22 @@ class _CreateAccState extends State<CreateAcc> {
                                   fontSize: 16, color: greytitleColor),
                             ),
                             InkWell(
-                              onTap: () {
+                              onTap: () async {
+                                console(11111111);
+                                setState(() {
+                                  loadingAction = true;
+                                });
+                                //
+                                if (_provinces.isEmpty) {
+                                  await _loadProvinces();
+                                }
                                 setState(() {
                                   _ddlOpen = !_ddlOpen;
                                   _ddlClicked = true;
+                                });
+
+                                setState(() {
+                                  loadingAction = false;
                                 });
                               },
                               child: Padding(
@@ -1790,6 +1770,10 @@ class _CreateAccState extends State<CreateAcc> {
                         Center(
                           child: InkWell(
                             onTap: () async {
+                              setState(() {
+                                loadingAction = true;
+                              });
+
                               _ddlClicked = true;
 
                               if ((_fnameController.text.isEmpty ||
@@ -1873,6 +1857,9 @@ class _CreateAccState extends State<CreateAcc> {
                                   }
                                 }
                               }
+                              setState(() {
+                                loadingAction = false;
+                              });
                             },
                             child: Container(
                                 padding: EdgeInsets.symmetric(
@@ -2091,20 +2078,13 @@ class _CreateAccState extends State<CreateAcc> {
                     SizedBox(height: 20),
                     InkWell(
                       onTap: () async {
-                        print(_emailController.text);
-                        print(_passController.text);
-                        print(_fnameController.text);
-                        print(_mnameController.text);
-                        print(_lnameController.text);
-                        print(_contactController.text);
-                        print(_selectedProvinceName);
-                        print(_selectedCityMunicipalityName);
-                        print(_selectedBarangayName);
-                        print(_streetController.text);
-                        print(_postalController.text);
+                        setState(() {
+                          loadingAction = true;
+                        });
+                        //
                         String? error = _validateCode();
                         if (error == null) {
-                          updateEnteredCode(); //to update stored enteredCode
+                          updateEnteredCode();
                           String? errorMessage = await verifyEmailCode(
                               _emailController.text, enteredCode);
                           if (errorMessage != null) {
@@ -2139,6 +2119,9 @@ class _CreateAccState extends State<CreateAcc> {
                         } else {
                           showErrorSnackBar(context, error);
                         }
+                        setState(() {
+                          loadingAction = false;
+                        });
                       },
                       child: Container(
                         alignment: Alignment.center,

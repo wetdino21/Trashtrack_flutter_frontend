@@ -111,7 +111,7 @@ Future<String?> launchPaymentLinkSession(int? gb_id) async {
         'Content-Type': 'application/json',
       },
       body: jsonEncode({
-        'amount': 10000, // 100.00 PHP (amount in centavos)
+        'amount': 12345, // 100.00 PHP (amount in centavos)
         'gb_id': gb_id
       }),
     );

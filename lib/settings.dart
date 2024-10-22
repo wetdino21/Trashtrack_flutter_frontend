@@ -129,7 +129,7 @@ class _C_SettingsScreenState extends State<C_SettingsScreen> {
                       padding: EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: Colors.red,
-                        boxShadow: shadowColor,
+                        boxShadow: shadowLowColor,
                         borderRadius: BorderRadius.circular(100),
                       ),
                       child: Icon(
@@ -240,7 +240,7 @@ class _C_SettingsScreenState extends State<C_SettingsScreen> {
       padding: EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: deepPurple,
-        boxShadow: shadowColor,
+        boxShadow: shadowLowColor,
         borderRadius: BorderRadius.circular(100),
       ),
       child: Icon(

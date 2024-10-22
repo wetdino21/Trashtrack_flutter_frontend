@@ -57,22 +57,25 @@ class _C_DrawerState extends State<C_Drawer> {
             // Header Section
             ListTile(
               minTileHeight: 70,
-              leading: imageBytes != null
-                  ? CircleAvatar(
-                      backgroundImage: MemoryImage(imageBytes!),
-                    )
-                  : Container(
-                      padding: EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(50),
-                          boxShadow: shadowColor,
-                          color: deepGreen),
-                      child: Icon(
-                        Icons.person,
-                        size: 30,
-                        color: white,
+              leading: Container(
+                decoration: BoxDecoration(
+                    shape: BoxShape.circle, boxShadow: shadowLowColor),
+                child: imageBytes != null
+                    ? CircleAvatar(
+                        backgroundImage: MemoryImage(imageBytes!),
+                      )
+                    : Container(
+                        padding: EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(50),
+                            color: deepGreen),
+                        child: Icon(
+                          Icons.person,
+                          size: 30,
+                          color: white,
+                        ),
                       ),
-                    ),
+              ),
               title: Row(
                 children: [
                   Expanded(
@@ -152,7 +155,7 @@ class _C_DrawerState extends State<C_Drawer> {
 
                   // Waste info
                   ListTile(
-                    leading: _buildIcon(Icons.article_outlined),
+                    leading: _buildIcon(Icons.newspaper),
                     title: Text('Service Guidelines'),
                     selectedColor: Colors.green,
                     tileColor: selectedIndexs == 2 ? Colors.black12 : null,
@@ -192,7 +195,7 @@ class _C_DrawerState extends State<C_Drawer> {
                   ),
                   // Privacy Policy
                   ListTile(
-                    leading: _buildIcon(Icons.error),
+                    leading: _buildIcon(Icons.privacy_tip),
                     title: Text('Privacy Policy'),
                     selectedColor: Colors.green,
                     tileColor: selectedIndexs == 4 ? Colors.black12 : null,
@@ -219,7 +222,7 @@ class _C_DrawerState extends State<C_Drawer> {
       padding: EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: deepPurple,
-        boxShadow: shadowColor,
+        boxShadow: shadowLowColor,
         borderRadius: BorderRadius.circular(100),
       ),
       child: Icon(

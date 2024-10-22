@@ -889,13 +889,13 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                             color: _colorTweenCar.value,
                           ),
                           child: Container(
-                              padding: EdgeInsets.all(5),
+                              padding: EdgeInsets.only(left: 15, top: 5, right: 5, bottom: 5),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(50),
                                 color: Colors.white,
                               ),
                               child: Icon(
-                                Icons.drive_eta,
+                                Icons.bus_alert,
                                 color: Colors.black,
                                 size: 30,
                               )),
@@ -977,185 +977,8 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                     //         ),
 
                     isLoading
-                        ? AnimatedBuilder(
-                            animation: _controller,
-                            builder: (context, child) {
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    height: 100,
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      //color: Colors.white.withOpacity(.6),
-                                      color: _colorTween.value,
-                                    ),
-                                    child: Row(
-                                      // mainAxisAlignment: MainAxisAlignment.start,
-                                      // crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Expanded(
-                                            flex: 1,
-                                            child: Container(
-                                              alignment: Alignment.centerLeft,
-                                              child: Container(
-                                                height: 30,
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(50),
-                                                  //color: Colors.white.withOpacity(.6),
-                                                  color: _colorTween2.value,
-                                                ),
-                                              ),
-                                            )),
-                                        Expanded(
-                                            flex: 10,
-                                            child: Container(
-                                                alignment: Alignment.centerLeft,
-                                                child: Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Expanded(
-                                                        flex: 1,
-                                                        child: Container(
-                                                            width: 100,
-                                                            margin:
-                                                                EdgeInsets.all(
-                                                                    3),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          10),
-                                                              //color: Colors.white.withOpacity(.6),
-                                                              color:
-                                                                  _colorTween2
-                                                                      .value,
-                                                            ),
-                                                            child: Text(''))),
-                                                    Expanded(
-                                                        flex: 2,
-                                                        child: Container(
-                                                            width: 250,
-                                                            margin:
-                                                                EdgeInsets.all(
-                                                                    3),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          10),
-                                                              //color: Colors.white.withOpacity(.6),
-                                                              color:
-                                                                  _colorTween2
-                                                                      .value,
-                                                            ),
-                                                            child: Text(''))),
-                                                    Expanded(
-                                                        flex: 1,
-                                                        child: Container(
-                                                            width: 150,
-                                                            margin:
-                                                                EdgeInsets.all(
-                                                                    3),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          10),
-                                                              //color: Colors.white.withOpacity(.6),
-                                                              color:
-                                                                  _colorTween2
-                                                                      .value,
-                                                            ),
-                                                            child: Text(''))),
-                                                  ],
-                                                ))),
-                                      ],
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 20,
-                                  ),
-                                  Container(
-                                    height: 30,
-                                    width: 300,
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      //color: Colors.white.withOpacity(.6),
-                                      color: _colorTween2.value,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Container(
-                                    height: 100,
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: _colorTween2.value,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 20,
-                                  ),
-                                  Container(
-                                    height: 30,
-                                    width: 300,
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      //color: Colors.white.withOpacity(.6),
-                                      color: _colorTween.value,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Container(
-                                    height: 100,
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: _colorTween.value,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 20,
-                                  ),
-                                  Container(
-                                    height: 30,
-                                    width: 300,
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      //color: Colors.white.withOpacity(.6),
-                                      color: _colorTween2.value,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Container(
-                                    height: 100,
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: _colorTween2.value,
-                                    ),
-                                  ),
-                                ],
-                              );
-                            })
+                        ? loadingBookingAnimation(
+                            _controller, _colorTween, _colorTween2)
 
                         // onload dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
                         : Column(

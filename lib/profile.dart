@@ -805,18 +805,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
             //   Positioned.fill(child: GestureDetector(onTap: () {
             //     _panelController.close();
             //   })),
-            if (isLoading)
-              Positioned.fill(
-                  child: InkWell(
-                child: Center(
-                  child: CircularProgressIndicator(
-                    color: Colors.green,
-                    strokeWidth: 10,
-                    strokeAlign: 2,
-                    backgroundColor: Colors.deepPurple,
-                  ),
-                ),
-              )),
+            if (isLoading) showLoadingAction(),
           ],
         ),
       ),

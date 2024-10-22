@@ -15,8 +15,10 @@ const Color buttonColor = Color(0xFF86BF3E);
 const Color boxColor = Color(0xFF103510);
 const Color accentColor = Colors.greenAccent;
 const Color iconBoxColor = Color(0xFF001E03);
+Color green = Colors.green;
 Color deepGreen = Color(0xFF388E3C);
 Color deepPurple = Colors.deepPurple;
+Color deepPurpleAccent = Colors.deepPurpleAccent;
 Color? pupleSoft = Colors.deepPurple[200];
 Color darkPurple = Color(0xFF3A0F63);
 Color? greytitleColor = Colors.grey[700];
@@ -28,9 +30,12 @@ Color blackSoft = Colors.grey[600]!;
 Color grey = Colors.grey[600]!;
 Color greySoft = Colors.grey[400]!;
 Color blueSoft = const Color.fromARGB(255, 152, 222, 255);
+Color blue = Colors.blue;
+Color deepBlue = Colors.blue[900]!;
 Color orange = Colors.deepOrange;
 Color yellowSoft = Color(0xFFFFD700);
 Color greenSoft = Colors.greenAccent;
+Color red = Colors.red;
 
 List<BoxShadow> shadowColor = [
   BoxShadow(
@@ -43,18 +48,17 @@ List<BoxShadow> shadowColor = [
 
 List<BoxShadow> shadowBigColor = [
   BoxShadow(
-    color: Colors.black.withOpacity(.5),
-    spreadRadius: 5,
-    blurRadius: 10,
+    color: Colors.black.withOpacity(.5), spreadRadius: 5,
+    //blurRadius: 5,
     offset: Offset(5, 5), // Position of the shadow
   ),
 ];
-
+//
 List<BoxShadow> shadowMidColor = [
   BoxShadow(
     color: Colors.black.withOpacity(.5),
     spreadRadius: 2,
-    blurRadius: 5,
+    //blurRadius: 5,
     offset: Offset(5, 5), // Only right (5px) and bottom (5px) shadow
   ),
 ];
@@ -63,7 +67,7 @@ List<BoxShadow> shadowLowColor = [
   BoxShadow(
     color: Colors.black.withOpacity(.5),
     spreadRadius: 1,
-    blurRadius: 3,
+    //blurRadius: 3,
     offset: Offset(5, 5), // Only right (5px) and bottom (5px) shadow
   ),
 ];
@@ -72,8 +76,17 @@ List<BoxShadow> shadowTopColor = [
   BoxShadow(
     color: Colors.black.withOpacity(.5),
     spreadRadius: 1,
-    blurRadius: 3,
+    //blurRadius: 3,
     offset: Offset(5, -5), // Only right (5px) and bottom (5px) shadow
+  ),
+];
+
+List<BoxShadow> shadowTextColor = [
+  BoxShadow(
+    color: Colors.black.withOpacity(0.3),
+    spreadRadius: 1,
+    blurRadius: 10,
+    offset: Offset(5, 5), //Offset(-5, -5) right  and bottom
   ),
 ];
 
@@ -81,10 +94,8 @@ BorderRadius borderRadius5 = BorderRadius.circular(5);
 BorderRadius borderRadius10 = BorderRadius.circular(10);
 BorderRadius borderRadius15 = BorderRadius.circular(10);
 BorderRadius borderRadius50 = BorderRadius.circular(10);
-BoxDecoration boxDecoration1 = BoxDecoration(
-    boxShadow: shadowColor, borderRadius: borderRadius10, color: white);
-BoxDecoration boxDecorationBig = BoxDecoration(
-    boxShadow: shadowBigColor, borderRadius: borderRadius50, color: white);
+BoxDecoration boxDecoration1 = BoxDecoration(boxShadow: shadowColor, borderRadius: borderRadius10, color: white);
+BoxDecoration boxDecorationBig = BoxDecoration(boxShadow: shadowBigColor, borderRadius: borderRadius50, color: white);
 //snackbar
 void showErrorSnackBar(BuildContext context, String errorMessage) {
   if (context.mounted) {
@@ -98,6 +109,25 @@ void showErrorSnackBar(BuildContext context, String errorMessage) {
       ),
     );
   }
+}
+
+Widget showLoadingAction() {
+  return Positioned.fill(
+    child: InkWell(
+      onTap: () {},
+      child: Container(
+        color: black.withOpacity(0.3),
+        child: Center(
+          child: CircularProgressIndicator(
+            color: Colors.green,
+            strokeWidth: 10,
+            strokeAlign: 2,
+            backgroundColor: Colors.deepPurple,
+          ),
+        ),
+      ),
+    ),
+  );
 }
 
 void showSuccessSnackBar(BuildContext context, String successMessage) {
@@ -158,8 +188,8 @@ void showSuccessSnackBar(BuildContext context, String successMessage) {
 // }
 
 // for loading
-Widget LoadingAnimation(AnimationController _controller,
-    Animation<Color?> _colorTween, Animation<Color?> _colorTween2) {
+Widget loadingAnimation(
+    AnimationController _controller, Animation<Color?> _colorTween, Animation<Color?> _colorTween2) {
   return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
@@ -180,8 +210,7 @@ Widget LoadingAnimation(AnimationController _controller,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
                     //color: Colors.white.withOpacity(.6),
-                    color:
-                        index % 2 == 0 ? _colorTween.value : _colorTween2.value,
+                    color: index % 2 == 0 ? _colorTween.value : _colorTween2.value,
                   ),
                 ),
                 SizedBox(
@@ -192,8 +221,7 @@ Widget LoadingAnimation(AnimationController _controller,
                   padding: EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color:
-                        index % 2 == 0 ? _colorTween.value : _colorTween2.value,
+                    color: index % 2 == 0 ? _colorTween.value : _colorTween2.value,
                   ),
                 ),
               ],
@@ -204,8 +232,165 @@ Widget LoadingAnimation(AnimationController _controller,
 }
 
 // for loading
-Widget LoadingSingleAnimation(AnimationController _controller,
-    Animation<Color?> _colorTween, Animation<Color?> _colorTween2) {
+Widget loadingBookingAnimation(
+    AnimationController _controller, Animation<Color?> _colorTween, Animation<Color?> _colorTween2) {
+  return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 100,
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                //color: Colors.white.withOpacity(.6),
+                color: _colorTween.value,
+              ),
+              child: Row(
+                // mainAxisAlignment: MainAxisAlignment.start,
+                // crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                      flex: 1,
+                      child: Container(
+                        alignment: Alignment.centerLeft,
+                        child: Container(
+                          height: 30,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(50),
+                            //color: Colors.white.withOpacity(.6),
+                            color: _colorTween2.value,
+                          ),
+                        ),
+                      )),
+                  Expanded(
+                      flex: 10,
+                      child: Container(
+                          alignment: Alignment.centerLeft,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                  flex: 1,
+                                  child: Container(
+                                      width: 100,
+                                      margin: EdgeInsets.all(3),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        //color: Colors.white.withOpacity(.6),
+                                        color: _colorTween2.value,
+                                      ),
+                                      child: Text(''))),
+                              Expanded(
+                                  flex: 2,
+                                  child: Container(
+                                      width: 250,
+                                      margin: EdgeInsets.all(3),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        //color: Colors.white.withOpacity(.6),
+                                        color: _colorTween2.value,
+                                      ),
+                                      child: Text(''))),
+                              Expanded(
+                                  flex: 1,
+                                  child: Container(
+                                      width: 150,
+                                      margin: EdgeInsets.all(3),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        //color: Colors.white.withOpacity(.6),
+                                        color: _colorTween2.value,
+                                      ),
+                                      child: Text(''))),
+                            ],
+                          ))),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Container(
+              height: 30,
+              width: 300,
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                //color: Colors.white.withOpacity(.6),
+                color: _colorTween2.value,
+              ),
+            ),
+            SizedBox(
+              height: 5,
+            ),
+            Container(
+              height: 100,
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: _colorTween2.value,
+              ),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Container(
+              height: 30,
+              width: 300,
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                //color: Colors.white.withOpacity(.6),
+                color: _colorTween.value,
+              ),
+            ),
+            SizedBox(
+              height: 5,
+            ),
+            Container(
+              height: 100,
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: _colorTween.value,
+              ),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Container(
+              height: 30,
+              width: 300,
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                //color: Colors.white.withOpacity(.6),
+                color: _colorTween2.value,
+              ),
+            ),
+            SizedBox(
+              height: 5,
+            ),
+            Container(
+              height: 100,
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: _colorTween2.value,
+              ),
+            ),
+          ],
+        );
+      });
+}
+
+// for loading
+Widget loadingSingleAnimation(
+    AnimationController _controller, Animation<Color?> _colorTween, Animation<Color?> _colorTween2) {
   return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
@@ -265,8 +450,8 @@ Widget LoadingSingleAnimation(AnimationController _controller,
       });
 }
 
-Widget LoadingHomeAnimation(AnimationController _controller,
-    Animation<Color?> _colorTween, Animation<Color?> _colorTween2) {
+Widget loadingHomeAnimation(
+    AnimationController _controller, Animation<Color?> _colorTween, Animation<Color?> _colorTween2) {
   return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {

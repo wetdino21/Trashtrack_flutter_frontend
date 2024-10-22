@@ -192,7 +192,9 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                   ),
                 Center(
                   child: Container(
-                    decoration: BoxDecoration(boxShadow: shadowColor),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15.0),
+                        boxShadow: shadowLowColor),
                     child: ElevatedButton(
                         onPressed: () {
                           if (user == 'customer') {
@@ -232,8 +234,9 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
           Column(
             children: [
               Container(
+                height: 70,
                 margin: EdgeInsets.symmetric(horizontal: 10),
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: white,
                   boxShadow: shadowMidColor,
@@ -242,48 +245,52 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                 child: Row(
                   children: [
                     Expanded(
+                      flex: 1,
                       child: Container(
-                        decoration: BoxDecoration(boxShadow: shadowColor),
-                        child: ElevatedButton(
-                          onPressed: () => onPageSelected(0),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
+                        height: double.infinity,
+                        decoration: BoxDecoration(
+                            color:
                                 selectedPage == 0 ? Colors.deepPurple : white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.horizontal(
-                                  left: Radius.circular(50)),
-                            ),
-                          ),
-                          child: Text(
-                            'Current',
-                            style: TextStyle(
-                              color: selectedPage == 0
-                                  ? Colors.white
-                                  : Colors.black,
+                            borderRadius: BorderRadius.horizontal(
+                                left: Radius.circular(50)),
+                            boxShadow: shadowColor),
+                        child: InkWell(
+                          onTap: () => onPageSelected(0),
+                          child: Center(
+                            child: Text(
+                              'Current',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: selectedPage == 0
+                                    ? Colors.white
+                                    : Colors.black,
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
                     Expanded(
+                      flex: 1,
                       child: Container(
-                        decoration: BoxDecoration(boxShadow: shadowColor),
-                        child: ElevatedButton(
-                          onPressed: () => onPageSelected(1),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
+                        height: double.infinity,
+                        decoration: BoxDecoration(
+                            color:
                                 selectedPage == 1 ? Colors.deepPurple : white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.horizontal(
-                                  right: Radius.circular(50)),
-                            ),
-                          ),
-                          child: Text(
-                            'History',
-                            style: TextStyle(
-                              color: selectedPage == 1
-                                  ? Colors.white
-                                  : Colors.black,
+                            borderRadius: BorderRadius.horizontal(
+                                right: Radius.circular(50)),
+                            boxShadow: shadowColor),
+                        child: InkWell(
+                          onTap: () => onPageSelected(1),
+                          child: Center(
+                            child: Text(
+                              'History',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: selectedPage == 1
+                                    ? Colors.white
+                                    : Colors.black,
+                              ),
                             ),
                           ),
                         ),
@@ -336,7 +343,7 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                         await _fetchBookingData();
                       },
                       child: isLoading
-                          ? LoadingAnimation(
+                          ? loadingAnimation(
                               _controller, _colorTween, _colorTween2)
                           : bookingList == null || !containCurrent
                               ? ListView(
@@ -443,12 +450,19 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                                                   'No status';
 
                                           // Pass the extracted data to the C_CurrentScheduleCard widget
-                                          return C_ScheduleCardList(
-                                            bookId: book_Id,
-                                            date: date,
-                                            dateCreated: dateCreated,
-                                            wasteType: wasteTypes,
-                                            status: status,
+                                          return Column(
+                                            children: [
+                                              C_ScheduleCardList(
+                                                bookId: book_Id,
+                                                date: date,
+                                                dateCreated: dateCreated,
+                                                wasteType: wasteTypes,
+                                                status: status,
+                                              ),
+                                              if (bookingList!.length - 1 ==
+                                                  index)
+                                                SizedBox(height: 200),
+                                            ],
                                           );
                                         }
                                         return Container();
@@ -515,12 +529,19 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                                             booking['bk_status'] ?? 'No status';
 
                                         // Pass the extracted data to the C_CurrentScheduleCard widget
-                                        return C_ScheduleCardList(
-                                          bookId: book_Id,
-                                          date: date,
-                                          dateCreated: dateCreated,
-                                          wasteType: wasteTypes,
-                                          status: status,
+                                        return Column(
+                                          children: [
+                                            C_ScheduleCardList(
+                                              bookId: book_Id,
+                                              date: date,
+                                              dateCreated: dateCreated,
+                                              wasteType: wasteTypes,
+                                              status: status,
+                                            ),
+                                            if (bookingList!.length - 1 ==
+                                                index)
+                                              SizedBox(height: 200),
+                                          ],
                                         );
                                       },
                                     ),
@@ -533,7 +554,7 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                         await _fetchBookingData();
                       },
                       child: isLoading
-                          ? LoadingAnimation(
+                          ? loadingAnimation(
                               _controller, _colorTween, _colorTween2)
                           : (bookingList == null || !containHistory) &&
                                   bookingListHistory == null
@@ -643,12 +664,19 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                                                   'No status';
 
                                           // Pass the extracted data to the C_CurrentScheduleCard widget
-                                          return C_ScheduleCardList(
-                                            bookId: book_Id,
-                                            date: date,
-                                            dateCreated: dateCreated,
-                                            wasteType: wasteTypes,
-                                            status: status,
+                                          return Column(
+                                            children: [
+                                              C_ScheduleCardList(
+                                                bookId: book_Id,
+                                                date: date,
+                                                dateCreated: dateCreated,
+                                                wasteType: wasteTypes,
+                                                status: status,
+                                              ),
+                                              if (bookingList!.length - 1 ==
+                                                  index)
+                                                SizedBox(height: 200),
+                                            ],
                                           );
                                         }
                                         return Container();
@@ -718,12 +746,19 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                                             booking['bk_status'] ?? 'No status';
 
                                         // Pass the extracted data to the C_CurrentScheduleCard widget
-                                        return C_ScheduleCardList(
-                                          bookId: book_Id,
-                                          date: date,
-                                          dateCreated: dateCreated,
-                                          wasteType: wasteTypes,
-                                          status: status,
+                                        return Column(
+                                          children: [
+                                            C_ScheduleCardList(
+                                              bookId: book_Id,
+                                              date: date,
+                                              dateCreated: dateCreated,
+                                              wasteType: wasteTypes,
+                                              status: status,
+                                            ),
+                                            if (bookingList!.length - 1 ==
+                                                index)
+                                              SizedBox(height: 200),
+                                          ],
                                         );
                                       },
                                     ),

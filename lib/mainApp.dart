@@ -34,7 +34,7 @@ class _MainAppState extends State<MainApp> {
   String? user;
 
   int _selectedIndex = 0;
-  bool Loading = false;
+  bool loading = false;
   bool _isDelayed = false;
   bool firstLoad = true;
 
@@ -47,14 +47,14 @@ class _MainAppState extends State<MainApp> {
       _selectedIndex = widget.selectedIndex!;
     }
 
-    //load all resource
-    if (firstLoad && _selectedIndex == 0) {
-      Future.delayed(const Duration(seconds: 3), () {
-        setState(() {
-          firstLoad = false;
-        });
-      });
-    }
+    // //load all resource
+    // if (firstLoad && _selectedIndex == 0) {
+    //   Future.delayed(const Duration(seconds: 3), () {
+    //     setState(() {
+    //       firstLoad = false;
+    //     });
+    //   });
+    // }
 
     if (_selectedIndex != 0) {
       firstLoad = false;
@@ -70,7 +70,7 @@ class _MainAppState extends State<MainApp> {
   Future<void> _dbData() async {
     try {
       setState(() {
-        Loading = true;
+        loading = true;
       });
       //await notificationCount(); //notification count
       //if(!mounted) return;
@@ -93,13 +93,23 @@ class _MainAppState extends State<MainApp> {
         //userData = data; //isnt used
         String? usertype = data['user'];
         user = usertype;
-        Loading = false;
+        loading = false;
       });
+
+      //load all resource
+      if (firstLoad && _selectedIndex == 0) {
+        Future.delayed(const Duration(seconds: 2), () {
+          setState(() {
+            firstLoad = false;
+          });
+        });
+      }
     } catch (e) {
+      console(e.toString());
       if (!mounted) return;
-      setState(() {
-        Loading = false;
-      });
+      // setState(() {
+      //   Loading = false;
+      // });
     }
   }
 
@@ -190,7 +200,7 @@ class _MainAppState extends State<MainApp> {
     return Scaffold(
         body: Stack(
       children: [
-        if (!Loading)
+        if (!loading)
           Scaffold(
             drawer: C_Drawer(),
             appBar: C_CustomAppBar(
@@ -209,7 +219,7 @@ class _MainAppState extends State<MainApp> {
               onTap: _onItemTapped,
             ),
           ),
-        if (Loading || firstLoad)
+        if (loading || firstLoad)
           Scaffold(
             backgroundColor: deepPurple,
             body: Stack(

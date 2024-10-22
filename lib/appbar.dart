@@ -68,6 +68,7 @@ class C_CustomAppBarState extends State<C_CustomAppBar> {
     if (channel != null) channel!.sink.close();
     _audioService.dispose();
     //notificationService.closeConnection();
+    console('appbar disposeddddddddddddd');
     super.dispose();
   }
 
@@ -178,6 +179,7 @@ class C_CustomAppBarState extends State<C_CustomAppBar> {
                   decoration: BoxDecoration(
                     color: deepPurple,
                     shape: BoxShape.circle,
+                    boxShadow: shadowLowColor,
                   ),
                   child: Icon(
                     Icons.notifications,
@@ -234,6 +236,7 @@ class C_CustomAppBarState extends State<C_CustomAppBar> {
             decoration: BoxDecoration(
               color: deepPurple,
               shape: BoxShape.circle,
+               boxShadow: shadowLowColor,
               border: Border.all(width: 2, color: deepPurple),
             ),
             //child: imageBytes != null

@@ -102,10 +102,7 @@ flutter:
     - assets/Brands.png
     - assets/default.jpg
     - assets/anime.jpg
-    - assets/square_truck.jpg
-    - assets/truck.png
     - assets/paymongo.png
-
     - assets/gcash.png
     - assets/grabpay.png
     - assets/paymaya.png
@@ -118,7 +115,7 @@ flutter:
     - assets/sound/
     - assets/image/
 
-    - assets/icon/trashtrack_icon.png
+    - assets/icon/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

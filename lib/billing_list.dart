@@ -27,6 +27,7 @@ class _BillingListState extends State<BillingList>
   List<Map<String, dynamic>>? pdfBills;
   List<Uint8List>? pdf;
   bool isLoading = false;
+  bool loadingAction = false;
   late AnimationController _controller;
   late Animation<Color?> _colorTween;
   late Animation<Color?> _colorTween2;
@@ -159,67 +160,141 @@ class _BillingListState extends State<BillingList>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: deepGreen,
+      backgroundColor: deepPurple,
       appBar: AppBar(
-        backgroundColor: deepGreen,
+        backgroundColor: deepPurple,
         foregroundColor: Colors.white,
         title: Text('BIlling List'),
       ),
-      body: RefreshIndicator(
-        onRefresh: _fetchBillPdfs,
-        child: isLoading
-            ? Container(
-                padding: EdgeInsets.all(10),
-                child: LoadingAnimation(_controller, _colorTween, _colorTween2),
-              )
-            : pdfBills == null
-                ? ListView(
-                    children: [
-                      Container(
-                          height: MediaQuery.of(context).size.height * 0.8,
-                          alignment: Alignment.center,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.notifications_off,
-                                  color: whiteSoft, size: 100),
-                              Text(
-                                'No Bills at this time\n\n\n\n',
-                                style:
-                                    TextStyle(color: whiteSoft, fontSize: 20),
-                              ),
-                            ],
-                          )),
-                    ],
+      body: Stack(
+        children: [
+          RefreshIndicator(
+            onRefresh: _fetchBillPdfs,
+            child: isLoading
+                ? Container(
+                    padding: EdgeInsets.all(10),
+                    child: loadingAnimation(
+                        _controller, _colorTween, _colorTween2),
                   )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(5),
-                    itemCount: pdfBills!.length,
-                    itemBuilder: (context, index) {
-                      final pdfBill = pdfBills![index];
+                : pdfBills == null
+                    ? ListView(
+                        children: [
+                          Container(
+                              height: MediaQuery.of(context).size.height * 0.8,
+                              alignment: Alignment.center,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.article_outlined,
+                                      color: whiteSoft, size: 100),
+                                  Text(
+                                    'Generate the latest bill first.\n\n\n\n',
+                                    style: TextStyle(
+                                        color: whiteSoft, fontSize: 20),
+                                  ),
+                                ],
+                              )),
+                        ],
+                      )
+                    : Container(
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 5),
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 20),
+                            Container(
+                              alignment: Alignment.topLeft,
+                              margin: const EdgeInsets.only(left: 10),
+                              child: Text(
+                                'BILL# ${widget.billId.toString()}',
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18),
+                              ),
+                            ),
+                            ListView.builder(
+                              shrinkWrap: true,
+                              padding: const EdgeInsets.all(5),
+                              itemCount: pdfBills!.length,
+                              itemBuilder: (context, index) {
+                                final pdfBill = pdfBills![index];
 
-                      return GestureDetector(
-                        onTap: () async {
-                          Uint8List pdfBytes = pdfBill['bd_file'];
-                          //Uint8List pdfBytes = pdfBill;
-                          await _downloadPdf(pdfBytes);
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          margin: const EdgeInsets.symmetric(vertical: 4),
-                          decoration: BoxDecoration(
-                            color: white,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            '',
-                            //'Total Amount: ${pdfBill['bd_total_amnt']}',
-                            style: TextStyle(color: Colors.black),
-                          ),
+                                final formattedAmount = NumberFormat.currency(
+                                  locale: 'en_PH',
+                                  symbol: '₱',
+                                  decimalDigits: 2,
+                                ).format(double.parse(
+                                    pdfBill['bd_total_amnt'].toString()));
+                                DateTime dbGeneratedDate =
+                                    DateTime.parse(pdfBill['bd_created_at'])
+                                        .toLocal();
+                                String generatedDate =
+                                    DateFormat('MMM dd, yyyy hh:mm a')
+                                        .format(dbGeneratedDate);
+
+                                return Column(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () async {
+                                        setState(() {
+                                          loadingAction = true;
+                                        });
+                                        Uint8List pdfBytes = pdfBill['bd_file'];
+                                        //Uint8List pdfBytes = pdfBill;
+                                        await _downloadPdf(pdfBytes);
+
+                                        setState(() {
+                                          loadingAction = false;
+                                        });
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.all(5),
+                                        margin: const EdgeInsets.symmetric(
+                                            vertical: 5),
+                                        decoration: BoxDecoration(
+                                            color: white,
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            boxShadow: shadowLowColor),
+                                        child: ListTile(
+                                          leading: Icon(Icons.picture_as_pdf,
+                                              color: Colors.red, size: 30),
+                                          title: Row(
+                                            children: [
+                                              Text(
+                                                'Total Due: ',
+                                                style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 14),
+                                              ),
+                                              Text(
+                                                formattedAmount,
+                                                style: TextStyle(color: orange),
+                                              ),
+                                            ],
+                                          ),
+                                          subtitle: Text(
+                                            'Generated: ${generatedDate}',
+                                            style: TextStyle(
+                                                color: grey, fontSize: 12),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    //add space last
+                                    if (pdfBills!.length - 1 == index)
+                                      const SizedBox(height: 200)
+                                  ],
+                                );
+                              },
+                            ),
+                          ],
                         ),
-                      );
-                    },
-                  ),
+                      ),
+          ),
+          if (loadingAction) showLoadingAction(),
+        ],
       ),
     );
   }

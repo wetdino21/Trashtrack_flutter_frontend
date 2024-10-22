@@ -100,7 +100,7 @@ class _C_NotificationScreenState extends State<C_NotificationScreen>
         child: isLoading
             ? Container(
                 padding: EdgeInsets.all(10),
-                child: LoadingAnimation(_controller, _colorTween, _colorTween2),
+                child: loadingAnimation(_controller, _colorTween, _colorTween2),
               )
             : notifications == null
                 ? ListView(

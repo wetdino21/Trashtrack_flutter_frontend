@@ -111,8 +111,13 @@ Future<void> deleteTokens() async {
   // Clear user data from the model
   UserModel globalUserModel = UserModel();
   globalUserModel.clearModelData();
-  navigatorKey.currentState?.pushNamed('/logout');
-  // Delay navigation until the widget is stable
+  //navigatorKey.currentState?.pushNamedAndRemoveUntil('/logout');
+  
+  // no context that's why use global key
+  navigatorKey.currentState?.pushNamedAndRemoveUntil(
+    '/logout',
+    (Route<dynamic> route) => false,
+  );
 }
 
 // Function to make API call (with token verification)

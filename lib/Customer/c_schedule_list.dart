@@ -166,6 +166,8 @@ class _C_ScheduleCardListState extends State<C_ScheduleCardList> {
                                   ? Colors.red
                                   : Colors.blue,
                       fontSize: 18.0,
+                      //shadows: shadowTextColor,
+                      fontWeight: FontWeight.bold
                       // shadows: [
                       //   Shadow(
                       //     blurRadius:

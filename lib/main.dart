@@ -52,8 +52,7 @@ void main() async {
 //   runApp(MyApp());
 //   // runApp(const MyApp());
 // }
-final GlobalKey<NavigatorState> navigatorKey =
-    GlobalKey<NavigatorState>(); // for logout complex
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>(); // for logout complex
 
 class MyApp extends StatelessWidget {
   @override
@@ -104,15 +103,13 @@ class _WebsocketMultipleState extends State<WebsocketMultiple> {
   @override
   void initState() {
     super.initState();
-    channel = IOWebSocketChannel.connect(
-        'ws://192.168.254.187:8080'); // Connect to server
+    channel = IOWebSocketChannel.connect('ws://192.168.254.187:8080'); // Connect to server
 
     // Listen for incoming messages
     channel.stream.listen((message) {
       final decodedMessage = jsonDecode(message);
       setState(() {
-        messages.add(
-            'Received ${decodedMessage['type']} message: ${decodedMessage['content']}');
+        messages.add('Received ${decodedMessage['type']} message: ${decodedMessage['content']}');
       });
     });
   }
@@ -128,8 +125,7 @@ class _WebsocketMultipleState extends State<WebsocketMultiple> {
 
   @override
   void dispose() {
-    channel.sink
-        .close(); // Close WebSocket connection when the widget is disposed
+    channel.sink.close(); // Close WebSocket connection when the widget is disposed
     super.dispose();
   }
 
@@ -152,8 +148,7 @@ class _WebsocketMultipleState extends State<WebsocketMultiple> {
             onSubmitted: (text) => sendMessage('chat', text),
           ),
           ElevatedButton(
-            onPressed: () =>
-                sendMessage('notification', 'New notification from client!'),
+            onPressed: () => sendMessage('notification', 'New notification from client!'),
             child: Text('Send Notification'),
           ),
           ElevatedButton(
@@ -202,7 +197,7 @@ class _TokenCheckState extends State<TokenCheck> {
             style: TextStyle(color: white, fontSize: 20),
           ),
           Center(
-            child: Image.asset('assets/truck.png'),
+            child: Image.asset('assets/icon/trashtrack_icon_trans.png', scale: 3),
           ),
           ElevatedButton(
               onPressed: () {

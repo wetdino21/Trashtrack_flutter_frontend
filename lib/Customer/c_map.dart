@@ -17,8 +17,7 @@ LocationSettings locationSettings = AndroidSettings(
     forceLocationManager: false,
     intervalDuration: const Duration(seconds: 3),
     foregroundNotificationConfig: const ForegroundNotificationConfig(
-      notificationText:
-          "TrashTrack is using geolocator. To stop the this, close the location on app or close the app.",
+      notificationText: "TrashTrack is using geolocator. To stop the this, close the location on app or close the app.",
       notificationTitle: "Streaming your current location",
       enableWakeLock: true,
     ));
@@ -35,10 +34,8 @@ class C_MapScreen extends StatefulWidget {
   _C_MapScreenState createState() => _C_MapScreenState();
 }
 
-class _C_MapScreenState extends State<C_MapScreen>
-    with SingleTickerProviderStateMixin {
-  final GlobalKey<_C_MapScreenState> _mapScreenKey =
-      GlobalKey<_C_MapScreenState>();
+class _C_MapScreenState extends State<C_MapScreen> with SingleTickerProviderStateMixin {
+  final GlobalKey<_C_MapScreenState> _mapScreenKey = GlobalKey<_C_MapScreenState>();
   bool hideScreen = false;
   final MapController _mapController = MapController();
   LatLng? _currentLocation;
@@ -94,6 +91,7 @@ class _C_MapScreenState extends State<C_MapScreen>
   late Animation<Color?> _colorTween3;
   late Animation<Color?> _colorTween4;
   late Animation<Color?> _colorTween5;
+  bool loadingAction = false;
 
   @override
   void initState() {
@@ -202,14 +200,12 @@ class _C_MapScreenState extends State<C_MapScreen>
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
-        if (permission != LocationPermission.whileInUse &&
-            permission != LocationPermission.always) {
+        if (permission != LocationPermission.whileInUse && permission != LocationPermission.always) {
           return; // Location services are not enabled
         }
       }
 
-      if (permission == LocationPermission.denied ||
-          permission == LocationPermission.deniedForever) {
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
         await Geolocator.openAppSettings();
         return;
       }
@@ -242,20 +238,16 @@ class _C_MapScreenState extends State<C_MapScreen>
       ).listen(
         (Position position) async {
           //update everyime latlong change
-          await updateHaulLatLong(
-              widget.bookID!, position.latitude, position.longitude);
+          await updateHaulLatLong(widget.bookID!, position.latitude, position.longitude);
           //
-          String? getCurrentName =
-              await getPlaceName(position.latitude, position.longitude);
-          String? getDestiantionName = await getPlaceName(
-              widget.pickupPoint!.latitude, widget.pickupPoint!.longitude);
+          String? getCurrentName = await getPlaceName(position.latitude, position.longitude);
+          String? getDestiantionName = await getPlaceName(widget.pickupPoint!.latitude, widget.pickupPoint!.longitude);
 
           if (!mounted) return;
           setState(() {
             _startController.text = getCurrentName!;
             startPoint = LatLng(position.latitude, position.longitude);
-            if (!startLocStreaming)
-              _mapController.move(startPoint!, _mapController.zoom);
+            if (!startLocStreaming) _mapController.move(startPoint!, _mapController.zoom);
 
             startLocStreaming = true;
             destinationPoint = widget.pickupPoint;
@@ -288,14 +280,12 @@ class _C_MapScreenState extends State<C_MapScreen>
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
-        if (permission != LocationPermission.whileInUse &&
-            permission != LocationPermission.always) {
+        if (permission != LocationPermission.whileInUse && permission != LocationPermission.always) {
           return; // Location services are not enabled
         }
       }
 
-      if (permission == LocationPermission.denied ||
-          permission == LocationPermission.deniedForever) {
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
         await Geolocator.openAppSettings();
         return;
       }
@@ -314,17 +304,14 @@ class _C_MapScreenState extends State<C_MapScreen>
           final data = await fetchAllLatLong(widget.bookID!);
           print(data);
           if (data != null) {
-            String? getCurrentName =
-                await getPlaceName(data['cus_lat'], data['cus_long']);
-            String? getDestiantionName =
-                await getPlaceName(data['haul_lat'], data['haul_long']);
+            String? getCurrentName = await getPlaceName(data['cus_lat'], data['cus_long']);
+            String? getDestiantionName = await getPlaceName(data['haul_lat'], data['haul_long']);
 
             if (!mounted) return;
             setState(() {
               _startController.text = getCurrentName!;
               startPoint = LatLng(data['cus_lat'], data['cus_long']);
-              if (!startLocStreaming)
-                _mapController.move(startPoint!, _mapController.zoom);
+              if (!startLocStreaming) _mapController.move(startPoint!, _mapController.zoom);
 
               startLocStreaming = true;
               destinationPoint = LatLng(data['haul_lat'], data['haul_long']);
@@ -464,14 +451,12 @@ class _C_MapScreenState extends State<C_MapScreen>
   }
 
   //zoom when route is available
-  void zoomToFit(
-      MapController mapController, LatLng start, LatLng destination) {
+  void zoomToFit(MapController mapController, LatLng start, LatLng destination) {
     LatLngBounds bounds = LatLngBounds.fromPoints([start, destination]);
 
     // Set the map to fit within the bounds with padding
     var padding = const EdgeInsets.all(50.0); // Adjust padding as necessary
-    mapController.fitBounds(bounds,
-        options: FitBoundsOptions(padding: padding));
+    mapController.fitBounds(bounds, options: FitBoundsOptions(padding: padding));
   }
 
   //fetch route
@@ -512,16 +497,13 @@ class _C_MapScreenState extends State<C_MapScreen>
             }).toList();
 
             // Store distance and duration for each route
-            routeDistances = routesData
-                .map<double>((route) => (route['distance'] as num).toDouble())
-                .toList();
+            routeDistances = routesData.map<double>((route) => (route['distance'] as num).toDouble()).toList();
             routeDurations = routesData.map<double>((route) {
               double originalDuration = (route['duration'] as num).toDouble();
 
               // Assuming 2 minutes added per kilometer
               double distanceInKm = route['distance'] / 1000;
-              double addedDuration =
-                  distanceInKm * 1.2 * 60; // 1.2 minutes per km in seconds
+              double addedDuration = distanceInKm * 1.2 * 60; // 1.2 minutes per km in seconds
 
               return originalDuration + addedDuration; // Adjusted duration
             }).toList();
@@ -657,8 +639,7 @@ class _C_MapScreenState extends State<C_MapScreen>
   }
 
   LatLng calculateMidpoint(LatLng a, LatLng b) {
-    return LatLng(
-        (a.latitude + b.latitude) / 2, (a.longitude + b.longitude) / 2);
+    return LatLng((a.latitude + b.latitude) / 2, (a.longitude + b.longitude) / 2);
   }
 
   Future<String?> getPlaceName(double lat, double lng) async {
@@ -671,8 +652,7 @@ class _C_MapScreenState extends State<C_MapScreen>
           'https://nominatim.openstreetmap.org/reverse?format=json&lat=$lat&lon=$lng&zoom=18&addressdetails=1');
 
       final response = await http.get(url, headers: {
-        'User-Agent':
-            'Testing/1.0 (krazyclips101@gmail.com)' // Required by Nominatim
+        'User-Agent': 'Testing/1.0 (krazyclips101@gmail.com)' // Required by Nominatim
       });
 
       if (response.statusCode == 200) {
@@ -709,8 +689,7 @@ class _C_MapScreenState extends State<C_MapScreen>
 
   void fetchSelectedPlaceNames() async {
     // Get the place name first by awaiting the result
-    String? placeName =
-        await getPlaceName(selectedPoint!.latitude, selectedPoint!.longitude);
+    String? placeName = await getPlaceName(selectedPoint!.latitude, selectedPoint!.longitude);
 
     // Then call setState to update the UI
     if (!mounted) return null;
@@ -720,8 +699,7 @@ class _C_MapScreenState extends State<C_MapScreen>
   }
 
   void fetchStartPlaceName() async {
-    String? startPlace =
-        await getPlaceName(startPoint!.latitude, startPoint!.longitude);
+    String? startPlace = await getPlaceName(startPoint!.latitude, startPoint!.longitude);
     if (startPlace != null) {
       _startController.text = startPlace;
       setState(() {
@@ -731,8 +709,7 @@ class _C_MapScreenState extends State<C_MapScreen>
   }
 
   void fetchDestinationPlaceName() async {
-    String? destinationPlace = await getPlaceName(
-        destinationPoint!.latitude, destinationPoint!.longitude);
+    String? destinationPlace = await getPlaceName(destinationPoint!.latitude, destinationPoint!.longitude);
     if (destinationPlace != null) {
       _destinationController.text = destinationPlace;
       setState(() {
@@ -744,20 +721,19 @@ class _C_MapScreenState extends State<C_MapScreen>
   //current live
   Future<void> _getCurrentLocation() async {
     try {
-      //if (!currentLocStreaming)
-      // setState(() {
-      //   isLoading = true;
-      // });
+      setState(() {
+        loadingAction = true;
+      });
+
+      //
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
-        if (permission != LocationPermission.whileInUse &&
-            permission != LocationPermission.always) {
+        if (permission != LocationPermission.whileInUse && permission != LocationPermission.always) {
           return; // Location services are not enabled
         }
       }
-      if (permission == LocationPermission.denied ||
-          permission == LocationPermission.deniedForever) {
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
         await Geolocator.openAppSettings();
         return;
       }
@@ -801,8 +777,7 @@ class _C_MapScreenState extends State<C_MapScreen>
         locationSettings: locationSettings,
       ).listen(
         (Position position) async {
-          String? getCurrentName =
-              await getPlaceName(position.latitude, position.longitude);
+          String? getCurrentName = await getPlaceName(position.latitude, position.longitude);
 
           if (!mounted) return null;
           setState(() {
@@ -838,13 +813,17 @@ class _C_MapScreenState extends State<C_MapScreen>
       //       _currentLocation!, 13.0); // Move to current location
 
       // });
-    } catch (e) {
-      print('fail to get current location!');
-    } finally {
       setState(() {
-        isLoading = false;
+        loadingAction = false;
       });
+    } catch (e) {
+      console(e.toString());
     }
+    // finally {
+    //   setState(() {
+    //     isLoading = false;
+    //   });
+    // }
   }
 
   //start live
@@ -853,14 +832,12 @@ class _C_MapScreenState extends State<C_MapScreen>
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
-        if (permission != LocationPermission.whileInUse &&
-            permission != LocationPermission.always) {
+        if (permission != LocationPermission.whileInUse && permission != LocationPermission.always) {
           return; // Location services are not enabled
         }
       }
 
-      if (permission == LocationPermission.denied ||
-          permission == LocationPermission.deniedForever) {
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
         await Geolocator.openAppSettings();
         return;
       }
@@ -880,13 +857,11 @@ class _C_MapScreenState extends State<C_MapScreen>
         locationSettings: locationSettings,
       ).listen(
         (Position position) async {
-          String? getCurrentName =
-              await getPlaceName(position.latitude, position.longitude);
+          String? getCurrentName = await getPlaceName(position.latitude, position.longitude);
           setState(() {
             _startController.text = getCurrentName!;
             startPoint = LatLng(position.latitude, position.longitude);
-            if (!startLocStreaming)
-              _mapController.move(startPoint!, _mapController.zoom);
+            if (!startLocStreaming) _mapController.move(startPoint!, _mapController.zoom);
 
             startLocStreaming = true;
             if (destinationPoint != null) {
@@ -944,8 +919,7 @@ class _C_MapScreenState extends State<C_MapScreen>
             ),
             children: [
               TileLayer(
-                urlTemplate:
-                    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                 subdomains: ['a', 'b', 'c'],
                 maxZoom: 19, // Maximum zoom in level
                 minZoom: 5, // Minimum zoom out level
@@ -959,21 +933,18 @@ class _C_MapScreenState extends State<C_MapScreen>
                       Polyline(
                         points: routes[i],
                         strokeWidth: 4.0,
-                        color:
-                            i + 1 == nearestRoute ? Colors.blue : Colors.orange,
+                        color: i + 1 == nearestRoute ? Colors.blue : Colors.orange,
                       ),
                   ],
                 ),
 
               // Display markers
-              if (selectedCurrentName !=
-                  null) // Add a marker for the current location
+              if (selectedCurrentName != null) // Add a marker for the current location
                 MarkerLayer(
                   markers: [
                     Marker(
                         point: _currentLocation!,
-                        builder: (ctx) => Icon(Icons.location_on,
-                            color: Colors.red, size: 40, shadows: shadowColor),
+                        builder: (ctx) => Icon(Icons.location_on, color: Colors.red, size: 40, shadows: shadowColor),
                         rotate: true),
                   ],
                 ),
@@ -985,8 +956,7 @@ class _C_MapScreenState extends State<C_MapScreen>
                         width: 80.0,
                         height: 80.0,
                         point: selectedPoint!,
-                        builder: (ctx) => Icon(Icons.location_pin,
-                            color: Colors.red, size: 40, shadows: shadowColor),
+                        builder: (ctx) => Icon(Icons.location_pin, color: Colors.red, size: 40, shadows: shadowColor),
                         rotate: true),
                   ],
                 ),
@@ -1001,10 +971,7 @@ class _C_MapScreenState extends State<C_MapScreen>
                       point: startPoint!,
                       builder: (ctx) => Column(
                         children: [
-                          Icon(Icons.location_pin,
-                              color: Colors.green,
-                              size: 40,
-                              shadows: shadowColor),
+                          Icon(Icons.location_pin, color: Colors.green, size: 40, shadows: shadowColor),
                         ],
                       ),
                     ),
@@ -1021,10 +988,7 @@ class _C_MapScreenState extends State<C_MapScreen>
                       point: destinationPoint!,
                       builder: (ctx) => Column(
                         children: [
-                          Icon(Icons.location_pin,
-                              color: Colors.red,
-                              size: 40,
-                              shadows: shadowColor),
+                          Icon(Icons.location_pin, color: Colors.red, size: 40, shadows: shadowColor),
                         ],
                       ),
                     ),
@@ -1033,13 +997,9 @@ class _C_MapScreenState extends State<C_MapScreen>
               ],
               // Display distance and duration on the map
               if (routes.isNotEmpty)
-                for (int i = routes.length - 1;
-                    i >= 0 && (routes.length - i) <= 3;
-                    i--)
+                for (int i = routes.length - 1; i >= 0 && (routes.length - i) <= 3; i--)
                   for (int j = 0; j < routes[i].length - 1; j++)
-                    if (j ==
-                        (routes[i].length - 2) ~/
-                            2) // Check if it's the middle segment
+                    if (j == (routes[i].length - 2) ~/ 2) // Check if it's the middle segment
                       MarkerLayer(
                         markers: [
                           Marker(
@@ -1053,13 +1013,8 @@ class _C_MapScreenState extends State<C_MapScreen>
                                           : 100,
                               height: 200,
                               point: LatLng(
-                                calculateMidpoint(
-                                            routes[i][j], routes[i][j + 1])
-                                        .latitude +
-                                    0.0001, // Adjust as needed
-                                calculateMidpoint(
-                                        routes[i][j], routes[i][j + 1])
-                                    .longitude,
+                                calculateMidpoint(routes[i][j], routes[i][j + 1]).latitude + 0.0001, // Adjust as needed
+                                calculateMidpoint(routes[i][j], routes[i][j + 1]).longitude,
                               ),
                               builder: (ctx) {
                                 return Column(
@@ -1068,13 +1023,10 @@ class _C_MapScreenState extends State<C_MapScreen>
                                     // Triangular Pin
                                     Container(
                                       child: RouteMarker(
-                                        duration:
-                                            formatDuration(routeDurations[i]),
-                                        distance:
-                                            formatDistance(routeDistances[i]),
+                                        duration: formatDuration(routeDurations[i]),
+                                        distance: formatDistance(routeDistances[i]),
                                         route: i + 1, // Indexing the route
-                                        nearestRoute:
-                                            nearestRoute!, // Pass nearestRoute
+                                        nearestRoute: nearestRoute!, // Pass nearestRoute
                                       ),
                                     ),
                                     //arrowButtomBox(),
@@ -1155,33 +1107,24 @@ class _C_MapScreenState extends State<C_MapScreen>
                     padding: EdgeInsets.all(5.0),
                     decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius:
-                            BorderRadius.vertical(bottom: Radius.circular(15)),
+                        borderRadius: BorderRadius.vertical(bottom: Radius.circular(15)),
                         boxShadow: shadowColor),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        (!startIsSearching && !destinationIsSearching) ||
-                                startIsSearching ||
-                                !destinationIsSearching
+                        (!startIsSearching && !destinationIsSearching) || startIsSearching || !destinationIsSearching
                             ? Row(
                                 children: [
-                                  Icon(Icons.location_on,
-                                      color: Colors.green,
-                                      shadows: shadowColor),
+                                  Icon(Icons.location_on, color: Colors.green, shadows: shadowColor),
                                   SizedBox(width: 3),
                                   Expanded(
                                     child: Container(
-                                      padding: EdgeInsets.only(
-                                        left: 15,
-                                      ),
+                                      padding: EdgeInsets.only(left: 15),
                                       decoration: BoxDecoration(
                                           color: white,
                                           boxShadow: shadowColor,
-                                          borderRadius:
-                                              BorderRadius.circular(5),
-                                          border: Border.all(
-                                              width: 1, color: Colors.grey)),
+                                          borderRadius: BorderRadius.circular(5),
+                                          border: Border.all(width: 1, color: Colors.grey)),
                                       child: TextField(
                                         controller: _startController,
                                         focusNode: _startFocusNode,
@@ -1189,13 +1132,11 @@ class _C_MapScreenState extends State<C_MapScreen>
                                           startIsSearching = true;
                                           destinationIsSearching = false;
                                           startfound = false;
-                                          _searchPlaces(
-                                              value); // Call the search function
+                                          _searchPlaces(value); // Call the search function
                                         },
                                         decoration: InputDecoration(
                                           hintText: 'Select Starting Point',
-                                          hintStyle: TextStyle(
-                                              fontWeight: FontWeight.normal),
+                                          hintStyle: TextStyle(fontWeight: FontWeight.normal),
                                           border: InputBorder.none,
                                         ),
                                         style: TextStyle(
@@ -1220,13 +1161,10 @@ class _C_MapScreenState extends State<C_MapScreen>
                               )
                             : SizedBox(),
                         SizedBox(height: 3),
-                        (!startIsSearching && !destinationIsSearching) ||
-                                destinationIsSearching ||
-                                !startIsSearching
+                        (!startIsSearching && !destinationIsSearching) || destinationIsSearching || !startIsSearching
                             ? Row(
                                 children: [
-                                  Icon(Icons.location_on,
-                                      color: Colors.red, shadows: shadowColor),
+                                  Icon(Icons.location_on, color: Colors.red, shadows: shadowColor),
                                   SizedBox(width: 3),
                                   Expanded(
                                     child: Container(
@@ -1234,10 +1172,8 @@ class _C_MapScreenState extends State<C_MapScreen>
                                       decoration: BoxDecoration(
                                           color: white,
                                           boxShadow: shadowColor,
-                                          borderRadius:
-                                              BorderRadius.circular(5),
-                                          border: Border.all(
-                                              width: 1, color: Colors.grey)),
+                                          borderRadius: BorderRadius.circular(5),
+                                          border: Border.all(width: 1, color: Colors.grey)),
                                       child: TextField(
                                         controller: _destinationController,
                                         focusNode: _destinationFocusNode,
@@ -1245,13 +1181,11 @@ class _C_MapScreenState extends State<C_MapScreen>
                                           destinationIsSearching = true;
                                           startIsSearching = false;
                                           destinationfound = false;
-                                          _searchPlaces(
-                                              value); // Call the search function
+                                          _searchPlaces(value); // Call the search function
                                         },
                                         decoration: InputDecoration(
                                           hintText: 'Select Destination Point',
-                                          hintStyle: TextStyle(
-                                              fontWeight: FontWeight.normal),
+                                          hintStyle: TextStyle(fontWeight: FontWeight.normal),
                                           border: InputBorder.none,
                                         ),
                                         style: TextStyle(
@@ -1275,8 +1209,7 @@ class _C_MapScreenState extends State<C_MapScreen>
                                 ],
                               )
                             : SizedBox(),
-                        (!startIsSearching && !destinationIsSearching) &&
-                                _startController.text.isEmpty
+                        (!startIsSearching && !destinationIsSearching) && _startController.text.isEmpty
                             ? InkWell(
                                 onTap: () {
                                   setState(() {
@@ -1297,9 +1230,7 @@ class _C_MapScreenState extends State<C_MapScreen>
                         startIsSearching
                             ? Column(
                                 children: [
-                                  _startFocusNode.hasFocus &&
-                                          _startController.text.isEmpty &&
-                                          !startLocStreaming
+                                  _startFocusNode.hasFocus && _startController.text.isEmpty && !startLocStreaming
                                       ? Column(
                                           children: [
                                             SizedBox(
@@ -1334,18 +1265,14 @@ class _C_MapScreenState extends State<C_MapScreen>
                                             ),
                                           ],
                                         )
-                                      : _foundPlaces.isEmpty &&
-                                              _startController
-                                                  .text.isNotEmpty &&
-                                              !startfound
+                                      : _foundPlaces.isEmpty && _startController.text.isNotEmpty && !startfound
                                           ? Center(
                                               child: ListTile(
                                                 leading: Icon(
                                                   Icons.location_on_outlined,
                                                   size: 20,
                                                 ),
-                                                title:
-                                                    Text('No Location found'),
+                                                title: Text('No Location found'),
                                               ),
                                             )
                                           : Container(
@@ -1353,53 +1280,33 @@ class _C_MapScreenState extends State<C_MapScreen>
                                               child: ListView.builder(
                                                 itemCount: _foundPlaces.length,
                                                 itemBuilder: (context, index) {
-                                                  final place =
-                                                      _foundPlaces[index];
+                                                  final place = _foundPlaces[index];
                                                   return Column(
                                                     children: [
                                                       ListTile(
                                                         leading: Icon(
-                                                          Icons
-                                                              .location_on_outlined,
+                                                          Icons.location_on_outlined,
                                                           size: 20,
                                                         ),
                                                         minLeadingWidth: .5,
                                                         title: Text(
                                                           place['name'],
-                                                          style: TextStyle(
-                                                              fontSize: 14),
+                                                          style: TextStyle(fontSize: 14),
                                                         ),
                                                         onTap: () {
                                                           setState(() {
                                                             _foundPlaces = [];
-                                                            startIsSearching =
-                                                                false;
+                                                            startIsSearching = false;
                                                             startfound = true;
-                                                            _startController
-                                                                    .text =
-                                                                place['name'];
+                                                            _startController.text = place['name'];
                                                             startPoint = LatLng(
-                                                                double.parse(
-                                                                    place[
-                                                                        'lat']),
-                                                                double.parse(
-                                                                    place[
-                                                                        'lon']));
+                                                                double.parse(place['lat']), double.parse(place['lon']));
                                                             routes.clear();
-                                                            if (startPoint !=
-                                                                    null &&
-                                                                destinationPoint !=
-                                                                    null) {
-                                                              fetchRoutes(
-                                                                  startPoint!,
-                                                                  destinationPoint!);
+                                                            if (startPoint != null && destinationPoint != null) {
+                                                              fetchRoutes(startPoint!, destinationPoint!);
                                                             }
-                                                            _mapController.move(
-                                                                startPoint!,
-                                                                _mapController
-                                                                    .zoom);
-                                                            _startFocusNode
-                                                                .unfocus();
+                                                            _mapController.move(startPoint!, _mapController.zoom);
+                                                            _startFocusNode.unfocus();
                                                           });
                                                         },
                                                       ),
@@ -1417,14 +1324,12 @@ class _C_MapScreenState extends State<C_MapScreen>
                         destinationIsSearching
                             ? Container(
                                 //height: _foundPlaces.isEmpty && _startController.text.isEmpty? 10 : _foundPlaces.isEmpty && _startController.text.isNotEmpty? 100: 500,
-                                child: _destinationController.text.isEmpty ||
-                                        destinationfound
+                                child: _destinationController.text.isEmpty || destinationfound
                                     ? SizedBox(
                                         height: 10,
                                       )
                                     : _foundPlaces.isEmpty &&
-                                            _destinationController
-                                                .text.isNotEmpty &&
+                                            _destinationController.text.isNotEmpty &&
                                             !destinationfound
                                         ? Center(
                                             child: ListTile(
@@ -1440,52 +1345,32 @@ class _C_MapScreenState extends State<C_MapScreen>
                                             child: ListView.builder(
                                               itemCount: _foundPlaces.length,
                                               itemBuilder: (context, index) {
-                                                final place =
-                                                    _foundPlaces[index];
+                                                final place = _foundPlaces[index];
                                                 return Column(
                                                   children: [
                                                     ListTile(
                                                       leading: Icon(
-                                                        Icons
-                                                            .location_on_outlined,
+                                                        Icons.location_on_outlined,
                                                         size: 20,
                                                       ),
                                                       title: Text(
                                                         place['name'],
-                                                        style: TextStyle(
-                                                            fontSize: 14),
+                                                        style: TextStyle(fontSize: 14),
                                                       ),
                                                       onTap: () {
                                                         setState(() {
                                                           _foundPlaces = [];
-                                                          destinationIsSearching =
-                                                              false;
-                                                          destinationfound =
-                                                              true;
-                                                          _destinationController
-                                                                  .text =
-                                                              place['name'];
+                                                          destinationIsSearching = false;
+                                                          destinationfound = true;
+                                                          _destinationController.text = place['name'];
                                                           destinationPoint = LatLng(
-                                                              double.parse(
-                                                                  place['lat']),
-                                                              double.parse(
-                                                                  place[
-                                                                      'lon']));
+                                                              double.parse(place['lat']), double.parse(place['lon']));
                                                           routes.clear();
-                                                          if (destinationPoint !=
-                                                                  null &&
-                                                              startPoint !=
-                                                                  null) {
-                                                            fetchRoutes(
-                                                                startPoint!,
-                                                                destinationPoint!);
+                                                          if (destinationPoint != null && startPoint != null) {
+                                                            fetchRoutes(startPoint!, destinationPoint!);
                                                           }
-                                                          _mapController.move(
-                                                              destinationPoint!,
-                                                              _mapController
-                                                                  .zoom);
-                                                          _destinationFocusNode
-                                                              .unfocus();
+                                                          _mapController.move(destinationPoint!, _mapController.zoom);
+                                                          _destinationFocusNode.unfocus();
                                                         });
                                                       },
                                                     ),
@@ -1518,9 +1403,7 @@ class _C_MapScreenState extends State<C_MapScreen>
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       //arrival notif
-                      if (user == 'hauler' &&
-                          widget.bookStatus == 'Ongoing' &&
-                          arrivalDistance < 200)
+                      if (user == 'hauler' && widget.bookStatus == 'Ongoing' && arrivalDistance < 200)
                         AnimatedBuilder(
                             animation: _controller,
                             builder: (context, child) {
@@ -1540,31 +1423,23 @@ class _C_MapScreenState extends State<C_MapScreen>
                                     child: InkWell(
                                       onTap: () async {
                                         if (!isLoading) {
-                                          String? msgArrival =
-                                              await arrivalNotify(
-                                                  widget.bookID!);
+                                          String? msgArrival = await arrivalNotify(widget.bookID!);
                                           if (msgArrival == 'success') {
-                                            showSuccessSnackBar(context,
-                                                'Sent arrival notif to customer');
+                                            showSuccessSnackBar(context, 'Sent arrival notif to customer');
                                           } else {
-                                            showErrorSnackBar(context,
-                                                'Something went wrong. Please try again Later');
+                                            showErrorSnackBar(context, 'Something went wrong. Please try again Later');
                                           }
                                         }
                                       },
                                       child: Row(
                                         children: [
                                           Icon(
-                                            selectedCurrentName != null
-                                                ? Icons.close
-                                                : Icons.notification_add,
+                                            selectedCurrentName != null ? Icons.close : Icons.notification_add,
                                             color: Colors.blue,
                                             size: 35,
                                           ),
                                           Text(' Arrived',
-                                              style: TextStyle(
-                                                  color: blackSoft,
-                                                  fontWeight: FontWeight.bold))
+                                              style: TextStyle(color: blackSoft, fontWeight: FontWeight.bold))
                                         ],
                                       ),
                                     )),
@@ -1576,25 +1451,32 @@ class _C_MapScreenState extends State<C_MapScreen>
                           margin: EdgeInsets.all(15),
                           padding: EdgeInsets.all(14.0),
                           decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(15),
-                              boxShadow: shadowColor),
+                              color: Colors.white, borderRadius: BorderRadius.circular(15), boxShadow: shadowColor),
                           child: InkWell(
-                            onTap: () {
+                            onTap: () async {
+                              setState(() {
+                                loadingAction = true;
+                              });
+
+                              //
                               if (!isLoading) {
                                 if (selectedCurrentName != null) {
                                   resetSelection();
                                 } else {
                                   isLoading = true;
                                   resetSelection();
-                                  _getCurrentLocation();
+                                  await _getCurrentLocation();
                                 }
                               }
+
+                              //
+                              setState(() {
+                                loadingAction = false;
+                              });
+                              console('1111111111111');
                             },
                             child: Icon(
-                              selectedCurrentName != null
-                                  ? Icons.close
-                                  : Icons.my_location,
+                              selectedCurrentName != null ? Icons.close : Icons.my_location,
                               color: Colors.red,
                               size: 30,
                             ),
@@ -1616,8 +1498,7 @@ class _C_MapScreenState extends State<C_MapScreen>
                                 } else {
                                   resetSelection(); // Optional: reset for fresh start
                                   setState(() {
-                                    isSelectingDirections =
-                                        true; // Switch to directions mode
+                                    isSelectingDirections = true; // Switch to directions mode
                                   });
                                 }
                               } else {
@@ -1626,9 +1507,7 @@ class _C_MapScreenState extends State<C_MapScreen>
                               }
                             },
                             child: Icon(
-                              isSelectingDirections
-                                  ? Icons.close
-                                  : Icons.directions,
+                              isSelectingDirections ? Icons.close : Icons.directions,
                               color: Colors.white,
                               size: 30,
                             ),
@@ -1637,20 +1516,7 @@ class _C_MapScreenState extends State<C_MapScreen>
                   ),
                 )
               : SizedBox(),
-          if (isLoading)
-            Positioned.fill(
-              child: InkWell(
-                onTap: () {},
-                child: Center(
-                  child: CircularProgressIndicator(
-                    color: Colors.green,
-                    strokeWidth: 10,
-                    strokeAlign: 2,
-                    backgroundColor: Colors.deepPurple,
-                  ),
-                ),
-              ),
-            ),
+          if (isLoading || loadingAction) showLoadingAction(),
           if (findingRoute)
             Positioned.fill(
               child: InkWell(
@@ -1667,8 +1533,7 @@ class _C_MapScreenState extends State<C_MapScreen>
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text('Finding Fastest Route',
-                              style: TextStyle(fontSize: 20, color: greySoft)),
+                          Text('Finding Fastest Route', style: TextStyle(fontSize: 20, color: greySoft)),
                         ],
                       ),
                       AnimatedBuilder(
@@ -1678,24 +1543,17 @@ class _C_MapScreenState extends State<C_MapScreen>
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                Icon(Icons.location_pin,
-                                    color: blackSoft, size: 35),
-                                Icon(Icons.circle,
-                                    color: _colorTween1.value, size: 15),
+                                Icon(Icons.location_pin, color: blackSoft, size: 35),
+                                Icon(Icons.circle, color: _colorTween1.value, size: 15),
                                 SizedBox(width: 20),
-                                Icon(Icons.circle,
-                                    color: _colorTween2.value, size: 15),
+                                Icon(Icons.circle, color: _colorTween2.value, size: 15),
                                 SizedBox(width: 20),
-                                Icon(Icons.circle,
-                                    color: _colorTween3.value, size: 15),
+                                Icon(Icons.circle, color: _colorTween3.value, size: 15),
                                 SizedBox(width: 20),
-                                Icon(Icons.circle,
-                                    color: _colorTween4.value, size: 15),
+                                Icon(Icons.circle, color: _colorTween4.value, size: 15),
                                 SizedBox(width: 20),
-                                Icon(Icons.circle,
-                                    color: _colorTween5.value, size: 15),
-                                Icon(Icons.location_pin,
-                                    color: blackSoft, size: 35)
+                                Icon(Icons.circle, color: _colorTween5.value, size: 15),
+                                Icon(Icons.location_pin, color: blackSoft, size: 35)
                               ],
                             );
                           }),
@@ -1737,12 +1595,9 @@ class _C_MapScreenState extends State<C_MapScreen>
                       Expanded(
                         child: Text(
                           selectedPlaceName == null ? '' : selectedPlaceName!,
-                          style: TextStyle(
-                              color: Colors.grey[700],
-                              fontWeight: FontWeight.bold),
+                          style: TextStyle(color: Colors.grey[700], fontWeight: FontWeight.bold),
                           softWrap: true,
-                          overflow: TextOverflow
-                              .visible, // Prevent clipping, allow text to expand
+                          overflow: TextOverflow.visible, // Prevent clipping, allow text to expand
                         ),
                       ),
                     ],
@@ -1765,8 +1620,7 @@ class _C_MapScreenState extends State<C_MapScreen>
                   padding: EdgeInsets.all(16.0),
                   decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius:
-                          BorderRadius.vertical(top: Radius.circular(15)),
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
                       boxShadow: shadowColor),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -1779,16 +1633,11 @@ class _C_MapScreenState extends State<C_MapScreen>
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 20,
-                                color: nearestDistance == ''
-                                    ? Colors.red
-                                    : Colors.blue),
+                                color: nearestDistance == '' ? Colors.red : Colors.blue),
                           ),
                           Text(
                             '(${nearestDistance})',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                                color: Colors.black54),
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.black54),
                           ),
                         ],
                       ),
@@ -1797,8 +1646,7 @@ class _C_MapScreenState extends State<C_MapScreen>
                           SizedBox(width: 10),
                           Text(
                             'Fastest Route',
-                            style:
-                                TextStyle(fontSize: 18, color: Colors.black54),
+                            style: TextStyle(fontSize: 18, color: Colors.black54),
                           ),
                         ],
                       ),
@@ -1810,16 +1658,14 @@ class _C_MapScreenState extends State<C_MapScreen>
                       padding: EdgeInsets.all(16.0),
                       decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius:
-                              BorderRadius.vertical(top: Radius.circular(15)),
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
                           boxShadow: shadowColor),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
                             'Current Location',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 20),
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                           ),
                           Row(
                             children: [
@@ -1827,15 +1673,10 @@ class _C_MapScreenState extends State<C_MapScreen>
                               SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  selectedCurrentName == null
-                                      ? ''
-                                      : selectedCurrentName!,
-                                  style: TextStyle(
-                                      color: Colors.grey[700],
-                                      fontWeight: FontWeight.bold),
+                                  selectedCurrentName == null ? '' : selectedCurrentName!,
+                                  style: TextStyle(color: Colors.grey[700], fontWeight: FontWeight.bold),
                                   softWrap: true,
-                                  overflow: TextOverflow
-                                      .visible, // Prevent clipping, allow text to expand
+                                  overflow: TextOverflow.visible, // Prevent clipping, allow text to expand
                                 ),
                               ),
                             ],
@@ -1887,9 +1728,7 @@ class RouteMarker extends StatelessWidget {
           height: 50,
           padding: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
           decoration: BoxDecoration(
-            color: isFastestRoute
-                ? Colors.blue
-                : Colors.white, // Highlight if fastest
+            color: isFastestRoute ? Colors.blue : Colors.white, // Highlight if fastest
             borderRadius: BorderRadius.circular(5),
             boxShadow: shadowColor,
           ),
@@ -1901,9 +1740,7 @@ class RouteMarker extends StatelessWidget {
                   Icon(
                     Icons.directions_car,
                     size: 18,
-                    color: isFastestRoute
-                        ? Colors.white
-                        : Colors.black, // Icon color change
+                    color: isFastestRoute ? Colors.white : Colors.black, // Icon color change
                   ),
                   SizedBox(width: 4),
                   Text(
@@ -1911,9 +1748,7 @@ class RouteMarker extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: isFastestRoute
-                          ? Colors.white
-                          : Colors.black, // Text color change
+                      color: isFastestRoute ? Colors.white : Colors.black, // Text color change
                     ),
                   ),
                 ],
@@ -1924,9 +1759,7 @@ class RouteMarker extends StatelessWidget {
                     distance,
                     style: TextStyle(
                       fontSize: 12,
-                      color: isFastestRoute
-                          ? Colors.white
-                          : Colors.black, // Text color change
+                      color: isFastestRoute ? Colors.white : Colors.black, // Text color change
                     ),
                   ),
                 ],
@@ -1942,9 +1775,7 @@ class RouteMarker extends StatelessWidget {
               top: 0,
               bottom: 0,
               left: 25,
-              child: Image.asset(isFastestRoute
-                  ? 'assets/pin_blue.png'
-                  : 'assets/pin_white.png'))
+              child: Image.asset(isFastestRoute ? 'assets/pin_blue.png' : 'assets/pin_white.png'))
         ]),
         // Container(
         //   height: 50,
@@ -1982,14 +1813,12 @@ Future<bool> checkLocationPermission() async {
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
-      if (permission != LocationPermission.whileInUse &&
-          permission != LocationPermission.always) {
+      if (permission != LocationPermission.whileInUse && permission != LocationPermission.always) {
         return false; // Location services are not enabled
       }
     }
 
-    if (permission == LocationPermission.denied ||
-        permission == LocationPermission.deniedForever) {
+    if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
       await Geolocator.openAppSettings();
       return false;
     }

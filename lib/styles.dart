@@ -22,7 +22,6 @@ Color deepPurpleAccent = Colors.deepPurpleAccent;
 Color? pupleSoft = Colors.deepPurple[200];
 Color darkPurple = Color(0xFF3A0F63);
 Color? greytitleColor = Colors.grey[700];
-Color darkRed = Color(0xFFB00020);
 Color whiteSoft = Colors.white70;
 Color white = Colors.white;
 Color black = Colors.black;
@@ -36,6 +35,8 @@ Color orange = Colors.deepOrange;
 Color yellowSoft = Color(0xFFFFD700);
 Color greenSoft = Colors.greenAccent;
 Color red = Colors.red;
+Color redSoft = Colors.redAccent;
+Color darkRed = Color(0xFFB00020);
 
 List<BoxShadow> shadowColor = [
   BoxShadow(
@@ -43,6 +44,24 @@ List<BoxShadow> shadowColor = [
     spreadRadius: 2,
     blurRadius: 5,
     offset: Offset(3, 3), //Offset(-5, -5) right  and bottom
+  ),
+];
+
+List<BoxShadow> shadowLessColor = [
+  BoxShadow(
+    color: Colors.black.withOpacity(0.7),
+    spreadRadius: 2,
+    //blurRadius: 5,
+    offset: Offset(2, 2), //Offset(-5, -5) right  and bottom
+  ),
+];
+
+List<BoxShadow> shadowTextColor = [
+  BoxShadow(
+    color: Colors.black.withOpacity(0.5),
+    spreadRadius: 2,
+    blurRadius: 5,
+    offset: Offset(0.7, 0.7), //Offset(-5, -5) right  and bottom
   ),
 ];
 
@@ -81,14 +100,14 @@ List<BoxShadow> shadowTopColor = [
   ),
 ];
 
-List<BoxShadow> shadowTextColor = [
-  BoxShadow(
-    color: Colors.black.withOpacity(0.3),
-    spreadRadius: 1,
-    blurRadius: 10,
-    offset: Offset(5, 5), //Offset(-5, -5) right  and bottom
-  ),
-];
+// List<BoxShadow> shadowTextColor = [
+//   BoxShadow(
+//     color: Colors.black.withOpacity(0.3),
+//     spreadRadius: 1,
+//     blurRadius: 10,
+//     offset: Offset(5, 5), //Offset(-5, -5) right  and bottom
+//   ),
+// ];
 
 BorderRadius borderRadius5 = BorderRadius.circular(5);
 BorderRadius borderRadius10 = BorderRadius.circular(10);

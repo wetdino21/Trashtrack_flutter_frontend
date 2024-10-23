@@ -21,8 +21,7 @@ class C_PaymentScreen extends StatefulWidget {
   State<C_PaymentScreen> createState() => _C_PaymentScreenState();
 }
 
-class _C_PaymentScreenState extends State<C_PaymentScreen>
-    with SingleTickerProviderStateMixin {
+class _C_PaymentScreenState extends State<C_PaymentScreen> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<Color?> _colorTween;
   late Animation<Color?> _colorTween2;
@@ -112,349 +111,270 @@ class _C_PaymentScreenState extends State<C_PaymentScreen>
         children: [
           Stack(
             children: [
-              Column(
-                children: [
-                  Container(
-                    padding: EdgeInsets.only(top: 80),
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: white,
-                          boxShadow: shadowTopColor,
-                          borderRadius:
-                              BorderRadius.only(topRight: Radius.circular(15))),
-                      height: MediaQuery.of(context).size.height * .75,
-                      //height: MediaQuery.of(context).size.height - kBottomNavigationBarHeight,
-                      margin: EdgeInsets.symmetric(horizontal: 10),
-                      child: PageView(
-                        controller: _pageController,
-                        onPageChanged: (index) {
-                          setState(() {
-                            selectedPage = index;
-                          });
-                        },
-                        children: [
-                          // Current Schedule
+              Container(
+                padding: EdgeInsets.only(top: 80),
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: white,
+                      boxShadow: shadowTopColor,
+                      borderRadius: BorderRadius.only(topRight: Radius.circular(15))),
+                  height: MediaQuery.of(context).size.height * .75,
+                  //height: MediaQuery.of(context).size.height - kBottomNavigationBarHeight,
+                  margin: EdgeInsets.symmetric(horizontal: 10),
+                  child: PageView(
+                    controller: _pageController,
+                    onPageChanged: (index) {
+                      setState(() {
+                        selectedPage = index;
+                      });
+                    },
+                    children: [
+                      // Current Schedule
 
-                          RefreshIndicator(
-                              onRefresh: () async {
-                                await _fetchBillPaymentData();
-                              },
-                              child: isLoading
-                                  ? Container(
-                                      padding: EdgeInsets.all(20),
-                                      child: loadingAnimation(_controller,
-                                          _colorTween, _colorTween2),
-                                    )
-                                  : billList == null
-                                      ? ListView(
+                      RefreshIndicator(
+                          onRefresh: () async {
+                            await _fetchBillPaymentData();
+                          },
+                          child: isLoading
+                              ? Container(
+                                  padding: EdgeInsets.all(20),
+                                  child: loadingAnimation(_controller, _colorTween, _colorTween2),
+                                )
+                              : billList == null
+                                  ? ListView(
+                                      children: [
+                                        Column(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                SizedBox(
-                                                  height: 100,
-                                                ),
-                                                Container(
-                                                    alignment: Alignment.center,
-                                                    child: Column(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
-                                                      children: [
-                                                        Icon(Icons.wallet,
-                                                            color: blackSoft,
-                                                            size: 70),
-                                                        Text(
-                                                          'No pending payment\n\n\n\n',
-                                                          style: TextStyle(
-                                                              color: blackSoft,
-                                                              fontSize: 20),
-                                                        ),
-                                                      ],
-                                                    )),
-                                                SizedBox(
-                                                  height: 100,
-                                                ),
-                                              ],
+                                            SizedBox(
+                                              height: 100,
+                                            ),
+                                            Container(
+                                                alignment: Alignment.center,
+                                                child: Column(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    Icon(Icons.wallet, color: blackSoft, size: 70),
+                                                    Text(
+                                                      'No pending payment\n\n\n\n',
+                                                      style: TextStyle(color: blackSoft, fontSize: 20),
+                                                    ),
+                                                  ],
+                                                )),
+                                            SizedBox(
+                                              height: 100,
                                             ),
                                           ],
-                                        )
-                                      : ListView.builder(
-                                          itemCount: billList?.length ??
-                                              0, // Simplified null check
-                                          itemBuilder: (context, index) {
-                                            final bill = billList?[index];
+                                        ),
+                                      ],
+                                    )
+                                  : ListView.builder(
+                                      itemCount: billList?.length ?? 0, // Simplified null check
+                                      itemBuilder: (context, index) {
+                                        final bill = billList?[index];
 
-                                            if (bill == null) {
-                                              return SizedBox
-                                                  .shrink(); // Return an empty box if bill is null
-                                            }
+                                        if (bill == null) {
+                                          return SizedBox.shrink(); // Return an empty box if bill is null
+                                        }
 
-                                            // Extracting fields from the bill
-                                            int? gb_id = bill['gb_id'];
-                                            String bill_id =
-                                                'Bill# ${gb_id.toString()}';
-                                            String booking_id =
-                                                'BOOKING# ${bill['bk_id']?.toString()}';
-                                            String status =
-                                                bill['gb_status']?.toString() ??
-                                                    '';
-                                            DateTime dbDueDate = DateTime.parse(
-                                                    bill['gb_date_due'] ?? '')
-                                                .toLocal();
-                                            String formatdbDueDate = DateFormat(
-                                                    'MMM dd, yyyy hh:mm a')
-                                                .format(dbDueDate);
-                                            String dueDate = formatdbDueDate;
-                                            DateTime dbdateIssue =
-                                                DateTime.parse(bill[
-                                                            'gb_date_issued'] ??
-                                                        '')
-                                                    .toLocal();
-                                            String formatdateIssue = DateFormat(
-                                                    'MMM dd, yyyy hh:mm a')
-                                                .format(dbdateIssue);
-                                            String dateIssued =
-                                                'Issued: $formatdateIssue';
+                                        // Extracting fields from the bill
+                                        int? gb_id = bill['gb_id'];
+                                        String bill_id = 'Bill# ${gb_id.toString()}';
+                                        String booking_id = 'BOOKING# ${bill['bk_id']?.toString()}';
+                                        String status = bill['gb_status']?.toString() ?? '';
+                                        DateTime dbDueDate = DateTime.parse(bill['gb_date_due'] ?? '').toLocal();
+                                        String formatdbDueDate = DateFormat('MMM dd, yyyy hh:mm a').format(dbDueDate);
+                                        String dueDate = formatdbDueDate;
+                                        DateTime dbdateIssue = DateTime.parse(bill['gb_date_issued'] ?? '').toLocal();
+                                        String formatdateIssue = DateFormat('MMM dd, yyyy hh:mm a').format(dbdateIssue);
+                                        String dateIssued = 'Issued: $formatdateIssue';
 
-                                            return InkWell(
+                                        return Column(
+                                          children: [
+                                            if (index == 0) SizedBox(height: 30),
+                                            InkWell(
                                               onTap: () {
                                                 if (gb_id != null) {
                                                   Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              PaymentDetails(
-                                                                  gb_id:
-                                                                      gb_id))).then(
-                                                      (value) {
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) => PaymentDetails(gb_id: gb_id)))
+                                                      .then((value) {
                                                     if (value == true) {
                                                       _fetchBillPaymentData();
                                                     }
                                                   });
                                                 }
                                               },
-                                              child: Column(
-                                                children: [
-                                                  if (index == 0)
-                                                    SizedBox(height: 30),
-                                                  Container(
-                                                    padding: EdgeInsets.all(10),
-                                                    margin: EdgeInsets.all(10),
-                                                    decoration: BoxDecoration(
-                                                        color: deepPurple,
-                                                        boxShadow:
-                                                            shadowLowColor,
-                                                        borderRadius:
-                                                            borderRadius10),
-                                                    child: Column(
+                                              child: Container(
+                                                padding: EdgeInsets.all(10),
+                                                margin: EdgeInsets.all(10),
+                                                decoration: BoxDecoration(
+                                                    color: deepPurple,
+                                                    boxShadow: shadowLowColor,
+                                                    borderRadius: borderRadius10),
+                                                child: Column(
+                                                  children: [
+                                                    Container(
+                                                      alignment: Alignment.topLeft,
+                                                      child: Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          Text(
+                                                            bill_id,
+                                                            style: TextStyle(color: whiteSoft, fontSize: 14),
+                                                          ),
+                                                          Text(
+                                                            booking_id,
+                                                            style: TextStyle(color: whiteSoft, fontSize: 14),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Container(
+                                                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                                                      decoration: BoxDecoration(
+                                                          color: white,
+                                                          borderRadius: borderRadius5,
+                                                          boxShadow: shadowLowColor),
+                                                      child: Column(
+                                                        children: [
+                                                          Text(
+                                                            'Due Date',
+                                                            style: TextStyle(
+                                                                color: grey, fontWeight: FontWeight.bold, fontSize: 14),
+                                                          ),
+                                                          Row(
+                                                            mainAxisAlignment: MainAxisAlignment.center,
+                                                            children: [
+                                                              Icon(
+                                                                Icons.calendar_month,
+                                                                color: redSoft,
+                                                              ),
+                                                              Text(
+                                                                dueDate,
+                                                                style: TextStyle(
+                                                                    color: redSoft,
+                                                                    fontWeight: FontWeight.bold,
+                                                                    fontSize: 20),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                       children: [
-                                                        Container(
-                                                          alignment:
-                                                              Alignment.topLeft,
-                                                          child: Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              Text(
-                                                                bill_id,
-                                                                style: TextStyle(
-                                                                    color:
-                                                                        whiteSoft,
-                                                                    fontSize:
-                                                                        14),
-                                                              ),
-                                                              Text(
-                                                                booking_id,
-                                                                style: TextStyle(
-                                                                    color:
-                                                                        whiteSoft,
-                                                                    fontSize:
-                                                                        14),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                        Container(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .symmetric(
-                                                                  horizontal:
-                                                                      10),
-                                                          decoration: BoxDecoration(
-                                                              color: white,
-                                                              borderRadius:
-                                                                  borderRadius5,
-                                                              boxShadow:
-                                                                  shadowLowColor),
-                                                          child: Column(
-                                                            children: [
-                                                              Text(
-                                                                'Due Date',
-                                                                style: TextStyle(
-                                                                    color: grey,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    fontSize:
-                                                                        14),
-                                                              ),
-                                                              Row(
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .center,
-                                                                children: [
-                                                                  Icon(
-                                                                    Icons
-                                                                        .calendar_month,
-                                                                    color:
-                                                                        greytitleColor,
-                                                                  ),
-                                                                  Text(
-                                                                    dueDate,
-                                                                    style: TextStyle(
-                                                                        color:
-                                                                            greytitleColor,
-                                                                        fontWeight:
-                                                                            FontWeight
-                                                                                .bold,
-                                                                        fontSize:
-                                                                            20),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ],
-                                                          ),
+                                                        Text(
+                                                          dateIssued,
+                                                          style: TextStyle(color: whiteSoft, fontSize: 14),
                                                         ),
                                                         Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceBetween,
                                                           children: [
-                                                            Text(
-                                                              dateIssued,
-                                                              style: TextStyle(
-                                                                  color:
-                                                                      whiteSoft,
-                                                                  fontSize: 14),
+                                                            Transform.rotate(
+                                                              angle: -0.7854, // 45 degrees in radians
+                                                              child: Icon(
+                                                                Icons.push_pin,
+                                                                color: Colors.red,
+                                                                size: 20,
+                                                                shadows: shadowLessColor,
+                                                              ),
                                                             ),
                                                             Text(
                                                               status,
                                                               style: TextStyle(
-                                                                  color:
-                                                                      yellowSoft,
-                                                                  fontSize: 18),
+                                                                  color: white,
+                                                                  fontWeight: FontWeight.bold,
+                                                                  fontSize: 18,
+                                                                  shadows: shadowLessColor),
                                                             ),
                                                           ],
                                                         ),
                                                       ],
                                                     ),
-                                                  ),
-                                                  if (billList!.length - 1 ==
-                                                      index)
-                                                    const SizedBox(height: 200)
-                                                ],
+                                                  ],
+                                                ),
                                               ),
-                                            );
-                                          },
-                                        )),
+                                            ),
+                                            if (billList!.length - 1 == index) const SizedBox(height: 200)
+                                          ],
+                                        );
+                                      },
+                                    )),
 
-                          // History Schedule
-                          RefreshIndicator(
-                            onRefresh: () async {
-                              await _fetchBillPaymentData();
-                            },
-                            child: isLoading
-                                ? Container(
-                                    padding: const EdgeInsets.all(20),
-                                    child: loadingAnimation(
-                                        _controller, _colorTween, _colorTween2),
-                                  )
-                                : (paymentList == null)
-                                    ? ListView(
+                      // History Schedule
+                      RefreshIndicator(
+                        onRefresh: () async {
+                          await _fetchBillPaymentData();
+                        },
+                        child: isLoading
+                            ? Container(
+                                padding: const EdgeInsets.all(20),
+                                child: loadingAnimation(_controller, _colorTween, _colorTween2),
+                              )
+                            : (paymentList == null)
+                                ? ListView(
+                                    children: [
+                                      Column(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              const SizedBox(
-                                                height: 100,
-                                              ),
-                                              Container(
-                                                  alignment: Alignment.center,
-                                                  child: Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      Icon(Icons.history,
-                                                          color: blackSoft,
-                                                          size: 70),
-                                                      Text(
-                                                        'No payment history\n\n\n\n',
-                                                        style: TextStyle(
-                                                            color: blackSoft,
-                                                            fontSize: 20),
-                                                      ),
-                                                    ],
-                                                  )),
-                                              const SizedBox(
-                                                height: 100,
-                                              ),
-                                            ],
+                                          const SizedBox(
+                                            height: 100,
+                                          ),
+                                          Container(
+                                              alignment: Alignment.center,
+                                              child: Column(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  Icon(Icons.history, color: blackSoft, size: 70),
+                                                  Text(
+                                                    'No payment history\n\n\n\n',
+                                                    style: TextStyle(color: blackSoft, fontSize: 20),
+                                                  ),
+                                                ],
+                                              )),
+                                          const SizedBox(
+                                            height: 100,
                                           ),
                                         ],
-                                      )
-                                    : ListView.builder(
-                                        itemCount: paymentList?.length ??
-                                            0, // Simplified null check
-                                        itemBuilder: (context, index) {
-                                          final payment = paymentList?[index];
+                                      ),
+                                    ],
+                                  )
+                                : ListView.builder(
+                                    itemCount: paymentList?.length ?? 0, // Simplified null check
+                                    itemBuilder: (context, index) {
+                                      final payment = paymentList?[index];
 
-                                          if (payment == null) {
-                                            return SizedBox
-                                                .shrink(); // Return an empty box if payment is null
-                                          }
+                                      if (payment == null) {
+                                        return SizedBox.shrink(); // Return an empty box if payment is null
+                                      }
 
-                                          // Extracting fields from the payment
-                                          int? gb_id = payment['gb_id'];
-                                          String bill_id =
-                                              'Bill# ${gb_id.toString()}';
-                                          String booking_id =
-                                              'BOOKING# ${payment['bk_id']?.toString()}';
-                                          String status =
-                                              payment['p_status'].toString();
-                                          if (status.isNotEmpty) {
-                                            status = status.replaceRange(
-                                                0, 1, status[0].toUpperCase());
-                                          }
+                                      // Extracting fields from the payment
+                                      int? gb_id = payment['gb_id'];
+                                      String bill_id = 'Bill# ${gb_id.toString()}';
+                                      String booking_id = 'BOOKING# ${payment['bk_id']?.toString()}';
+                                      String status = payment['p_status'].toString();
+                                      if (status.isNotEmpty) {
+                                        status = status.replaceRange(0, 1, status[0].toUpperCase());
+                                      }
 
-                                          String amount =
-                                              '₱ ${payment['p_amount'].toString()}';
-                                          String method =
-                                              payment['p_method'].toString();
-                                          DateTime dbdateIssue = DateTime.parse(
-                                                  payment['p_date_paid'] ?? '')
-                                              .toLocal();
-                                          String formatdateIssue =
-                                              DateFormat('MMM dd, yyyy hh:mm a')
-                                                  .format(dbdateIssue);
-                                          String dateIssued =
-                                              'Paid at: $formatdateIssue';
+                                      String amount = '₱ ${payment['p_amount'].toString()}';
+                                      String method = payment['p_method'].toString();
+                                      DateTime dbdateIssue = DateTime.parse(payment['p_date_paid'] ?? '').toLocal();
+                                      String formatdateIssue = DateFormat('MMM dd, yyyy hh:mm a').format(dbdateIssue);
+                                      String dateIssued = 'Paid at: $formatdateIssue';
 
-                                          return InkWell(
+                                      return Column(
+                                        children: [
+                                          if (index == 0) SizedBox(height: 30),
+                                          InkWell(
                                             onTap: () {
                                               if (gb_id != null) {
                                                 Navigator.push(
                                                         context,
                                                         MaterialPageRoute(
-                                                            builder: (context) =>
-                                                                PaymentDetails(
-                                                                    gb_id:
-                                                                        gb_id)))
+                                                            builder: (context) => PaymentDetails(gb_id: gb_id)))
                                                     .then((value) {
                                                   if (value == true) {
                                                     _fetchBillPaymentData();
@@ -462,126 +382,107 @@ class _C_PaymentScreenState extends State<C_PaymentScreen>
                                                 });
                                               }
                                             },
-                                            child: Column(
-                                              children: [
-                                                if (index == 0)
-                                                  SizedBox(height: 30),
-                                                Container(
-                                                  padding: EdgeInsets.all(10),
-                                                  margin: EdgeInsets.all(10),
-                                                  decoration: BoxDecoration(
-                                                      color: deepPurple,
-                                                      boxShadow: shadowLowColor,
-                                                      borderRadius:
-                                                          borderRadius10),
-                                                  child: Column(
+                                            child: Container(
+                                              padding: EdgeInsets.all(10),
+                                              margin: EdgeInsets.all(10),
+                                              decoration: BoxDecoration(
+                                                  color: deepPurple,
+                                                  boxShadow: shadowLowColor,
+                                                  borderRadius: borderRadius10),
+                                              child: Column(
+                                                children: [
+                                                  Container(
+                                                    alignment: Alignment.topLeft,
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Text(
+                                                          bill_id,
+                                                          style: TextStyle(color: whiteSoft, fontSize: 14),
+                                                        ),
+                                                        Text(
+                                                          booking_id,
+                                                          style: TextStyle(color: whiteSoft, fontSize: 14),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                                                    decoration: BoxDecoration(
+                                                        color: white,
+                                                        borderRadius: borderRadius5,
+                                                        boxShadow: shadowLowColor),
+                                                    child: Column(
+                                                      children: [
+                                                        Text(
+                                                          method,
+                                                          style: TextStyle(
+                                                              color: grey, fontWeight: FontWeight.bold, fontSize: 14),
+                                                        ),
+                                                        Row(
+                                                          mainAxisAlignment: MainAxisAlignment.center,
+                                                          children: [
+                                                            Text(
+                                                              amount,
+                                                              style: TextStyle(
+                                                                  color: orange,
+                                                                  fontWeight: FontWeight.bold,
+                                                                  fontSize: 20),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                     children: [
-                                                      Container(
-                                                        alignment:
-                                                            Alignment.topLeft,
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Text(
-                                                              bill_id,
-                                                              style: TextStyle(
-                                                                  color:
-                                                                      whiteSoft,
-                                                                  fontSize: 14),
-                                                            ),
-                                                            Text(
-                                                              booking_id,
-                                                              style: TextStyle(
-                                                                  color:
-                                                                      whiteSoft,
-                                                                  fontSize: 14),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      Container(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .symmetric(
-                                                                horizontal: 10),
-                                                        decoration: BoxDecoration(
-                                                            color: white,
-                                                            borderRadius:
-                                                                borderRadius5,
-                                                            boxShadow:
-                                                                shadowLowColor),
-                                                        child: Column(
-                                                          children: [
-                                                            Text(
-                                                              method,
-                                                              style: TextStyle(
-                                                                  color: grey,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  fontSize: 14),
-                                                            ),
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .center,
-                                                              children: [
-                                                                Text(
-                                                                  amount,
-                                                                  style: TextStyle(
-                                                                      color:
-                                                                          orange,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      fontSize:
-                                                                          20),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ],
-                                                        ),
+                                                      Text(
+                                                        dateIssued,
+                                                        style: TextStyle(color: whiteSoft, fontSize: 14),
                                                       ),
                                                       Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
                                                         children: [
-                                                          Text(
-                                                            dateIssued,
-                                                            style: TextStyle(
-                                                                color:
-                                                                    whiteSoft,
-                                                                fontSize: 14),
+                                                          Container(
+                                                            decoration: BoxDecoration(
+                                                              color: green,
+                                                              shape: BoxShape.circle,
+                                                              boxShadow: shadowLessColor,
+                                                            ),
+                                                            child: Icon(
+                                                              Icons.check,
+                                                              color: white,
+                                                              size: 20,
+                                                              weight: 20,
+                                                            ),
                                                           ),
+                                                          SizedBox(width: 5),
                                                           Text(
                                                             status,
                                                             style: TextStyle(
-                                                                color:
-                                                                    greenSoft,
-                                                                fontSize: 18),
+                                                                color: greenSoft,
+                                                                 fontWeight: FontWeight.bold,
+                                                                fontSize: 18,
+                                                                shadows: shadowLessColor),
                                                           ),
                                                         ],
                                                       ),
                                                     ],
                                                   ),
-                                                ),
-                                                if (paymentList!.length - 1 ==
-                                                    index)
-                                                  const SizedBox(height: 200)
-                                              ],
+                                                ],
+                                              ),
                                             ),
-                                          );
-                                        },
-                                      ),
-                          ),
-                        ],
+                                          ),
+                                          if (paymentList!.length - 1 == index) const SizedBox(height: 200)
+                                        ],
+                                      );
+                                    },
+                                  ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
+                ),
               ),
               Positioned(
                 left: 0,
@@ -594,12 +495,10 @@ class _C_PaymentScreenState extends State<C_PaymentScreen>
                       GestureDetector(
                         onTap: () => onPageSelected(0),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 20, horizontal: 30),
+                          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
                           decoration: BoxDecoration(
                               color: selectedPage == 0 ? white : deepPurple,
-                              borderRadius: const BorderRadius.vertical(
-                                  top: Radius.circular(15)),
+                              borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
                               boxShadow: shadowTopColor),
                           child: Text(
                             'Pending',
@@ -613,18 +512,14 @@ class _C_PaymentScreenState extends State<C_PaymentScreen>
                       GestureDetector(
                         onTap: () => onPageSelected(1),
                         child: Container(
-                          padding: EdgeInsets.symmetric(
-                              vertical: 20, horizontal: 30),
+                          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
                           decoration: BoxDecoration(
                               color: selectedPage == 1 ? white : deepPurple,
-                              borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(15)),
+                              borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
                               boxShadow: shadowTopColor),
                           child: Text(
                             'History',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: selectedPage == 1 ? blackSoft : white),
+                            style: TextStyle(fontWeight: FontWeight.bold, color: selectedPage == 1 ? blackSoft : white),
                           ),
                         ),
                       ),
@@ -649,8 +544,7 @@ class PaymentDetails extends StatefulWidget {
   State<PaymentDetails> createState() => _PaymentDetailsState();
 }
 
-class _PaymentDetailsState extends State<PaymentDetails>
-    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+class _PaymentDetailsState extends State<PaymentDetails> with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late AnimationController _controller;
   late Animation<Color?> _colorTween;
   late Animation<Color?> _colorTween2;
@@ -750,22 +644,17 @@ class _PaymentDetailsState extends State<PaymentDetails>
           paymentDetails = data2;
           console(billDetails);
           //
-          DateTime dbIssuedDate =
-              DateTime.parse(billDetails!['gb_date_due'] ?? '').toLocal();
-          String formatdbIssuedDate =
-              DateFormat('MMM dd, yyyy').format(dbIssuedDate);
+          DateTime dbIssuedDate = DateTime.parse(billDetails!['gb_date_issued'] ?? '').toLocal();
+          String formatdbIssuedDate = DateFormat('MMM dd, yyyy (hh:mm a)').format(dbIssuedDate);
           dateIssued = formatdbIssuedDate;
 
-          DateTime dbDueDate =
-              DateTime.parse(billDetails!['gb_date_due'] ?? '').toLocal();
+          DateTime dbDueDate = DateTime.parse(billDetails!['gb_date_due'] ?? '').toLocal();
           String formatdbDueDate = DateFormat('MMM dd, yyyy').format(dbDueDate);
           dueDate = formatdbDueDate;
 
           if (paymentDetails != null) {
-            DateTime dbDatePaid =
-                DateTime.parse(paymentDetails!['p_date_paid'] ?? '').toLocal();
-            String formatdbDatePaid =
-                DateFormat('MMM dd, yyyy').format(dbDatePaid);
+            DateTime dbDatePaid = DateTime.parse(paymentDetails!['p_date_paid'] ?? '').toLocal();
+            String formatdbDatePaid = DateFormat('MMM dd, yyyy (hh:mm a)').format(dbDatePaid);
             datePaid = formatdbDatePaid;
 
             amountPaid = '₱${paymentDetails!['p_amount']}';
@@ -794,13 +683,11 @@ class _PaymentDetailsState extends State<PaymentDetails>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: deepGreen,
+      backgroundColor: deepPurple,
       appBar: AppBar(
-        backgroundColor: deepGreen,
+        backgroundColor: deepPurple,
         foregroundColor: Colors.white,
-        title: Text('Payment Details',
-            style: TextStyle(
-                color: white, fontSize: 25, fontWeight: FontWeight.bold)),
+        title: Text('Payment Details', style: TextStyle(color: white, fontSize: 25, fontWeight: FontWeight.bold)),
       ),
       body: Stack(
         children: [
@@ -830,8 +717,7 @@ class _PaymentDetailsState extends State<PaymentDetails>
                         ? ListView(
                             padding: EdgeInsets.all(20),
                             children: [
-                              loadingSingleAnimation(
-                                  _controller, _colorTween, _colorTween2),
+                              loadingSingleAnimation(_controller, _colorTween, _colorTween2),
                             ],
                           )
                         : billDetails != null
@@ -844,25 +730,19 @@ class _PaymentDetailsState extends State<PaymentDetails>
                                     margin: EdgeInsets.only(left: 10),
                                     child: Text(
                                       'BILL# ${billDetails!['gb_id'].toString()}',
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18),
+                                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
                                     ),
                                   ),
                                   Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Container(
                                         alignment: Alignment.topLeft,
                                         margin: EdgeInsets.only(left: 10),
                                         child: Text(
                                           'BOOKING# ${billDetails!['bk_id'].toString()}',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 18),
+                                          style:
+                                              TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
                                         ),
                                       ),
                                       InkWell(
@@ -870,27 +750,23 @@ class _PaymentDetailsState extends State<PaymentDetails>
                                             context,
                                             MaterialPageRoute(
                                                 builder: (context) =>
-                                                    C_ScheduleDetails(
-                                                        bookId: billDetails![
-                                                            'bk_id']))),
+                                                    C_ScheduleDetails(bookId: billDetails!['bk_id']))),
                                         child: Container(
-                                          decoration: BoxDecoration(
-                                              boxShadow: shadowTextColor),
+                                          //decoration: BoxDecoration(boxShadow: shadowTextColor),
                                           child: Row(
                                             children: [
                                               Icon(
                                                 Icons.calendar_month,
-                                                color: blueSoft,
+                                                color: greenSoft,
                                               ),
                                               Text(
                                                 'View Booking',
                                                 style: TextStyle(
-                                                  color: blueSoft,
+                                                  color: greenSoft,
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 18,
-                                                  decoration:
-                                                      TextDecoration.underline,
-                                                  decorationColor: blueSoft,
+                                                  decoration: TextDecoration.underline,
+                                                  decorationColor: greenSoft,
                                                 ),
                                               ),
                                             ],
@@ -903,63 +779,41 @@ class _PaymentDetailsState extends State<PaymentDetails>
                                   Column(
                                     children: [
                                       Container(
-                                        decoration: BoxDecoration(
-                                            boxShadow: shadowMidColor),
+                                        decoration:
+                                            BoxDecoration(borderRadius: borderRadius15, boxShadow: shadowMidColor),
                                         child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Container(
-                                              padding: EdgeInsets.symmetric(
-                                                  vertical: 10.0),
+                                              padding: EdgeInsets.symmetric(vertical: 10.0),
                                               decoration: BoxDecoration(
-                                                  color: billDetails![
-                                                              'gb_status'] ==
-                                                          'Paid'
-                                                      ? deepBlue
-                                                      : red,
-                                                  borderRadius:
-                                                      const BorderRadius
-                                                          .vertical(
-                                                          top: Radius.circular(
-                                                              10))),
+                                                  color: billDetails!['gb_status'] == 'Paid' ? green : red,
+                                                  borderRadius: const BorderRadius.vertical(top: Radius.circular(10))),
                                               child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
+                                                mainAxisAlignment: MainAxisAlignment.center,
                                                 children: [
                                                   Text(
                                                     billDetails!['gb_status'],
                                                     style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 25),
+                                                        color: Colors.white, fontWeight: FontWeight.bold, fontSize: 25),
                                                   ),
-                                                  if (billDetails![
-                                                          'gb_status'] ==
-                                                      'Paid')
+                                                  if (billDetails!['gb_status'] == 'Paid')
                                                     Container(
                                                       height: 50,
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              8.0),
+                                                      padding: const EdgeInsets.all(8.0),
                                                       child: CircleAvatar(
                                                         child: Icon(
                                                           Icons.check,
                                                           color: white,
                                                           size: 30,
                                                         ),
-                                                        backgroundColor: green,
+                                                        backgroundColor: deepBlue,
                                                       ),
                                                     ),
-                                                  if (billDetails![
-                                                          'gb_status'] !=
-                                                      'Paid')
+                                                  if (billDetails!['gb_status'] != 'Paid')
                                                     Container(
                                                       height: 50,
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              8.0),
+                                                      padding: const EdgeInsets.all(8.0),
                                                       child: CircleAvatar(
                                                         child: Icon(
                                                           Icons.error,
@@ -977,17 +831,10 @@ class _PaymentDetailsState extends State<PaymentDetails>
                                               decoration: BoxDecoration(
                                                   color: white,
                                                   borderRadius:
-                                                      const BorderRadius
-                                                          .vertical(
-                                                          bottom:
-                                                              Radius.circular(
-                                                                  10))),
+                                                      const BorderRadius.vertical(bottom: Radius.circular(10))),
                                               child: Column(
                                                 children: [
-                                                  if (paymentDetails != null &&
-                                                      billDetails![
-                                                              'gb_status'] ==
-                                                          'Paid')
+                                                  if (paymentDetails != null && billDetails!['gb_status'] == 'Paid')
                                                     Column(
                                                       children: [
                                                         Column(
@@ -996,18 +843,14 @@ class _PaymentDetailsState extends State<PaymentDetails>
                                                               'Amount',
                                                               style: TextStyle(
                                                                   color: grey,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
+                                                                  fontWeight: FontWeight.bold,
                                                                   fontSize: 12),
                                                             ),
                                                             Text(
                                                               amountPaid,
                                                               style: TextStyle(
                                                                   color: orange,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
+                                                                  fontWeight: FontWeight.bold,
                                                                   fontSize: 24),
                                                             ),
                                                             SizedBox(height: 20)
@@ -1019,18 +862,14 @@ class _PaymentDetailsState extends State<PaymentDetails>
                                                               'Date Paid: ',
                                                               style: TextStyle(
                                                                   color: grey,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
+                                                                  fontWeight: FontWeight.bold,
                                                                   fontSize: 12),
                                                             ),
                                                             Text(
                                                               datePaid,
                                                               style: TextStyle(
                                                                   color: grey,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
+                                                                  fontWeight: FontWeight.bold,
                                                                   fontSize: 16),
                                                             ),
                                                           ],
@@ -1041,9 +880,7 @@ class _PaymentDetailsState extends State<PaymentDetails>
                                                               'Payment Method: $payMethod',
                                                               style: TextStyle(
                                                                   color: grey,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
+                                                                  fontWeight: FontWeight.bold,
                                                                   fontSize: 12),
                                                             ),
                                                           ],
@@ -1054,9 +891,7 @@ class _PaymentDetailsState extends State<PaymentDetails>
                                                               'Transaction# $trans_Id',
                                                               style: TextStyle(
                                                                   color: grey,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
+                                                                  fontWeight: FontWeight.bold,
                                                                   fontSize: 12),
                                                             ),
                                                           ],
@@ -1067,9 +902,7 @@ class _PaymentDetailsState extends State<PaymentDetails>
                                                               'Checkout# $checkout_Id',
                                                               style: TextStyle(
                                                                   color: grey,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
+                                                                  fontWeight: FontWeight.bold,
                                                                   fontSize: 12),
                                                             ),
                                                           ],
@@ -1078,11 +911,8 @@ class _PaymentDetailsState extends State<PaymentDetails>
                                                       ],
                                                     ),
                                                   Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: List.generate(50,
-                                                        (index) {
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: List.generate(50, (index) {
                                                       return Container(
                                                         width: 3,
                                                         height: 1,
@@ -1096,18 +926,12 @@ class _PaymentDetailsState extends State<PaymentDetails>
                                                       Text(
                                                         'Due Date: ',
                                                         style: TextStyle(
-                                                            color: grey,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            fontSize: 14),
+                                                            color: grey, fontWeight: FontWeight.bold, fontSize: 14),
                                                       ),
                                                       Text(
                                                         dueDate,
                                                         style: TextStyle(
-                                                            color: grey,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            fontSize: 14),
+                                                            color: grey, fontWeight: FontWeight.bold, fontSize: 14),
                                                       ),
                                                     ],
                                                   ),
@@ -1116,18 +940,12 @@ class _PaymentDetailsState extends State<PaymentDetails>
                                                       Text(
                                                         'Date Issued: ',
                                                         style: TextStyle(
-                                                            color: grey,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            fontSize: 12),
+                                                            color: grey, fontWeight: FontWeight.bold, fontSize: 12),
                                                       ),
                                                       Text(
                                                         dateIssued,
                                                         style: TextStyle(
-                                                            color: grey,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            fontSize: 12),
+                                                            color: grey, fontWeight: FontWeight.bold, fontSize: 12),
                                                       ),
                                                     ],
                                                   ),
@@ -1149,34 +967,26 @@ class _PaymentDetailsState extends State<PaymentDetails>
                                               Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      BillingList(
-                                                          billId: billDetails![
-                                                              'gb_id']),
+                                                  builder: (context) => BillingList(billId: billDetails!['gb_id']),
                                                 ),
                                               );
                                             },
                                             child: Container(
-                                              decoration: BoxDecoration(
-                                                  boxShadow: shadowTextColor),
+                                              //decoration: BoxDecoration(boxShadow: shadowTextColor),
                                               child: Row(
                                                 children: [
                                                   Container(
                                                     padding: EdgeInsets.all(2),
-                                                    child: Icon(
-                                                        Icons.picture_as_pdf,
-                                                        color: blueSoft),
+                                                    child: Icon(Icons.picture_as_pdf, color: greenSoft),
                                                   ),
                                                   Text(
                                                     'Bill Records',
                                                     style: TextStyle(
-                                                      color: blueSoft,
-                                                      fontWeight:
-                                                          FontWeight.bold,
+                                                      color: greenSoft,
+                                                      fontWeight: FontWeight.bold,
                                                       fontSize: 18,
-                                                      decoration: TextDecoration
-                                                          .underline,
-                                                      decorationColor: blueSoft,
+                                                      decoration: TextDecoration.underline,
+                                                      decorationColor: greenSoft,
                                                     ),
                                                   ),
                                                 ],
@@ -1231,38 +1041,24 @@ class _PaymentDetailsState extends State<PaymentDetails>
                                                       },
                                                       child: Container(
                                                         height: double.infinity,
-                                                        padding: EdgeInsets.all(
-                                                            10.0),
+                                                        padding: EdgeInsets.all(10.0),
                                                         decoration: BoxDecoration(
                                                             color: Colors.white,
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        10),
-                                                            boxShadow:
-                                                                shadowLowColor),
+                                                            borderRadius: BorderRadius.circular(10),
+                                                            boxShadow: shadowLowColor),
                                                         child: Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
+                                                          mainAxisAlignment: MainAxisAlignment.center,
                                                           children: [
                                                             Text(
                                                               'Pay Now',
                                                               style: TextStyle(
-                                                                color:
-                                                                    deepPurple,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
+                                                                color: deepGreen,
+                                                                fontWeight: FontWeight.bold,
                                                                 fontSize: 24,
                                                               ),
                                                             ),
                                                             SizedBox(width: 5),
-                                                            Icon(
-                                                                Icons
-                                                                    .waving_hand,
-                                                                color:
-                                                                    deepPurple)
+                                                            Icon(Icons.waving_hand, color: deepGreen)
                                                           ],
                                                         ),
                                                       ),
@@ -1278,50 +1074,35 @@ class _PaymentDetailsState extends State<PaymentDetails>
                                                           isLoading = true;
                                                         });
 
-                                                        await _downloadPdf(
-                                                            context,
-                                                            billDetails![
-                                                                'gb_id']);
+                                                        await _downloadPdf(context, billDetails!['gb_id']);
 
                                                         setState(() {
                                                           isLoading = false;
                                                         });
                                                       },
                                                       child: Container(
-                                                        padding:
-                                                            EdgeInsets.all(5),
+                                                        padding: EdgeInsets.all(5),
                                                         decoration: BoxDecoration(
                                                             color: Colors.white,
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        10),
-                                                            boxShadow:
-                                                                shadowLowColor),
+                                                            borderRadius: BorderRadius.circular(10),
+                                                            boxShadow: shadowLowColor),
                                                         child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .center,
+                                                          crossAxisAlignment: CrossAxisAlignment.center,
                                                           children: [
                                                             Center(
                                                               child: Text(
                                                                 'Latest Bill',
                                                                 style: TextStyle(
                                                                     color: grey,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    fontSize:
-                                                                        14.0),
+                                                                    fontWeight: FontWeight.bold,
+                                                                    fontSize: 14.0),
                                                               ),
                                                             ),
                                                             Container(
                                                               child: Icon(
-                                                                Icons
-                                                                    .picture_as_pdf_rounded,
+                                                                Icons.picture_as_pdf_rounded,
                                                                 size: 40,
-                                                                color:
-                                                                    deepPurple,
+                                                                color: deepGreen,
                                                               ),
                                                             )
                                                           ],
@@ -1338,8 +1119,7 @@ class _PaymentDetailsState extends State<PaymentDetails>
                                                   refreshStatus = false;
                                                   isLoading = true;
                                                 });
-                                                await _downloadPdf(context,
-                                                    billDetails!['gb_id']);
+                                                await _downloadPdf(context, billDetails!['gb_id']);
 
                                                 setState(() {
                                                   isLoading = false;
@@ -1349,25 +1129,18 @@ class _PaymentDetailsState extends State<PaymentDetails>
                                                   padding: EdgeInsets.all(5),
                                                   decoration: BoxDecoration(
                                                       color: Colors.white,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      boxShadow:
-                                                          shadowLowColor),
+                                                      borderRadius: BorderRadius.circular(10),
+                                                      boxShadow: shadowLowColor),
                                                   child: ListTile(
                                                     leading: Icon(
-                                                      Icons
-                                                          .picture_as_pdf_rounded,
+                                                      Icons.picture_as_pdf_rounded,
                                                       size: 40,
-                                                      color: deepPurple,
+                                                      color: deepGreen,
                                                     ),
                                                     title: Text(
                                                       'Latest Bill',
                                                       style: TextStyle(
-                                                          color: grey,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontSize: 18.0),
+                                                          color: grey, fontWeight: FontWeight.bold, fontSize: 18.0),
                                                     ),
                                                   )),
                                             ),
@@ -1389,8 +1162,7 @@ class _PaymentDetailsState extends State<PaymentDetails>
 }
 
 //dont touch
-Future<void> _uploadPdf(
-    BuildContext context, int bill_Id, Uint8List pdfBytes) async {
+Future<void> _uploadPdf(BuildContext context, int bill_Id, Uint8List pdfBytes) async {
   Map<String, String?> tokens = await getTokens();
   String? accessToken = tokens['access_token'];
 
@@ -1442,18 +1214,15 @@ Future<void> _downloadPdf(BuildContext context, int bill_Id) async {
 
     var dio = Dio();
 
-    Directory? downloadsDirectory =
-        Directory('/storage/emulated/0/Download/trash');
+    Directory? downloadsDirectory = Directory('/storage/emulated/0/Download/trash');
 
     // Check if the directory exists
     if (!await downloadsDirectory.exists()) {
       downloadsDirectory = await getExternalStorageDirectory();
     }
 
-    String formattedDate =
-        DateFormat('MMMM dd, yyyy HH-mm-ss').format(DateTime.now());
-    String savePath =
-        "${downloadsDirectory!.path}/TrashTrack_Bill ($formattedDate).pdf";
+    String formattedDate = DateFormat('MMMM dd, yyyy HH-mm-ss').format(DateTime.now());
+    String savePath = "${downloadsDirectory!.path}/TrashTrack_Bill ($formattedDate).pdf";
 
     Map<String, String?> tokens = await getTokens();
     String? accessToken = tokens['access_token'];

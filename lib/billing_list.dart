@@ -22,8 +22,7 @@ class BillingList extends StatefulWidget {
   State<BillingList> createState() => _BillingListState();
 }
 
-class _BillingListState extends State<BillingList>
-    with SingleTickerProviderStateMixin {
+class _BillingListState extends State<BillingList> with SingleTickerProviderStateMixin {
   List<Map<String, dynamic>>? pdfBills;
   List<Uint8List>? pdf;
   bool isLoading = false;
@@ -115,8 +114,7 @@ class _BillingListState extends State<BillingList>
 //       throw Exception('Invalid PDF data');
 //     }
 
-    Directory? downloadsDirectory =
-        Directory('/storage/emulated/0/Download/trash');
+    Directory? downloadsDirectory = Directory('/storage/emulated/0/Download/trash');
 
     // Check if the directory exists
     if (!await downloadsDirectory.exists()) {
@@ -131,10 +129,8 @@ class _BillingListState extends State<BillingList>
       return;
     }
 
-    String formattedDate =
-        DateFormat('MMMM dd, yyyy HH-mm-ss').format(DateTime.now());
-    String savePath =
-        "${downloadsDirectory.path}/TrashTrack_Bill ($formattedDate).pdf";
+    String formattedDate = DateFormat('MMMM dd, yyyy HH-mm-ss').format(DateTime.now());
+    String savePath = "${downloadsDirectory.path}/TrashTrack_Bill ($formattedDate).pdf";
 
     try {
       showDownloadDialog(context);
@@ -173,8 +169,7 @@ class _BillingListState extends State<BillingList>
             child: isLoading
                 ? Container(
                     padding: EdgeInsets.all(10),
-                    child: loadingAnimation(
-                        _controller, _colorTween, _colorTween2),
+                    child: loadingAnimation(_controller, _colorTween, _colorTween2),
                   )
                 : pdfBills == null
                     ? ListView(
@@ -185,20 +180,17 @@ class _BillingListState extends State<BillingList>
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.article_outlined,
-                                      color: whiteSoft, size: 100),
+                                  Icon(Icons.article_outlined, color: whiteSoft, size: 100),
                                   Text(
                                     'Generate the latest bill first.\n\n\n\n',
-                                    style: TextStyle(
-                                        color: whiteSoft, fontSize: 20),
+                                    style: TextStyle(color: whiteSoft, fontSize: 20),
                                   ),
                                 ],
                               )),
                         ],
                       )
                     : Container(
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 5),
+                        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                         child: Column(
                           children: [
                             const SizedBox(height: 20),
@@ -207,10 +199,15 @@ class _BillingListState extends State<BillingList>
                               margin: const EdgeInsets.only(left: 10),
                               child: Text(
                                 'BILL# ${widget.billId.toString()}',
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18),
+                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+                              ),
+                            ),
+                            Container(
+                              alignment: Alignment.topLeft,
+                              margin: const EdgeInsets.only(left: 10),
+                              child: const Text(
+                                'Note: The pdf bill/s listed below might not be latest bill. Please click Latest Bill (from the previous page) to download it and will be added here if the accrual date reached.',
+                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 10),
                               ),
                             ),
                             ListView.builder(
@@ -224,14 +221,9 @@ class _BillingListState extends State<BillingList>
                                   locale: 'en_PH',
                                   symbol: '₱',
                                   decimalDigits: 2,
-                                ).format(double.parse(
-                                    pdfBill['bd_total_amnt'].toString()));
-                                DateTime dbGeneratedDate =
-                                    DateTime.parse(pdfBill['bd_created_at'])
-                                        .toLocal();
-                                String generatedDate =
-                                    DateFormat('MMM dd, yyyy hh:mm a')
-                                        .format(dbGeneratedDate);
+                                ).format(double.parse(pdfBill['bd_total_amnt'].toString()));
+                                DateTime dbGeneratedDate = DateTime.parse(pdfBill['bd_created_at']).toLocal();
+                                String generatedDate = DateFormat('MMM dd, yyyy hh:mm a').format(dbGeneratedDate);
 
                                 return Column(
                                   children: [
@@ -250,23 +242,18 @@ class _BillingListState extends State<BillingList>
                                       },
                                       child: Container(
                                         padding: const EdgeInsets.all(5),
-                                        margin: const EdgeInsets.symmetric(
-                                            vertical: 5),
+                                        margin: const EdgeInsets.symmetric(vertical: 5),
                                         decoration: BoxDecoration(
                                             color: white,
-                                            borderRadius:
-                                                BorderRadius.circular(8),
+                                            borderRadius: BorderRadius.circular(8),
                                             boxShadow: shadowLowColor),
                                         child: ListTile(
-                                          leading: Icon(Icons.picture_as_pdf,
-                                              color: Colors.red, size: 30),
+                                          leading: Icon(Icons.picture_as_pdf, color: Colors.red, size: 30),
                                           title: Row(
                                             children: [
                                               Text(
                                                 'Total Due: ',
-                                                style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 14),
+                                                style: TextStyle(color: Colors.black, fontSize: 14),
                                               ),
                                               Text(
                                                 formattedAmount,
@@ -276,15 +263,13 @@ class _BillingListState extends State<BillingList>
                                           ),
                                           subtitle: Text(
                                             'Generated: ${generatedDate}',
-                                            style: TextStyle(
-                                                color: grey, fontSize: 12),
+                                            style: TextStyle(color: grey, fontSize: 12),
                                           ),
                                         ),
                                       ),
                                     ),
                                     //add space last
-                                    if (pdfBills!.length - 1 == index)
-                                      const SizedBox(height: 200)
+                                    if (pdfBills!.length - 1 == index) const SizedBox(height: 200)
                                   ],
                                 );
                               },

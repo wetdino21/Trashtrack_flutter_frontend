@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:trashtrack/home.dart';
 import 'package:trashtrack/profile.dart';
 import 'package:trashtrack/settings.dart';
@@ -20,6 +21,7 @@ class C_Drawer extends StatefulWidget {
 }
 
 class _C_DrawerState extends State<C_Drawer> {
+  String? version;
   Uint8List? imageBytes;
   Map<String, dynamic>? userData;
   int? selectedIndexs;
@@ -34,6 +36,8 @@ class _C_DrawerState extends State<C_Drawer> {
 
   Future<void> _dbData() async {
     try {
+      await _getAppVersion();
+
       final data = await userDataFromHive();
       if (!mounted) return;
       setState(() {
@@ -44,6 +48,17 @@ class _C_DrawerState extends State<C_Drawer> {
       if (!mounted) return;
       showErrorSnackBar(context, e.toString());
     }
+  }
+
+  Future<void> _getAppVersion() async {
+    console('opennedddddddddddddddddd');
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+
+    String appVersion = 'Version: ${packageInfo.version}.${packageInfo.buildNumber}';
+    setState(() {
+      version = appVersion;
+      console(version);
+    });
   }
 
   @override
@@ -58,17 +73,14 @@ class _C_DrawerState extends State<C_Drawer> {
             ListTile(
               minTileHeight: 70,
               leading: Container(
-                decoration: BoxDecoration(
-                    shape: BoxShape.circle, boxShadow: shadowLowColor),
+                decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: shadowLowColor),
                 child: imageBytes != null
                     ? CircleAvatar(
                         backgroundImage: MemoryImage(imageBytes!),
                       )
                     : Container(
                         padding: EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(50),
-                            color: deepGreen),
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(50), color: deepGreen),
                         child: Icon(
                           Icons.person,
                           size: 30,
@@ -80,9 +92,7 @@ class _C_DrawerState extends State<C_Drawer> {
                 children: [
                   Expanded(
                     child: Text(
-                      userData != null
-                          ? '${userData!['fname']} ${userData!['lname']}'
-                          : 'Loading . . .',
+                      userData != null ? '${userData!['fname']} ${userData!['lname']}' : 'Loading . . .',
                       style: TextStyle(fontWeight: FontWeight.bold),
                       softWrap: true,
                       overflow: TextOverflow.ellipsis,
@@ -98,15 +108,11 @@ class _C_DrawerState extends State<C_Drawer> {
                   color: deepPurple,
                 ),
                 onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => C_SettingsScreen()));
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => C_SettingsScreen()));
                 },
               ),
               onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => C_ProfileScreen()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => C_ProfileScreen()));
               },
             ),
             // Expanded List Section
@@ -122,10 +128,7 @@ class _C_DrawerState extends State<C_Drawer> {
                     onTap: () {
                       // Navigate to home
                       if (selectedIndexs != 0) {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => C_HomeScreen()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => C_HomeScreen()));
                       }
 
                       // selectedIndexs == 0
@@ -188,8 +191,7 @@ class _C_DrawerState extends State<C_Drawer> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) => TermsAndConditions()),
+                        MaterialPageRoute(builder: (context) => TermsAndConditions()),
                       );
                     },
                   ),
@@ -202,14 +204,19 @@ class _C_DrawerState extends State<C_Drawer> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) => PrivacyPolicy()),
+                        MaterialPageRoute(builder: (context) => PrivacyPolicy()),
                       );
                     },
                   ),
                 ],
               ),
             ),
+            //dispay version of the app
+            if (version != null)
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(version!, style: TextStyle(fontWeight: FontWeight.bold)),
+              ),
           ],
         ),
       ),

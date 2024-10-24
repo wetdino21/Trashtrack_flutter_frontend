@@ -93,7 +93,7 @@ Future<void> launchPaymentLink(BuildContext context) async {
 }
 
 //final
-Future<String?> launchPaymentLinkSession(int? gb_id) async {
+Future<String?> launchPaymentLinkSession(int gbId) async {
   final tokens = await getTokens();
   String? accessToken = tokens['access_token'];
   if (accessToken == null) {
@@ -111,8 +111,8 @@ Future<String?> launchPaymentLinkSession(int? gb_id) async {
         'Content-Type': 'application/json',
       },
       body: jsonEncode({
-        'amount': 12345, // 100.00 PHP (amount in centavos)
-        'gb_id': gb_id
+        //'amount': 12345, // 100.00 PHP (amount in centavos)
+        'gb_id': gbId
       }),
     );
 
@@ -139,7 +139,7 @@ Future<String?> launchPaymentLinkSession(int? gb_id) async {
         print('Access token expired. Attempting to refresh...');
         String? refreshMsg = await refreshAccessToken();
         if (refreshMsg == null) {
-          return await launchPaymentLinkSession(gb_id);
+          return await launchPaymentLinkSession(gbId);
         }
       } else if (response.statusCode == 403) {
         // Access token is invalid. Logout

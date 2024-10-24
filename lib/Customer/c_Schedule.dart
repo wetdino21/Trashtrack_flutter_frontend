@@ -234,7 +234,7 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
           Column(
             children: [
               Container(
-                height: 70,
+                height: 60,
                 margin: EdgeInsets.symmetric(horizontal: 10),
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
@@ -250,7 +250,7 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                         height: double.infinity,
                         decoration: BoxDecoration(
                             color:
-                                selectedPage == 0 ? Colors.deepPurple : white,
+                                selectedPage == 0 ? deepPurple : white,
                             borderRadius: BorderRadius.horizontal(
                                 left: Radius.circular(50)),
                             boxShadow: shadowColor),
@@ -276,7 +276,7 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
                         height: double.infinity,
                         decoration: BoxDecoration(
                             color:
-                                selectedPage == 1 ? Colors.deepPurple : white,
+                                selectedPage == 1 ? deepPurple : white,
                             borderRadius: BorderRadius.horizontal(
                                 right: Radius.circular(50)),
                             boxShadow: shadowColor),

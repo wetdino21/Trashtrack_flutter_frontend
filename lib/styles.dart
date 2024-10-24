@@ -23,6 +23,7 @@ Color? pupleSoft = Colors.deepPurple[200];
 Color darkPurple = Color(0xFF3A0F63);
 Color? greytitleColor = Colors.grey[700];
 Color whiteSoft = Colors.white70;
+Color whiteLow = const Color.fromARGB(255, 238, 236, 236);
 Color white = Colors.white;
 Color black = Colors.black;
 Color blackSoft = Colors.grey[600]!;
@@ -68,7 +69,7 @@ List<BoxShadow> shadowTextColor = [
 List<BoxShadow> shadowBigColor = [
   BoxShadow(
     color: Colors.black.withOpacity(.5), spreadRadius: 5,
-    //blurRadius: 5,
+    blurRadius: 2,
     offset: Offset(5, 5), // Position of the shadow
   ),
 ];
@@ -77,7 +78,7 @@ List<BoxShadow> shadowMidColor = [
   BoxShadow(
     color: Colors.black.withOpacity(.5),
     spreadRadius: 2,
-    //blurRadius: 5,
+    blurRadius: 2,
     offset: Offset(5, 5), // Only right (5px) and bottom (5px) shadow
   ),
 ];
@@ -86,7 +87,7 @@ List<BoxShadow> shadowLowColor = [
   BoxShadow(
     color: Colors.black.withOpacity(.5),
     spreadRadius: 1,
-    //blurRadius: 3,
+    blurRadius: 2,
     offset: Offset(5, 5), // Only right (5px) and bottom (5px) shadow
   ),
 ];
@@ -95,7 +96,7 @@ List<BoxShadow> shadowTopColor = [
   BoxShadow(
     color: Colors.black.withOpacity(.5),
     spreadRadius: 1,
-    //blurRadius: 3,
+    blurRadius: 2,
     offset: Offset(5, -5), // Only right (5px) and bottom (5px) shadow
   ),
 ];

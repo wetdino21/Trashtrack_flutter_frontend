@@ -61,17 +61,10 @@ class _C_ScheduleCardListState extends State<C_ScheduleCardList> {
     return InkWell(
       onTap: () {
         if (user == 'customer') {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) =>
-                      C_ScheduleDetails(bookId: widget.bookId)));
+          Navigator.push(context, MaterialPageRoute(builder: (context) => C_ScheduleDetails(bookId: widget.bookId)));
         } else if (user == 'hauler') {
           Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) =>
-                      Booking_Pending_Details(bookId: widget.bookId)));
+              context, MaterialPageRoute(builder: (context) => Booking_Pending_Details(bookId: widget.bookId)));
         }
       },
       splashColor: Colors.green,
@@ -85,19 +78,22 @@ class _C_ScheduleCardListState extends State<C_ScheduleCardList> {
         // ),
         child: Container(
           padding: EdgeInsets.all(10.0),
-          decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10.0),
-              boxShadow: shadowMidColor),
+          decoration:
+              BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10.0), boxShadow: shadowMidColor),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 padding: EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(7),
-                    color: Colors.deepPurpleAccent,
-                    boxShadow: shadowColor),
+                child: Text(
+                  'BOOKING# ${widget.bookId}',
+                  style: TextStyle(color: blackSoft, fontWeight: FontWeight.bold, fontSize: 12),
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.all(5),
+                decoration:
+                    BoxDecoration(borderRadius: BorderRadius.circular(7), color: deepPurple, boxShadow: shadowColor),
                 child: Column(
                   children: [
                     Align(
@@ -108,21 +104,17 @@ class _C_ScheduleCardListState extends State<C_ScheduleCardList> {
                       ),
                     ),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                            widget.status == 'Cancelled' ||
-                                    widget.status == 'Collected'
+                            widget.status == 'Cancelled' || widget.status == 'Collected'
                                 ? Icons.history
                                 : Icons.calendar_month,
-                            size: widget.status == 'Cancelled' ||
-                                    widget.status == 'Collected'
-                                ? 35
-                                : 25,
+                            size: widget.status == 'Cancelled' || widget.status == 'Collected' ? 35 : 25,
                             color: Colors.white),
-                        SizedBox(width: 10.0),
                         Text(
                           widget.date,
-                          style: TextStyle(color: Colors.white, fontSize: 23.0),
+                          style: TextStyle(color: Colors.white, fontSize: 20.0, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
@@ -158,43 +150,43 @@ class _C_ScheduleCardListState extends State<C_ScheduleCardList> {
                   Text(
                     widget.status,
                     style: TextStyle(
-                      color: widget.status == 'Pending'
-                          ? Colors.orange
-                          : widget.status == 'Ongoing'
-                              ? Colors.green
-                              : widget.status == 'Cancelled'
-                                  ? Colors.red
-                                  : Colors.blue,
-                      fontSize: 18.0,
-                      //shadows: shadowTextColor,
-                      fontWeight: FontWeight.bold
-                      // shadows: [
-                      //   Shadow(
-                      //     blurRadius:
-                      //         50.0, // How much blur you want for the glow
-                      //     color: status == 'Pending'
-                      //         ? Colors.orangeAccent
-                      //         : status == 'Ongoing'
-                      //             ? Colors.greenAccent
-                      //             : status == 'Cancelled'
-                      //                 ? Colors.pinkAccent
-                      //                 : Colors
-                      //                     .lightBlueAccent, // The glow color
-                      //     offset: Offset(1, 1), // Position of the shadow
-                      //   ),
-                      //   Shadow(
-                      //     blurRadius: 50.0, // Increase blur for a stronger glow
-                      //     color: status == 'Pending'
-                      //         ? Colors.orangeAccent
-                      //         : status == 'Ongoing'
-                      //             ? Colors.greenAccent
-                      //             : status == 'Cancelled'
-                      //                 ? Colors.pinkAccent
-                      //                 : Colors.lightBlueAccent,
-                      //     offset: Offset(0, 0),
-                      //   ),
-                      // ],
-                    ),
+                        color: widget.status == 'Pending'
+                            ? Colors.orange
+                            : widget.status == 'Ongoing'
+                                ? Colors.green
+                                : widget.status == 'Cancelled'
+                                    ? Colors.red
+                                    : Colors.blue,
+                        fontSize: 18.0,
+                        //shadows: shadowTextColor,
+                        fontWeight: FontWeight.bold
+                        // shadows: [
+                        //   Shadow(
+                        //     blurRadius:
+                        //         50.0, // How much blur you want for the glow
+                        //     color: status == 'Pending'
+                        //         ? Colors.orangeAccent
+                        //         : status == 'Ongoing'
+                        //             ? Colors.greenAccent
+                        //             : status == 'Cancelled'
+                        //                 ? Colors.pinkAccent
+                        //                 : Colors
+                        //                     .lightBlueAccent, // The glow color
+                        //     offset: Offset(1, 1), // Position of the shadow
+                        //   ),
+                        //   Shadow(
+                        //     blurRadius: 50.0, // Increase blur for a stronger glow
+                        //     color: status == 'Pending'
+                        //         ? Colors.orangeAccent
+                        //         : status == 'Ongoing'
+                        //             ? Colors.greenAccent
+                        //             : status == 'Cancelled'
+                        //                 ? Colors.pinkAccent
+                        //                 : Colors.lightBlueAccent,
+                        //     offset: Offset(0, 0),
+                        //   ),
+                        // ],
+                        ),
                   ),
                 ],
               ),
@@ -217,8 +209,7 @@ class C_ScheduleDetails extends StatefulWidget {
   _C_ScheduleDetailsState createState() => _C_ScheduleDetailsState();
 }
 
-class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
-    with SingleTickerProviderStateMixin {
+class _C_ScheduleDetailsState extends State<C_ScheduleDetails> with SingleTickerProviderStateMixin {
   // Controllers for the input fields
   final _fullnameController = TextEditingController();
   final _contactController = TextEditingController();
@@ -352,18 +343,16 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
           }
 
           if (bookingWasteListdb != null) {
-            bookingWasteList =
-                List<Map<String, dynamic>>.from(bookingWasteListdb);
+            bookingWasteList = List<Map<String, dynamic>>.from(bookingWasteListdb);
             // bookingWasteList = bookingWasteListdb
             //     .where((waste) => waste['bk_id'] == widget.bookId)
             //     .toList();
             // Initialize _selectedWasteTypes with the bookingWasteList
-            _selectedWasteTypes = List<Map<String, dynamic>>.from(
-                bookingWasteList!.map((waste) => {
-                      'name': waste['bw_name'],
-                      'price': waste['bw_price'],
-                      'unit': waste['bw_unit'],
-                    }));
+            _selectedWasteTypes = List<Map<String, dynamic>>.from(bookingWasteList!.map((waste) => {
+                  'name': waste['bw_name'],
+                  'price': waste['bw_price'],
+                  'unit': waste['bw_unit'],
+                }));
           }
 
           if (bookingData != null) {
@@ -372,8 +361,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
             }
             //store from booking
             _fullnameController.text = (bookingData!['bk_fullname'] ?? '');
-            _contactController.text =
-                bookingData!['bk_contact'].substring(1) ?? '';
+            _contactController.text = bookingData!['bk_contact'].substring(1) ?? '';
             _selectedProvinceName = bookingData!['bk_province'] ?? '';
             _selectedCityMunicipalityName = bookingData!['bk_city'] ?? '';
             _selectedBarangayName = bookingData!['bk_brgy'] ?? '';
@@ -497,14 +485,12 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
-        if (permission != LocationPermission.whileInUse &&
-            permission != LocationPermission.always) {
+        if (permission != LocationPermission.whileInUse && permission != LocationPermission.always) {
           return; // Location services are not enabled
         }
       }
 
-      if (permission == LocationPermission.denied ||
-          permission == LocationPermission.deniedForever) {
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
         await Geolocator.openAppSettings();
         return;
       }
@@ -554,9 +540,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
         },
       )),
     );
-    if (selectedPoint ==
-            LatLng(bookingData!['bk_latitude'] as double,
-                bookingData!['bk_longitude'] as double) &&
+    if (selectedPoint == LatLng(bookingData!['bk_latitude'] as double, bookingData!['bk_longitude'] as double) &&
         _selectedDate == DateTime.parse(bookingData!['bk_date']).toLocal() &&
         isWasteEqual == true) {
       showSuccessSnackBar(context, 'No update changes');
@@ -577,11 +561,9 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Colors.deepPurple,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(20.0))),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
           title: Text('Save Changes', style: TextStyle(color: Colors.white)),
-          content: Text('Are you sure to update booking details?',
-              style: TextStyle(color: Colors.white)),
+          content: Text('Are you sure to update booking details?', style: TextStyle(color: Colors.white)),
           actions: [
             TextButton(
               onPressed: () {
@@ -615,12 +597,9 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                     });
                   } else if (dbMessage == 'ongoing') {
                     Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => MainApp(selectedIndex: 2)));
+                        context, MaterialPageRoute(builder: (context) => MainApp(selectedIndex: 2)));
                   } else {
-                    showErrorSnackBar(
-                        context, 'Somthing\'s wrong. Please try again later.');
+                    showErrorSnackBar(context, 'Somthing\'s wrong. Please try again later.');
                   }
                 }
               },
@@ -659,9 +638,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
         _selectedBarangayName == bookingData!['bk_brgy'] &&
         _streetController.text == (bookingData!['bk_street']) &&
         _postalController.text == (bookingData!['bk_postal']) &&
-        selectedPoint ==
-            LatLng(bookingData!['bk_latitude'] as double,
-                bookingData!['bk_longitude'] as double) &&
+        selectedPoint == LatLng(bookingData!['bk_latitude'] as double, bookingData!['bk_longitude'] as double) &&
         _selectedDate == DateTime.parse(bookingData!['bk_date']).toLocal() &&
         isWasteEqual == true) {
       setState(() {
@@ -681,11 +658,9 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Colors.red[900],
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(20.0))),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
           title: Text('Discard Changes', style: TextStyle(color: Colors.white)),
-          content: Text('Are you sure to discard any changes?',
-              style: TextStyle(color: Colors.white)),
+          content: Text('Are you sure to discard any changes?', style: TextStyle(color: Colors.white)),
           actions: [
             TextButton(
               onPressed: () {
@@ -697,8 +672,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
               onPressed: () async {
                 await _fetchBookingData();
                 setState(() {
-                  _selectedDate =
-                      DateTime.parse(bookingData!['bk_date']).toLocal();
+                  _selectedDate = DateTime.parse(bookingData!['bk_date']).toLocal();
                   _isEditing = false;
                   onAddress = false;
                   boxColorTheme = Colors.teal;
@@ -720,30 +694,22 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Colors.red[900],
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(20.0))),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
           title: Text('Cancel Booking', style: TextStyle(color: Colors.white)),
-          content: Text('Are you sure to Cancel this booking?',
-              style: TextStyle(color: Colors.white)),
+          content: Text('Are you sure to Cancel this booking?', style: TextStyle(color: Colors.white)),
           actions: [
             TextButton(
               onPressed: () async {
                 if (bookingData != null) {
-                  String? dbMessage =
-                      await bookingCancel(context, bookingData!['bk_id']);
+                  String? dbMessage = await bookingCancel(context, bookingData!['bk_id']);
                   if (dbMessage == 'success') {
                     Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => MainApp(selectedIndex: 2)));
+                        context, MaterialPageRoute(builder: (context) => MainApp(selectedIndex: 2)));
                   } else if (dbMessage == 'ongoing') {
                     Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => MainApp(selectedIndex: 2)));
+                        context, MaterialPageRoute(builder: (context) => MainApp(selectedIndex: 2)));
                   } else {
-                    showErrorSnackBar(
-                        context, 'Somthing\'s wrong. Please try again later.');
+                    showErrorSnackBar(context, 'Somthing\'s wrong. Please try again later.');
                   }
                 }
               },
@@ -776,8 +742,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
 
   Future<void> _loadCitiesMunicipalities(String provinceCode) async {
     try {
-      final citiesMunicipalities =
-          await fetchCitiesMunicipalities(provinceCode);
+      final citiesMunicipalities = await fetchCitiesMunicipalities(provinceCode);
       setState(() {
         _citiesMunicipalities = citiesMunicipalities;
         _showCityMunicipalityDropdown = true;
@@ -879,8 +844,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                       builder: (context) => MainApp(
                                           selectedIndex: 1,
                                           bookID: widget.bookId,
-                                          pickupPoint: LatLng(data['haul_lat'],
-                                              data['haul_long']))));
+                                          pickupPoint: LatLng(data['haul_lat'], data['haul_long']))));
                             }
                           }
                         },
@@ -920,10 +884,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
             await _dbData();
             await _loadWasteCategories();
 
-            if (bookingData != null &&
-                bookingWasteList != null &&
-                userData != null &&
-                _wasteTypes.isNotEmpty) {
+            if (bookingData != null && bookingWasteList != null && userData != null && _wasteTypes.isNotEmpty) {
               isLoading = false;
             }
           },
@@ -979,8 +940,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                     //         ),
 
                     isLoading
-                        ? loadingBookingAnimation(
-                            _controller, _colorTween, _colorTween2)
+                        ? loadingBookingAnimation(_controller, _colorTween, _colorTween2)
 
                         // onload dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
                         : Column(
@@ -1000,18 +960,15 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                       margin: EdgeInsets.only(left: 20),
                                       child: Text(
                                         'BOOKING# ${bookingData!['bk_id'].toString()}',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 18),
+                                        style:
+                                            TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
                                       ),
                                     ),
                                     Container(
                                       margin: EdgeInsets.all(10),
                                       decoration: BoxDecoration(
                                           color: Colors.grey[200],
-                                          borderRadius:
-                                              BorderRadius.circular(10),
+                                          borderRadius: BorderRadius.circular(10),
                                           boxShadow: shadowBigColor),
                                       child: Column(
                                         children: [
@@ -1020,42 +977,28 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                             width: double.infinity,
                                             padding: EdgeInsets.all(15),
                                             decoration: BoxDecoration(
-                                              color: bookingData![
-                                                          'bk_status'] ==
-                                                      'Pending'
+                                              color: bookingData!['bk_status'] == 'Pending'
                                                   ? Colors.orange
-                                                  : bookingData!['bk_status'] ==
-                                                          'Ongoing'
+                                                  : bookingData!['bk_status'] == 'Ongoing'
                                                       ? Colors.green
-                                                      : bookingData![
-                                                                  'bk_status'] ==
-                                                              'Cancelled'
+                                                      : bookingData!['bk_status'] == 'Cancelled'
                                                           ? Colors.red
                                                           : Colors.blue,
-                                              borderRadius:
-                                                  BorderRadius.vertical(
-                                                      top: Radius.circular(10)),
+                                              borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
                                             ),
                                             child: Column(
                                               children: [
                                                 Text(
                                                   bookingData == null
                                                       ? 'Loading ...'
-                                                      : bookingData!['bk_status'] ==
-                                                                  'Pending' ||
-                                                              bookingData![
-                                                                      'bk_status'] ==
-                                                                  'Ongoing'
+                                                      : bookingData!['bk_status'] == 'Pending' ||
+                                                              bookingData!['bk_status'] == 'Ongoing'
                                                           ? 'Your Request Pickup is ${bookingData!['bk_status']}'
                                                           : 'Your Request Pickup was ${bookingData!['bk_status']}',
                                                   style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 18),
+                                                      color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
                                                 ),
-                                                bookingData!['bk_status'] ==
-                                                        'Ongoing'
+                                                bookingData!['bk_status'] == 'Ongoing'
                                                     ? Text(
                                                         'Today is your waste collection day!',
                                                         style: TextStyle(
@@ -1070,58 +1013,35 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                             padding: EdgeInsets.all(10),
                                             decoration: BoxDecoration(
                                               //color: Colors.grey[200],
-                                              borderRadius:
-                                                  BorderRadius.vertical(
-                                                      bottom:
-                                                          Radius.circular(10)),
+                                              borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
                                             ),
                                             child: onAddress
                                                 ? Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
                                                       Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
+                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                         children: [
                                                           SizedBox(),
                                                           Container(
-                                                            alignment: Alignment
-                                                                .centerRight,
-                                                            padding: EdgeInsets
-                                                                .symmetric(
-                                                                    vertical:
-                                                                        10,
-                                                                    horizontal:
-                                                                        10),
+                                                            alignment: Alignment.centerRight,
+                                                            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                                                             decoration: BoxDecoration(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            5),
-                                                                color:
-                                                                    Colors.blue,
-                                                                boxShadow:
-                                                                    shadowColor),
+                                                                borderRadius: BorderRadius.circular(5),
+                                                                color: Colors.blue,
+                                                                boxShadow: shadowColor),
                                                             child: InkWell(
                                                               onTap: () {
                                                                 setState(() {
-                                                                  onAddress =
-                                                                      false;
+                                                                  onAddress = false;
                                                                 });
                                                               },
                                                               child: Text(
                                                                 'Minimize',
                                                                 style: TextStyle(
-                                                                    color: Colors
-                                                                        .white,
-                                                                    fontSize:
-                                                                        12,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold),
+                                                                    color: Colors.white,
+                                                                    fontSize: 12,
+                                                                    fontWeight: FontWeight.bold),
                                                               ),
                                                             ),
                                                           ),
@@ -1130,110 +1050,73 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                                       Center(
                                                           child: Text(
                                                         'Information',
-                                                        style: TextStyle(
-                                                            fontSize: 16,
-                                                            color: Colors.grey),
+                                                        style: TextStyle(fontSize: 16, color: Colors.grey),
                                                       )),
-                                                      const SizedBox(
-                                                          height: 20),
+                                                      const SizedBox(height: 20),
                                                       Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .only(left: 10),
+                                                        padding: const EdgeInsets.only(left: 10),
                                                         child: Text(
                                                           'Contact',
                                                           style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              color:
-                                                                  greytitleColor,
+                                                              fontWeight: FontWeight.bold,
+                                                              color: greytitleColor,
                                                               fontSize: 16),
                                                         ),
                                                       ),
                                                       _buildTextField(
-                                                        controller:
-                                                            _fullnameController,
+                                                        controller: _fullnameController,
                                                         hintText: 'Full Name',
                                                         onChanged: (value) {
                                                           setState(() {
-                                                            fullnamevalidator =
-                                                                validateFullname(
-                                                                    value);
+                                                            fullnamevalidator = validateFullname(value);
                                                             fullname = value!;
                                                           });
                                                         },
                                                       ),
-                                                      _labelValidator(
-                                                          fullnamevalidator),
+                                                      _labelValidator(fullnamevalidator),
                                                       const SizedBox(height: 5),
                                                       _buildNumberField(
                                                         inputFormatters: [
-                                                          FilteringTextInputFormatter
-                                                              .digitsOnly,
-                                                          LengthLimitingTextInputFormatter(
-                                                              10),
+                                                          FilteringTextInputFormatter.digitsOnly,
+                                                          LengthLimitingTextInputFormatter(10),
                                                         ],
                                                       ),
-                                                      _labelValidator(
-                                                          contactvalidator),
-                                                      const SizedBox(
-                                                          height: 20),
+                                                      _labelValidator(contactvalidator),
+                                                      const SizedBox(height: 20),
                                                       Center(
                                                           child: Text(
                                                         'Complete Address',
-                                                        style: TextStyle(
-                                                            fontSize: 16,
-                                                            color: Colors.grey),
+                                                        style: TextStyle(fontSize: 16, color: Colors.grey),
                                                       )),
-                                                      const SizedBox(
-                                                          height: 20),
+                                                      const SizedBox(height: 20),
                                                       Column(
                                                         children: [
                                                           Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
                                                             children: [
                                                               Text(
                                                                 '  Province/City or Municipality/Barangay',
                                                                 style: TextStyle(
-                                                                    fontSize:
-                                                                        16,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    color:
-                                                                        greytitleColor),
+                                                                    fontSize: 16,
+                                                                    fontWeight: FontWeight.bold,
+                                                                    color: greytitleColor),
                                                               ),
                                                               Column(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
+                                                                crossAxisAlignment: CrossAxisAlignment.start,
                                                                 children: [
                                                                   Container(
                                                                     padding: EdgeInsets.symmetric(
-                                                                        vertical:
-                                                                            5.0,
-                                                                        horizontal:
-                                                                            15),
+                                                                        vertical: 5.0, horizontal: 15),
                                                                     decoration: BoxDecoration(
-                                                                        color: Colors
-                                                                            .white,
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(
-                                                                                10.0),
-                                                                        boxShadow:
-                                                                            shadowColor),
+                                                                        color: Colors.white,
+                                                                        borderRadius: BorderRadius.circular(10.0),
+                                                                        boxShadow: shadowColor),
                                                                     child: Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .spaceBetween,
+                                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                                       children: [
                                                                         // Show selected values
                                                                         Expanded(
-                                                                          child:
-                                                                              Text(
+                                                                          child: Text(
                                                                             _selectedProvinceName == null
                                                                                 ? 'Select Province'
                                                                                 : _selectedCityMunicipalityName == null
@@ -1243,22 +1126,22 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                                                                         : '${_selectedProvinceName} / '
                                                                                             '${_selectedCityMunicipalityName} / '
                                                                                             '${_selectedBarangayName}',
-                                                                            style:
-                                                                                TextStyle(color: _selectedProvinceName == null ? greySoft : black, fontSize: 16.0),
+                                                                            style: TextStyle(
+                                                                                color: _selectedProvinceName == null
+                                                                                    ? greySoft
+                                                                                    : black,
+                                                                                fontSize: 16.0),
                                                                             overflow:
                                                                                 TextOverflow.visible, // Allow wrapping
-                                                                            softWrap:
-                                                                                true, // Enable soft wrapping
+                                                                            softWrap: true, // Enable soft wrapping
                                                                           ),
                                                                         ),
                                                                         IconButton(
-                                                                            icon:
-                                                                                Icon(
+                                                                            icon: Icon(
                                                                               Icons.clear,
                                                                               color: Colors.deepPurple,
                                                                             ),
-                                                                            onPressed:
-                                                                                () {
+                                                                            onPressed: () {
                                                                               //close
                                                                               _loadProvinces();
                                                                               setState(() {
@@ -1280,47 +1163,42 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                                                   ),
                                                                   if (_showProvinceDropdown)
                                                                     Container(
-                                                                      height:
-                                                                          100,
-                                                                      margin: EdgeInsets.symmetric(
-                                                                          horizontal:
-                                                                              10),
+                                                                      height: 100,
+                                                                      margin: EdgeInsets.symmetric(horizontal: 10),
                                                                       decoration: BoxDecoration(
-                                                                          color: Colors.deepPurple.withOpacity(
-                                                                              0.7),
-                                                                          borderRadius:
-                                                                              BorderRadius.vertical(bottom: Radius.circular(15)),
+                                                                          color: Colors.deepPurple.withOpacity(0.7),
+                                                                          borderRadius: BorderRadius.vertical(
+                                                                              bottom: Radius.circular(15)),
                                                                           boxShadow: shadowColor),
-                                                                      child: ListView
-                                                                          .builder(
-                                                                        itemCount:
-                                                                            _provinces.length,
-                                                                        itemBuilder:
-                                                                            (context,
-                                                                                index) {
-                                                                          final city =
-                                                                              _provinces[index];
+                                                                      child: ListView.builder(
+                                                                        itemCount: _provinces.length,
+                                                                        itemBuilder: (context, index) {
+                                                                          final city = _provinces[index];
 
                                                                           return InkWell(
-                                                                            onTap:
-                                                                                () {
+                                                                            onTap: () {
                                                                               setState(() {
-                                                                                _loadCitiesMunicipalities(city['code']); // Load barangays for the selected city
+                                                                                _loadCitiesMunicipalities(city[
+                                                                                    'code']); // Load barangays for the selected city
 
-                                                                                _selectedProvinceName = city['name']; // Set by name
+                                                                                _selectedProvinceName =
+                                                                                    city['name']; // Set by name
                                                                                 _showProvinceDropdown = false;
                                                                                 _showCityMunicipalityDropdown = true;
                                                                               });
                                                                             },
-                                                                            child:
-                                                                                Container(
-                                                                              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                                                                            child: Container(
+                                                                              padding: EdgeInsets.symmetric(
+                                                                                  vertical: 10, horizontal: 15),
                                                                               decoration: BoxDecoration(
-                                                                                border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
+                                                                                border: Border(
+                                                                                    bottom: BorderSide(
+                                                                                        color: Colors.grey.shade300)),
                                                                               ),
                                                                               child: Text(
                                                                                 city['name'], // Display the name
-                                                                                style: TextStyle(fontSize: 16, color: Colors.white),
+                                                                                style: TextStyle(
+                                                                                    fontSize: 16, color: Colors.white),
                                                                               ),
                                                                             ),
                                                                           );
@@ -1329,47 +1207,41 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                                                     ),
                                                                   if (_showCityMunicipalityDropdown)
                                                                     Container(
-                                                                      height:
-                                                                          400,
-                                                                      margin: EdgeInsets.symmetric(
-                                                                          horizontal:
-                                                                              10),
+                                                                      height: 400,
+                                                                      margin: EdgeInsets.symmetric(horizontal: 10),
                                                                       decoration: BoxDecoration(
-                                                                          color: Colors.deepPurple.withOpacity(
-                                                                              0.7),
-                                                                          borderRadius:
-                                                                              BorderRadius.vertical(bottom: Radius.circular(15)),
+                                                                          color: Colors.deepPurple.withOpacity(0.7),
+                                                                          borderRadius: BorderRadius.vertical(
+                                                                              bottom: Radius.circular(15)),
                                                                           boxShadow: shadowColor),
-                                                                      child: ListView
-                                                                          .builder(
-                                                                        itemCount:
-                                                                            _citiesMunicipalities.length,
-                                                                        itemBuilder:
-                                                                            (context,
-                                                                                index) {
-                                                                          final city =
-                                                                              _citiesMunicipalities[index];
+                                                                      child: ListView.builder(
+                                                                        itemCount: _citiesMunicipalities.length,
+                                                                        itemBuilder: (context, index) {
+                                                                          final city = _citiesMunicipalities[index];
 
                                                                           return InkWell(
-                                                                            onTap:
-                                                                                () {
+                                                                            onTap: () {
                                                                               setState(() {
                                                                                 _loadBarangays(city['code']);
 
-                                                                                _selectedCityMunicipalityName = city['name'];
+                                                                                _selectedCityMunicipalityName =
+                                                                                    city['name'];
                                                                                 _showCityMunicipalityDropdown = false;
                                                                                 _showBarangayDropdown = true;
                                                                               });
                                                                             },
-                                                                            child:
-                                                                                Container(
-                                                                              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                                                                            child: Container(
+                                                                              padding: EdgeInsets.symmetric(
+                                                                                  vertical: 10, horizontal: 15),
                                                                               decoration: BoxDecoration(
-                                                                                border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
+                                                                                border: Border(
+                                                                                    bottom: BorderSide(
+                                                                                        color: Colors.grey.shade300)),
                                                                               ),
                                                                               child: Text(
                                                                                 city['name'], // Display the name
-                                                                                style: TextStyle(fontSize: 16, color: Colors.white),
+                                                                                style: TextStyle(
+                                                                                    fontSize: 16, color: Colors.white),
                                                                               ),
                                                                             ),
                                                                           );
@@ -1380,46 +1252,43 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                                                   //brgy ddl
                                                                   if (_showBarangayDropdown)
                                                                     Container(
-                                                                      height:
-                                                                          400,
-                                                                      margin: EdgeInsets.symmetric(
-                                                                          horizontal:
-                                                                              10),
+                                                                      height: 400,
+                                                                      margin: EdgeInsets.symmetric(horizontal: 10),
                                                                       decoration: BoxDecoration(
-                                                                          color: Colors.deepPurple.withOpacity(
-                                                                              0.7),
-                                                                          borderRadius:
-                                                                              BorderRadius.vertical(bottom: Radius.circular(15)),
+                                                                          color: Colors.deepPurple.withOpacity(0.7),
+                                                                          borderRadius: BorderRadius.vertical(
+                                                                              bottom: Radius.circular(15)),
                                                                           boxShadow: shadowColor),
-                                                                      child: ListView
-                                                                          .builder(
-                                                                        itemCount:
-                                                                            _barangays.length,
-                                                                        itemBuilder:
-                                                                            (context,
-                                                                                index) {
-                                                                          final city =
-                                                                              _barangays[index];
+                                                                      child: ListView.builder(
+                                                                        itemCount: _barangays.length,
+                                                                        itemBuilder: (context, index) {
+                                                                          final city = _barangays[index];
 
                                                                           return InkWell(
-                                                                            onTap:
-                                                                                () {
+                                                                            onTap: () {
                                                                               setState(() {
                                                                                 _selectedBarangayName = city['name'];
                                                                                 _showBarangayDropdown = false;
 
-                                                                                address = _selectedBarangayName! + ', ' + _selectedCityMunicipalityName! + ', ' + _selectedProvinceName!;
+                                                                                address = _selectedBarangayName! +
+                                                                                    ', ' +
+                                                                                    _selectedCityMunicipalityName! +
+                                                                                    ', ' +
+                                                                                    _selectedProvinceName!;
                                                                               });
                                                                             },
-                                                                            child:
-                                                                                Container(
-                                                                              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                                                                            child: Container(
+                                                                              padding: EdgeInsets.symmetric(
+                                                                                  vertical: 10, horizontal: 15),
                                                                               decoration: BoxDecoration(
-                                                                                border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
+                                                                                border: Border(
+                                                                                    bottom: BorderSide(
+                                                                                        color: Colors.grey.shade300)),
                                                                               ),
                                                                               child: Text(
                                                                                 city['name'], // Display the name
-                                                                                style: TextStyle(fontSize: 16, color: Colors.white),
+                                                                                style: TextStyle(
+                                                                                    fontSize: 16, color: Colors.white),
                                                                               ),
                                                                             ),
                                                                           );
@@ -1431,61 +1300,43 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                                             ],
                                                           ),
                                                           if (_selectedProvinceName == null ||
-                                                              _selectedCityMunicipalityName ==
-                                                                  null ||
-                                                              _selectedBarangayName ==
-                                                                  null)
+                                                              _selectedCityMunicipalityName == null ||
+                                                              _selectedBarangayName == null)
                                                             Text(
                                                               'Please select your adrress.',
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .red),
+                                                              style: TextStyle(color: Colors.red),
                                                             ),
-                                                          const SizedBox(
-                                                              height: 5),
+                                                          const SizedBox(height: 5),
                                                           _buildTextField(
-                                                            controller:
-                                                                _streetController,
-                                                            hintText:
-                                                                'Street Name, Building, House No.',
+                                                            controller: _streetController,
+                                                            hintText: 'Street Name, Building, House No.',
                                                             onChanged: (value) {
                                                               setState(() {
-                                                                streetvalidator =
-                                                                    validateStreet(
-                                                                        value); // Trigger validation on text change
+                                                                streetvalidator = validateStreet(
+                                                                    value); // Trigger validation on text change
                                                                 street = value!;
                                                               });
                                                             },
                                                           ),
-                                                          _labelValidator(
-                                                              streetvalidator),
-                                                          const SizedBox(
-                                                              height: 5),
+                                                          _labelValidator(streetvalidator),
+                                                          const SizedBox(height: 5),
                                                           _buildTextField(
-                                                            controller:
-                                                                _postalController,
-                                                            keyboardType:
-                                                                TextInputType
-                                                                    .number,
+                                                            controller: _postalController,
+                                                            keyboardType: TextInputType.number,
                                                             inputFormatters: [
-                                                              FilteringTextInputFormatter
-                                                                  .digitsOnly,
-                                                              LengthLimitingTextInputFormatter(
-                                                                  4),
+                                                              FilteringTextInputFormatter.digitsOnly,
+                                                              LengthLimitingTextInputFormatter(4),
                                                             ],
-                                                            hintText:
-                                                                'Postal Code',
+                                                            hintText: 'Postal Code',
                                                             onChanged: (value) {
                                                               setState(() {
-                                                                postalvalidator =
-                                                                    validatePostalCode(
-                                                                        value); // Trigger validation on text change
+                                                                postalvalidator = validatePostalCode(
+                                                                    value); // Trigger validation on text change
                                                                 postal = value!;
                                                               });
                                                             },
                                                           ),
-                                                          _labelValidator(
-                                                              postalvalidator),
+                                                          _labelValidator(postalvalidator),
                                                         ],
                                                       ),
                                                     ],
@@ -1493,16 +1344,12 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                                 //if not on address
                                                 : IntrinsicHeight(
                                                     child: Container(
-                                                      padding:
-                                                          EdgeInsets.all(5),
+                                                      padding: EdgeInsets.all(5),
                                                       decoration: BoxDecoration(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(10),
+                                                          borderRadius: BorderRadius.circular(10),
                                                           //color: Colors.white.withOpacity(.6),
                                                           color: Colors.white,
-                                                          boxShadow:
-                                                              shadowColor),
+                                                          boxShadow: shadowColor),
                                                       child: Row(
                                                         // mainAxisAlignment: MainAxisAlignment.start,
                                                         // crossAxisAlignment: CrossAxisAlignment.start,
@@ -1512,50 +1359,33 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                                               child: Container(
                                                                   height: 35,
                                                                   width: 30,
-                                                                  padding: EdgeInsets
-                                                                      .only(
-                                                                          left:
-                                                                              2),
-                                                                  decoration:
-                                                                      BoxDecoration(
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            50),
+                                                                  padding: EdgeInsets.only(left: 2),
+                                                                  decoration: BoxDecoration(
+                                                                    borderRadius: BorderRadius.circular(50),
                                                                   ),
-                                                                  alignment:
-                                                                      Alignment
-                                                                          .centerLeft,
+                                                                  alignment: Alignment.centerLeft,
                                                                   child: Icon(
-                                                                    Icons
-                                                                        .pin_drop,
+                                                                    Icons.pin_drop,
                                                                     size: 30,
-                                                                    color: Colors
-                                                                        .green,
+                                                                    color: Colors.green,
                                                                   ))),
                                                           Expanded(
                                                               flex: 10,
                                                               child: Container(
-                                                                  padding: EdgeInsets
-                                                                      .only(
-                                                                          left:
-                                                                              10),
-                                                                  alignment:
-                                                                      Alignment
-                                                                          .centerLeft,
+                                                                  padding: EdgeInsets.only(left: 10),
+                                                                  alignment: Alignment.centerLeft,
                                                                   child: Column(
-                                                                    crossAxisAlignment:
-                                                                        CrossAxisAlignment
-                                                                            .start,
+                                                                    crossAxisAlignment: CrossAxisAlignment.start,
                                                                     children: [
                                                                       Row(
-                                                                        crossAxisAlignment:
-                                                                            CrossAxisAlignment.start,
+                                                                        crossAxisAlignment: CrossAxisAlignment.start,
                                                                         children: [
                                                                           Expanded(
-                                                                            child:
-                                                                                Text(
+                                                                            child: Text(
                                                                               fullname,
-                                                                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                                                              style: TextStyle(
+                                                                                  fontWeight: FontWeight.bold,
+                                                                                  fontSize: 15),
                                                                               softWrap: true,
                                                                             ),
                                                                           ),
@@ -1569,17 +1399,13 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                                                         ],
                                                                       ),
                                                                       Expanded(
-                                                                          flex:
-                                                                              2,
-                                                                          child:
-                                                                              Text(
+                                                                          flex: 2,
+                                                                          child: Text(
                                                                             '${street} \n${address}, ${postal}',
                                                                           )),
                                                                       Expanded(
-                                                                          flex:
-                                                                              1,
-                                                                          child:
-                                                                              Row(
+                                                                          flex: 1,
+                                                                          child: Row(
                                                                             children: [
                                                                               SizedBox(
                                                                                 width: 5,
@@ -1587,9 +1413,11 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                                                               Container(
                                                                                 padding: EdgeInsets.all(2),
                                                                                 decoration: BoxDecoration(
-                                                                                  borderRadius: BorderRadius.circular(3),
+                                                                                  borderRadius:
+                                                                                      BorderRadius.circular(3),
                                                                                   //color: Colors.white.withOpacity(.6),
-                                                                                  border: Border.all(color: Colors.green),
+                                                                                  border:
+                                                                                      Border.all(color: Colors.green),
                                                                                 ),
                                                                                 child: Text(
                                                                                   'Pickup Address',
@@ -1626,47 +1454,36 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                       alignment: Alignment.center,
                                       child: Text(
                                         'Pin Location',
-                                        style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold),
+                                        style:
+                                            TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
                                       ),
                                     ),
                                     Stack(
                                       children: [
                                         Container(
                                           decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
+                                              borderRadius: BorderRadius.circular(10),
                                               color: Colors.grey[200],
                                               boxShadow: shadowColor),
                                           height: onMap ? 500 : 100,
                                           child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                                            borderRadius: BorderRadius.circular(10),
                                             child: FlutterMap(
                                               mapController: _mapController,
                                               options: MapOptions(
-                                                  center: LatLng(10.29411,
-                                                      123.902453), // Example: Cebu City
+                                                  center: LatLng(10.29411, 123.902453), // Example: Cebu City
                                                   zoom: 13.0,
                                                   //maxZoom: 19,
-                                                  maxZoom:
-                                                      19, // Maximum zoom in level
-                                                  minZoom:
-                                                      5, // Minimum zoom out level
-                                                  onTap: (tapPosition, point) =>
-                                                      handleOnePoint(point),
+                                                  maxZoom: 19, // Maximum zoom in level
+                                                  minZoom: 5, // Minimum zoom out level
+                                                  onTap: (tapPosition, point) => handleOnePoint(point),
                                                   enableScrollWheel: true),
                                               children: [
                                                 TileLayer(
-                                                  urlTemplate:
-                                                      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                                  urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                                                   subdomains: ['a', 'b', 'c'],
-                                                  maxZoom:
-                                                      19, // Maximum zoom in level
-                                                  minZoom:
-                                                      5, // Minimum zoom out level
+                                                  maxZoom: 19, // Maximum zoom in level
+                                                  minZoom: 5, // Minimum zoom out level
                                                 ),
                                                 if (selectedPoint != null) ...[
                                                   MarkerLayer(
@@ -1675,11 +1492,8 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                                           width: 80.0,
                                                           height: 80.0,
                                                           point: selectedPoint!,
-                                                          builder: (ctx) => Icon(
-                                                              Icons
-                                                                  .location_pin,
-                                                              color: Colors.red,
-                                                              size: 40),
+                                                          builder: (ctx) =>
+                                                              Icon(Icons.location_pin, color: Colors.red, size: 40),
                                                           rotate: true),
                                                     ],
                                                   ),
@@ -1695,28 +1509,20 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                             top: 20,
                                             right: 20,
                                             child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.end,
+                                              crossAxisAlignment: CrossAxisAlignment.end,
                                               children: [
                                                 Container(
-                                                  padding: EdgeInsets.symmetric(
-                                                      vertical: 10,
-                                                      horizontal: 10),
+                                                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                                                   decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              5),
+                                                      borderRadius: BorderRadius.circular(5),
                                                       color: Colors.blue,
                                                       boxShadow: shadowColor),
                                                   child: InkWell(
                                                     onTap: () {
                                                       onMap = false;
                                                       setState(() {
-                                                        if (selectedPoint !=
-                                                            null)
-                                                          _mapController.move(
-                                                              selectedPoint!,
-                                                              13);
+                                                        if (selectedPoint != null)
+                                                          _mapController.move(selectedPoint!, 13);
                                                         onMap = false;
                                                         pinLocValidator = '';
                                                       });
@@ -1726,8 +1532,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                                       style: TextStyle(
                                                           color: Colors.white,
                                                           fontSize: 12,
-                                                          fontWeight:
-                                                              FontWeight.bold),
+                                                          fontWeight: FontWeight.bold),
                                                     ),
                                                   ),
                                                 ),
@@ -1737,9 +1542,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                                 Container(
                                                   padding: EdgeInsets.all(15),
                                                   decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              15),
+                                                      borderRadius: BorderRadius.circular(15),
                                                       color: Colors.white,
                                                       boxShadow: shadowColor),
                                                   child: InkWell(
@@ -1762,15 +1565,13 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                         if (!onMap)
                                           Positioned.fill(
                                               child: Container(
-                                            color: const Color.fromARGB(
-                                                0, 163, 145, 145),
+                                            color: const Color.fromARGB(0, 163, 145, 145),
                                             child: InkWell(
                                               onTap: () {
                                                 setState(() {
                                                   onMap = true;
                                                 });
-                                                if (selectedPoint == null)
-                                                  _getCurrentLocation();
+                                                if (selectedPoint == null) _getCurrentLocation();
                                               },
                                             ),
                                           )),
@@ -1780,13 +1581,11 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                                 child: InkWell(
                                                   onTap: () {},
                                                   child: Center(
-                                                    child:
-                                                        CircularProgressIndicator(
+                                                    child: CircularProgressIndicator(
                                                       color: Colors.green,
                                                       strokeWidth: 10,
                                                       strokeAlign: 2,
-                                                      backgroundColor:
-                                                          boxColorTheme,
+                                                      backgroundColor: boxColorTheme,
                                                     ),
                                                   ),
                                                 ),
@@ -1806,36 +1605,30 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                       padding: EdgeInsets.all(10),
                                       margin: EdgeInsets.all(10),
                                       decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
+                                          borderRadius: BorderRadius.circular(10),
                                           color: Colors.grey[200],
                                           boxShadow: shadowBigColor),
                                       child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
                                         children: [
                                           Text(
                                             'Waste Type',
                                             style: TextStyle(
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 16),
+                                                color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16),
                                           ),
                                           Container(
                                             padding: EdgeInsets.all(5),
                                             decoration: BoxDecoration(
                                                 color: Colors.white,
                                                 boxShadow: shadowColor,
-                                                borderRadius:
-                                                    BorderRadius.circular(10)),
+                                                borderRadius: BorderRadius.circular(10)),
                                             child: _wasteCategoryList(),
                                           ),
                                         ],
                                       ),
                                     ),
                               _labelValidator(wasteCatValidator),
-                              if (bookingData!['bk_status'] == 'Pending' ||
-                                  bookingData!['bk_status'] == 'Ongoing')
+                              if (bookingData!['bk_status'] == 'Pending' || bookingData!['bk_status'] == 'Ongoing')
                                 Container(
                                   padding: EdgeInsets.all(10),
                                   margin: EdgeInsets.all(10),
@@ -1858,16 +1651,13 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                         )),
                                         Image.asset('assets/paymongo.png'),
                                         Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
                                             Padding(
                                               padding: const EdgeInsets.all(5),
                                               child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
+                                                  borderRadius: BorderRadius.circular(10),
                                                   child: Container(
                                                       height: 50,
                                                       width: 50,
@@ -1879,8 +1669,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                             Padding(
                                               padding: const EdgeInsets.all(5),
                                               child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
+                                                  borderRadius: BorderRadius.circular(10),
                                                   child: Container(
                                                       height: 50,
                                                       width: 50,
@@ -1892,8 +1681,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                             Padding(
                                               padding: const EdgeInsets.all(5),
                                               child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
+                                                  borderRadius: BorderRadius.circular(10),
                                                   child: Container(
                                                       height: 50,
                                                       width: 50,
@@ -1905,8 +1693,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                             Padding(
                                               padding: const EdgeInsets.all(5),
                                               child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
+                                                  borderRadius: BorderRadius.circular(10),
                                                   child: Container(
                                                       height: 50,
                                                       width: 50,
@@ -1918,8 +1705,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                             Padding(
                                               padding: const EdgeInsets.all(5),
                                               child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
+                                                  borderRadius: BorderRadius.circular(10),
                                                   child: Container(
                                                       height: 50,
                                                       width: 50,
@@ -1940,30 +1726,25 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                   ? Column(
                                       children: [
                                         Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
+                                          mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
                                             Checkbox(
-                                              side: BorderSide(
-                                                  color: Colors.white),
+                                              side: BorderSide(color: Colors.white),
                                               value: _acceptTerms,
                                               activeColor: Colors.green,
                                               onChanged: (bool? newValue) {
                                                 setState(() {
-                                                  _acceptTerms =
-                                                      newValue ?? false;
+                                                  _acceptTerms = newValue ?? false;
                                                 });
                                               },
                                             ),
                                             Text(
                                               'I accept the ',
-                                              style: TextStyle(
-                                                  color: Colors.white),
+                                              style: TextStyle(color: Colors.white),
                                             ),
                                             TextButton(
                                               onPressed: () {
-                                                Navigator.pushNamed(
-                                                    context, 'terms');
+                                                Navigator.pushNamed(context, 'terms');
                                               },
                                               style: TextButton.styleFrom(
                                                 padding: EdgeInsets.zero,
@@ -1972,8 +1753,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                                 'terms and conditions.',
                                                 style: TextStyle(
                                                   color: Colors.green,
-                                                  decoration:
-                                                      TextDecoration.underline,
+                                                  decoration: TextDecoration.underline,
                                                   decorationColor: Colors.green,
                                                 ),
                                               ),
@@ -1982,8 +1762,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                         ),
                                         SizedBox(height: 10.0),
                                         Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
                                             SizedBox(
                                               width: 20,
@@ -2001,111 +1780,60 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                                                 // });
                                               },
                                               child: Container(
-                                                  padding: EdgeInsets.symmetric(
-                                                      horizontal: 20.0,
-                                                      vertical: 10),
+                                                  padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
                                                   decoration: BoxDecoration(
                                                       color: Colors.blue,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10.0),
-                                                      boxShadow:
-                                                          shadowMidColor),
+                                                      borderRadius: BorderRadius.circular(10.0),
+                                                      boxShadow: shadowMidColor),
                                                   child: const Text(
                                                     'DISCARD',
                                                     style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 18,
-                                                        fontWeight:
-                                                            FontWeight.bold),
+                                                        color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                                                   )),
                                             ),
                                             InkWell(
                                               onTap: () async {
-                                                if ((_fullnameController.text.isEmpty ||
-                                                        fullnamevalidator !=
-                                                            '') ||
-                                                    (_contactController
-                                                            .text.isEmpty ||
-                                                        contactvalidator !=
-                                                            '') ||
-                                                    (_selectedProvinceName ==
-                                                            null ||
-                                                        _selectedCityMunicipalityName ==
-                                                            null ||
-                                                        _selectedBarangayName ==
-                                                            null) ||
-                                                    (_streetController
-                                                            .text.isEmpty ||
-                                                        streetvalidator !=
-                                                            '') ||
-                                                    (_postalController
-                                                            .text.isEmpty ||
-                                                        postalvalidator !=
-                                                            '')) {
+                                                if ((_fullnameController.text.isEmpty || fullnamevalidator != '') ||
+                                                    (_contactController.text.isEmpty || contactvalidator != '') ||
+                                                    (_selectedProvinceName == null ||
+                                                        _selectedCityMunicipalityName == null ||
+                                                        _selectedBarangayName == null) ||
+                                                    (_streetController.text.isEmpty || streetvalidator != '') ||
+                                                    (_postalController.text.isEmpty || postalvalidator != '')) {
                                                   setState(() {
-                                                    fullnamevalidator =
-                                                        validateFullname(
-                                                            _fullnameController
-                                                                .text);
-                                                    contactvalidator =
-                                                        validateContact(
-                                                            _contactController
-                                                                .text);
+                                                    fullnamevalidator = validateFullname(_fullnameController.text);
+                                                    contactvalidator = validateContact(_contactController.text);
                                                     //no address needed
-                                                    streetvalidator =
-                                                        validateStreet(
-                                                            _streetController
-                                                                .text);
-                                                    postalvalidator =
-                                                        validatePostalCode(
-                                                            _postalController
-                                                                .text);
+                                                    streetvalidator = validateStreet(_streetController.text);
+                                                    postalvalidator = validatePostalCode(_postalController.text);
 
                                                     //open address tab
                                                     onAddress = true;
                                                   });
-                                                } else if (selectedPoint ==
-                                                        null ||
+                                                } else if (selectedPoint == null ||
                                                     _selectedDate == null ||
-                                                    _selectedWasteTypes
-                                                        .isEmpty) {
+                                                    _selectedWasteTypes.isEmpty) {
                                                   setState(() {
-                                                    pinLocValidator =
-                                                        _validatePinLocl(
-                                                            selectedPoint);
-                                                    dateValidator =
-                                                        _validateDate(
-                                                            _selectedDate);
-                                                    wasteCatValidator =
-                                                        _validateWaste(
-                                                            _selectedWasteTypes);
+                                                    pinLocValidator = _validatePinLocl(selectedPoint);
+                                                    dateValidator = _validateDate(_selectedDate);
+                                                    wasteCatValidator = _validateWaste(_selectedWasteTypes);
                                                   });
                                                 } else if (!_acceptTerms) {
-                                                  showErrorSnackBar(context,
-                                                      'Accept the terms and condition');
+                                                  showErrorSnackBar(context, 'Accept the terms and condition');
                                                 } else {
                                                   _confirmUpdateBooking();
                                                 }
                                               },
                                               child: Container(
-                                                  padding: EdgeInsets.symmetric(
-                                                      horizontal: 30.0,
-                                                      vertical: 10),
+                                                  padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 10),
                                                   decoration: BoxDecoration(
                                                       color: Colors.green,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10.0),
-                                                      boxShadow:
-                                                          shadowMidColor),
+                                                      borderRadius: BorderRadius.circular(10.0),
+                                                      boxShadow: shadowMidColor),
                                                   child: const Text(
                                                     'SAVE',
                                                     style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 18,
-                                                        fontWeight:
-                                                            FontWeight.bold),
+                                                        color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                                                   )),
                                             ),
                                             SizedBox(
@@ -2146,8 +1874,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
 
               if (_showOptionsBox)
                 Positioned(
-                  top: AppBar().preferredSize.height -
-                      50, // Adjust this value as needed
+                  top: AppBar().preferredSize.height - 50, // Adjust this value as needed
                   right: 10, // Adjust to align with the IconButton
                   child: Container(
                     decoration: BoxDecoration(
@@ -2172,9 +1899,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                             });
                           },
                           child: Container(
-                              child: Text("Cancel Booking?",
-                                  style: TextStyle(
-                                      fontSize: 18, color: Colors.black54))),
+                              child: Text("Cancel Booking?", style: TextStyle(fontSize: 18, color: Colors.black54))),
                         ),
                         Icon(
                           Icons.sentiment_very_dissatisfied,
@@ -2216,9 +1941,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
               hintStyle: TextStyle(fontSize: 14, color: greySoft),
               filled: true,
               fillColor: Colors.white,
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide.none),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
             ),
             inputFormatters: inputFormatters,
             onChanged: onChanged,
@@ -2245,11 +1968,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                   SizedBox(
                     height: 12,
                   ),
-                  Text('+63',
-                      style: TextStyle(
-                          color: Colors.deepPurple,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16)),
+                  Text('+63', style: TextStyle(color: Colors.deepPurple, fontWeight: FontWeight.bold, fontSize: 16)),
                 ],
               ),
               //prefixIcon: Icon(Icons.abc),
@@ -2257,17 +1976,15 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
               hintStyle: TextStyle(fontSize: 14, color: greySoft),
               filled: true,
               fillColor: Colors.white,
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide.none),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
             ),
             keyboardType: TextInputType.number,
             inputFormatters: inputFormatters,
             onChanged: (value) {
               if (value.length > 10) {
                 _contactController.text = value.substring(0, 10);
-                _contactController.selection = TextSelection.fromPosition(
-                    TextPosition(offset: _contactController.text.length));
+                _contactController.selection =
+                    TextSelection.fromPosition(TextPosition(offset: _contactController.text.length));
               }
               setState(() {
                 contactvalidator = validateContact(value);
@@ -2294,10 +2011,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
         children: [
           Text(
             ' ${hintText}',
-            style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey[700]),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey[700]),
           ),
           Container(
             decoration: BoxDecoration(boxShadow: shadowColor),
@@ -2312,15 +2026,12 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                 contentPadding: EdgeInsets.symmetric(horizontal: 15),
                 filled: true,
                 fillColor: Colors.white,
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
               ),
               items: items.map<DropdownMenuItem<String>>((item) {
                 return DropdownMenuItem<String>(
                   value: item['code'],
-                  child: Text(
-                      item['name']), // Use the appropriate field for display
+                  child: Text(item['name']), // Use the appropriate field for display
                 );
               }).toList(),
               onChanged: onChanged,
@@ -2382,8 +2093,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
               var unit = category['unit'];
 
               // Check if the waste type is selected by comparing the name
-              bool isSelected = _selectedWasteTypes
-                  .any((selectedCategory) => selectedCategory['name'] == type);
+              bool isSelected = _selectedWasteTypes.any((selectedCategory) => selectedCategory['name'] == type);
 
               return CheckboxListTile(
                 title: Row(
@@ -2411,8 +2121,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                       });
                     } else {
                       // Remove the waste type object
-                      _selectedWasteTypes.removeWhere((selectedCategory) =>
-                          selectedCategory['name'] == type);
+                      _selectedWasteTypes.removeWhere((selectedCategory) => selectedCategory['name'] == type);
                     }
 
                     // Validator
@@ -2423,8 +2132,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                     }
                   });
                 },
-                activeColor:
-                    Colors.blue, // Color of the checkbox when selected.
+                activeColor: Colors.blue, // Color of the checkbox when selected.
                 checkColor: Colors.white, // Color of the checkmark.
               );
             }).toList()
@@ -2459,10 +2167,8 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
       child: Container(
         padding: EdgeInsets.all(10),
         margin: EdgeInsets.all(10),
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            color: Colors.grey[200],
-            boxShadow: shadowBigColor),
+        decoration:
+            BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.grey[200], boxShadow: shadowBigColor),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -2470,18 +2176,13 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
               alignment: Alignment.center,
               child: Text(
                 label,
-                style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold),
+                style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
             Container(
               padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: shadowColor),
+              decoration:
+                  BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), boxShadow: shadowColor),
               child: Row(
                 children: [
                   Icon(Icons.calendar_month, color: Colors.green),
@@ -2490,8 +2191,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails>
                     _selectedDate == null
                         ? hint
                         // : '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}',
-                        : DateFormat('MMM d, yyyy (EEEE)')
-                            .format(_selectedDate!), // Format: Mon 1, 2024
+                        : DateFormat('MMM d, yyyy (EEEE)').format(_selectedDate!), // Format: Mon 1, 2024
                     style: TextStyle(
                         color: _selectedDate == null ? Colors.grey : null,
                         //fontWeight: FontWeight.bold,

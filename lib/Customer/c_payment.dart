@@ -83,10 +83,13 @@ class _C_PaymentScreenState extends State<C_PaymentScreen> with SingleTickerProv
       if (!mounted) {
         return;
       }
-      if (data != null && data2 != null) {
+      if (data != null) {
         setState(() {
           billList = data;
-          paymentList = data2;
+          if (data2 != null) {
+            paymentList = data2;
+          }
+
           isLoading = false;
         });
       } else {
@@ -115,7 +118,7 @@ class _C_PaymentScreenState extends State<C_PaymentScreen> with SingleTickerProv
                 padding: EdgeInsets.only(top: 80),
                 child: Container(
                   decoration: BoxDecoration(
-                      color: white,
+                      color: whiteLow,
                       boxShadow: shadowTopColor,
                       borderRadius: BorderRadius.only(topRight: Radius.circular(15))),
                   height: MediaQuery.of(context).size.height * .75,
@@ -183,7 +186,7 @@ class _C_PaymentScreenState extends State<C_PaymentScreen> with SingleTickerProv
                                         String booking_id = 'BOOKING# ${bill['bk_id']?.toString()}';
                                         String status = bill['gb_status']?.toString() ?? '';
                                         DateTime dbDueDate = DateTime.parse(bill['gb_date_due'] ?? '').toLocal();
-                                        String formatdbDueDate = DateFormat('MMM dd, yyyy hh:mm a').format(dbDueDate);
+                                        String formatdbDueDate = DateFormat('MMM dd, yyyy (EEEE)').format(dbDueDate);
                                         String dueDate = formatdbDueDate;
                                         DateTime dbdateIssue = DateTime.parse(bill['gb_date_issued'] ?? '').toLocal();
                                         String formatdateIssue = DateFormat('MMM dd, yyyy hh:mm a').format(dbdateIssue);
@@ -210,8 +213,8 @@ class _C_PaymentScreenState extends State<C_PaymentScreen> with SingleTickerProv
                                                 padding: EdgeInsets.all(10),
                                                 margin: EdgeInsets.all(10),
                                                 decoration: BoxDecoration(
-                                                    color: deepPurple,
-                                                    boxShadow: shadowLowColor,
+                                                    color: Colors.white,
+                                                    boxShadow: shadowColor,
                                                     borderRadius: borderRadius10),
                                                 child: Column(
                                                   children: [
@@ -222,39 +225,44 @@ class _C_PaymentScreenState extends State<C_PaymentScreen> with SingleTickerProv
                                                         children: [
                                                           Text(
                                                             bill_id,
-                                                            style: TextStyle(color: whiteSoft, fontSize: 14),
+                                                            style: TextStyle(
+                                                                color: blackSoft,
+                                                                fontSize: 14,
+                                                                fontWeight: FontWeight.bold),
                                                           ),
                                                           Text(
                                                             booking_id,
-                                                            style: TextStyle(color: whiteSoft, fontSize: 14),
+                                                            style: TextStyle(color: blackSoft, fontSize: 12),
                                                           ),
                                                         ],
                                                       ),
                                                     ),
                                                     Container(
-                                                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                                                      padding: const EdgeInsets.all(5),
                                                       decoration: BoxDecoration(
-                                                          color: white,
+                                                          color: deepPurple,
                                                           borderRadius: borderRadius5,
-                                                          boxShadow: shadowLowColor),
+                                                          boxShadow: shadowColor),
                                                       child: Column(
                                                         children: [
                                                           Text(
                                                             'Due Date',
                                                             style: TextStyle(
-                                                                color: grey, fontWeight: FontWeight.bold, fontSize: 14),
+                                                                color: white,
+                                                                fontWeight: FontWeight.bold,
+                                                                fontSize: 14),
                                                           ),
                                                           Row(
                                                             mainAxisAlignment: MainAxisAlignment.center,
                                                             children: [
                                                               Icon(
                                                                 Icons.calendar_month,
-                                                                color: redSoft,
+                                                                color: white,
                                                               ),
                                                               Text(
                                                                 dueDate,
                                                                 style: TextStyle(
-                                                                    color: redSoft,
+                                                                    color: white,
                                                                     fontWeight: FontWeight.bold,
                                                                     fontSize: 20),
                                                               ),
@@ -268,7 +276,7 @@ class _C_PaymentScreenState extends State<C_PaymentScreen> with SingleTickerProv
                                                       children: [
                                                         Text(
                                                           dateIssued,
-                                                          style: TextStyle(color: whiteSoft, fontSize: 14),
+                                                          style: TextStyle(color: blackSoft, fontSize: 12),
                                                         ),
                                                         Row(
                                                           children: [
@@ -278,16 +286,17 @@ class _C_PaymentScreenState extends State<C_PaymentScreen> with SingleTickerProv
                                                                 Icons.push_pin,
                                                                 color: Colors.red,
                                                                 size: 20,
-                                                                shadows: shadowLessColor,
+                                                                shadows: shadowColor,
                                                               ),
                                                             ),
                                                             Text(
                                                               status,
                                                               style: TextStyle(
-                                                                  color: white,
-                                                                  fontWeight: FontWeight.bold,
-                                                                  fontSize: 18,
-                                                                  shadows: shadowLessColor),
+                                                                color: redSoft,
+                                                                fontWeight: FontWeight.bold,
+                                                                fontSize: 18,
+                                                                //shadows: shadowLessColor
+                                                              ),
                                                             ),
                                                           ],
                                                         ),
@@ -359,7 +368,10 @@ class _C_PaymentScreenState extends State<C_PaymentScreen> with SingleTickerProv
                                         status = status.replaceRange(0, 1, status[0].toUpperCase());
                                       }
 
-                                      String amount = '₱ ${payment['p_amount'].toString()}';
+                                      //String amount = '₱ ${payment['p_amount'].toString()}';
+                                      String dbAmountPaid = '${payment['p_amount']}';
+                                      double amountPaidValue = double.parse(dbAmountPaid);
+                                      String amount = '₱${NumberFormat('#,##0.00').format(amountPaidValue)}';
                                       String method = payment['p_method'].toString();
                                       DateTime dbdateIssue = DateTime.parse(payment['p_date_paid'] ?? '').toLocal();
                                       String formatdateIssue = DateFormat('MMM dd, yyyy hh:mm a').format(dbdateIssue);
@@ -386,9 +398,7 @@ class _C_PaymentScreenState extends State<C_PaymentScreen> with SingleTickerProv
                                               padding: EdgeInsets.all(10),
                                               margin: EdgeInsets.all(10),
                                               decoration: BoxDecoration(
-                                                  color: deepPurple,
-                                                  boxShadow: shadowLowColor,
-                                                  borderRadius: borderRadius10),
+                                                  color: white, boxShadow: shadowColor, borderRadius: borderRadius10),
                                               child: Column(
                                                 children: [
                                                   Container(
@@ -398,27 +408,30 @@ class _C_PaymentScreenState extends State<C_PaymentScreen> with SingleTickerProv
                                                       children: [
                                                         Text(
                                                           bill_id,
-                                                          style: TextStyle(color: whiteSoft, fontSize: 14),
+                                                          style: TextStyle(
+                                                              color: blackSoft,
+                                                              fontSize: 14,
+                                                              fontWeight: FontWeight.bold),
                                                         ),
                                                         Text(
                                                           booking_id,
-                                                          style: TextStyle(color: whiteSoft, fontSize: 14),
+                                                          style: TextStyle(color: blackSoft, fontSize: 12),
                                                         ),
                                                       ],
                                                     ),
                                                   ),
                                                   Container(
-                                                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                                                    padding: const EdgeInsets.all(5),
                                                     decoration: BoxDecoration(
-                                                        color: white,
+                                                        color: deepPurple,
                                                         borderRadius: borderRadius5,
-                                                        boxShadow: shadowLowColor),
+                                                        boxShadow: shadowColor),
                                                     child: Column(
                                                       children: [
                                                         Text(
                                                           method,
                                                           style: TextStyle(
-                                                              color: grey, fontWeight: FontWeight.bold, fontSize: 14),
+                                                              color: white, fontWeight: FontWeight.bold, fontSize: 14),
                                                         ),
                                                         Row(
                                                           mainAxisAlignment: MainAxisAlignment.center,
@@ -426,7 +439,7 @@ class _C_PaymentScreenState extends State<C_PaymentScreen> with SingleTickerProv
                                                             Text(
                                                               amount,
                                                               style: TextStyle(
-                                                                  color: orange,
+                                                                  color: white,
                                                                   fontWeight: FontWeight.bold,
                                                                   fontSize: 20),
                                                             ),
@@ -440,7 +453,7 @@ class _C_PaymentScreenState extends State<C_PaymentScreen> with SingleTickerProv
                                                     children: [
                                                       Text(
                                                         dateIssued,
-                                                        style: TextStyle(color: whiteSoft, fontSize: 14),
+                                                        style: TextStyle(color: blackSoft, fontSize: 12),
                                                       ),
                                                       Row(
                                                         children: [
@@ -448,7 +461,7 @@ class _C_PaymentScreenState extends State<C_PaymentScreen> with SingleTickerProv
                                                             decoration: BoxDecoration(
                                                               color: green,
                                                               shape: BoxShape.circle,
-                                                              boxShadow: shadowLessColor,
+                                                              boxShadow: shadowColor,
                                                             ),
                                                             child: Icon(
                                                               Icons.check,
@@ -461,10 +474,11 @@ class _C_PaymentScreenState extends State<C_PaymentScreen> with SingleTickerProv
                                                           Text(
                                                             status,
                                                             style: TextStyle(
-                                                                color: greenSoft,
-                                                                 fontWeight: FontWeight.bold,
-                                                                fontSize: 18,
-                                                                shadows: shadowLessColor),
+                                                              color: green,
+                                                              fontWeight: FontWeight.bold,
+                                                              fontSize: 18,
+                                                              //shadows: shadowLessColor
+                                                            ),
                                                           ),
                                                         ],
                                                       ),
@@ -497,14 +511,14 @@ class _C_PaymentScreenState extends State<C_PaymentScreen> with SingleTickerProv
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
                           decoration: BoxDecoration(
-                              color: selectedPage == 0 ? white : deepPurple,
+                              color: selectedPage == 0 ? whiteLow : deepPurple,
                               borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
                               boxShadow: shadowTopColor),
                           child: Text(
                             'Pending',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: selectedPage == 0 ? deepPurple : white,
+                              color: selectedPage == 0 ? deepPurple : whiteLow,
                             ),
                           ),
                         ),
@@ -514,12 +528,13 @@ class _C_PaymentScreenState extends State<C_PaymentScreen> with SingleTickerProv
                         child: Container(
                           padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
                           decoration: BoxDecoration(
-                              color: selectedPage == 1 ? white : deepPurple,
+                              color: selectedPage == 1 ? whiteLow : deepPurple,
                               borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
                               boxShadow: shadowTopColor),
                           child: Text(
                             'History',
-                            style: TextStyle(fontWeight: FontWeight.bold, color: selectedPage == 1 ? blackSoft : white),
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, color: selectedPage == 1 ? deepPurple : whiteLow),
                           ),
                         ),
                       ),
@@ -568,6 +583,7 @@ class _PaymentDetailsState extends State<PaymentDetails> with SingleTickerProvid
   String payMethod = '';
   String trans_Id = '';
   String checkout_Id = '';
+  String amountDue = '';
 
   @override
   void initState() {
@@ -639,10 +655,11 @@ class _PaymentDetailsState extends State<PaymentDetails> with SingleTickerProvid
         return;
       }
       if (data != null) {
+        //data2 can be null
         setState(() {
           billDetails = data;
           paymentDetails = data2;
-          console(billDetails);
+          //console(billDetails);
           //
           DateTime dbIssuedDate = DateTime.parse(billDetails!['gb_date_issued'] ?? '').toLocal();
           String formatdbIssuedDate = DateFormat('MMM dd, yyyy (hh:mm a)').format(dbIssuedDate);
@@ -652,12 +669,19 @@ class _PaymentDetailsState extends State<PaymentDetails> with SingleTickerProvid
           String formatdbDueDate = DateFormat('MMM dd, yyyy').format(dbDueDate);
           dueDate = formatdbDueDate;
 
+          amountDue = billDetails!['amount_due'] != null
+              ? '₱${NumberFormat('#,##0.00').format(billDetails!['amount_due'])}'
+              : 'Loading...';
+
           if (paymentDetails != null) {
             DateTime dbDatePaid = DateTime.parse(paymentDetails!['p_date_paid'] ?? '').toLocal();
             String formatdbDatePaid = DateFormat('MMM dd, yyyy (hh:mm a)').format(dbDatePaid);
             datePaid = formatdbDatePaid;
 
-            amountPaid = '₱${paymentDetails!['p_amount']}';
+            //amountPaid = '₱${paymentDetails!['p_amount']}';
+            String dbAmountPaid = '${paymentDetails!['p_amount']}';
+            double amountPaidValue = double.parse(dbAmountPaid);
+            amountPaid = '₱${NumberFormat('#,##0.00').format(amountPaidValue)}';
             payMethod = '${paymentDetails!['p_method']}';
             trans_Id = '${paymentDetails!['p_trans_id']}';
             checkout_Id = '${paymentDetails!['p_checkout_id']}';
@@ -910,6 +934,26 @@ class _PaymentDetailsState extends State<PaymentDetails> with SingleTickerProvid
                                                         SizedBox(height: 20),
                                                       ],
                                                     ),
+                                                  if (billDetails!['gb_status'] != 'Paid')
+                                                    Container(
+                                                      child: Column(
+                                                        children: [
+                                                          Text(
+                                                            'Amount',
+                                                            style: TextStyle(
+                                                                color: grey, fontWeight: FontWeight.bold, fontSize: 12),
+                                                          ),
+                                                          Text(
+                                                            amountDue,
+                                                            style: TextStyle(
+                                                                color: orange,
+                                                                fontWeight: FontWeight.bold,
+                                                                fontSize: 24),
+                                                          ),
+                                                          SizedBox(height: 20)
+                                                        ],
+                                                      ),
+                                                    ),
                                                   Row(
                                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                     children: List.generate(50, (index) {
@@ -1035,8 +1079,11 @@ class _PaymentDetailsState extends State<PaymentDetails> with SingleTickerProvid
                                                         //   });
 
                                                         // }
-                                                        setState(() {
-                                                          isLoading = false;
+
+                                                        Timer(Duration(seconds: 2), () {
+                                                          setState(() {
+                                                            isLoading = false;
+                                                          });
                                                         });
                                                       },
                                                       child: Container(

@@ -1522,7 +1522,7 @@ Future<List<Map<String, dynamic>>?> fetchBill() async {
       print('Access token invalid. Attempting to logout...');
       await deleteTokens(); // Logout user
     } else if (response.statusCode == 404) {
-      print('No notification found');
+      print('No Bill found');
       return null;
     }
 
@@ -1570,7 +1570,7 @@ Future<Map<String, dynamic>?> fetchBillDetails(int billId) async {
       print('Access token invalid. Attempting to logout...');
       await deleteTokens(); // Logout user
     } else if (response.statusCode == 404) {
-      print('No notification found');
+      print('No bill details found');
       return null;
     }
 
@@ -1599,6 +1599,7 @@ Future<List<Map<String, dynamic>>?> fetchPayment() async {
 
   if (response.statusCode == 200) {
     List<dynamic> decodedList = jsonDecode(response.body);
+   
     return decodedList.map((item) => item as Map<String, dynamic>).toList();
   } else {
     if (response.statusCode == 401) {
@@ -1617,7 +1618,7 @@ Future<List<Map<String, dynamic>>?> fetchPayment() async {
       print('Access token invalid. Attempting to logout...');
       await deleteTokens(); // Logout user
     } else if (response.statusCode == 404) {
-      print('No notification found');
+      print('No payment found');
       return null;
     }
 
@@ -1665,7 +1666,7 @@ Future<Map<String, dynamic>?> fetchPaymentDetails(int billId) async {
       print('Access token invalid. Attempting to logout...');
       await deleteTokens(); // Logout user
     } else if (response.statusCode == 404) {
-      print('No notification found');
+      print('No payment Only bill details yet');
       return null;
     }
 
@@ -1725,7 +1726,7 @@ Future<List<Map<String, dynamic>>?> fetchAllPdfBills(int gb_id) async {
       print('Access token invalid. Attempting to logout...');
       await deleteTokens(); // Logout user
     } else if (response.statusCode == 404) {
-      print('No notification found');
+      print('No pdf bills found');
       return null;
     }
 
@@ -1842,7 +1843,7 @@ Future<List<Map<String, dynamic>>?> fetchVehicles() async {
         print('Access token invalid. Attempting to logout...');
         await deleteTokens(); // Logout user
       } else if (response.statusCode == 404) {
-        print('No notification found');
+        print('No vehicles found');
         return null;
       }
 

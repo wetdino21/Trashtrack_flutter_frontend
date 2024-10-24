@@ -251,7 +251,10 @@ class _C_MapScreenState extends State<C_MapScreen> with SingleTickerProviderStat
 
             startLocStreaming = true;
             destinationPoint = widget.pickupPoint;
-            fetchRoutes(startPoint!, destinationPoint!);
+            if (startPoint != null && destinationPoint != null) {
+              fetchRoutes(startPoint!, destinationPoint!);
+            }
+
             // if (destinationPoint != null) {
             //   fetchRoutes(startPoint!, destinationPoint!);
             // }
@@ -316,7 +319,10 @@ class _C_MapScreenState extends State<C_MapScreen> with SingleTickerProviderStat
               startLocStreaming = true;
               destinationPoint = LatLng(data['haul_lat'], data['haul_long']);
               //destinationPoint = widget.pickupPoint;
-              fetchRoutes(startPoint!, destinationPoint!);
+              if (startPoint != null && destinationPoint != null) {
+                fetchRoutes(startPoint!, destinationPoint!);
+              }
+              //fetchRoutes(startPoint!, destinationPoint!);
 
               _startController.text = getCurrentName;
               _destinationController.text = getDestiantionName!;

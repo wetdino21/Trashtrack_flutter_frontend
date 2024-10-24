@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:trashtrack/Customer/c_api_cus_data.dart';
+import 'package:trashtrack/Customer/c_payment.dart';
+import 'package:trashtrack/Customer/c_schedule_list.dart';
 import 'package:trashtrack/api_postgre_service.dart';
 import 'package:trashtrack/data_model.dart';
 import 'package:trashtrack/mainApp.dart';
@@ -12,8 +14,7 @@ class C_NotificationScreen extends StatefulWidget {
   State<C_NotificationScreen> createState() => _C_NotificationScreenState();
 }
 
-class _C_NotificationScreenState extends State<C_NotificationScreen>
-    with SingleTickerProviderStateMixin {
+class _C_NotificationScreenState extends State<C_NotificationScreen> with SingleTickerProviderStateMixin {
   List<Map<String, dynamic>>? notifications;
   bool isLoading = false;
   late AnimationController _controller;
@@ -111,12 +112,10 @@ class _C_NotificationScreenState extends State<C_NotificationScreen>
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.notifications_off,
-                                  color: whiteSoft, size: 100),
+                              Icon(Icons.notifications_off, color: whiteSoft, size: 100),
                               Text(
                                 'No notification at this time\n\n\n\n',
-                                style:
-                                    TextStyle(color: whiteSoft, fontSize: 20),
+                                style: TextStyle(color: whiteSoft, fontSize: 20),
                               ),
                             ],
                           )),
@@ -127,16 +126,11 @@ class _C_NotificationScreenState extends State<C_NotificationScreen>
                     itemCount: notifications!.length,
                     itemBuilder: (context, index) {
                       final notification = notifications![index];
-                      final bool status = notification['notif_read'] ==
-                          true; // Ensure this is a boolean
+                      final bool status = notification['notif_read'] == true;
                       String showStatus = status ? 'Read' : 'Sent';
 
-                      final Color statusColor = status
-                          ? greySoft
-                          : Colors.green; // Color for the status text
-                      final Color boxColor = status
-                          ? white
-                          : deepPurple; // Color for the notification box
+                      final Color statusColor = status ? greySoft : Colors.green;
+                      final Color boxColor = status ? white : deepPurple;
 
                       return GestureDetector(
                         onTap: () async {
@@ -146,17 +140,28 @@ class _C_NotificationScreenState extends State<C_NotificationScreen>
                             userModel!.setUserData(newNotifCount: newCount);
                           }
 
-                          Navigator.of(context).push(
+                          DateTime dbdateIssue = DateTime.parse(notification['notif_created_at'] ?? '').toLocal();
+                          String formatdate = DateFormat('MMM dd, yyyy hh:mm a').format(dbdateIssue);
+
+                          Navigator.of(context)
+                              .push(
                             MaterialPageRoute(
                                 builder: (context) => NotificationDetails(
+                                    bkId: notification['bk_id'],
+                                    gbId: notification['gb_id'],
                                     isRead: notification['notif_read'],
-                                    message: notification['notif_message'])),
-                          );
+                                    message: notification['notif_message'],
+                                    date: formatdate)),
+                          )
+                              .then((value) {
+                            if (value == true) {
+                              _fetchNotifications();
+                            }
+                          });
                         },
                         child: NotificationCard(
                           notif_id: notification['notif_id'],
-                          dateTime:
-                              formatDateTime(notification['notif_created_at']),
+                          dateTime: formatDateTime(notification['notif_created_at']),
                           title: notification['notif_message'],
                           status: showStatus,
                           statusColor: statusColor,
@@ -198,10 +203,8 @@ class NotificationCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(10),
       margin: EdgeInsets.all(5),
-      decoration: BoxDecoration(
-          color: notifBoxColor,
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: shadowLowColor),
+      decoration:
+          BoxDecoration(color: notifBoxColor, borderRadius: BorderRadius.circular(8), boxShadow: shadowLowColor),
       child: Row(
         children: [
           Icon(Icons.circle, color: statusColor, size: 16),
@@ -213,17 +216,12 @@ class NotificationCard extends StatelessWidget {
                 Text('$dateTime', style: TextStyle(color: greySoft)),
                 Text(
                   title,
-                  style: TextStyle(
-                      color: status == 'Read' ? blackSoft : white,
-                      fontSize: 16),
+                  style: TextStyle(color: status == 'Read' ? blackSoft : white, fontSize: 16),
                   maxLines: 1,
                   softWrap: true,
                 ),
                 if (status.isNotEmpty)
-                  Align(
-                      alignment: Alignment.bottomRight,
-                      child:
-                          Text('$status', style: TextStyle(color: greySoft))),
+                  Align(alignment: Alignment.bottomRight, child: Text('$status', style: TextStyle(color: greySoft))),
               ],
             ),
           ),
@@ -236,8 +234,11 @@ class NotificationCard extends StatelessWidget {
 class NotificationDetails extends StatefulWidget {
   final String? message;
   final bool? isRead;
+  final String? date;
+  final int? bkId;
+  final int? gbId;
 
-  NotificationDetails({this.message, this.isRead});
+  NotificationDetails({this.message, this.isRead, this.date, this.bkId, this.gbId});
 
   @override
   State<NotificationDetails> createState() => _NotificationDetailsState();
@@ -251,7 +252,7 @@ class _NotificationDetailsState extends State<NotificationDetails> {
         appBar: AppBar(
           backgroundColor: deepGreen,
           foregroundColor: Colors.white,
-          title: Text('Notification Details'),
+          //title: Text(''),
         ),
         body: ListView(
           children: [
@@ -261,33 +262,81 @@ class _NotificationDetailsState extends State<NotificationDetails> {
                   if (didPop) {
                     return;
                   }
-                  // Navigator.pop(context);
-                  // Navigator.of(context).pushReplacement(
-                  //   MaterialPageRoute(
-                  //       builder: (context) => C_NotificationScreen()),
-                  // );
+
                   if (widget.isRead == true) {
                     return Navigator.pop(context);
                   }
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => C_NotificationScreen()),
-                    ModalRoute.withName(
-                        '/mainApp'), // Keeps the home route in the stack
-                  );
+                  Navigator.pop(context, true);
+                  // Navigator.pushAndRemoveUntil(
+                  //   context,
+                  //   MaterialPageRoute(builder: (context) => C_NotificationScreen()),
+                  //   ModalRoute.withName('/mainApp'), // Keeps the home route in the stack
+                  // );
                 },
                 child: Container()),
-            SizedBox(height: 20),
             Container(
-              decoration: boxDecorationBig,
-              padding: EdgeInsets.all(20),
-              margin: EdgeInsets.all(10),
+              margin: EdgeInsets.all(20),
               child: Column(
                 children: [
+                  Row(
+                    children: [
+                      SizedBox(width: 10),
+                      Icon(Icons.send, color: white, size: 20),
+                      SizedBox(width: 10),
+                      Text(
+                        widget.date ?? '',
+                        style: TextStyle(color: Colors.white, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 5),
+                  if (widget.bkId != null)
+                    ClipRRect(borderRadius: borderRadius15, child: Image.asset('assets/image/truck_arrival2.jpg')),
+                  if (widget.gbId != null)
+                    ClipRRect(borderRadius: borderRadius15, child: Image.asset('assets/image/bill_ready3.jpg')),
+                  Container(
+                    padding: EdgeInsets.all(10),
+                    child: Column(
+                      children: [
+                        SizedBox(height: 20),
+                        Text(widget.message ?? '',
+                            style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                  ),
                   SizedBox(height: 20),
-                  Text(widget.message ?? ''),
-                  SizedBox(height: 50),
+                  if (widget.bkId != null)
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                            context, MaterialPageRoute(builder: (context) => C_ScheduleDetails(bookId: widget.bkId!)));
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        alignment: Alignment.center,
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                            color: deepPurple, borderRadius: BorderRadius.circular(50), boxShadow: shadowLowColor),
+                        child: Text('Check booking!',
+                            style: TextStyle(color: white, fontSize: 24, fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                  if (widget.gbId != null)
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                            context, MaterialPageRoute(builder: (context) => PaymentDetails(gb_id: widget.gbId!)));
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        alignment: Alignment.center,
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                            color: deepPurple, borderRadius: BorderRadius.circular(50), boxShadow: shadowLowColor),
+                        child: Text('Check bill!',
+                            style: TextStyle(color: white, fontSize: 24, fontWeight: FontWeight.bold)),
+                      ),
+                    ),
                 ],
               ),
             ),

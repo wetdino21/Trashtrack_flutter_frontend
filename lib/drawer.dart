@@ -57,7 +57,7 @@ class _C_DrawerState extends State<C_Drawer> {
     String appVersion = 'Version: ${packageInfo.version}.${packageInfo.buildNumber}';
     setState(() {
       version = appVersion;
-      console(version);
+      //console(version);
     });
   }
 

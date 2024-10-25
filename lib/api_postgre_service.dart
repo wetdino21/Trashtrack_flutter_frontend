@@ -129,19 +129,8 @@ Future<String?> emailCheckforgotpass(String email) async {
 //   }
 // }
 
-Future<String?> createCustomer(
-    BuildContext context,
-    String email,
-    String password,
-    String fname,
-    String mname,
-    String lname,
-    String contact,
-    String? province,
-    String? city,
-    String? brgy,
-    String street,
-    String postal) async {
+Future<String?> createCustomer(BuildContext context, String email, String password, String fname, String mname,
+    String lname, String contact, String? province, String? city, String? brgy, String street, String postal) async {
   final response = await http.post(
     Uri.parse('$baseUrl/signup'),
     headers: {'Content-Type': 'application/json'},
@@ -178,8 +167,7 @@ Future<String?> createCustomer(
   }
 }
 
-Future<String?> loginAccount(
-    BuildContext context, String email, String password) async {
+Future<String?> loginAccount(BuildContext context, String email, String password) async {
   try {
     final response = await http.post(
       Uri.parse('$baseUrl/login'),
@@ -319,27 +307,13 @@ Future<String?> userUpdate(
         print('Access token expired. Attempting to refresh...');
         String? refreshMsg = await refreshAccessToken();
         if (refreshMsg == null) {
-          return await userUpdate(
-              context,
-              bookId,
-              fname,
-              mname,
-              lname,
-              email,
-              photoBytes,
-              contact,
-              province,
-              city,
-              brgy,
-              street,
-              postal,
-              address);
+          return await userUpdate(context, bookId, fname, mname, lname, email, photoBytes, contact, province, city,
+              brgy, street, postal, address);
         }
       } else if (response.statusCode == 403) {
         // Access token is invalid. Logout
         print('Access token invalid. Attempting to logout...');
-        showErrorSnackBar(
-            context, 'Active time has been expired. Please login again.');
+        showErrorSnackBar(context, 'Active time has been expired. Please login again.');
         await deleteTokens(); // Logout user
       } else {
         print('Error updating user: ${response.body}');
@@ -364,11 +338,8 @@ Future<List<Map<String, dynamic>>?> fetchWasteCategory() async {
       List<dynamic> data = jsonDecode(response.body);
       // Extracting category names and prices as a list of maps
       return data
-          .map<Map<String, dynamic>>((item) => {
-                'name': item['wc_name'].toString(),
-                'unit': item['wc_unit'],
-                'price': item['wc_price']
-              })
+          .map<Map<String, dynamic>>(
+              (item) => {'name': item['wc_name'].toString(), 'unit': item['wc_unit'], 'price': item['wc_price']})
           .toList();
     } else {
       print(response.body);
@@ -381,8 +352,7 @@ Future<List<Map<String, dynamic>>?> fetchWasteCategory() async {
 }
 
 ////////REQUESTS WITH TOKEN///////////////////////////////////////////////////////////////////////////////
-Future<void> updateProfile(
-    BuildContext context, String fname, String lname) async {
+Future<void> updateProfile(BuildContext context, String fname, String lname) async {
   Map<String, String?> tokens = await getTokens();
   String? accessToken = tokens['access_token'];
   print('$fname $lname');
@@ -418,8 +388,7 @@ Future<void> updateProfile(
     } else if (response.statusCode == 403) {
       // Access token is invalid. logout
       print('Access token invalid. Attempting to logout...');
-      showErrorSnackBar(
-          context, 'Active time has been expired please login again.');
+      showErrorSnackBar(context, 'Active time has been expired please login again.');
       await deleteTokens(); // Logout use
     } else {
       print('Response: ${response.body}');
@@ -481,14 +450,13 @@ Future<String?> booking(
         print('Access token expired. Attempting to refresh...');
         String? refreshMsg = await refreshAccessToken();
         if (refreshMsg == null) {
-          return await booking(context, fullname, contact, province, city, brgy,
-              street, postal, latitude, longitude, date, selectedWasteTypes);
+          return await booking(context, fullname, contact, province, city, brgy, street, postal, latitude, longitude,
+              date, selectedWasteTypes);
         }
       } else if (response.statusCode == 403) {
         // Access token is invalid. logout
         print('Access token invalid. Attempting to logout...');
-        showErrorSnackBar(
-            context, 'Active time has been expired please login again.');
+        showErrorSnackBar(context, 'Active time has been expired please login again.');
         await deleteTokens(); // Logout use
       } else {
         print('Response: ${response.body}');
@@ -505,8 +473,7 @@ Future<String?> booking(
 }
 
 //fetch_booking
-Future<Map<String, List<Map<String, dynamic>>>?> fetchBookingData(
-    BuildContext context) async {
+Future<Map<String, List<Map<String, dynamic>>>?> fetchBookingData(BuildContext context) async {
   Map<String, String?> tokens = await getTokens();
   String? accessToken = tokens['access_token'];
 
@@ -530,10 +497,8 @@ Future<Map<String, List<Map<String, dynamic>>>?> fetchBookingData(
     Map<String, dynamic> data = jsonDecode(response.body);
 
     // Extract 'booking' and 'wasteTypes' from the response
-    List<Map<String, dynamic>> bookingList =
-        List<Map<String, dynamic>>.from(data['booking']);
-    List<Map<String, dynamic>> wasteTypeList =
-        List<Map<String, dynamic>>.from(data['wasteTypes']);
+    List<Map<String, dynamic>> bookingList = List<Map<String, dynamic>>.from(data['booking']);
+    List<Map<String, dynamic>> wasteTypeList = List<Map<String, dynamic>>.from(data['wasteTypes']);
 
     // Optionally: Combine them if needed or pass them individually
     return {'booking': bookingList, 'wasteTypes': wasteTypeList};
@@ -569,8 +534,7 @@ Future<Map<String, List<Map<String, dynamic>>>?> fetchBookingData(
 }
 
 //fetch_booking
-Future<Map<String, List<Map<String, dynamic>>>?> fetchBookingDetails(
-    BuildContext context, int bookID) async {
+Future<Map<String, List<Map<String, dynamic>>>?> fetchBookingDetails(BuildContext context, int bookID) async {
   Map<String, String?> tokens = await getTokens();
   String? accessToken = tokens['access_token'];
 
@@ -686,26 +650,13 @@ Future<String?> bookingUpdate(
         print('Access token expired. Attempting to refresh...');
         String? refreshMsg = await refreshAccessToken();
         if (refreshMsg == null) {
-          return await bookingUpdate(
-              context,
-              bookId,
-              fullname,
-              contact,
-              province,
-              city,
-              brgy,
-              street,
-              postal,
-              latitude,
-              longitude,
-              date,
-              selectedWasteTypes);
+          return await bookingUpdate(context, bookId, fullname, contact, province, city, brgy, street, postal, latitude,
+              longitude, date, selectedWasteTypes);
         }
       } else if (response.statusCode == 403) {
         // Access token is invalid. logout
         print('Access token invalid. Attempting to logout...');
-        showErrorSnackBar(
-            context, 'Active time has been expired please login again.');
+        showErrorSnackBar(context, 'Active time has been expired please login again.');
         await deleteTokens(); // Logout use
       } else {
         print('Response: ${response.body}');
@@ -757,8 +708,7 @@ Future<String?> bookingCancel(BuildContext context, int bookId) async {
       } else if (response.statusCode == 403) {
         // Access token is invalid. logout
         print('Access token invalid. Attempting to logout...');
-        showErrorSnackBar(
-            context, 'Active time has been expired please login again.');
+        showErrorSnackBar(context, 'Active time has been expired please login again.');
         await deleteTokens(); // Logout use
       } else {
         print('Response: ${response.body}');
@@ -774,8 +724,8 @@ Future<String?> bookingCancel(BuildContext context, int bookId) async {
   return null;
 }
 
-//fetch_pending_booking pickup
-Future<Map<String, List<Map<String, dynamic>>>?> fetchPendingBooking() async {
+//fetch_today_booking pickup
+Future<Map<String, List<Map<String, dynamic>>>?> fetchTodayBooking() async {
   Map<String, String?> tokens = await getTokens();
   String? accessToken = tokens['access_token'];
 
@@ -787,7 +737,7 @@ Future<Map<String, List<Map<String, dynamic>>>?> fetchPendingBooking() async {
 
   // try {
   final response = await http.post(
-    Uri.parse('$baseUrl/fetch_pickup_booking'),
+    Uri.parse('$baseUrl/fetch_today_booking'),
     headers: {
       'Authorization': 'Bearer $accessToken',
     },
@@ -799,10 +749,8 @@ Future<Map<String, List<Map<String, dynamic>>>?> fetchPendingBooking() async {
     Map<String, dynamic> data = jsonDecode(response.body);
 
     // Extract 'booking' and 'wasteTypes' from the response
-    List<Map<String, dynamic>> bookingList =
-        List<Map<String, dynamic>>.from(data['booking']);
-    List<Map<String, dynamic>> wasteTypeList =
-        List<Map<String, dynamic>>.from(data['wasteTypes']);
+    List<Map<String, dynamic>> bookingList = List<Map<String, dynamic>>.from(data['booking']);
+    List<Map<String, dynamic>> wasteTypeList = List<Map<String, dynamic>>.from(data['wasteTypes']);
 
     // Optionally: Combine them if needed or pass them individually
     return {'booking': bookingList, 'wasteTypes': wasteTypeList};
@@ -812,7 +760,68 @@ Future<Map<String, List<Map<String, dynamic>>>?> fetchPendingBooking() async {
       print('Access token expired. Attempting to refresh...');
       String? refreshMsg = await refreshAccessToken();
       if (refreshMsg == null) {
-        return await fetchPendingBooking();
+        return await fetchTodayBooking();
+      } else {
+        // Refresh token is invalid or expired, logout the user
+        await deleteTokens(); // Logout user
+        return null;
+      }
+    } else if (response.statusCode == 403) {
+      // Access token is invalid. logout
+      print('Access token invalid. Attempting to logout...');
+      await deleteTokens(); // Logout user
+    } else if (response.statusCode == 404) {
+      print('No booking found');
+      return null;
+    }
+
+    //showErrorSnackBar(context, response.body);
+    print('Response: ${response.body}');
+    return null;
+  }
+  // } catch (e) {
+  //   print(e);
+  // }
+  //return null;
+}
+
+//fetch_upcoming_booking pickup
+Future<Map<String, List<Map<String, dynamic>>>?> fetchUpcomingBooking() async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+
+  if (accessToken == null) {
+    print('No access token available. User needs to log in.');
+    await deleteTokens();
+    return null;
+  }
+
+  // try {
+  final response = await http.post(
+    Uri.parse('$baseUrl/fetch_upcoming_booking'),
+    headers: {
+      'Authorization': 'Bearer $accessToken',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    //print(response.body);
+    //return List<Map<String, dynamic>>.from(jsonDecode(response.body));
+    Map<String, dynamic> data = jsonDecode(response.body);
+
+    // Extract 'booking' and 'wasteTypes' from the response
+    List<Map<String, dynamic>> bookingList = List<Map<String, dynamic>>.from(data['booking']);
+    List<Map<String, dynamic>> wasteTypeList = List<Map<String, dynamic>>.from(data['wasteTypes']);
+
+    // Optionally: Combine them if needed or pass them individually
+    return {'booking': bookingList, 'wasteTypes': wasteTypeList};
+  } else {
+    if (response.statusCode == 401) {
+      // Access token might be expired, attempt to refresh it
+      print('Access token expired. Attempting to refresh...');
+      String? refreshMsg = await refreshAccessToken();
+      if (refreshMsg == null) {
+        return await fetchUpcomingBooking();
       } else {
         // Refresh token is invalid or expired, logout the user
         await deleteTokens(); // Logout user
@@ -838,8 +847,7 @@ Future<Map<String, List<Map<String, dynamic>>>?> fetchPendingBooking() async {
 }
 
 //booking
-Future<String?> bookingAccept(
-    BuildContext context, int bookID, double latitude, double longitude) async {
+Future<String?> bookingAccept(BuildContext context, int bookID, double latitude, double longitude) async {
   Map<String, String?> tokens = await getTokens();
   String? accessToken = tokens['access_token'];
   if (accessToken == null) {
@@ -878,8 +886,7 @@ Future<String?> bookingAccept(
       } else if (response.statusCode == 403) {
         // Access token is invalid. logout
         print('Access token invalid. Attempting to logout...');
-        showErrorSnackBar(
-            context, 'Active time has been expired please login again.');
+        showErrorSnackBar(context, 'Active time has been expired please login again.');
         await deleteTokens(); // Logout use
       } else {
         print('Response: ${response.body}');
@@ -1035,14 +1042,10 @@ Future<Map<String, List<Map<String, dynamic>>>?> fetchCurrentPickup() async {
     Map<String, dynamic> data = jsonDecode(response.body);
 
     // Extract 'booking' and 'wasteTypes' from the response
-    List<Map<String, dynamic>> bookingList =
-        List<Map<String, dynamic>>.from(data['booking']);
-    List<Map<String, dynamic>> wasteTypeList =
-        List<Map<String, dynamic>>.from(data['wasteTypes']);
-    List<Map<String, dynamic>> bookingList2 =
-        List<Map<String, dynamic>>.from(data['booking2']);
-    List<Map<String, dynamic>> wasteTypeList2 =
-        List<Map<String, dynamic>>.from(data['wasteTypes2']);
+    List<Map<String, dynamic>> bookingList = List<Map<String, dynamic>>.from(data['booking']);
+    List<Map<String, dynamic>> wasteTypeList = List<Map<String, dynamic>>.from(data['wasteTypes']);
+    List<Map<String, dynamic>> bookingList2 = List<Map<String, dynamic>>.from(data['booking2']);
+    List<Map<String, dynamic>> wasteTypeList2 = List<Map<String, dynamic>>.from(data['wasteTypes2']);
 
     // Optionally: Combine them if needed or pass them individually
     return {
@@ -1115,8 +1118,7 @@ Future<String?> deactivateUser(BuildContext context, String email) async {
       } else if (response.statusCode == 403) {
         // Access token is invalid. logout
         print('Access token invalid. Attempting to logout...');
-        showErrorSnackBar(
-            context, 'Active time has been expired please login again.');
+        showErrorSnackBar(context, 'Active time has been expired please login again.');
         await deleteTokens(); // Logout use
       } else {
         print('Response: ${response.body}');
@@ -1133,8 +1135,7 @@ Future<String?> deactivateUser(BuildContext context, String email) async {
 }
 
 //binding password-email update
-Future<String?> binding_trashtrack(
-    BuildContext context, String? password) async {
+Future<String?> binding_trashtrack(BuildContext context, String? password) async {
   Map<String, String?> tokens = await getTokens();
   String? accessToken = tokens['access_token'];
   if (accessToken == null) {
@@ -1169,8 +1170,7 @@ Future<String?> binding_trashtrack(
       } else if (response.statusCode == 403) {
         // Access token is invalid. logout
         print('Access token invalid. Attempting to logout...');
-        showErrorSnackBar(
-            context, 'Active time has been expired please login again.');
+        showErrorSnackBar(context, 'Active time has been expired please login again.');
         await deleteTokens(); // Logout use
       } else {
         print('Response: ${response.body}');
@@ -1228,8 +1228,7 @@ Future<String?> binding_google(BuildContext context, String? email) async {
       } else if (response.statusCode == 403) {
         // Access token is invalid. logout
         print('Access token invalid. Attempting to logout...');
-        showErrorSnackBar(
-            context, 'Active time has been expired please login again.');
+        showErrorSnackBar(context, 'Active time has been expired please login again.');
         await deleteTokens(); // Logout use
       } else {
         print('Response: ${response.body}');
@@ -1246,8 +1245,7 @@ Future<String?> binding_google(BuildContext context, String? email) async {
 }
 
 // update password
-Future<String?> change_password(
-    BuildContext context, String? newPassword) async {
+Future<String?> change_password(BuildContext context, String? newPassword) async {
   Map<String, String?> tokens = await getTokens();
   String? accessToken = tokens['access_token'];
   if (accessToken == null) {
@@ -1281,8 +1279,7 @@ Future<String?> change_password(
       } else if (response.statusCode == 403) {
         // Access token is invalid. logout
         print('Access token invalid. Attempting to logout...');
-        showErrorSnackBar(
-            context, 'Active time has been expired please login again.');
+        showErrorSnackBar(context, 'Active time has been expired please login again.');
         await deleteTokens(); // Logout use
       } else {
         print('Response: ${response.body}');
@@ -1429,7 +1426,7 @@ Future<String?> readNotif(int notif_id) async {
 }
 
 // total request cus
-Future<int?> totalPickupRequest() async {
+Future<int?> fetchTotalCusPickupRequest() async {
   Map<String, String?> tokens = await getTokens();
   String? accessToken = tokens['access_token'];
 
@@ -1441,7 +1438,7 @@ Future<int?> totalPickupRequest() async {
 
   try {
     final response = await http.post(
-      Uri.parse('$baseUrl/total_pickup_request'), // Updated endpoint
+      Uri.parse('$baseUrl/total_cus_pickup_request'), // Updated endpoint
       headers: {
         'Authorization': 'Bearer $accessToken',
         'Content-Type': 'application/json',
@@ -1451,8 +1448,7 @@ Future<int?> totalPickupRequest() async {
     if (response.statusCode == 200) {
       final responseBody = jsonDecode(response.body);
       if (responseBody != null && responseBody['total'] != null) {
-        return int.tryParse(
-            responseBody['total'].toString()); // Ensure it's an int
+        return int.tryParse(responseBody['total'].toString()); // Ensure it's an int
       }
       return null;
     } else {
@@ -1461,7 +1457,176 @@ Future<int?> totalPickupRequest() async {
         print('Access token expired. Attempting to refresh...');
         String? refreshMsg = await refreshAccessToken();
         if (refreshMsg == null) {
-          return await totalPickupRequest();
+          return await fetchTotalCusPickupRequest();
+        } else {
+          // Refresh token is invalid or expired, logout the user
+          await deleteTokens(); // Logout user
+          return null;
+        }
+      } else if (response.statusCode == 403) {
+        // Access token is invalid. Logout
+        print('Access token invalid. Attempting to logout...');
+        await deleteTokens(); // Logout user
+      } else if (response.statusCode == 404) {
+        return null;
+      }
+
+      print('Response: ${response.body}');
+      return null;
+    }
+  } catch (e) {
+    print('Error occurred: $e'); // Handle exceptions
+    return null;
+  }
+}
+
+// total hauler pickup
+Future<int?> fetchTotalHaulerPickup() async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+
+  if (accessToken == null) {
+    print('No access token available. User needs to log in.');
+    await deleteTokens();
+    return null;
+  }
+
+  try {
+    final response = await http.post(
+      Uri.parse('$baseUrl/total_hauler_pickup'), // Updated endpoint
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final responseBody = jsonDecode(response.body);
+      if (responseBody != null && responseBody['total'] != null) {
+        return int.tryParse(responseBody['total'].toString()); // Ensure it's an int
+      }
+      return null;
+    } else {
+      if (response.statusCode == 401) {
+        // Access token might be expired, attempt to refresh it
+        print('Access token expired. Attempting to refresh...');
+        String? refreshMsg = await refreshAccessToken();
+        if (refreshMsg == null) {
+          return await fetchTotalHaulerPickup();
+        } else {
+          // Refresh token is invalid or expired, logout the user
+          await deleteTokens(); // Logout user
+          return null;
+        }
+      } else if (response.statusCode == 403) {
+        // Access token is invalid. Logout
+        print('Access token invalid. Attempting to logout...');
+        await deleteTokens(); // Logout user
+      } else if (response.statusCode == 404) {
+        return null;
+      }
+
+      print('Response: ${response.body}');
+      return null;
+    }
+  } catch (e) {
+    print('Error occurred: $e'); // Handle exceptions
+    return null;
+  }
+}
+
+// total cus waste collected
+Future<double?> fetchTotalCusWasteCollected() async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+
+  if (accessToken == null) {
+    print('No access token available. User needs to log in.');
+    await deleteTokens();
+    return null;
+  }
+
+  try {
+    final response = await http.post(
+      Uri.parse('$baseUrl/total_cus_waste_collected'), // Updated endpoint
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final responseBody = jsonDecode(response.body);
+
+      if (responseBody != null && responseBody['total'] != null) {
+        console(double.tryParse(responseBody['total'].toString()));
+        return double.tryParse(responseBody['total'].toString()); // Ensure it's an int
+      }
+      return null;
+    } else {
+      if (response.statusCode == 401) {
+        // Access token might be expired, attempt to refresh it
+        print('Access token expired. Attempting to refresh...');
+        String? refreshMsg = await refreshAccessToken();
+        if (refreshMsg == null) {
+          return await fetchTotalCusWasteCollected();
+        } else {
+          // Refresh token is invalid or expired, logout the user
+          await deleteTokens(); // Logout user
+          return null;
+        }
+      } else if (response.statusCode == 403) {
+        // Access token is invalid. Logout
+        print('Access token invalid. Attempting to logout...');
+        await deleteTokens(); // Logout user
+      } else if (response.statusCode == 404) {
+        return null;
+      }
+
+      print('Response: ${response.body}');
+      return null;
+    }
+  } catch (e) {
+    print('Error occurred: $e'); // Handle exceptions
+    return null;
+  }
+}
+
+// total haul waste collected
+Future<double?> fetchTotalHaulWasteCollected() async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+
+  if (accessToken == null) {
+    print('No access token available. User needs to log in.');
+    await deleteTokens();
+    return null;
+  }
+
+  try {
+    final response = await http.post(
+      Uri.parse('$baseUrl/total_haul_waste_collected'), // Updated endpoint
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final responseBody = jsonDecode(response.body);
+
+      if (responseBody != null && responseBody['total'] != null) {
+        console(double.tryParse(responseBody['total'].toString()));
+        return double.tryParse(responseBody['total'].toString()); // Ensure it's an int
+      }
+      return null;
+    } else {
+      if (response.statusCode == 401) {
+        // Access token might be expired, attempt to refresh it
+        print('Access token expired. Attempting to refresh...');
+        String? refreshMsg = await refreshAccessToken();
+        if (refreshMsg == null) {
+          return await fetchTotalHaulWasteCollected();
         } else {
           // Refresh token is invalid or expired, logout the user
           await deleteTokens(); // Logout user
@@ -1599,7 +1764,7 @@ Future<List<Map<String, dynamic>>?> fetchPayment() async {
 
   if (response.statusCode == 200) {
     List<dynamic> decodedList = jsonDecode(response.body);
-   
+
     return decodedList.map((item) => item as Map<String, dynamic>).toList();
   } else {
     if (response.statusCode == 401) {
@@ -1822,8 +1987,7 @@ Future<List<Map<String, dynamic>>?> fetchVehicles() async {
       List<dynamic> data = jsonDecode(response.body);
 
       // Cast the list of dynamic to a list of Map<String, dynamic>
-      List<Map<String, dynamic>> vehicles =
-          List<Map<String, dynamic>>.from(data);
+      List<Map<String, dynamic>> vehicles = List<Map<String, dynamic>>.from(data);
 
       return vehicles;
     } else {

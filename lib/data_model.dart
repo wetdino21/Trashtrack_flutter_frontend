@@ -12,7 +12,6 @@ class UserModel extends ChangeNotifier {
   String? auth;
   Uint8List? profile;
   int? notifCount;
-  int? totalRequest;
 
 // Fetch or update user data and notify listeners
   void setUserData({
@@ -23,7 +22,6 @@ class UserModel extends ChangeNotifier {
     String? newAuth,
     Uint8List? newProfile,
     int? newNotifCount,
-    int? newTotalRequest,
   }) {
     // Call clearModelData if the id is changing
     if (newId != null && newId != id) {
@@ -37,7 +35,6 @@ class UserModel extends ChangeNotifier {
     if (newAuth != null) auth = newAuth;
     if (newProfile != null) profile = newProfile;
     if (newNotifCount != null) notifCount = newNotifCount;
-    if (newTotalRequest != null) totalRequest = newTotalRequest;
     // Notify listeners when the data is updated
     notifyListeners();
   }

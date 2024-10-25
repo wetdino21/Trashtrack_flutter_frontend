@@ -91,75 +91,75 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class WebsocketMultiple extends StatefulWidget {
-  @override
-  _WebsocketMultipleState createState() => _WebsocketMultipleState();
-}
+// class WebsocketMultiple extends StatefulWidget {
+//   @override
+//   _WebsocketMultipleState createState() => _WebsocketMultipleState();
+// }
 
-class _WebsocketMultipleState extends State<WebsocketMultiple> {
-  late IOWebSocketChannel channel;
-  List<String> messages = [];
+// class _WebsocketMultipleState extends State<WebsocketMultiple> {
+//   late IOWebSocketChannel channel;
+//   List<String> messages = [];
 
-  @override
-  void initState() {
-    super.initState();
-    channel = IOWebSocketChannel.connect('ws://192.168.254.187:8080'); // Connect to server
+//   @override
+//   void initState() {
+//     super.initState();
+//     channel = IOWebSocketChannel.connect('ws://192.168.254.187:8080'); // Connect to server
 
-    // Listen for incoming messages
-    channel.stream.listen((message) {
-      final decodedMessage = jsonDecode(message);
-      setState(() {
-        messages.add('Received ${decodedMessage['type']} message: ${decodedMessage['content']}');
-      });
-    });
-  }
+//     // Listen for incoming messages
+//     channel.stream.listen((message) {
+//       final decodedMessage = jsonDecode(message);
+//       setState(() {
+//         messages.add('Received ${decodedMessage['type']} message: ${decodedMessage['content']}');
+//       });
+//     });
+//   }
 
-  // Send a message to the server
-  void sendMessage(String type, String content) {
-    final message = jsonEncode({
-      'type': type,
-      'content': content,
-    });
-    channel.sink.add(message);
-  }
+//   // Send a message to the server
+//   void sendMessage(String type, String content) {
+//     final message = jsonEncode({
+//       'type': type,
+//       'content': content,
+//     });
+//     channel.sink.add(message);
+//   }
 
-  @override
-  void dispose() {
-    channel.sink.close(); // Close WebSocket connection when the widget is disposed
-    super.dispose();
-  }
+//   @override
+//   void dispose() {
+//     channel.sink.close(); // Close WebSocket connection when the widget is disposed
+//     super.dispose();
+//   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('WebSocket Example')),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              itemCount: messages.length,
-              itemBuilder: (context, index) => ListTile(
-                title: Text(messages[index]),
-              ),
-            ),
-          ),
-          TextField(
-            decoration: InputDecoration(labelText: 'Send chat message'),
-            onSubmitted: (text) => sendMessage('chat', text),
-          ),
-          ElevatedButton(
-            onPressed: () => sendMessage('notification', 'New notification from client!'),
-            child: Text('Send Notification'),
-          ),
-          ElevatedButton(
-            onPressed: () => sendMessage('update', 'Client update!'),
-            child: Text('Send Update'),
-          ),
-        ],
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(title: Text('WebSocket Example')),
+//       body: Column(
+//         children: [
+//           Expanded(
+//             child: ListView.builder(
+//               itemCount: messages.length,
+//               itemBuilder: (context, index) => ListTile(
+//                 title: Text(messages[index]),
+//               ),
+//             ),
+//           ),
+//           TextField(
+//             decoration: InputDecoration(labelText: 'Send chat message'),
+//             onSubmitted: (text) => sendMessage('chat', text),
+//           ),
+//           ElevatedButton(
+//             onPressed: () => sendMessage('notification', 'New notification from client!'),
+//             child: Text('Send Notification'),
+//           ),
+//           ElevatedButton(
+//             onPressed: () => sendMessage('update', 'Client update!'),
+//             child: Text('Send Update'),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
 ////////
 class TokenCheck extends StatefulWidget {
@@ -189,23 +189,25 @@ class _TokenCheckState extends State<TokenCheck> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: deepPurple,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'NO INTERNET CONNECTION',
-            style: TextStyle(color: white, fontSize: 20),
-          ),
-          Center(
-            child: Image.asset('assets/icon/trashtrack_icon_trans.png', scale: 3),
-          ),
-          ElevatedButton(
-              onPressed: () {
-                deleteTokens();
-              },
-              child: Text('Delete token')),
-        ],
-      ),
+      body: MainApp(),
+
+      // Column(
+      //   mainAxisAlignment: MainAxisAlignment.center,
+      //   children: [
+      //     Text(
+      //       'NO INTERNET CONNECTION',
+      //       style: TextStyle(color: white, fontSize: 20),
+      //     ),
+      //     Center(
+      //       child: Image.asset('assets/icon/trashtrack_icon_trans.png', scale: 3),
+      //     ),
+      //     ElevatedButton(
+      //         onPressed: () {
+      //           deleteTokens();
+      //         },
+      //         child: Text('Delete token')),
+      //   ],
+      // ),
     );
   }
 }

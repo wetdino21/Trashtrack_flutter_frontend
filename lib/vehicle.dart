@@ -104,13 +104,14 @@ class _VehicleScreenState extends State<VehicleScreen>
       }
 
       setState(() {
+        console('1111111111111111');
         isLoading = false;
       });
     } catch (e) {
       print(e.toString());
-      setState(() {
-        isLoading = false;
-      });
+      // setState(() {
+      //   isLoading = true;
+      // });
     }
   }
 
@@ -179,7 +180,7 @@ class _VehicleScreenState extends State<VehicleScreen>
                                                       color: blackSoft,
                                                       size: 70),
                                                   Text(
-                                                    'No upcoming booking\n\n\n\n',
+                                                    'No vehicle/s yet\n\n\n\n',
                                                     style: TextStyle(
                                                         color: blackSoft,
                                                         fontSize: 20),

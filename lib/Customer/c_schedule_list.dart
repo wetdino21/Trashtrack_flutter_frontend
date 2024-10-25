@@ -23,6 +23,7 @@ class C_ScheduleCardList extends StatefulWidget {
   final String dateCreated; // Sept. 10, 2024
   final String wasteType; // food waste, municipal waste ...
   final String status;
+  final bool? today;
 
   C_ScheduleCardList({
     required this.bookId,
@@ -30,6 +31,7 @@ class C_ScheduleCardList extends StatefulWidget {
     required this.dateCreated,
     required this.wasteType,
     required this.status,
+    this.today,
   });
 
   @override
@@ -63,8 +65,15 @@ class _C_ScheduleCardListState extends State<C_ScheduleCardList> {
         if (user == 'customer') {
           Navigator.push(context, MaterialPageRoute(builder: (context) => C_ScheduleDetails(bookId: widget.bookId)));
         } else if (user == 'hauler') {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => Booking_Pending_Details(bookId: widget.bookId)));
+          if (widget.today != null) {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => Booking_Pending_Details(bookId: widget.bookId, today: widget.today!)));
+          } else {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => Booking_Pending_Details(bookId: widget.bookId)));
+          }
         }
       },
       splashColor: Colors.green,

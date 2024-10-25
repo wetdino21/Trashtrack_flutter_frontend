@@ -75,7 +75,6 @@ class _MainAppState extends State<MainApp> {
       //await notificationCount(); //notification count
       //if(!mounted) return;
       await storeDataInHive(context); // user data
-      final totalRequest = await totalPickupRequest();
       final data = await userDataFromHive();
 
       Provider.of<UserModel>(context, listen: false).setUserData(
@@ -86,7 +85,6 @@ class _MainAppState extends State<MainApp> {
         newAuth: data['auth'],
         newProfile: data['profile'],
         newNotifCount: data['notif_count'],
-        newTotalRequest: totalRequest,
       );
 
       setState(() {
@@ -121,10 +119,7 @@ class _MainAppState extends State<MainApp> {
   List<Widget> get _pages {
     return [
       C_HomeScreen(),
-      C_MapScreen(
-          pickupPoint: widget.pickupPoint,
-          bookID: widget.bookID,
-          bookStatus: widget.bookStatus),
+      C_MapScreen(pickupPoint: widget.pickupPoint, bookID: widget.bookID, bookStatus: widget.bookStatus),
       C_ScheduleScreen(),
       user == null
           ? Container()
@@ -231,10 +226,7 @@ class _MainAppState extends State<MainApp> {
                       child: Stack(
                         //mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          ClipOval(
-                              child: Image.asset(
-                                  'assets/icon/trashtrack_icon.png',
-                                  scale: 10)),
+                          ClipOval(child: Image.asset('assets/icon/trashtrack_icon.png', scale: 10)),
                           Positioned.fill(
                             child: CircularProgressIndicator(
                               color: Colors.green,

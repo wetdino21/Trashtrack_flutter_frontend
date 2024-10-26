@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:trashtrack/Customer/c_Schedule.dart';
-import 'package:trashtrack/api_postgre_service.dart';
 import 'package:trashtrack/appbar.dart';
 import 'package:trashtrack/bottom_nav_bar.dart';
 import 'package:trashtrack/drawer.dart';
@@ -19,7 +18,6 @@ class MainApp extends StatefulWidget {
   LatLng? pickupPoint;
   int? bookID;
   String? bookStatus;
-  bool _isDelayed = false;
 
   MainApp({this.selectedIndex, this.pickupPoint, this.bookID, this.bookStatus});
 
@@ -35,12 +33,23 @@ class _MainAppState extends State<MainApp> {
 
   int _selectedIndex = 0;
   bool loading = false;
-  bool _isDelayed = false;
   bool firstLoad = true;
+  //animate
+  bool isHome = false;
+  double height = 0.3;
+  double position = 0;
+  UserModel? userModel;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    userModel = Provider.of<UserModel>(context); // Access provider here
+  }
 
   @override
   void initState() {
     super.initState();
+    _startAnimation();
     _dbData();
 
     if (widget.selectedIndex != null) {
@@ -77,7 +86,7 @@ class _MainAppState extends State<MainApp> {
       await storeDataInHive(context); // user data
       final data = await userDataFromHive();
 
-      Provider.of<UserModel>(context, listen: false).setUserData(
+      userModel!.setUserData(
         newId: data['id'].toString(),
         newFname: data['fname'],
         newLname: data['lname'],
@@ -86,22 +95,31 @@ class _MainAppState extends State<MainApp> {
         newProfile: data['profile'],
         newNotifCount: data['notif_count'],
       );
+      // Provider.of<UserModel>(context, listen: false).setUserData(
+      //   newId: data['id'].toString(),
+      //   newFname: data['fname'],
+      //   newLname: data['lname'],
+      //   newEmail: data['email'],
+      //   newAuth: data['auth'],
+      //   newProfile: data['profile'],
+      //   newNotifCount: data['notif_count'],
+      // );
 
       setState(() {
         //userData = data; //isnt used
         String? usertype = data['user'];
         user = usertype;
         loading = false;
-      });
 
-      //load all resource
-      if (firstLoad && _selectedIndex == 0) {
-        Future.delayed(const Duration(seconds: 2), () {
-          setState(() {
-            firstLoad = false;
+        //load all resource
+        if (firstLoad && _selectedIndex == 0) {
+          Future.delayed(const Duration(seconds: 2), () {
+            setState(() {
+              firstLoad = false;
+            });
           });
-        });
-      }
+        }
+      });
     } catch (e) {
       console(e.toString());
       if (!mounted) return;
@@ -111,6 +129,32 @@ class _MainAppState extends State<MainApp> {
     }
   }
 
+  //animation
+  void _startAnimation() async {
+    setState(() {
+      height = 0.3;
+      position = 0;
+    });
+    // First, wait for a moment
+    await Future.delayed(Duration(milliseconds: 10));
+
+    // Animate height change
+    if (!mounted) return;
+    setState(() {
+      height = 1; // Expand height to 80%
+    });
+
+    // Wait for height animation to complete
+    await Future.delayed(Duration(milliseconds: 100));
+
+    // Now move the image to the right
+    if (!mounted) return;
+    setState(() {
+      position = MediaQuery.of(context).size.width; // Move it off-screen
+    });
+  }
+
+  //sound
   Future<void> _playSound() async {
     await _audioService.playPressSound();
   }
@@ -130,27 +174,27 @@ class _MainAppState extends State<MainApp> {
                   : Container(),
     ];
   }
-  // final List<Widget> _pages = [
-  //   C_HomeScreen(),
-  //   C_MapScreen(),
-  //   C_ScheduleScreen(),
-  //   C_PaymentScreen(),
-  // ];
 
+  //ontappppppppppppppp
   void _onItemTapped(int index) {
-    if (_isDelayed) return; // If delayed, prevent action
-
     if (index == 0) {
-      _isDelayed = true;
+      setState(() {
+        loading = true;
+      });
+      _startAnimation();
+      userModel!.setIsHome(true);
+      //
+
       if (_selectedIndex != index) {
         _playSound();
         setState(() {
           _selectedIndex = index;
         });
       }
-      Future.delayed(const Duration(milliseconds: 700), () {
+      //
+      Future.delayed(const Duration(seconds: 1), () {
         setState(() {
-          _isDelayed = false;
+          loading = false;
         });
       });
     } else {
@@ -214,35 +258,8 @@ class _MainAppState extends State<MainApp> {
               onTap: _onItemTapped,
             ),
           ),
-        if (loading || firstLoad)
-          Scaffold(
-            backgroundColor: deepPurple,
-            body: Stack(
-              children: [
-                Positioned.fill(
-                  child: InkWell(
-                    onTap: () {},
-                    child: Center(
-                      child: Stack(
-                        //mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ClipOval(child: Image.asset('assets/icon/trashtrack_icon.png', scale: 10)),
-                          Positioned.fill(
-                            child: CircularProgressIndicator(
-                              color: Colors.green,
-                              strokeWidth: 10,
-                              strokeAlign: 5,
-                              backgroundColor: Colors.deepPurple,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          )
+        if (loading || firstLoad) showLoadingIconAnimate(),
+        if (userModel!.isToHome) showLoadingMovingTruck(context, height, position),
       ],
     ));
     // Scaffold(

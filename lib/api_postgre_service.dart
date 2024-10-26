@@ -1559,8 +1559,7 @@ Future<double?> fetchTotalCusWasteCollected() async {
       final responseBody = jsonDecode(response.body);
 
       if (responseBody != null && responseBody['total'] != null) {
-        console(double.tryParse(responseBody['total'].toString()));
-        return double.tryParse(responseBody['total'].toString()); // Ensure it's an int
+        return double.tryParse(responseBody['total'].toString());
       }
       return null;
     } else {

@@ -83,6 +83,9 @@ class C_CustomAppBarState extends State<C_CustomAppBar> {
     String ipAddress = extractIpAddress(baseUrl);
     //192.168.254.187
     final data = await userDataFromHive();
+    if (!mounted) return;
+
+    if (data.isEmpty) return;
     setState(() {
       user = data['user'];
     });
@@ -198,9 +201,7 @@ class C_CustomAppBarState extends State<C_CustomAppBar> {
                         width: 20,
                         child: Container(
                           padding: const EdgeInsets.all(1.0),
-                          decoration: BoxDecoration(
-                              color: white,
-                              borderRadius: BorderRadius.circular(100)),
+                          decoration: BoxDecoration(color: white, borderRadius: BorderRadius.circular(100)),
                           child: CircleAvatar(
                               backgroundColor: Colors.red,
                               child: Text(
@@ -236,7 +237,7 @@ class C_CustomAppBarState extends State<C_CustomAppBar> {
             decoration: BoxDecoration(
               color: deepPurple,
               shape: BoxShape.circle,
-               boxShadow: shadowLowColor,
+              boxShadow: shadowLowColor,
               border: Border.all(width: 2, color: deepPurple),
             ),
             //child: imageBytes != null

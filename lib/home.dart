@@ -53,6 +53,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> with SingleTickerProviderSt
   void initState() {
     super.initState();
     _dbData();
+
     //_objLoad();
 
     _controller = AnimationController(
@@ -218,6 +219,8 @@ class _C_HomeScreenState extends State<C_HomeScreen> with SingleTickerProviderSt
                                                       if (!mounted) return;
                                                       setState(() {
                                                         _isObjectLoaded = true;
+                                                        //load animation
+                                                        userModel!.setIsHome(false);
                                                         print("Object fully loaded in the scene");
                                                       });
                                                     }

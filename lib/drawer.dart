@@ -51,7 +51,6 @@ class _C_DrawerState extends State<C_Drawer> {
   }
 
   Future<void> _getAppVersion() async {
-    console('opennedddddddddddddddddd');
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
     String appVersion = 'Version: ${packageInfo.version}.${packageInfo.buildNumber}';
@@ -73,7 +72,7 @@ class _C_DrawerState extends State<C_Drawer> {
             ListTile(
               minTileHeight: 70,
               leading: Container(
-                decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: shadowLowColor),
+                decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: shadowIconColor),
                 child: imageBytes != null
                     ? CircleAvatar(
                         backgroundImage: MemoryImage(imageBytes!),
@@ -229,7 +228,7 @@ class _C_DrawerState extends State<C_Drawer> {
       padding: EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: deepPurple,
-        boxShadow: shadowLowColor,
+        boxShadow: shadowIconColor,
         borderRadius: BorderRadius.circular(100),
       ),
       child: Icon(

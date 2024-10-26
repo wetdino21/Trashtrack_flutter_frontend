@@ -581,8 +581,8 @@ class _PaymentDetailsState extends State<PaymentDetails> with SingleTickerProvid
   String datePaid = '';
   String amountPaid = '';
   String payMethod = '';
-  String trans_Id = '';
-  String checkout_Id = '';
+  String? transId;
+  String? checkoutId;
   String amountDue = '';
 
   @override
@@ -683,8 +683,13 @@ class _PaymentDetailsState extends State<PaymentDetails> with SingleTickerProvid
             double amountPaidValue = double.parse(dbAmountPaid);
             amountPaid = '₱${NumberFormat('#,##0.00').format(amountPaidValue)}';
             payMethod = '${paymentDetails!['p_method']}';
-            trans_Id = '${paymentDetails!['p_trans_id']}';
-            checkout_Id = '${paymentDetails!['p_checkout_id']}';
+
+            if (paymentDetails!['p_trans_id'] != null) {
+              transId = '${paymentDetails!['p_trans_id']}';
+            }
+            if (paymentDetails!['p_checkout_id'] != null) {
+              checkoutId = '${paymentDetails!['p_checkout_id']}';
+            }
           }
 
           //
@@ -909,28 +914,30 @@ class _PaymentDetailsState extends State<PaymentDetails> with SingleTickerProvid
                                                             ),
                                                           ],
                                                         ),
-                                                        Row(
-                                                          children: [
-                                                            SelectableText(
-                                                              'Transaction# $trans_Id',
-                                                              style: TextStyle(
-                                                                  color: grey,
-                                                                  fontWeight: FontWeight.bold,
-                                                                  fontSize: 12),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        Row(
-                                                          children: [
-                                                            SelectableText(
-                                                              'Checkout# $checkout_Id',
-                                                              style: TextStyle(
-                                                                  color: grey,
-                                                                  fontWeight: FontWeight.bold,
-                                                                  fontSize: 12),
-                                                            ),
-                                                          ],
-                                                        ),
+                                                        if (transId != null)
+                                                          Row(
+                                                            children: [
+                                                              SelectableText(
+                                                                'Transaction# $transId',
+                                                                style: TextStyle(
+                                                                    color: grey,
+                                                                    fontWeight: FontWeight.bold,
+                                                                    fontSize: 12),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        if (checkoutId != null)
+                                                          Row(
+                                                            children: [
+                                                              SelectableText(
+                                                                'Checkout# $checkoutId',
+                                                                style: TextStyle(
+                                                                    color: grey,
+                                                                    fontWeight: FontWeight.bold,
+                                                                    fontSize: 12),
+                                                              ),
+                                                            ],
+                                                          ),
                                                         SizedBox(height: 20),
                                                       ],
                                                     ),

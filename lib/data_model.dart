@@ -12,6 +12,7 @@ class UserModel extends ChangeNotifier {
   String? auth;
   Uint8List? profile;
   int? notifCount;
+  bool isToHome = false;
 
 // Fetch or update user data and notify listeners
   void setUserData({
@@ -40,8 +41,14 @@ class UserModel extends ChangeNotifier {
   }
 
   // update profile
+  void setIsHome(bool newIsToHome) {
+    isToHome = newIsToHome;
+    notifyListeners();
+  }
+
+  // update profile
   void setUserProfile(Uint8List? userProfile) {
-    profile = profile;
+    profile = userProfile;
     notifyListeners();
   }
 

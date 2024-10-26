@@ -112,7 +112,7 @@ Future<void> deleteTokens() async {
   UserModel globalUserModel = UserModel();
   globalUserModel.clearModelData();
   //navigatorKey.currentState?.pushNamedAndRemoveUntil('/logout');
-  
+
   // no context that's why use global key
   navigatorKey.currentState?.pushNamedAndRemoveUntil(
     '/logout',
@@ -185,6 +185,7 @@ Future<String?> refreshAccessToken() async {
     print('Access token refreshed successfully');
     return null;
   } else if (response.statusCode == 403) {
+    // showExpiredSessionDialog();
     print('Refresh token expired or invalid. Logging out...');
     await deleteTokens(); // Logout user if refresh token is invalid
     return 'invalid/expired token';
@@ -300,28 +301,44 @@ void showLogoutConfirmationDialog(BuildContext context) {
     builder: (BuildContext context) {
       return AlertDialog(
         backgroundColor: Colors.red[900],
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(15.0))),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
         title: Text('Logout', style: TextStyle(color: Colors.white)),
-        content: Text('Are you sure you want to log out?',
-            style: TextStyle(color: Colors.white)),
+        content: Text('Are you sure you want to log out?', style: TextStyle(color: Colors.white)),
         actions: [
           TextButton(
             onPressed: () {
               deleteTokens();
               Navigator.of(context).pop();
             },
-            child: Text('Yes',
-                style: TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold)),
+            child: Text('Yes', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           ),
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
             },
-            child: Text('Cancel',
-                style: TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold)),
+            child: Text('Cancel', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+void showExpiredSessionDialog() {
+  showDialog(
+    context: navigatorKey.currentContext!,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
+        title: Text('Session Expired', style: TextStyle(color: redSoft)),
+        content: Text('Your time with us has come to an end. Please login again.', style: TextStyle(color: blackSoft)),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('OK', style: TextStyle(color: blackSoft, fontWeight: FontWeight.bold)),
           ),
         ],
       );

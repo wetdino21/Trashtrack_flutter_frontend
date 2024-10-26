@@ -19,8 +19,7 @@ class RequestPickupScreen extends StatefulWidget {
   _RequestPickupScreenState createState() => _RequestPickupScreenState();
 }
 
-class _RequestPickupScreenState extends State<RequestPickupScreen>
-    with SingleTickerProviderStateMixin {
+class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTickerProviderStateMixin {
   // Controllers for the input fields
   final _fullnameController = TextEditingController();
   final _contactController = TextEditingController();
@@ -174,7 +173,6 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
         } else {
           print('Failed to load waste categories');
         }
-        console(111111111);
         setState(() {
           isLoading = false;
         });
@@ -231,14 +229,12 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
-        if (permission != LocationPermission.whileInUse &&
-            permission != LocationPermission.always) {
+        if (permission != LocationPermission.whileInUse && permission != LocationPermission.always) {
           return; // Location services are not enabled
         }
       }
 
-      if (permission == LocationPermission.denied ||
-          permission == LocationPermission.deniedForever) {
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
         await Geolocator.openAppSettings();
         return;
       }
@@ -295,8 +291,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
 
   Future<void> _loadCitiesMunicipalities(String provinceCode) async {
     try {
-      final citiesMunicipalities =
-          await fetchCitiesMunicipalities(provinceCode);
+      final citiesMunicipalities = await fetchCitiesMunicipalities(provinceCode);
       setState(() {
         _citiesMunicipalities = citiesMunicipalities;
         _showCityMunicipalityDropdown = true;
@@ -381,8 +376,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                     )),
                     SizedBox(height: 16.0),
                     isLoading
-                        ? loadingBookingAnimation(
-                            _controller, _colorTween, _colorTween2)
+                        ? loadingBookingAnimation(_controller, _colorTween, _colorTween2)
 
                         // onload dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
                         : Column(
@@ -404,25 +398,17 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                       boxShadow: shadowBigColor),
                                   child: onAddress
                                       ? Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
                                                 SizedBox(),
                                                 Container(
-                                                  alignment:
-                                                      Alignment.centerRight,
-                                                  padding: EdgeInsets.symmetric(
-                                                      vertical: 10,
-                                                      horizontal: 10),
+                                                  alignment: Alignment.centerRight,
+                                                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                                                   decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              5),
+                                                      borderRadius: BorderRadius.circular(5),
                                                       color: Colors.blue,
                                                       boxShadow: shadowColor),
                                                   child: InkWell(
@@ -436,8 +422,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                                       style: TextStyle(
                                                           color: Colors.white,
                                                           fontSize: 12,
-                                                          fontWeight:
-                                                              FontWeight.bold),
+                                                          fontWeight: FontWeight.bold),
                                                     ),
                                                   ),
                                                 ),
@@ -446,20 +431,15 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                             Center(
                                                 child: Text(
                                               'Information',
-                                              style: TextStyle(
-                                                  fontSize: 16,
-                                                  color: Colors.grey),
+                                              style: TextStyle(fontSize: 16, color: Colors.grey),
                                             )),
                                             const SizedBox(height: 20),
                                             Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 10),
+                                              padding: const EdgeInsets.only(left: 10),
                                               child: Text(
                                                 'Contact',
                                                 style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    color: greytitleColor,
-                                                    fontSize: 16),
+                                                    fontWeight: FontWeight.bold, color: greytitleColor, fontSize: 16),
                                               ),
                                             ),
                                             _buildTextField(
@@ -467,8 +447,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                               hintText: 'Full Name',
                                               onChanged: (value) {
                                                 setState(() {
-                                                  fullnamevalidator =
-                                                      validateFullname(value);
+                                                  fullnamevalidator = validateFullname(value);
                                                   fullname = value!;
                                                 });
                                               },
@@ -477,10 +456,8 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                             const SizedBox(height: 5),
                                             _buildNumberField(
                                               inputFormatters: [
-                                                FilteringTextInputFormatter
-                                                    .digitsOnly,
-                                                LengthLimitingTextInputFormatter(
-                                                    10),
+                                                FilteringTextInputFormatter.digitsOnly,
+                                                LengthLimitingTextInputFormatter(10),
                                               ],
                                             ),
                                             _labelValidator(contactvalidator),
@@ -488,59 +465,39 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                             Center(
                                                 child: Text(
                                               'Complete Address',
-                                              style: TextStyle(
-                                                  fontSize: 16,
-                                                  color: Colors.grey),
+                                              style: TextStyle(fontSize: 16, color: Colors.grey),
                                             )),
                                             const SizedBox(height: 20),
                                             Column(
                                               children: [
                                                 Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
                                                     Text(
                                                       '  Province/City or Municipality/Barangay',
                                                       style: TextStyle(
                                                           fontSize: 16,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color:
-                                                              greytitleColor),
+                                                          fontWeight: FontWeight.bold,
+                                                          color: greytitleColor),
                                                     ),
                                                     Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
                                                       children: [
                                                         Container(
-                                                          padding: EdgeInsets
-                                                              .symmetric(
-                                                                  vertical: 5.0,
-                                                                  horizontal:
-                                                                      15),
+                                                          padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 15),
                                                           decoration: BoxDecoration(
-                                                              color:
-                                                                  Colors.white,
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          10.0),
-                                                              boxShadow:
-                                                                  shadowColor),
+                                                              color: Colors.white,
+                                                              borderRadius: BorderRadius.circular(10.0),
+                                                              boxShadow: shadowColor),
                                                           child: Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
+                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                             children: [
                                                               // Show selected values
                                                               Expanded(
                                                                 child: Text(
-                                                                  _selectedProvinceName ==
-                                                                          null
+                                                                  _selectedProvinceName == null
                                                                       ? 'Select Province'
-                                                                      : _selectedCityMunicipalityName ==
-                                                                              null
+                                                                      : _selectedCityMunicipalityName == null
                                                                           ? '${_selectedProvinceName} / '
                                                                           : _selectedBarangayName == null
                                                                               ? '${_selectedProvinceName} / ${_selectedCityMunicipalityName} / '
@@ -548,51 +505,34 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                                                                   '${_selectedCityMunicipalityName} / '
                                                                                   '${_selectedBarangayName}',
                                                                   style: TextStyle(
-                                                                      color: _selectedProvinceName ==
-                                                                              null
+                                                                      color: _selectedProvinceName == null
                                                                           ? greySoft
                                                                           : black,
-                                                                      fontSize:
-                                                                          16.0),
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .visible, // Allow wrapping
-                                                                  softWrap:
-                                                                      true, // Enable soft wrapping
+                                                                      fontSize: 16.0),
+                                                                  overflow: TextOverflow.visible, // Allow wrapping
+                                                                  softWrap: true, // Enable soft wrapping
                                                                 ),
                                                               ),
                                                               IconButton(
                                                                   icon: Icon(
                                                                     Icons.clear,
-                                                                    color: Colors
-                                                                        .deepPurple,
+                                                                    color: Colors.deepPurple,
                                                                   ),
-                                                                  onPressed:
-                                                                      () {
+                                                                  onPressed: () {
                                                                     //close
                                                                     _loadProvinces();
-                                                                    setState(
-                                                                        () {
-                                                                      _provinces =
-                                                                          [];
-                                                                      _citiesMunicipalities =
-                                                                          [];
-                                                                      _barangays =
-                                                                          [];
+                                                                    setState(() {
+                                                                      _provinces = [];
+                                                                      _citiesMunicipalities = [];
+                                                                      _barangays = [];
 
-                                                                      _showCityMunicipalityDropdown =
-                                                                          false;
-                                                                      _showBarangayDropdown =
-                                                                          false;
+                                                                      _showCityMunicipalityDropdown = false;
+                                                                      _showBarangayDropdown = false;
 
-                                                                      _selectedProvinceName =
-                                                                          null;
-                                                                      _selectedCityMunicipalityName =
-                                                                          null;
-                                                                      _selectedBarangayName =
-                                                                          null;
-                                                                      address =
-                                                                          '';
+                                                                      _selectedProvinceName = null;
+                                                                      _selectedCityMunicipalityName = null;
+                                                                      _selectedBarangayName = null;
+                                                                      address = '';
                                                                     });
                                                                   })
                                                             ],
@@ -601,71 +541,41 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                                         if (_showProvinceDropdown)
                                                           Container(
                                                             height: 100,
-                                                            margin: EdgeInsets
-                                                                .symmetric(
-                                                                    horizontal:
-                                                                        10),
+                                                            margin: EdgeInsets.symmetric(horizontal: 10),
                                                             decoration: BoxDecoration(
-                                                                color: Colors
-                                                                    .deepPurple
-                                                                    .withOpacity(
-                                                                        0.7),
-                                                                borderRadius: BorderRadius.vertical(
-                                                                    bottom: Radius
-                                                                        .circular(
-                                                                            15)),
-                                                                boxShadow:
-                                                                    shadowColor),
-                                                            child: ListView
-                                                                .builder(
-                                                              itemCount:
-                                                                  _provinces
-                                                                      .length,
-                                                              itemBuilder:
-                                                                  (context,
-                                                                      index) {
-                                                                final city =
-                                                                    _provinces[
-                                                                        index];
+                                                                color: Colors.deepPurple.withOpacity(0.7),
+                                                                borderRadius:
+                                                                    BorderRadius.vertical(bottom: Radius.circular(15)),
+                                                                boxShadow: shadowColor),
+                                                            child: ListView.builder(
+                                                              itemCount: _provinces.length,
+                                                              itemBuilder: (context, index) {
+                                                                final city = _provinces[index];
 
                                                                 return InkWell(
                                                                   onTap: () {
-                                                                    setState(
-                                                                        () {
-                                                                      _loadCitiesMunicipalities(
-                                                                          city[
-                                                                              'code']); // Load barangays for the selected city
+                                                                    setState(() {
+                                                                      _loadCitiesMunicipalities(city[
+                                                                          'code']); // Load barangays for the selected city
 
                                                                       _selectedProvinceName =
-                                                                          city[
-                                                                              'name']; // Set by name
-                                                                      _showProvinceDropdown =
-                                                                          false;
-                                                                      _showCityMunicipalityDropdown =
-                                                                          true;
+                                                                          city['name']; // Set by name
+                                                                      _showProvinceDropdown = false;
+                                                                      _showCityMunicipalityDropdown = true;
                                                                     });
                                                                   },
-                                                                  child:
-                                                                      Container(
+                                                                  child: Container(
                                                                     padding: EdgeInsets.symmetric(
-                                                                        vertical:
-                                                                            10,
-                                                                        horizontal:
-                                                                            15),
-                                                                    decoration:
-                                                                        BoxDecoration(
+                                                                        vertical: 10, horizontal: 15),
+                                                                    decoration: BoxDecoration(
                                                                       border: Border(
                                                                           bottom:
                                                                               BorderSide(color: Colors.grey.shade300)),
                                                                     ),
                                                                     child: Text(
-                                                                      city[
-                                                                          'name'], // Display the name
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              16,
-                                                                          color:
-                                                                              Colors.white),
+                                                                      city['name'], // Display the name
+                                                                      style:
+                                                                          TextStyle(fontSize: 16, color: Colors.white),
                                                                     ),
                                                                   ),
                                                                 );
@@ -675,71 +585,39 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                                         if (_showCityMunicipalityDropdown)
                                                           Container(
                                                             height: 400,
-                                                            margin: EdgeInsets
-                                                                .symmetric(
-                                                                    horizontal:
-                                                                        10),
+                                                            margin: EdgeInsets.symmetric(horizontal: 10),
                                                             decoration: BoxDecoration(
-                                                                color: Colors
-                                                                    .deepPurple
-                                                                    .withOpacity(
-                                                                        0.7),
-                                                                borderRadius: BorderRadius.vertical(
-                                                                    bottom: Radius
-                                                                        .circular(
-                                                                            15)),
-                                                                boxShadow:
-                                                                    shadowColor),
-                                                            child: ListView
-                                                                .builder(
-                                                              itemCount:
-                                                                  _citiesMunicipalities
-                                                                      .length,
-                                                              itemBuilder:
-                                                                  (context,
-                                                                      index) {
-                                                                final city =
-                                                                    _citiesMunicipalities[
-                                                                        index];
+                                                                color: Colors.deepPurple.withOpacity(0.7),
+                                                                borderRadius:
+                                                                    BorderRadius.vertical(bottom: Radius.circular(15)),
+                                                                boxShadow: shadowColor),
+                                                            child: ListView.builder(
+                                                              itemCount: _citiesMunicipalities.length,
+                                                              itemBuilder: (context, index) {
+                                                                final city = _citiesMunicipalities[index];
 
                                                                 return InkWell(
                                                                   onTap: () {
-                                                                    setState(
-                                                                        () {
-                                                                      _loadBarangays(
-                                                                          city[
-                                                                              'code']);
+                                                                    setState(() {
+                                                                      _loadBarangays(city['code']);
 
-                                                                      _selectedCityMunicipalityName =
-                                                                          city[
-                                                                              'name'];
-                                                                      _showCityMunicipalityDropdown =
-                                                                          false;
-                                                                      _showBarangayDropdown =
-                                                                          true;
+                                                                      _selectedCityMunicipalityName = city['name'];
+                                                                      _showCityMunicipalityDropdown = false;
+                                                                      _showBarangayDropdown = true;
                                                                     });
                                                                   },
-                                                                  child:
-                                                                      Container(
+                                                                  child: Container(
                                                                     padding: EdgeInsets.symmetric(
-                                                                        vertical:
-                                                                            10,
-                                                                        horizontal:
-                                                                            15),
-                                                                    decoration:
-                                                                        BoxDecoration(
+                                                                        vertical: 10, horizontal: 15),
+                                                                    decoration: BoxDecoration(
                                                                       border: Border(
                                                                           bottom:
                                                                               BorderSide(color: Colors.grey.shade300)),
                                                                     ),
                                                                     child: Text(
-                                                                      city[
-                                                                          'name'], // Display the name
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              16,
-                                                                          color:
-                                                                              Colors.white),
+                                                                      city['name'], // Display the name
+                                                                      style:
+                                                                          TextStyle(fontSize: 16, color: Colors.white),
                                                                     ),
                                                                   ),
                                                                 );
@@ -751,42 +629,22 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                                         if (_showBarangayDropdown)
                                                           Container(
                                                             height: 400,
-                                                            margin: EdgeInsets
-                                                                .symmetric(
-                                                                    horizontal:
-                                                                        10),
+                                                            margin: EdgeInsets.symmetric(horizontal: 10),
                                                             decoration: BoxDecoration(
-                                                                color: Colors
-                                                                    .deepPurple
-                                                                    .withOpacity(
-                                                                        0.7),
-                                                                borderRadius: BorderRadius.vertical(
-                                                                    bottom: Radius
-                                                                        .circular(
-                                                                            15)),
-                                                                boxShadow:
-                                                                    shadowColor),
-                                                            child: ListView
-                                                                .builder(
-                                                              itemCount:
-                                                                  _barangays
-                                                                      .length,
-                                                              itemBuilder:
-                                                                  (context,
-                                                                      index) {
-                                                                final city =
-                                                                    _barangays[
-                                                                        index];
+                                                                color: Colors.deepPurple.withOpacity(0.7),
+                                                                borderRadius:
+                                                                    BorderRadius.vertical(bottom: Radius.circular(15)),
+                                                                boxShadow: shadowColor),
+                                                            child: ListView.builder(
+                                                              itemCount: _barangays.length,
+                                                              itemBuilder: (context, index) {
+                                                                final city = _barangays[index];
 
                                                                 return InkWell(
                                                                   onTap: () {
-                                                                    setState(
-                                                                        () {
-                                                                      _selectedBarangayName =
-                                                                          city[
-                                                                              'name'];
-                                                                      _showBarangayDropdown =
-                                                                          false;
+                                                                    setState(() {
+                                                                      _selectedBarangayName = city['name'];
+                                                                      _showBarangayDropdown = false;
 
                                                                       address = _selectedBarangayName! +
                                                                           ', ' +
@@ -795,27 +653,18 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                                                           _selectedProvinceName!;
                                                                     });
                                                                   },
-                                                                  child:
-                                                                      Container(
+                                                                  child: Container(
                                                                     padding: EdgeInsets.symmetric(
-                                                                        vertical:
-                                                                            10,
-                                                                        horizontal:
-                                                                            15),
-                                                                    decoration:
-                                                                        BoxDecoration(
+                                                                        vertical: 10, horizontal: 15),
+                                                                    decoration: BoxDecoration(
                                                                       border: Border(
                                                                           bottom:
                                                                               BorderSide(color: Colors.grey.shade300)),
                                                                     ),
                                                                     child: Text(
-                                                                      city[
-                                                                          'name'], // Display the name
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              16,
-                                                                          color:
-                                                                              Colors.white),
+                                                                      city['name'], // Display the name
+                                                                      style:
+                                                                          TextStyle(fontSize: 16, color: Colors.white),
                                                                     ),
                                                                   ),
                                                                 );
@@ -826,56 +675,44 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                                     ),
                                                   ],
                                                 ),
-                                                if (_selectedProvinceName ==
-                                                        null ||
-                                                    _selectedCityMunicipalityName ==
-                                                        null ||
-                                                    _selectedBarangayName ==
-                                                        null)
+                                                if (_selectedProvinceName == null ||
+                                                    _selectedCityMunicipalityName == null ||
+                                                    _selectedBarangayName == null)
                                                   Text(
                                                     'Please select your adrress.',
-                                                    style: TextStyle(
-                                                        color: Colors.red),
+                                                    style: TextStyle(color: Colors.red),
                                                   ),
                                                 const SizedBox(height: 5),
                                                 _buildTextField(
                                                   controller: _streetController,
-                                                  hintText:
-                                                      'Street Name, Building, House No.',
+                                                  hintText: 'Street Name, Building, House No.',
                                                   onChanged: (value) {
                                                     setState(() {
                                                       streetvalidator =
-                                                          validateStreet(
-                                                              value); // Trigger validation on text change
+                                                          validateStreet(value); // Trigger validation on text change
                                                       street = value!;
                                                     });
                                                   },
                                                 ),
-                                                _labelValidator(
-                                                    streetvalidator),
+                                                _labelValidator(streetvalidator),
                                                 const SizedBox(height: 5),
                                                 _buildTextField(
                                                   controller: _postalController,
-                                                  keyboardType:
-                                                      TextInputType.number,
+                                                  keyboardType: TextInputType.number,
                                                   inputFormatters: [
-                                                    FilteringTextInputFormatter
-                                                        .digitsOnly,
-                                                    LengthLimitingTextInputFormatter(
-                                                        4),
+                                                    FilteringTextInputFormatter.digitsOnly,
+                                                    LengthLimitingTextInputFormatter(4),
                                                   ],
                                                   hintText: 'Postal Code',
                                                   onChanged: (value) {
                                                     setState(() {
-                                                      postalvalidator =
-                                                          validatePostalCode(
-                                                              value); // Trigger validation on text change
+                                                      postalvalidator = validatePostalCode(
+                                                          value); // Trigger validation on text change
                                                       postal = value!;
                                                     });
                                                   },
                                                 ),
-                                                _labelValidator(
-                                                    postalvalidator),
+                                                _labelValidator(postalvalidator),
                                               ],
                                             ),
                                           ],
@@ -885,8 +722,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                           child: Container(
                                             padding: EdgeInsets.all(5),
                                             decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
+                                                borderRadius: BorderRadius.circular(10),
                                                 color: Colors.white,
                                                 boxShadow: shadowColor),
                                             child: Row(
@@ -898,18 +734,12 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                                     child: Container(
                                                         height: 35,
                                                         width: 30,
-                                                        padding:
-                                                            EdgeInsets.only(
-                                                                left: 2),
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(50),
+                                                        padding: EdgeInsets.only(left: 2),
+                                                        decoration: BoxDecoration(
+                                                          borderRadius: BorderRadius.circular(50),
                                                           //color: Colors.white,
                                                         ),
-                                                        alignment: Alignment
-                                                            .centerLeft,
+                                                        alignment: Alignment.centerLeft,
                                                         child: Icon(
                                                           Icons.pin_drop,
                                                           size: 30,
@@ -918,31 +748,20 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                                 Expanded(
                                                     flex: 10,
                                                     child: Container(
-                                                        padding:
-                                                            EdgeInsets.only(
-                                                                left: 10),
-                                                        alignment: Alignment
-                                                            .centerLeft,
+                                                        padding: EdgeInsets.only(left: 10),
+                                                        alignment: Alignment.centerLeft,
                                                         child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
                                                           children: [
                                                             Row(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
+                                                              crossAxisAlignment: CrossAxisAlignment.start,
                                                               children: [
                                                                 Expanded(
                                                                   flex: 1,
                                                                   child: Text(
                                                                     fullname,
                                                                     style: TextStyle(
-                                                                        fontWeight:
-                                                                            FontWeight
-                                                                                .bold,
-                                                                        fontSize:
-                                                                            15),
+                                                                        fontWeight: FontWeight.bold, fontSize: 15),
 
                                                                     //softWrap: true,
                                                                     // overflow:
@@ -953,14 +772,10 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                                                   flex: 1,
                                                                   child: Text(
                                                                     '| +(63)${contact}',
-                                                                    style:
-                                                                        TextStyle(
-                                                                      color: Colors
-                                                                          .grey,
+                                                                    style: TextStyle(
+                                                                      color: Colors.grey,
                                                                     ),
-                                                                    overflow:
-                                                                        TextOverflow
-                                                                            .ellipsis,
+                                                                    overflow: TextOverflow.ellipsis,
                                                                   ),
                                                                 ),
                                                               ],
@@ -978,24 +793,15 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                                                       width: 5,
                                                                     ),
                                                                     Container(
-                                                                      padding:
-                                                                          EdgeInsets.all(
-                                                                              2),
-                                                                      decoration:
-                                                                          BoxDecoration(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(3),
+                                                                      padding: EdgeInsets.all(2),
+                                                                      decoration: BoxDecoration(
+                                                                        borderRadius: BorderRadius.circular(3),
                                                                         //color: Colors.white.withOpacity(.6),
-                                                                        border: Border.all(
-                                                                            color:
-                                                                                Colors.grey),
+                                                                        border: Border.all(color: Colors.grey),
                                                                       ),
-                                                                      child:
-                                                                          Text(
+                                                                      child: Text(
                                                                         'Pickup Address',
-                                                                        style: TextStyle(
-                                                                            color:
-                                                                                Colors.black54),
+                                                                        style: TextStyle(color: Colors.black54),
                                                                       ),
                                                                     ),
                                                                   ],
@@ -1023,10 +829,8 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                       alignment: Alignment.center,
                                       child: Text(
                                         'Pin Location',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black,
-                                            fontSize: 16),
+                                        style:
+                                            TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 16),
                                       ),
                                     ),
                                     Stack(
@@ -1035,35 +839,26 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                           height: onMap ? 500 : 100,
                                           decoration: BoxDecoration(
                                               color: Colors.grey[200],
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
+                                              borderRadius: BorderRadius.circular(10),
                                               boxShadow: shadowColor),
                                           child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                                            borderRadius: BorderRadius.circular(10),
                                             child: FlutterMap(
                                               mapController: _mapController,
                                               options: MapOptions(
-                                                  center: LatLng(10.29411,
-                                                      123.902453), // Example: Cebu City
+                                                  center: LatLng(10.29411, 123.902453), // Example: Cebu City
                                                   zoom: 13.0,
                                                   //maxZoom: 19,
-                                                  maxZoom:
-                                                      19, // Maximum zoom in level
-                                                  minZoom:
-                                                      5, // Minimum zoom out level
-                                                  onTap: (tapPosition, point) =>
-                                                      handleOnePoint(point),
+                                                  maxZoom: 19, // Maximum zoom in level
+                                                  minZoom: 5, // Minimum zoom out level
+                                                  onTap: (tapPosition, point) => handleOnePoint(point),
                                                   enableScrollWheel: true),
                                               children: [
                                                 TileLayer(
-                                                  urlTemplate:
-                                                      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                                  urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                                                   subdomains: ['a', 'b', 'c'],
-                                                  maxZoom:
-                                                      19, // Maximum zoom in level
-                                                  minZoom:
-                                                      5, // Minimum zoom out level
+                                                  maxZoom: 19, // Maximum zoom in level
+                                                  minZoom: 5, // Minimum zoom out level
                                                 ),
                                                 if (selectedPoint != null) ...[
                                                   MarkerLayer(
@@ -1072,11 +867,8 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                                           width: 80.0,
                                                           height: 80.0,
                                                           point: selectedPoint!,
-                                                          builder: (ctx) => Icon(
-                                                              Icons
-                                                                  .location_pin,
-                                                              color: Colors.red,
-                                                              size: 40),
+                                                          builder: (ctx) =>
+                                                              Icon(Icons.location_pin, color: Colors.red, size: 40),
                                                           rotate: true),
                                                     ],
                                                   ),
@@ -1092,27 +884,19 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                             top: 20,
                                             right: 20,
                                             child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.end,
+                                              crossAxisAlignment: CrossAxisAlignment.end,
                                               children: [
                                                 Container(
-                                                  padding: EdgeInsets.symmetric(
-                                                      vertical: 10,
-                                                      horizontal: 10),
+                                                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                                                   decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              5),
+                                                      borderRadius: BorderRadius.circular(5),
                                                       color: Colors.blue,
                                                       boxShadow: shadowColor),
                                                   child: InkWell(
                                                     onTap: () {
                                                       setState(() {
-                                                        if (selectedPoint !=
-                                                            null)
-                                                          _mapController.move(
-                                                              selectedPoint!,
-                                                              13);
+                                                        if (selectedPoint != null)
+                                                          _mapController.move(selectedPoint!, 13);
                                                         onMap = false;
                                                         pinLocValidator = '';
                                                       });
@@ -1122,8 +906,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                                       style: TextStyle(
                                                           color: Colors.white,
                                                           fontSize: 12,
-                                                          fontWeight:
-                                                              FontWeight.bold),
+                                                          fontWeight: FontWeight.bold),
                                                     ),
                                                   ),
                                                 ),
@@ -1133,9 +916,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                                 Container(
                                                   padding: EdgeInsets.all(15),
                                                   decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              15),
+                                                      borderRadius: BorderRadius.circular(15),
                                                       color: Colors.white,
                                                       boxShadow: shadowColor),
                                                   child: InkWell(
@@ -1158,8 +939,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                         if (!onMap)
                                           Positioned.fill(
                                               child: Container(
-                                            color: const Color.fromARGB(
-                                                0, 163, 145, 145),
+                                            color: const Color.fromARGB(0, 163, 145, 145),
                                             child: InkWell(
                                               onTap: () async {
                                                 setState(() {
@@ -1177,13 +957,11 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                                 child: InkWell(
                                                   onTap: () {},
                                                   child: Center(
-                                                    child:
-                                                        CircularProgressIndicator(
+                                                    child: CircularProgressIndicator(
                                                       color: Colors.green,
                                                       strokeWidth: 10,
                                                       strokeAlign: 2,
-                                                      backgroundColor:
-                                                          Colors.deepPurple,
+                                                      backgroundColor: Colors.deepPurple,
                                                     ),
                                                   ),
                                                 ),
@@ -1206,26 +984,21 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                       margin: EdgeInsets.all(10),
                                       decoration: BoxDecoration(
                                           color: Colors.grey[200],
-                                          borderRadius:
-                                              BorderRadius.circular(10),
+                                          borderRadius: BorderRadius.circular(10),
                                           boxShadow: shadowBigColor),
                                       child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
                                         children: [
                                           Text(
                                             'Waste Type',
                                             style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black,
-                                                fontSize: 16),
+                                                fontWeight: FontWeight.bold, color: Colors.black, fontSize: 16),
                                           ),
                                           Container(
                                             padding: EdgeInsets.all(5),
                                             decoration: BoxDecoration(
                                                 color: Colors.white,
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
+                                                borderRadius: BorderRadius.circular(10),
                                                 boxShadow: shadowColor),
                                             child: _wasteCategoryList(),
                                           ),
@@ -1259,16 +1032,13 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                       )),
                                       Image.asset('assets/paymongo.png'),
                                       Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
                                           Padding(
                                             padding: const EdgeInsets.all(5),
                                             child: ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
+                                                borderRadius: BorderRadius.circular(10),
                                                 child: Container(
                                                     height: 50,
                                                     width: 50,
@@ -1280,8 +1050,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                           Padding(
                                             padding: const EdgeInsets.all(5),
                                             child: ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
+                                                borderRadius: BorderRadius.circular(10),
                                                 child: Container(
                                                     height: 50,
                                                     width: 50,
@@ -1293,8 +1062,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                           Padding(
                                             padding: const EdgeInsets.all(5),
                                             child: ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
+                                                borderRadius: BorderRadius.circular(10),
                                                 child: Container(
                                                     height: 50,
                                                     width: 50,
@@ -1306,8 +1074,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                           Padding(
                                             padding: const EdgeInsets.all(5),
                                             child: ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
+                                                borderRadius: BorderRadius.circular(10),
                                                 child: Container(
                                                     height: 50,
                                                     width: 50,
@@ -1319,8 +1086,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                           Padding(
                                             padding: const EdgeInsets.all(5),
                                             child: ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
+                                                borderRadius: BorderRadius.circular(10),
                                                 child: Container(
                                                     height: 50,
                                                     width: 50,
@@ -1380,28 +1146,19 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                     setState(() {
                                       loadingAction = true;
                                     });
-                                    if ((_fullnameController.text.isEmpty ||
-                                            fullnamevalidator != '') ||
-                                        (_contactController.text.isEmpty ||
-                                            contactvalidator != '') ||
+                                    if ((_fullnameController.text.isEmpty || fullnamevalidator != '') ||
+                                        (_contactController.text.isEmpty || contactvalidator != '') ||
                                         (_selectedProvinceName == null ||
-                                            _selectedCityMunicipalityName ==
-                                                null ||
+                                            _selectedCityMunicipalityName == null ||
                                             _selectedBarangayName == null) ||
-                                        (_streetController.text.isEmpty ||
-                                            streetvalidator != '') ||
-                                        (_postalController.text.isEmpty ||
-                                            postalvalidator != '')) {
+                                        (_streetController.text.isEmpty || streetvalidator != '') ||
+                                        (_postalController.text.isEmpty || postalvalidator != '')) {
                                       setState(() {
-                                        fullnamevalidator = validateFullname(
-                                            _fullnameController.text);
-                                        contactvalidator = validateContact(
-                                            _contactController.text);
+                                        fullnamevalidator = validateFullname(_fullnameController.text);
+                                        contactvalidator = validateContact(_contactController.text);
                                         //no address needed
-                                        streetvalidator = validateStreet(
-                                            _streetController.text);
-                                        postalvalidator = validatePostalCode(
-                                            _postalController.text);
+                                        streetvalidator = validateStreet(_streetController.text);
+                                        postalvalidator = validatePostalCode(_postalController.text);
 
                                         //open address tab
                                         onAddress = true;
@@ -1410,16 +1167,12 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                         _selectedWasteTypes.isEmpty ||
                                         _selectedDate == null) {
                                       setState(() {
-                                        pinLocValidator =
-                                            _validatePinLocl(selectedPoint);
-                                        wasteCatValidator =
-                                            _validateWaste(_selectedWasteTypes);
-                                        dateValidator =
-                                            _validateDate(_selectedDate);
+                                        pinLocValidator = _validatePinLocl(selectedPoint);
+                                        wasteCatValidator = _validateWaste(_selectedWasteTypes);
+                                        dateValidator = _validateDate(_selectedDate);
                                       });
                                     } else if (!_acceptTerms) {
-                                      showErrorSnackBar(context,
-                                          'Accept the terms and condition');
+                                      showErrorSnackBar(context, 'Accept the terms and condition');
                                     } else {
                                       print(_selectedWasteTypes);
                                       //good
@@ -1444,27 +1197,22 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                                                       selectedIndex: 2,
                                                     )));
                                       else
-                                        showErrorSnackBar(context,
-                                            'Somthing\'s wrong. Please try again later.');
+                                        showErrorSnackBar(context, 'Somthing\'s wrong. Please try again later.');
                                     }
                                     setState(() {
                                       loadingAction = false;
                                     });
                                   },
                                   child: Container(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 30.0, vertical: 10),
+                                      padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 10),
                                       decoration: BoxDecoration(
                                           color: Colors.green,
-                                          borderRadius:
-                                              BorderRadius.circular(10.0),
+                                          borderRadius: BorderRadius.circular(10.0),
                                           boxShadow: shadowMidColor),
                                       child: const Text(
                                         'SUBMIT',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold),
+                                        style:
+                                            TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                                       )),
                                 ),
                               ),
@@ -1506,9 +1254,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
               hintStyle: TextStyle(fontSize: 14, color: greySoft),
               filled: true,
               fillColor: Colors.white,
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide.none),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
             ),
             inputFormatters: inputFormatters,
             onChanged: onChanged,
@@ -1535,11 +1281,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                   SizedBox(
                     height: 12,
                   ),
-                  Text('+63',
-                      style: TextStyle(
-                          color: Colors.deepPurple,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16)),
+                  Text('+63', style: TextStyle(color: Colors.deepPurple, fontWeight: FontWeight.bold, fontSize: 16)),
                 ],
               ),
               //prefixIcon: Icon(Icons.abc),
@@ -1547,17 +1289,15 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
               hintStyle: TextStyle(fontSize: 14, color: greySoft),
               filled: true,
               fillColor: Colors.white,
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide.none),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
             ),
             keyboardType: TextInputType.number,
             inputFormatters: inputFormatters,
             onChanged: (value) {
               if (value.length > 10) {
                 _contactController.text = value.substring(0, 10);
-                _contactController.selection = TextSelection.fromPosition(
-                    TextPosition(offset: _contactController.text.length));
+                _contactController.selection =
+                    TextSelection.fromPosition(TextPosition(offset: _contactController.text.length));
               }
               setState(() {
                 contactvalidator = validateContact(value);
@@ -1584,10 +1324,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
         children: [
           Text(
             ' ${hintText}',
-            style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey[700]),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey[700]),
           ),
           Container(
             decoration: BoxDecoration(boxShadow: shadowColor),
@@ -1602,15 +1339,12 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                 contentPadding: EdgeInsets.symmetric(horizontal: 15),
                 filled: true,
                 fillColor: Colors.white,
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
               ),
               items: items.map<DropdownMenuItem<String>>((item) {
                 return DropdownMenuItem<String>(
                   value: item['code'],
-                  child: Text(
-                      item['name']), // Use the appropriate field for display
+                  child: Text(item['name']), // Use the appropriate field for display
                 );
               }).toList(),
               onChanged: onChanged,
@@ -1627,11 +1361,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
       return;
     }
     if (_fullnameController.text !=
-            ((userData!['cus_fname']) +
-                ' ' +
-                (userData!['cus_mname']) +
-                ' ' +
-                (userData!['cus_lname'])) ||
+            ((userData!['cus_fname']) + ' ' + (userData!['cus_mname']) + ' ' + (userData!['cus_lname'])) ||
         _contactController.text != userData!['cus_contact'].substring(1) ||
         _selectedProvinceName != userData!['cus_province'] ||
         _selectedCityMunicipalityName != userData!['cus_city'] ||
@@ -1653,11 +1383,9 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Colors.deepPurple,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(20.0))),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
           title: Text('Unsave Changes?', style: TextStyle(color: Colors.white)),
-          content: Text('Any data from this form will be removed!',
-              style: TextStyle(color: Colors.white)),
+          content: Text('Any data from this form will be removed!', style: TextStyle(color: Colors.white)),
           actions: [
             TextButton(
               onPressed: () {
@@ -1771,8 +1499,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
         var unit = category['unit'];
 
         // Check if the waste type is selected by comparing the name
-        bool isSelected = _selectedWasteTypes
-            .any((selectedCategory) => selectedCategory['name'] == type);
+        bool isSelected = _selectedWasteTypes.any((selectedCategory) => selectedCategory['name'] == type);
 
         return CheckboxListTile(
           title: Row(
@@ -1800,8 +1527,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                 });
               } else {
                 // Remove the waste type object
-                _selectedWasteTypes.removeWhere(
-                    (selectedCategory) => selectedCategory['name'] == type);
+                _selectedWasteTypes.removeWhere((selectedCategory) => selectedCategory['name'] == type);
               }
 
               // Validator
@@ -1892,26 +1618,19 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
       child: Container(
         padding: EdgeInsets.all(10),
         margin: EdgeInsets.all(10),
-        decoration: BoxDecoration(
-            color: Colors.grey[200],
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: shadowBigColor),
+        decoration:
+            BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(10), boxShadow: shadowBigColor),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
               label,
-              style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                  fontSize: 16),
+              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 16),
             ),
             Container(
               padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: shadowColor),
+              decoration:
+                  BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), boxShadow: shadowColor),
               child: Row(
                 children: [
                   Icon(Icons.calendar_today, color: Colors.green),
@@ -1920,11 +1639,8 @@ class _RequestPickupScreenState extends State<RequestPickupScreen>
                     _selectedDate == null
                         ? hint
                         // : '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}',
-                        : DateFormat('MMM d, yyyy (EEEE)')
-                            .format(_selectedDate!), // Format: Mon 1, 2024
-                    style: TextStyle(
-                        color: _selectedDate == null ? Colors.grey : null,
-                        fontSize: 14),
+                        : DateFormat('MMM d, yyyy (EEEE)').format(_selectedDate!), // Format: Mon 1, 2024
+                    style: TextStyle(color: _selectedDate == null ? Colors.grey : null, fontSize: 14),
                   ),
                   SizedBox(width: 10.0),
                 ],

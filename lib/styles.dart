@@ -48,6 +48,15 @@ List<BoxShadow> shadowColor = [
   ),
 ];
 
+List<BoxShadow> shadowIconColor = [
+  BoxShadow(
+    color: Colors.black.withOpacity(0.2),
+    spreadRadius: 2,
+    blurRadius: 2,
+    offset: Offset(2, 2), //Offset(-5, -5) right  and bottom
+  ),
+];
+
 List<BoxShadow> shadowLessColor = [
   BoxShadow(
     color: Colors.black.withOpacity(0.7),
@@ -540,4 +549,130 @@ Widget loadingHomeAnimation(
           ),
         );
       });
+}
+
+//animate
+Widget showLoadingMovingTruck(BuildContext context, double height, double position) {
+  return Scaffold(
+    backgroundColor: deepPurple,
+    body: SafeArea(
+      child: Container(
+        color: deepGreen,
+        child: Stack(
+          children: [
+            Container(
+              color: deepGreen, // Background color
+            ),
+            ListView(
+              shrinkWrap: true,
+              children: [
+                AnimatedContainer(
+                  duration: Duration(seconds: 1),
+                  curve: Curves.easeInOut,
+                  height: MediaQuery.of(context).size.height * height,
+                  color: Colors.deepPurple, // Purple color
+                  alignment: Alignment.topCenter,
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: Stack(
+                          alignment: Alignment.bottomCenter,
+                          children: [
+                            Positioned(
+                              top: 50,
+                              left: 5,
+                              child: Image.asset(
+                                'assets/image/cloud2.png',
+                                height: MediaQuery.of(context).size.height * 0.15,
+                              ),
+                            ),
+                            Positioned(
+                              top: 170,
+                              right: 20,
+                              child: Image.asset(
+                                'assets/image/cloud1.png',
+                                height: MediaQuery.of(context).size.height * 0.15,
+                              ),
+                            ),
+                            Positioned(
+                                top: MediaQuery.of(context).size.height * 0.4,
+                                child: Text(
+                                  'LOADING...',
+                                  style: TextStyle(color: whiteSoft, fontWeight: FontWeight.bold, fontSize: 30),
+                                )),
+                            AnimatedPositioned(
+                              duration: Duration(seconds: 1),
+                              left: position, // Position for the image
+                              bottom: 0,
+                              child: Column(
+                                children: [
+                                  Image.asset(
+                                    'assets/icon/trashtrack_car.png',
+                                    scale: 3,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        color: deepGreen,
+                        child: Column(
+                          children: [
+                            Container(height: 5, color: greySoft),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  'assets/image/window_blinder.png',
+                                  height: MediaQuery.of(context).size.height * 0.15,
+                                )
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 500),
+              ],
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+Widget showLoadingIconAnimate() {
+  return Scaffold(
+    backgroundColor: deepPurple,
+    body: Stack(
+      children: [
+        Positioned.fill(
+          child: InkWell(
+            onTap: () {},
+            child: Center(
+              child: Stack(
+                //mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ClipOval(child: Image.asset('assets/icon/trashtrack_icon.png', scale: 10)),
+                  Positioned.fill(
+                    child: CircularProgressIndicator(
+                      color: Colors.green,
+                      strokeWidth: 10,
+                      strokeAlign: 5,
+                      backgroundColor: Colors.deepPurple,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
 }

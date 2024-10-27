@@ -4,6 +4,7 @@ import 'package:trashtrack/Customer/c_schedule_list.dart';
 import 'package:trashtrack/Customer/c_booking.dart';
 import 'package:trashtrack/api_postgre_service.dart';
 import 'package:trashtrack/booking_pending_list.dart';
+import 'package:trashtrack/home.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:trashtrack/user_hive_data.dart';
 
@@ -12,8 +13,7 @@ class C_ScheduleScreen extends StatefulWidget {
   State<C_ScheduleScreen> createState() => _C_ScheduleScreenState();
 }
 
-class _C_ScheduleScreenState extends State<C_ScheduleScreen>
-    with SingleTickerProviderStateMixin {
+class _C_ScheduleScreenState extends State<C_ScheduleScreen> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<Color?> _colorTween;
   late Animation<Color?> _colorTween2;
@@ -24,6 +24,7 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
   List<Map<String, dynamic>>? bookingWasteListHistory;
 
   bool isLoading = false;
+  bool loadingAction = false;
   int selectedPage = 0;
   late PageController _pageController;
   bool containCurrent = false;
@@ -108,8 +109,7 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
 
           if (bookingList != null) {
             var filteredCurrent = bookingList!.where((booking) {
-              return booking['bk_status'] == 'Pending' ||
-                  booking['bk_status'] == 'Ongoing';
+              return booking['bk_status'] == 'Pending' || booking['bk_status'] == 'Ongoing';
             }).toList();
 
             // Check if filteredList has any items
@@ -120,8 +120,7 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
 
           if (bookingList != null) {
             var filteredHistory = bookingList!.where((booking) {
-              return booking['bk_status'] == 'Cancelled' ||
-                  booking['bk_status'] == 'Collected';
+              return booking['bk_status'] == 'Cancelled' || booking['bk_status'] == 'Collected';
             }).toList();
 
             // Check if filteredList has any items
@@ -160,614 +159,528 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen>
       backgroundColor: deepGreen,
       // appBar: C_CustomAppBar(title: 'Schedule'), //Schedule
       // drawer: C_Drawer(),
-      body: ListView(
+      body: Stack(
         children: [
-          Container(
-            margin: EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: white,
-              boxShadow: shadowMidColor,
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (user != null)
-                  Container(
-                    padding: EdgeInsets.all(20.0),
-                    margin: EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                      color: white,
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                    child: Text(
-                      user == 'customer'
-                          ? 'Book now?'
-                          : user == 'hauler'
-                              ? 'Pickup Waste?'
-                              : '',
-                      style: TextStyle(
-                          fontSize: 16.0, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                Center(
-                  child: Container(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15.0),
-                        boxShadow: shadowLowColor),
-                    child: ElevatedButton(
-                        onPressed: () {
-                          if (user == 'customer') {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => RequestPickupScreen(),
-                              ),
-                            );
-                          } else {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => Booking_List(),
-                              ),
-                            );
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: deepGreen,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15.0),
-                          ),
-                          padding: EdgeInsets.symmetric(
-                              vertical: 16.0, horizontal: 16.0),
-                        ),
-                        child: Icon(
-                          Icons.keyboard_arrow_right_outlined,
-                          color: Colors.white,
-                        )),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 10.0),
-          Column(
+          ListView(
             children: [
               Container(
-                height: 60,
-                margin: EdgeInsets.symmetric(horizontal: 10),
-                padding: EdgeInsets.all(10),
+                margin: EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: white,
                   boxShadow: shadowMidColor,
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(10.0),
                 ),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Expanded(
-                      flex: 1,
-                      child: Container(
-                        height: double.infinity,
+                    if (user != null)
+                      Container(
+                        padding: EdgeInsets.all(20.0),
+                        margin: EdgeInsets.all(5),
                         decoration: BoxDecoration(
-                            color:
-                                selectedPage == 0 ? deepPurple : white,
-                            borderRadius: BorderRadius.horizontal(
-                                left: Radius.circular(50)),
-                            boxShadow: shadowColor),
-                        child: InkWell(
-                          onTap: () => onPageSelected(0),
-                          child: Center(
-                            child: Text(
-                              'Current',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: selectedPage == 0
-                                    ? Colors.white
-                                    : Colors.black,
-                              ),
-                            ),
-                          ),
+                          color: white,
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        child: Text(
+                          user == 'customer'
+                              ? 'Book now?'
+                              : user == 'hauler'
+                                  ? 'Pickup Waste?'
+                                  : '',
+                          style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
                         ),
                       ),
-                    ),
-                    Expanded(
-                      flex: 1,
+                    Center(
                       child: Container(
-                        height: double.infinity,
-                        decoration: BoxDecoration(
-                            color:
-                                selectedPage == 1 ? deepPurple : white,
-                            borderRadius: BorderRadius.horizontal(
-                                right: Radius.circular(50)),
-                            boxShadow: shadowColor),
-                        child: InkWell(
-                          onTap: () => onPageSelected(1),
-                          child: Center(
-                            child: Text(
-                              'History',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: selectedPage == 1
-                                    ? Colors.white
-                                    : Colors.black,
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(15.0), boxShadow: shadowLowColor),
+                        child: ElevatedButton(
+                            onPressed: () async {
+                              setState(() {
+                                loadingAction = true;
+                              });
+                              //
+                              if (user == 'customer') {
+                                String? bklimit = await checkBookingLimit(context);
+                                if (bklimit == 'max') {
+                                  showBookLimitDialog(context);
+                                } else if (bklimit == 'success') {
+                                  String? isUnpaidBIll = await checkUnpaidBIll(context);
+                                  if (isUnpaidBIll == 'Unpaid') {
+                                    showUnpaidBillDialog(context);
+                                  } else if (isUnpaidBIll == 'success') {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => RequestPickupScreen(),
+                                      ),
+                                    );
+                                  }
+                                }
+                              } else {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Booking_List(),
+                                  ),
+                                );
+                              }
+                              //
+                              setState(() {
+                                loadingAction = false;
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: deepGreen,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15.0),
                               ),
+                              padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
                             ),
-                          ),
-                        ),
+                            child: Icon(
+                              Icons.keyboard_arrow_right_outlined,
+                              color: Colors.white,
+                            )),
                       ),
                     ),
                   ],
                 ),
               ),
-              Container(
-                height: 30,
-                child: Row(
-                  children: [
-                    Expanded(flex: 5, child: Container()),
-                    Expanded(
-                        flex: 1,
-                        child: Container(
-                          decoration: BoxDecoration(
-                              color: Colors.grey[300],
-                              boxShadow: shadowMidColor),
-                        )),
-                    Expanded(flex: 5, child: Container()),
-                    Expanded(
-                        flex: 1,
-                        child: Container(
-                          decoration: BoxDecoration(
-                              color: Colors.grey[300],
-                              boxShadow: shadowMidColor),
-                        )),
-                    Expanded(flex: 5, child: Container()),
-                  ],
-                ),
-              ),
-              Container(
-                height: MediaQuery.of(context).size.height * .60,
-                //height: MediaQuery.of(context).size.height - kBottomNavigationBarHeight,
-                //padding: EdgeInsets.symmetric(horizontal: 10),
-                child: PageView(
-                  controller: _pageController,
-                  onPageChanged: (index) {
-                    setState(() {
-                      selectedPage = index;
-                    });
-                  },
-                  children: [
-                    // Current Schedule
-
-                    RefreshIndicator(
-                      onRefresh: () async {
-                        //await _dbData();
-                        await _fetchBookingData();
+              SizedBox(height: 10.0),
+              Column(
+                children: [
+                  Container(
+                    height: 60,
+                    margin: EdgeInsets.symmetric(horizontal: 10),
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: white,
+                      boxShadow: shadowMidColor,
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: Container(
+                            height: double.infinity,
+                            decoration: BoxDecoration(
+                                color: selectedPage == 0 ? deepPurple : white,
+                                borderRadius: BorderRadius.horizontal(left: Radius.circular(50)),
+                                boxShadow: shadowColor),
+                            child: InkWell(
+                              onTap: () => onPageSelected(0),
+                              child: Center(
+                                child: Text(
+                                  'Current',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: selectedPage == 0 ? Colors.white : Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Container(
+                            height: double.infinity,
+                            decoration: BoxDecoration(
+                                color: selectedPage == 1 ? deepPurple : white,
+                                borderRadius: BorderRadius.horizontal(right: Radius.circular(50)),
+                                boxShadow: shadowColor),
+                            child: InkWell(
+                              onTap: () => onPageSelected(1),
+                              child: Center(
+                                child: Text(
+                                  'History',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: selectedPage == 1 ? Colors.white : Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    height: 30,
+                    child: Row(
+                      children: [
+                        Expanded(flex: 5, child: Container()),
+                        Expanded(
+                            flex: 1,
+                            child: Container(
+                              decoration: BoxDecoration(color: Colors.grey[300], boxShadow: shadowMidColor),
+                            )),
+                        Expanded(flex: 5, child: Container()),
+                        Expanded(
+                            flex: 1,
+                            child: Container(
+                              decoration: BoxDecoration(color: Colors.grey[300], boxShadow: shadowMidColor),
+                            )),
+                        Expanded(flex: 5, child: Container()),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    height: MediaQuery.of(context).size.height * .60,
+                    //height: MediaQuery.of(context).size.height - kBottomNavigationBarHeight,
+                    //padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: PageView(
+                      controller: _pageController,
+                      onPageChanged: (index) {
+                        setState(() {
+                          selectedPage = index;
+                        });
                       },
-                      child: isLoading
-                          ? loadingAnimation(
-                              _controller, _colorTween, _colorTween2)
-                          : bookingList == null || !containCurrent
-                              ? ListView(
-                                  children: [
-                                    Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Current Schedule
+
+                        RefreshIndicator(
+                          onRefresh: () async {
+                            //await _dbData();
+                            await _fetchBookingData();
+                          },
+                          child: isLoading
+                              ? loadingAnimation(_controller, _colorTween, _colorTween2)
+                              : bookingList == null || !containCurrent
+                                  ? ListView(
                                       children: [
-                                        SizedBox(
-                                          height: 100,
-                                        ),
-                                        Container(
-                                            alignment: Alignment.center,
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Icon(Icons.calendar_month,
-                                                    color: whiteSoft, size: 70),
-                                                Text(
-                                                  'No upcoming booking\n\n\n\n',
-                                                  style: TextStyle(
-                                                      color: whiteSoft,
-                                                      fontSize: 20),
-                                                ),
-                                              ],
-                                            )),
-                                        SizedBox(
-                                          height: 100,
+                                        Column(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            SizedBox(
+                                              height: 100,
+                                            ),
+                                            Container(
+                                                alignment: Alignment.center,
+                                                child: Column(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    Icon(Icons.calendar_month, color: whiteSoft, size: 70),
+                                                    Text(
+                                                      'No upcoming booking\n\n\n\n',
+                                                      style: TextStyle(color: whiteSoft, fontSize: 20),
+                                                    ),
+                                                  ],
+                                                )),
+                                            SizedBox(
+                                              height: 100,
+                                            ),
+                                          ],
                                         ),
                                       ],
-                                    ),
-                                  ],
-                                )
-                              : user == 'customer'
-                                  ? ListView.builder(
-                                      itemCount: bookingList?.length == null
-                                          ? 0
-                                          : bookingList!.length,
-                                      itemBuilder: (context, index) {
-                                        // Safely retrieve the booking details from bookingList
-                                        final booking = bookingList?[index];
+                                    )
+                                  : user == 'customer'
+                                      ? ListView.builder(
+                                          itemCount: bookingList?.length == null ? 0 : bookingList!.length,
+                                          itemBuilder: (context, index) {
+                                            // Safely retrieve the booking details from bookingList
+                                            final booking = bookingList?[index];
 
-                                        if (booking == null) {
-                                          return SizedBox.shrink();
-                                        }
-
-                                        if (booking['bk_status'] == 'Pending' ||
-                                            booking['bk_status'] == 'Ongoing') {
-                                          int book_Id = booking['bk_id'];
-                                          DateTime dbdate = DateTime.parse(
-                                                  booking['bk_date'] ?? '')
-                                              .toLocal();
-                                          final String date =
-                                              DateFormat('MMM dd, yyyy (EEEE)')
-                                                  .format(dbdate);
-
-                                          DateTime dbdateCreated =
-                                              DateTime.parse(booking[
-                                                          'bk_created_at'] ??
-                                                      '')
-                                                  .toLocal();
-                                          final String dateCreated =
-                                              DateFormat('MMM dd, yyyy hh:mm a')
-                                                  .format(dbdateCreated);
-
-                                          // Filter waste types for the current booking's bk_id
-                                          String wasteTypes = '';
-                                          if (bookingWasteList != null) {
-                                            List<Map<String, dynamic>>
-                                                filteredWasteList =
-                                                bookingWasteList!
-                                                    .where((waste) {
-                                              return waste['bk_id'] ==
-                                                  booking['bk_id'];
-                                            }).toList();
-
-                                            // Build the waste types string
-                                            int count = 0;
-                                            for (var waste
-                                                in filteredWasteList) {
-                                              count++;
-                                              wasteTypes +=
-                                                  waste['bw_name'] + ', ';
-                                              if (count == 2) break;
+                                            if (booking == null) {
+                                              return SizedBox.shrink();
                                             }
 
-                                            // Remove the trailing comma and space
-                                            if (wasteTypes.isNotEmpty) {
-                                              if (filteredWasteList.length >
-                                                  2) {
-                                                wasteTypes =
-                                                    wasteTypes + '. . .';
-                                              } else {
-                                                wasteTypes =
-                                                    wasteTypes.substring(0,
-                                                        wasteTypes.length - 2);
+                                            if (booking['bk_status'] == 'Pending' ||
+                                                booking['bk_status'] == 'Ongoing') {
+                                              int book_Id = booking['bk_id'];
+                                              DateTime dbdate = DateTime.parse(booking['bk_date'] ?? '').toLocal();
+                                              final String date = DateFormat('MMM dd, yyyy (EEEE)').format(dbdate);
+
+                                              DateTime dbdateCreated =
+                                                  DateTime.parse(booking['bk_created_at'] ?? '').toLocal();
+                                              final String dateCreated =
+                                                  DateFormat('MMM dd, yyyy hh:mm a').format(dbdateCreated);
+
+                                              // Filter waste types for the current booking's bk_id
+                                              String wasteTypes = '';
+                                              if (bookingWasteList != null) {
+                                                List<Map<String, dynamic>> filteredWasteList =
+                                                    bookingWasteList!.where((waste) {
+                                                  return waste['bk_id'] == booking['bk_id'];
+                                                }).toList();
+
+                                                // Build the waste types string
+                                                int count = 0;
+                                                for (var waste in filteredWasteList) {
+                                                  count++;
+                                                  wasteTypes += waste['bw_name'] + ', ';
+                                                  if (count == 2) break;
+                                                }
+
+                                                // Remove the trailing comma and space
+                                                if (wasteTypes.isNotEmpty) {
+                                                  if (filteredWasteList.length > 2) {
+                                                    wasteTypes = wasteTypes + '. . .';
+                                                  } else {
+                                                    wasteTypes = wasteTypes.substring(0, wasteTypes.length - 2);
+                                                  }
+                                                }
+                                              }
+
+                                              final String status = booking['bk_status'] ?? 'No status';
+
+                                              // Pass the extracted data to the C_CurrentScheduleCard widget
+                                              return Column(
+                                                children: [
+                                                  C_ScheduleCardList(
+                                                    bookId: book_Id,
+                                                    date: date,
+                                                    dateCreated: dateCreated,
+                                                    wasteType: wasteTypes,
+                                                    status: status,
+                                                  ),
+                                                  if (bookingList!.length - 1 == index) SizedBox(height: 200),
+                                                ],
+                                              );
+                                            }
+                                            return Container();
+                                          },
+                                        )
+                                      : ListView.builder(
+                                          itemCount: bookingList?.length == null ? 0 : bookingList!.length,
+                                          itemBuilder: (context, index) {
+                                            // Safely retrieve the booking details from bookingList
+                                            final booking = bookingList?[index];
+
+                                            if (booking == null) {
+                                              return SizedBox.shrink();
+                                            }
+
+                                            int book_Id = booking['bk_id'];
+                                            DateTime dbdate = DateTime.parse(booking['bk_date'] ?? '').toLocal();
+                                            final String date = DateFormat('MMM dd, yyyy (EEEE)').format(dbdate);
+
+                                            DateTime dbdateCreated =
+                                                DateTime.parse(booking['bk_created_at'] ?? '').toLocal();
+                                            final String dateCreated =
+                                                DateFormat('MMM dd, yyyy hh:mm a').format(dbdateCreated);
+
+                                            // Filter waste types for the current booking's bk_id
+                                            String wasteTypes = '';
+                                            if (bookingWasteList != null) {
+                                              List<Map<String, dynamic>> filteredWasteList =
+                                                  bookingWasteList!.where((waste) {
+                                                return waste['bk_id'] == booking['bk_id'];
+                                              }).toList();
+
+                                              // Build the waste types string
+                                              int count = 0;
+                                              for (var waste in filteredWasteList) {
+                                                count++;
+                                                wasteTypes += waste['bw_name'] + ', ';
+                                                if (count == 2) break;
+                                              }
+
+                                              // Remove the trailing comma and space
+                                              if (wasteTypes.isNotEmpty) {
+                                                if (filteredWasteList.length > 2) {
+                                                  wasteTypes = wasteTypes + '. . .';
+                                                } else {
+                                                  wasteTypes = wasteTypes.substring(0, wasteTypes.length - 2);
+                                                }
                                               }
                                             }
-                                          }
 
-                                          final String status =
-                                              booking['bk_status'] ??
-                                                  'No status';
+                                            final String status = booking['bk_status'] ?? 'No status';
 
-                                          // Pass the extracted data to the C_CurrentScheduleCard widget
-                                          return Column(
-                                            children: [
-                                              C_ScheduleCardList(
-                                                bookId: book_Id,
-                                                date: date,
-                                                dateCreated: dateCreated,
-                                                wasteType: wasteTypes,
-                                                status: status,
-                                              ),
-                                              if (bookingList!.length - 1 ==
-                                                  index)
-                                                SizedBox(height: 200),
-                                            ],
-                                          );
-                                        }
-                                        return Container();
-                                      },
-                                    )
-                                  : ListView.builder(
-                                      itemCount: bookingList?.length == null
-                                          ? 0
-                                          : bookingList!.length,
-                                      itemBuilder: (context, index) {
-                                        // Safely retrieve the booking details from bookingList
-                                        final booking = bookingList?[index];
-
-                                        if (booking == null) {
-                                          return SizedBox.shrink();
-                                        }
-
-                                        int book_Id = booking['bk_id'];
-                                        DateTime dbdate = DateTime.parse(
-                                                booking['bk_date'] ?? '')
-                                            .toLocal();
-                                        final String date =
-                                            DateFormat('MMM dd, yyyy (EEEE)')
-                                                .format(dbdate);
-
-                                        DateTime dbdateCreated = DateTime.parse(
-                                                booking['bk_created_at'] ?? '')
-                                            .toLocal();
-                                        final String dateCreated =
-                                            DateFormat('MMM dd, yyyy hh:mm a')
-                                                .format(dbdateCreated);
-
-                                        // Filter waste types for the current booking's bk_id
-                                        String wasteTypes = '';
-                                        if (bookingWasteList != null) {
-                                          List<Map<String, dynamic>>
-                                              filteredWasteList =
-                                              bookingWasteList!.where((waste) {
-                                            return waste['bk_id'] ==
-                                                booking['bk_id'];
-                                          }).toList();
-
-                                          // Build the waste types string
-                                          int count = 0;
-                                          for (var waste in filteredWasteList) {
-                                            count++;
-                                            wasteTypes +=
-                                                waste['bw_name'] + ', ';
-                                            if (count == 2) break;
-                                          }
-
-                                          // Remove the trailing comma and space
-                                          if (wasteTypes.isNotEmpty) {
-                                            if (filteredWasteList.length > 2) {
-                                              wasteTypes = wasteTypes + '. . .';
-                                            } else {
-                                              wasteTypes = wasteTypes.substring(
-                                                  0, wasteTypes.length - 2);
-                                            }
-                                          }
-                                        }
-
-                                        final String status =
-                                            booking['bk_status'] ?? 'No status';
-
-                                        // Pass the extracted data to the C_CurrentScheduleCard widget
-                                        return Column(
-                                          children: [
-                                            C_ScheduleCardList(
-                                              bookId: book_Id,
-                                              date: date,
-                                              dateCreated: dateCreated,
-                                              wasteType: wasteTypes,
-                                              status: status,
-                                            ),
-                                            if (bookingList!.length - 1 ==
-                                                index)
-                                              SizedBox(height: 200),
-                                          ],
-                                        );
-                                      },
-                                    ),
-                    ),
-
-                    // History Schedule
-                    RefreshIndicator(
-                      onRefresh: () async {
-                        //await _dbData();
-                        await _fetchBookingData();
-                      },
-                      child: isLoading
-                          ? loadingAnimation(
-                              _controller, _colorTween, _colorTween2)
-                          : (bookingList == null || !containHistory) &&
-                                  bookingListHistory == null
-                              ? ListView(
-                                  children: [
-                                    Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        SizedBox(
-                                          height: 100,
-                                        ),
-                                        Container(
-                                            alignment: Alignment.center,
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
+                                            // Pass the extracted data to the C_CurrentScheduleCard widget
+                                            return Column(
                                               children: [
-                                                Icon(Icons.history,
-                                                    color: whiteSoft, size: 70),
-                                                Text(
-                                                  'No scheduled history\n\n\n\n',
-                                                  style: TextStyle(
-                                                      color: whiteSoft,
-                                                      fontSize: 20),
+                                                C_ScheduleCardList(
+                                                  bookId: book_Id,
+                                                  date: date,
+                                                  dateCreated: dateCreated,
+                                                  wasteType: wasteTypes,
+                                                  status: status,
                                                 ),
+                                                if (bookingList!.length - 1 == index) SizedBox(height: 200),
                                               ],
-                                            )),
-                                        SizedBox(
-                                          height: 100,
+                                            );
+                                          },
+                                        ),
+                        ),
+
+                        // History Schedule
+                        RefreshIndicator(
+                          onRefresh: () async {
+                            //await _dbData();
+                            await _fetchBookingData();
+                          },
+                          child: isLoading
+                              ? loadingAnimation(_controller, _colorTween, _colorTween2)
+                              : (bookingList == null || !containHistory) && bookingListHistory == null
+                                  ? ListView(
+                                      children: [
+                                        Column(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            SizedBox(
+                                              height: 100,
+                                            ),
+                                            Container(
+                                                alignment: Alignment.center,
+                                                child: Column(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    Icon(Icons.history, color: whiteSoft, size: 70),
+                                                    Text(
+                                                      'No scheduled history\n\n\n\n',
+                                                      style: TextStyle(color: whiteSoft, fontSize: 20),
+                                                    ),
+                                                  ],
+                                                )),
+                                            SizedBox(
+                                              height: 100,
+                                            ),
+                                          ],
                                         ),
                                       ],
-                                    ),
-                                  ],
-                                )
-                              : user == 'customer'
-                                  ? ListView.builder(
-                                      itemCount: bookingList?.length == null
-                                          ? 0
-                                          : bookingList!.length,
-                                      itemBuilder: (context, index) {
-                                        // Safely retrieve the booking details from bookingList
-                                        final booking = bookingList?[index];
+                                    )
+                                  : user == 'customer'
+                                      ? ListView.builder(
+                                          itemCount: bookingList?.length == null ? 0 : bookingList!.length,
+                                          itemBuilder: (context, index) {
+                                            // Safely retrieve the booking details from bookingList
+                                            final booking = bookingList?[index];
 
-                                        if (booking == null) {
-                                          return SizedBox.shrink();
-                                        }
-
-                                        if (booking['bk_status'] ==
-                                                'Cancelled' ||
-                                            booking['bk_status'] ==
-                                                'Collected') {
-                                          int book_Id = booking['bk_id'];
-                                          DateTime dbdate = DateTime.parse(
-                                                  booking['bk_date'] ?? '')
-                                              .toLocal();
-                                          final String date =
-                                              DateFormat('MMM dd, yyyy (EEEE)')
-                                                  .format(dbdate);
-
-                                          DateTime dbdateCreated =
-                                              DateTime.parse(booking[
-                                                          'bk_created_at'] ??
-                                                      '')
-                                                  .toLocal();
-                                          final String dateCreated =
-                                              DateFormat('MMM dd, yyyy hh:mm a')
-                                                  .format(dbdateCreated);
-
-                                          // Filter waste types for the current booking's bk_id
-                                          String wasteTypes = '';
-                                          if (bookingWasteList != null) {
-                                            List<Map<String, dynamic>>
-                                                filteredWasteList =
-                                                bookingWasteList!
-                                                    .where((waste) {
-                                              return waste['bk_id'] ==
-                                                  booking['bk_id'];
-                                            }).toList();
-
-                                            // Build the waste types string
-                                            int count = 0;
-                                            for (var waste
-                                                in filteredWasteList) {
-                                              count++;
-                                              wasteTypes +=
-                                                  waste['bw_name'] + ', ';
-                                              if (count == 2) break;
+                                            if (booking == null) {
+                                              return SizedBox.shrink();
                                             }
 
-                                            // Remove the trailing comma and space
-                                            if (wasteTypes.isNotEmpty) {
-                                              if (filteredWasteList.length >
-                                                  2) {
-                                                wasteTypes =
-                                                    wasteTypes + '. . .';
-                                              } else {
-                                                wasteTypes =
-                                                    wasteTypes.substring(0,
-                                                        wasteTypes.length - 2);
+                                            if (booking['bk_status'] == 'Cancelled' ||
+                                                booking['bk_status'] == 'Collected') {
+                                              int book_Id = booking['bk_id'];
+                                              DateTime dbdate = DateTime.parse(booking['bk_date'] ?? '').toLocal();
+                                              final String date = DateFormat('MMM dd, yyyy (EEEE)').format(dbdate);
+
+                                              DateTime dbdateCreated =
+                                                  DateTime.parse(booking['bk_created_at'] ?? '').toLocal();
+                                              final String dateCreated =
+                                                  DateFormat('MMM dd, yyyy hh:mm a').format(dbdateCreated);
+
+                                              // Filter waste types for the current booking's bk_id
+                                              String wasteTypes = '';
+                                              if (bookingWasteList != null) {
+                                                List<Map<String, dynamic>> filteredWasteList =
+                                                    bookingWasteList!.where((waste) {
+                                                  return waste['bk_id'] == booking['bk_id'];
+                                                }).toList();
+
+                                                // Build the waste types string
+                                                int count = 0;
+                                                for (var waste in filteredWasteList) {
+                                                  count++;
+                                                  wasteTypes += waste['bw_name'] + ', ';
+                                                  if (count == 2) break;
+                                                }
+
+                                                // Remove the trailing comma and space
+                                                if (wasteTypes.isNotEmpty) {
+                                                  if (filteredWasteList.length > 2) {
+                                                    wasteTypes = wasteTypes + '. . .';
+                                                  } else {
+                                                    wasteTypes = wasteTypes.substring(0, wasteTypes.length - 2);
+                                                  }
+                                                }
+                                              }
+
+                                              final String status = booking['bk_status'] ?? 'No status';
+
+                                              // Pass the extracted data to the C_CurrentScheduleCard widget
+                                              return Column(
+                                                children: [
+                                                  C_ScheduleCardList(
+                                                    bookId: book_Id,
+                                                    date: date,
+                                                    dateCreated: dateCreated,
+                                                    wasteType: wasteTypes,
+                                                    status: status,
+                                                  ),
+                                                  if (bookingList!.length - 1 == index) SizedBox(height: 200),
+                                                ],
+                                              );
+                                            }
+                                            return Container();
+                                          },
+                                        )
+                                      : ListView.builder(
+                                          itemCount:
+                                              bookingListHistory?.length == null ? 0 : bookingListHistory!.length,
+                                          itemBuilder: (context, index) {
+                                            // Safely retrieve the booking details from bookingList
+                                            final booking = bookingListHistory?[index];
+
+                                            if (booking == null) {
+                                              return SizedBox.shrink();
+                                            }
+
+                                            int book_Id = booking['bk_id'];
+                                            DateTime dbdate = DateTime.parse(booking['bk_date'] ?? '').toLocal();
+                                            final String date = DateFormat('MMM dd, yyyy (EEEE)').format(dbdate);
+
+                                            DateTime dbdateCreated =
+                                                DateTime.parse(booking['bk_created_at'] ?? '').toLocal();
+                                            final String dateCreated =
+                                                DateFormat('MMM dd, yyyy hh:mm a').format(dbdateCreated);
+
+                                            // Filter waste types for the current booking's bk_id
+                                            String wasteTypes = '';
+                                            if (bookingWasteListHistory != null) {
+                                              List<Map<String, dynamic>> filteredWasteList =
+                                                  bookingWasteListHistory!.where((waste) {
+                                                return waste['bk_id'] == booking['bk_id'];
+                                              }).toList();
+
+                                              // Build the waste types string
+                                              int count = 0;
+                                              for (var waste in filteredWasteList) {
+                                                count++;
+                                                wasteTypes += waste['bw_name'] + ', ';
+                                                if (count == 2) break;
+                                              }
+
+                                              // Remove the trailing comma and space
+                                              if (wasteTypes.isNotEmpty) {
+                                                if (filteredWasteList.length > 2) {
+                                                  wasteTypes = wasteTypes + '. . .';
+                                                } else {
+                                                  wasteTypes = wasteTypes.substring(0, wasteTypes.length - 2);
+                                                }
                                               }
                                             }
-                                          }
 
-                                          final String status =
-                                              booking['bk_status'] ??
-                                                  'No status';
+                                            final String status = booking['bk_status'] ?? 'No status';
 
-                                          // Pass the extracted data to the C_CurrentScheduleCard widget
-                                          return Column(
-                                            children: [
-                                              C_ScheduleCardList(
-                                                bookId: book_Id,
-                                                date: date,
-                                                dateCreated: dateCreated,
-                                                wasteType: wasteTypes,
-                                                status: status,
-                                              ),
-                                              if (bookingList!.length - 1 ==
-                                                  index)
-                                                SizedBox(height: 200),
-                                            ],
-                                          );
-                                        }
-                                        return Container();
-                                      },
-                                    )
-                                  : ListView.builder(
-                                      itemCount:
-                                          bookingListHistory?.length == null
-                                              ? 0
-                                              : bookingListHistory!.length,
-                                      itemBuilder: (context, index) {
-                                        // Safely retrieve the booking details from bookingList
-                                        final booking =
-                                            bookingListHistory?[index];
-
-                                        if (booking == null) {
-                                          return SizedBox.shrink();
-                                        }
-
-                                        int book_Id = booking['bk_id'];
-                                        DateTime dbdate = DateTime.parse(
-                                                booking['bk_date'] ?? '')
-                                            .toLocal();
-                                        final String date =
-                                            DateFormat('MMM dd, yyyy (EEEE)')
-                                                .format(dbdate);
-
-                                        DateTime dbdateCreated = DateTime.parse(
-                                                booking['bk_created_at'] ?? '')
-                                            .toLocal();
-                                        final String dateCreated =
-                                            DateFormat('MMM dd, yyyy hh:mm a')
-                                                .format(dbdateCreated);
-
-                                        // Filter waste types for the current booking's bk_id
-                                        String wasteTypes = '';
-                                        if (bookingWasteListHistory != null) {
-                                          List<Map<String, dynamic>>
-                                              filteredWasteList =
-                                              bookingWasteListHistory!
-                                                  .where((waste) {
-                                            return waste['bk_id'] ==
-                                                booking['bk_id'];
-                                          }).toList();
-
-                                          // Build the waste types string
-                                          int count = 0;
-                                          for (var waste in filteredWasteList) {
-                                            count++;
-                                            wasteTypes +=
-                                                waste['bw_name'] + ', ';
-                                            if (count == 2) break;
-                                          }
-
-                                          // Remove the trailing comma and space
-                                          if (wasteTypes.isNotEmpty) {
-                                            if (filteredWasteList.length > 2) {
-                                              wasteTypes = wasteTypes + '. . .';
-                                            } else {
-                                              wasteTypes = wasteTypes.substring(
-                                                  0, wasteTypes.length - 2);
-                                            }
-                                          }
-                                        }
-
-                                        final String status =
-                                            booking['bk_status'] ?? 'No status';
-
-                                        // Pass the extracted data to the C_CurrentScheduleCard widget
-                                        return Column(
-                                          children: [
-                                            C_ScheduleCardList(
-                                              bookId: book_Id,
-                                              date: date,
-                                              dateCreated: dateCreated,
-                                              wasteType: wasteTypes,
-                                              status: status,
-                                            ),
-                                            if (bookingList!.length - 1 ==
-                                                index)
-                                              SizedBox(height: 200),
-                                          ],
-                                        );
-                                      },
-                                    ),
+                                            // Pass the extracted data to the C_CurrentScheduleCard widget
+                                            return Column(
+                                              children: [
+                                                C_ScheduleCardList(
+                                                  bookId: book_Id,
+                                                  date: date,
+                                                  dateCreated: dateCreated,
+                                                  wasteType: wasteTypes,
+                                                  status: status,
+                                                ),
+                                                if (bookingList!.length - 1 == index) SizedBox(height: 200),
+                                              ],
+                                            );
+                                          },
+                                        ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ],
           ),
+          if (loadingAction) showLoadingAction(),
         ],
       ),
       // bottomNavigationBar: C_BottomNavBar(

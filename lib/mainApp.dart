@@ -56,15 +56,6 @@ class _MainAppState extends State<MainApp> {
       _selectedIndex = widget.selectedIndex!;
     }
 
-    // //load all resource
-    // if (firstLoad && _selectedIndex == 0) {
-    //   Future.delayed(const Duration(seconds: 3), () {
-    //     setState(() {
-    //       firstLoad = false;
-    //     });
-    //   });
-    // }
-
     if (_selectedIndex != 0) {
       firstLoad = false;
     }
@@ -95,15 +86,6 @@ class _MainAppState extends State<MainApp> {
         newProfile: data['profile'],
         newNotifCount: data['notif_count'],
       );
-      // Provider.of<UserModel>(context, listen: false).setUserData(
-      //   newId: data['id'].toString(),
-      //   newFname: data['fname'],
-      //   newLname: data['lname'],
-      //   newEmail: data['email'],
-      //   newAuth: data['auth'],
-      //   newProfile: data['profile'],
-      //   newNotifCount: data['notif_count'],
-      // );
 
       setState(() {
         //userData = data; //isnt used
@@ -234,6 +216,19 @@ class _MainAppState extends State<MainApp> {
   //   }
   // }
 
+  // Get the FAB position based on selectedIndex
+  // List of icons in the bottom navigation bar
+  List<IconData> icons = [
+    Icons.home,
+    Icons.map_outlined,
+    Icons.calendar_month,
+    Icons.payment,
+  ];
+
+  FloatingActionButtonLocation getFabLocation() {
+    return SlidingFabLocation(context, _selectedIndex);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -241,6 +236,7 @@ class _MainAppState extends State<MainApp> {
       children: [
         if (!loading)
           Scaffold(
+            backgroundColor: white,
             drawer: C_Drawer(),
             appBar: C_CustomAppBar(
                 title: _selectedIndex == 0
@@ -257,74 +253,91 @@ class _MainAppState extends State<MainApp> {
               currentIndex: _selectedIndex,
               onTap: _onItemTapped,
             ),
+            floatingActionButton: Container(
+              decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: shadowTopCenterColor),
+              child: FloatingActionButton(
+                onPressed: () {},
+                backgroundColor: deepGreen,
+                child: Icon(user == 'hauler' && _selectedIndex == 3 ? Icons.directions_car : icons[_selectedIndex],
+                    color: white),
+                shape: CircleBorder(side: BorderSide(width: 0.1, color: white)),
+              ),
+            ),
+            floatingActionButtonLocation: getFabLocation(), // Dynamic FAB location
           ),
         if (loading || firstLoad) showLoadingIconAnimate(),
         if (userModel!.isToHome) showLoadingMovingTruck(context, height, position),
       ],
     ));
-    // Scaffold(
-    //   drawer: C_Drawer(),
-    //   appBar: C_CustomAppBar(
-    //       title: _selectedIndex == 0
-    //           ? 'Home'
-    //           : _selectedIndex == 1
-    //               ? 'Map'
-    //               : _selectedIndex == 2
-    //                   ? 'Schedule'
-    //                   : user == 'hauler'
-    //                       ? 'Vehicle'
-    //                       : 'Payment'),
-    //   body:
-    //       Loading ? const CircularProgressIndicator() : _pages[_selectedIndex],
-    //   bottomNavigationBar: C_BottomNavBar(
-    //     currentIndex: _selectedIndex,
-    //     onTap: _onItemTapped,
-    //   ),
-    // );
-  }
 
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Loading || firstLoad
-  //       ? Scaffold(
-  //           backgroundColor: deepPurple,
-  //           body: Stack(
-  //             children: [
-  //               Positioned.fill(
-  //                 child: InkWell(
-  //                   onTap: () {},
-  //                   child: Center(
-  //                     child: CircularProgressIndicator(
-  //                       color: Colors.green,
-  //                       strokeWidth: 10,
-  //                       strokeAlign: 2,
-  //                       backgroundColor: Colors.deepPurple,
-  //                     ),
-  //                   ),
-  //                 ),
-  //               ),
-  //             ],
-  //           ),
-  //         )
-  //       : Scaffold(
-  //           drawer: C_Drawer(),
-  //           appBar: C_CustomAppBar(
-  //               title: _selectedIndex == 0
-  //                   ? 'Home'
-  //                   : _selectedIndex == 1
-  //                       ? 'Map'
-  //                       : _selectedIndex == 2
-  //                           ? 'Schedule'
-  //                           : user == 'hauler'
-  //                               ? 'Vehicle'
-  //                               : 'Payment'),
-  //           body: Loading
-  //               ? const CircularProgressIndicator()
-  //               : _pages[_selectedIndex],
-  //           bottomNavigationBar: C_BottomNavBar(
-  //             currentIndex: _selectedIndex,
-  //             onTap: _onItemTapped,
-  //           ),
-  //         );
-  // }
+    // @override
+    // Widget build(BuildContext context) {
+    //   return Scaffold(
+    //       body: Stack(
+    //     children: [
+    //       if (!loading)
+    //         Scaffold(
+    //           drawer: C_Drawer(),
+    //           appBar: C_CustomAppBar(
+    //               title: _selectedIndex == 0
+    //                   ? 'Home'
+    //                   : _selectedIndex == 1
+    //                       ? 'Map'
+    //                       : _selectedIndex == 2
+    //                           ? 'Schedule'
+    //                           : user == 'hauler'
+    //                               ? 'Vehicle'
+    //                               : 'Payment'),
+    //           body: _pages[_selectedIndex],
+    //           bottomNavigationBar: C_BottomNavBar(
+    //             currentIndex: _selectedIndex,
+    //             onTap: _onItemTapped,
+    //           ),
+    //         ),
+    //       if (loading || firstLoad) showLoadingIconAnimate(),
+    //       if (userModel!.isToHome) showLoadingMovingTruck(context, height, position),
+    //     ],
+    //   ));
+  }
+}
+
+class SlidingFabLocation extends FloatingActionButtonLocation {
+  BuildContext context;
+  final int index;
+
+  SlidingFabLocation(this.context, this.index);
+
+  @override
+  Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry) {
+    final double fabY = scaffoldGeometry.scaffoldSize.height - scaffoldGeometry.contentTop - 5;
+    double width = MediaQuery.of(context).size.width;
+    // double width =
+    //     MediaQuery.of(context).size.width - MediaQuery.of(context).padding.left - MediaQuery.of(context).padding.right;
+    double start = 0.25;
+    double space = 0.125 / 2;
+
+    if (width > 500) {
+      space /= 0.8;
+    }
+    double fabX;
+    switch (index) {
+      case 0: // Home
+        fabX = width * space;
+        break;
+      case 1: // map
+        fabX = width * ((start * 1) + space);
+        //fabX = width * (start / 2);
+        break;
+      case 2: // schedule
+        fabX = width * ((start * 2) + space);
+        break;
+      case 3: // payment/vehicle
+
+        fabX = width * ((start * 3) + space);
+        break;
+      default:
+        fabX = scaffoldGeometry.scaffoldSize.width / 2;
+    }
+    return Offset(fabX, fabY);
+  }
 }

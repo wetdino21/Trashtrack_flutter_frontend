@@ -291,9 +291,9 @@ class _NotificationDetailsState extends State<NotificationDetails> {
                   ),
                   SizedBox(height: 5),
                   if (widget.bkId != null)
-                    ClipRRect(borderRadius: borderRadius15, child: Image.asset('assets/image/truck_arrival2.jpg')),
+                    ClipRRect(borderRadius: borderRadius15, child: Image.asset('assets/image/truck_arrival.jpg')),
                   if (widget.gbId != null)
-                    ClipRRect(borderRadius: borderRadius15, child: Image.asset('assets/image/bill_ready3.jpg')),
+                    ClipRRect(borderRadius: borderRadius15, child: Image.asset('assets/image/bill_ready.jpg')),
                   Container(
                     padding: EdgeInsets.all(10),
                     child: Column(

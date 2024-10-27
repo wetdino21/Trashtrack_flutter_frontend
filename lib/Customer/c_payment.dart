@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:trashtrack/Customer/c_schedule_list.dart';
 import 'package:trashtrack/api_network.dart';
 import 'package:trashtrack/api_paymongo.dart';
@@ -31,6 +32,8 @@ class _C_PaymentScreenState extends State<C_PaymentScreen> with SingleTickerProv
   late PageController _pageController;
   List<Map<String, dynamic>>? billList;
   List<Map<String, dynamic>>? paymentList;
+  final ScrollController _parentScrollController = ScrollController();
+  final ScrollController _nestedScrollController = ScrollController();
 
   @override
   void initState() {
@@ -55,6 +58,19 @@ class _C_PaymentScreenState extends State<C_PaymentScreen> with SingleTickerProv
       begin: Colors.grey,
       end: Colors.grey[350],
     ).animate(_controller);
+
+    // Listen for scroll events in the nested controller
+    _nestedScrollController.addListener(() {
+      if (_nestedScrollController.position.pixels <= 0 &&
+          _nestedScrollController.position.userScrollDirection == ScrollDirection.forward) {
+        // If we are at the top of the nested list and scrolling up, scroll parent
+        _parentScrollController.animateTo(
+          _parentScrollController.position.pixels - 20, // Adjust as needed
+          duration: Duration(milliseconds: 100),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   @override
@@ -62,6 +78,9 @@ class _C_PaymentScreenState extends State<C_PaymentScreen> with SingleTickerProv
     TickerCanceled;
     _controller.dispose();
     _pageController.dispose();
+    //
+    _parentScrollController.dispose();
+    _nestedScrollController.dispose();
     super.dispose();
   }
 
@@ -110,214 +129,210 @@ class _C_PaymentScreenState extends State<C_PaymentScreen> with SingleTickerProv
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: deepGreen,
-      body: ListView(
-        children: [
-          Stack(
-            children: [
-              Container(
-                padding: EdgeInsets.only(top: 80),
-                child: Container(
-                  decoration: BoxDecoration(
-                      color: whiteLow,
-                      boxShadow: shadowTopColor,
-                      borderRadius: BorderRadius.only(topRight: Radius.circular(15))),
-                  height: MediaQuery.of(context).size.height * .75,
-                  //height: MediaQuery.of(context).size.height - kBottomNavigationBarHeight,
-                  margin: EdgeInsets.symmetric(horizontal: 10),
-                  child: PageView(
-                    controller: _pageController,
-                    onPageChanged: (index) {
-                      setState(() {
-                        selectedPage = index;
-                      });
-                    },
-                    children: [
-                      // Current Schedule
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await _fetchBillPaymentData();
+        },
+        child: ListView(
+          controller: _parentScrollController,
+          children: [
+            Stack(
+              children: [
+                Container(
+                  padding: EdgeInsets.only(top: 80),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: whiteLow,
+                        boxShadow: shadowTopColor,
+                        borderRadius: BorderRadius.only(topRight: Radius.circular(15))),
+                    height: MediaQuery.of(context).size.height * .75,
+                    //height: MediaQuery.of(context).size.height - kBottomNavigationBarHeight,
+                    margin: EdgeInsets.symmetric(horizontal: 10),
+                    child: PageView(
+                      controller: _pageController,
+                      onPageChanged: (index) {
+                        setState(() {
+                          selectedPage = index;
+                        });
+                      },
+                      children: [
+                        // Current Schedule
 
-                      RefreshIndicator(
-                          onRefresh: () async {
-                            await _fetchBillPaymentData();
-                          },
-                          child: isLoading
-                              ? Container(
-                                  padding: EdgeInsets.all(20),
-                                  child: loadingAnimation(_controller, _colorTween, _colorTween2),
-                                )
-                              : billList == null
-                                  ? ListView(
-                                      children: [
-                                        Column(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            SizedBox(
-                                              height: 100,
-                                            ),
-                                            Container(
-                                                alignment: Alignment.center,
-                                                child: Column(
-                                                  mainAxisAlignment: MainAxisAlignment.center,
-                                                  children: [
-                                                    Icon(Icons.wallet, color: blackSoft, size: 70),
-                                                    Text(
-                                                      'No pending payment\n\n\n\n',
-                                                      style: TextStyle(color: blackSoft, fontSize: 20),
-                                                    ),
-                                                  ],
-                                                )),
-                                            SizedBox(
-                                              height: 100,
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    )
-                                  : ListView.builder(
-                                      itemCount: billList?.length ?? 0, // Simplified null check
-                                      itemBuilder: (context, index) {
-                                        final bill = billList?[index];
+                        isLoading
+                            ? Container(
+                                padding: EdgeInsets.all(20),
+                                child: loadingAnimation(_controller, _colorTween, _colorTween2),
+                              )
+                            : billList == null
+                                ? ListView(
+                                    children: [
+                                      Column(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          SizedBox(
+                                            height: 100,
+                                          ),
+                                          Container(
+                                              alignment: Alignment.center,
+                                              child: Column(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  Icon(Icons.wallet, color: blackSoft, size: 70),
+                                                  Text(
+                                                    'No pending payment\n\n\n\n',
+                                                    style: TextStyle(color: blackSoft, fontSize: 20),
+                                                  ),
+                                                ],
+                                              )),
+                                          SizedBox(
+                                            height: 100,
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  )
+                                : ListView.builder(
+                                    controller: _nestedScrollController,
+                                    itemCount: billList?.length ?? 0, // Simplified null check
+                                    itemBuilder: (context, index) {
+                                      final bill = billList?[index];
 
-                                        if (bill == null) {
-                                          return SizedBox.shrink(); // Return an empty box if bill is null
-                                        }
+                                      if (bill == null) {
+                                        return SizedBox.shrink(); // Return an empty box if bill is null
+                                      }
 
-                                        // Extracting fields from the bill
-                                        int? gb_id = bill['gb_id'];
-                                        String bill_id = 'Bill# ${gb_id.toString()}';
-                                        String booking_id = 'BOOKING# ${bill['bk_id']?.toString()}';
-                                        String status = bill['gb_status']?.toString() ?? '';
-                                        DateTime dbDueDate = DateTime.parse(bill['gb_date_due'] ?? '').toLocal();
-                                        String formatdbDueDate = DateFormat('MMM dd, yyyy (EEEE)').format(dbDueDate);
-                                        String dueDate = formatdbDueDate;
-                                        DateTime dbdateIssue = DateTime.parse(bill['gb_date_issued'] ?? '').toLocal();
-                                        String formatdateIssue = DateFormat('MMM dd, yyyy hh:mm a').format(dbdateIssue);
-                                        String dateIssued = 'Issued: $formatdateIssue';
+                                      // Extracting fields from the bill
+                                      int? gb_id = bill['gb_id'];
+                                      String bill_id = 'Bill# ${gb_id.toString()}';
+                                      String booking_id = 'BOOKING# ${bill['bk_id']?.toString()}';
+                                      String status = bill['gb_status']?.toString() ?? '';
+                                      DateTime dbDueDate = DateTime.parse(bill['gb_date_due'] ?? '').toLocal();
+                                      String formatdbDueDate = DateFormat('MMM dd, yyyy (EEEE)').format(dbDueDate);
+                                      String dueDate = formatdbDueDate;
+                                      DateTime dbdateIssue = DateTime.parse(bill['gb_date_issued'] ?? '').toLocal();
+                                      String formatdateIssue = DateFormat('MMM dd, yyyy hh:mm a').format(dbdateIssue);
+                                      String dateIssued = 'Issued: $formatdateIssue';
 
-                                        return Column(
-                                          children: [
-                                            if (index == 0) SizedBox(height: 30),
-                                            InkWell(
-                                              onTap: () {
-                                                if (gb_id != null) {
-                                                  Navigator.push(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                              builder: (context) => PaymentDetails(gb_id: gb_id)))
-                                                      .then((value) {
-                                                    if (value == true) {
-                                                      _fetchBillPaymentData();
-                                                    }
-                                                  });
-                                                }
-                                              },
-                                              child: Container(
-                                                padding: EdgeInsets.all(10),
-                                                margin: EdgeInsets.all(10),
-                                                decoration: BoxDecoration(
-                                                    color: Colors.white,
-                                                    boxShadow: shadowColor,
-                                                    borderRadius: borderRadius10),
-                                                child: Column(
-                                                  children: [
-                                                    Container(
-                                                      alignment: Alignment.topLeft,
-                                                      child: Column(
-                                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                                        children: [
-                                                          Text(
-                                                            bill_id,
-                                                            style: TextStyle(
-                                                                color: blackSoft,
-                                                                fontSize: 14,
-                                                                fontWeight: FontWeight.bold),
-                                                          ),
-                                                          Text(
-                                                            booking_id,
-                                                            style: TextStyle(color: blackSoft, fontSize: 12),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    Container(
-                                                      padding: const EdgeInsets.all(5),
-                                                      decoration: BoxDecoration(
-                                                          color: deepPurple,
-                                                          borderRadius: borderRadius5,
-                                                          boxShadow: shadowColor),
-                                                      child: Column(
-                                                        children: [
-                                                          Text(
-                                                            'Due Date',
-                                                            style: TextStyle(
-                                                                color: white,
-                                                                fontWeight: FontWeight.bold,
-                                                                fontSize: 14),
-                                                          ),
-                                                          Row(
-                                                            mainAxisAlignment: MainAxisAlignment.center,
-                                                            children: [
-                                                              Icon(
-                                                                Icons.calendar_month,
-                                                                color: white,
-                                                              ),
-                                                              Text(
-                                                                dueDate,
-                                                                style: TextStyle(
-                                                                    color: white,
-                                                                    fontWeight: FontWeight.bold,
-                                                                    fontSize: 20),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    Row(
-                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      return Column(
+                                        children: [
+                                          if (index == 0) SizedBox(height: 30),
+                                          InkWell(
+                                            onTap: () {
+                                              if (gb_id != null) {
+                                                Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder: (context) => PaymentDetails(gb_id: gb_id)))
+                                                    .then((value) {
+                                                  if (value == true) {
+                                                    _fetchBillPaymentData();
+                                                  }
+                                                });
+                                              }
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.all(10),
+                                              margin: EdgeInsets.all(10),
+                                              decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  boxShadow: shadowColor,
+                                                  borderRadius: borderRadius10),
+                                              child: Column(
+                                                children: [
+                                                  Container(
+                                                    alignment: Alignment.topLeft,
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
                                                       children: [
                                                         Text(
-                                                          dateIssued,
+                                                          bill_id,
+                                                          style: TextStyle(
+                                                              color: blackSoft,
+                                                              fontSize: 14,
+                                                              fontWeight: FontWeight.bold),
+                                                        ),
+                                                        Text(
+                                                          booking_id,
                                                           style: TextStyle(color: blackSoft, fontSize: 12),
                                                         ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    padding: const EdgeInsets.all(5),
+                                                    decoration: BoxDecoration(
+                                                        color: deepPurple,
+                                                        borderRadius: borderRadius5,
+                                                        boxShadow: shadowColor),
+                                                    child: Column(
+                                                      children: [
+                                                        Text(
+                                                          'Due Date',
+                                                          style: TextStyle(
+                                                              color: white, fontWeight: FontWeight.bold, fontSize: 14),
+                                                        ),
                                                         Row(
+                                                          mainAxisAlignment: MainAxisAlignment.center,
                                                           children: [
-                                                            Transform.rotate(
-                                                              angle: -0.7854, // 45 degrees in radians
-                                                              child: Icon(
-                                                                Icons.push_pin,
-                                                                color: Colors.red,
-                                                                size: 20,
-                                                                shadows: shadowColor,
-                                                              ),
+                                                            Icon(
+                                                              Icons.calendar_month,
+                                                              color: white,
                                                             ),
                                                             Text(
-                                                              status,
+                                                              dueDate,
                                                               style: TextStyle(
-                                                                color: redSoft,
-                                                                fontWeight: FontWeight.bold,
-                                                                fontSize: 18,
-                                                                //shadows: shadowLessColor
-                                                              ),
+                                                                  color: white,
+                                                                  fontWeight: FontWeight.bold,
+                                                                  fontSize: 20),
                                                             ),
                                                           ],
                                                         ),
                                                       ],
                                                     ),
-                                                  ],
-                                                ),
+                                                  ),
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      Text(
+                                                        dateIssued,
+                                                        style: TextStyle(color: blackSoft, fontSize: 12),
+                                                      ),
+                                                      Row(
+                                                        children: [
+                                                          Transform.rotate(
+                                                            angle: -0.7854, // 45 degrees in radians
+                                                            child: Icon(
+                                                              Icons.push_pin,
+                                                              color: Colors.red,
+                                                              size: 20,
+                                                              shadows: shadowColor,
+                                                            ),
+                                                          ),
+                                                          Text(
+                                                            status,
+                                                            style: TextStyle(
+                                                              color: redSoft,
+                                                              fontWeight: FontWeight.bold,
+                                                              fontSize: 18,
+                                                              //shadows: shadowLessColor
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
                                               ),
                                             ),
-                                            if (billList!.length - 1 == index) const SizedBox(height: 200)
-                                          ],
-                                        );
-                                      },
-                                    )),
+                                          ),
+                                          if (billList!.length - 1 == index) const SizedBox(height: 200)
+                                        ],
+                                      );
+                                    },
+                                  ),
 
-                      // History Schedule
-                      RefreshIndicator(
-                        onRefresh: () async {
-                          await _fetchBillPaymentData();
-                        },
-                        child: isLoading
+                        // History Schedule
+                        isLoading
                             ? Container(
                                 padding: const EdgeInsets.all(20),
                                 child: loadingAnimation(_controller, _colorTween, _colorTween2),
@@ -351,6 +366,7 @@ class _C_PaymentScreenState extends State<C_PaymentScreen> with SingleTickerProv
                                     ],
                                   )
                                 : ListView.builder(
+                                    controller: _nestedScrollController,
                                     itemCount: paymentList?.length ?? 0, // Simplified null check
                                     itemBuilder: (context, index) {
                                       final payment = paymentList?[index];
@@ -493,58 +509,58 @@ class _C_PaymentScreenState extends State<C_PaymentScreen> with SingleTickerProv
                                       );
                                     },
                                   ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              Positioned(
-                left: 0,
-                top: 0,
-                child: Container(
-                  height: 100,
-                  margin: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () => onPageSelected(0),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
-                          decoration: BoxDecoration(
-                              color: selectedPage == 0 ? whiteLow : deepPurple,
-                              borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
-                              boxShadow: shadowTopColor),
-                          child: Text(
-                            'Pending',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: selectedPage == 0 ? deepPurple : whiteLow,
+                Positioned(
+                  left: 0,
+                  top: 0,
+                  child: Container(
+                    height: 100,
+                    margin: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () => onPageSelected(0),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+                            decoration: BoxDecoration(
+                                color: selectedPage == 0 ? whiteLow : deepPurple,
+                                borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
+                                boxShadow: shadowTopColor),
+                            child: Text(
+                              'Pending',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: selectedPage == 0 ? deepPurple : whiteLow,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      GestureDetector(
-                        onTap: () => onPageSelected(1),
-                        child: Container(
-                          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
-                          decoration: BoxDecoration(
-                              color: selectedPage == 1 ? whiteLow : deepPurple,
-                              borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
-                              boxShadow: shadowTopColor),
-                          child: Text(
-                            'History',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, color: selectedPage == 1 ? deepPurple : whiteLow),
+                        GestureDetector(
+                          onTap: () => onPageSelected(1),
+                          child: Container(
+                            padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+                            decoration: BoxDecoration(
+                                color: selectedPage == 1 ? whiteLow : deepPurple,
+                                borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+                                boxShadow: shadowTopColor),
+                            child: Text(
+                              'History',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, color: selectedPage == 1 ? deepPurple : whiteLow),
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

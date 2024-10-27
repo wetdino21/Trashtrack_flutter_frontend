@@ -31,6 +31,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> with SingleTickerProviderSt
   //user data
   Map<String, dynamic>? userData;
   bool isLoading = false;
+  bool loadingAction = false;
   String? errorMessage;
   Object? _obj;
   bool _isObjectLoaded = false;
@@ -250,14 +251,29 @@ class _C_HomeScreenState extends State<C_HomeScreen> with SingleTickerProviderSt
                                           borderRadius: BorderRadius.circular(10.0),
                                           boxShadow: shadowLowColor),
                                       child: InkWell(
-                                        onTap: () {
+                                        //
+                                        onTap: () async {
+                                          setState(() {
+                                            loadingAction = true;
+                                          });
+                                          //
                                           if (user == 'customer') {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => RequestPickupScreen(),
-                                              ),
-                                            );
+                                            String? bklimit = await checkBookingLimit(context);
+                                            if (bklimit == 'max') {
+                                              showBookLimitDialog(context);
+                                            } else if (bklimit == 'success') {
+                                              String? isUnpaidBIll = await checkUnpaidBIll(context);
+                                              if (isUnpaidBIll == 'Unpaid') {
+                                                showUnpaidBillDialog(context);
+                                              } else if (isUnpaidBIll == 'success') {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => RequestPickupScreen(),
+                                                  ),
+                                                );
+                                              }
+                                            }
                                           } else {
                                             Navigator.push(
                                               context,
@@ -266,6 +282,10 @@ class _C_HomeScreenState extends State<C_HomeScreen> with SingleTickerProviderSt
                                               ),
                                             );
                                           }
+                                          //
+                                          setState(() {
+                                            loadingAction = false;
+                                          });
                                         },
                                         child: Text(
                                           user == 'customer' ? 'Request Pickup Now' : 'Go to Pickup',
@@ -331,6 +351,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> with SingleTickerProviderSt
                     ),
                   ),
                 ),
+              if (loadingAction) showLoadingAction(),
             ],
           ),
         ),
@@ -392,4 +413,48 @@ class StatisticBox extends StatelessWidget {
       ),
     );
   }
+}
+
+void showBookLimitDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
+        title: Text('Unable to request pickup', style: TextStyle(color: redSoft)),
+        content: Text('You have reached the maximum booking limit.', style: TextStyle(color: blackSoft)),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('OK', style: TextStyle(color: blackSoft, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+void showUnpaidBillDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
+        title: Text('Unable to request pickup', style: TextStyle(color: redSoft)),
+        content: Text('You still have unpaid payment, please pay it first.', style: TextStyle(color: blackSoft)),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('OK', style: TextStyle(color: blackSoft, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      );
+    },
+  );
 }

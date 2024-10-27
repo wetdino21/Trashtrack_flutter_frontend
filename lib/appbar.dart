@@ -86,36 +86,38 @@ class C_CustomAppBarState extends State<C_CustomAppBar> {
     if (!mounted) return;
 
     if (data.isEmpty) return;
-    setState(() {
-      user = data['user'];
-    });
+    if (data['user'] != null) {
+      setState(() {
+        user = data['user'];
+      });
 
-    if (data['user'] == 'customer') {
-      //if customer then notif
+      if (data['user'] == 'customer') {
+        //if customer then notif
 
-      if (data['id'] != null) {
-        channel = WebSocketChannel.connect(
-          Uri.parse('ws://${ipAddress}:8080?userId=${data['id'].toString()}'),
-          //Uri.parse('ws://192.168.254.187:8080?userId=${data['id'].toString()}'),
-        );
-        channel!.stream.listen((message) {
-          final notification = json.decode(message);
-          if (notification.containsKey('unread_count')) {
-            var unreadCount = notification['unread_count'];
-            setState(() {
-              //totalNotif = unreadCount; //same output
-              totalNotif = int.tryParse(unreadCount) ?? 0;
-              userModel!.setUserData(newNotifCount: totalNotif);
-              _playSound();
-            });
-          }
-        }, onError: (error) {
-          print('WebSocket error: $error');
-        }, onDone: () {
-          print('WebSocket connection closed');
-        });
-      } else {
-        print('Failed to retrieve user ID for WebSocket connection');
+        if (data['id'] != null) {
+          channel = WebSocketChannel.connect(
+            Uri.parse('ws://${ipAddress}:8080?userId=${data['id'].toString()}'),
+            //Uri.parse('ws://192.168.254.187:8080?userId=${data['id'].toString()}'),
+          );
+          channel!.stream.listen((message) {
+            final notification = json.decode(message);
+            if (notification.containsKey('unread_count')) {
+              var unreadCount = notification['unread_count'];
+              setState(() {
+                //totalNotif = unreadCount; //same output
+                totalNotif = int.tryParse(unreadCount) ?? 0;
+                userModel!.setUserData(newNotifCount: totalNotif);
+                _playSound();
+              });
+            }
+          }, onError: (error) {
+            print('WebSocket error: $error');
+          }, onDone: () {
+            print('WebSocket connection closed');
+          });
+        } else {
+          print('Failed to retrieve user ID for WebSocket connection');
+        }
       }
     }
   }
@@ -160,95 +162,101 @@ class C_CustomAppBarState extends State<C_CustomAppBar> {
       ),
       actions: [
         if (user == 'customer')
-          Stack(
-            children: [
-              // ListView.builder(
-              //   itemCount: notifications.length,
-              //   itemBuilder: (context, index) {
-              //     return ListTile(
-              //       title: Text(notifications[index]),
-              //     );
-              //   },
-              // ),
-              InkWell(
-                onTap: () {
-                  Navigator.pushNamed(context, 'c_notification');
-                },
-                borderRadius: BorderRadius.circular(50),
-                child: Container(
-                  margin: EdgeInsets.all(5),
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: deepPurple,
-                    shape: BoxShape.circle,
-                    boxShadow: shadowLowColor,
-                  ),
-                  child: Icon(
-                    Icons.notifications,
-                    color: Colors.white,
-                    size: 30,
+          Tooltip(
+            message: 'Notification',
+            child: Stack(
+              children: [
+                // ListView.builder(
+                //   itemCount: notifications.length,
+                //   itemBuilder: (context, index) {
+                //     return ListTile(
+                //       title: Text(notifications[index]),
+                //     );
+                //   },
+                // ),
+                InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, 'c_notification');
+                  },
+                  borderRadius: BorderRadius.circular(50),
+                  child: Container(
+                    margin: EdgeInsets.all(5),
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: deepPurple,
+                      shape: BoxShape.circle,
+                      boxShadow: shadowLowColor,
+                    ),
+                    child: Icon(
+                      Icons.notifications,
+                      color: Colors.white,
+                      size: 30,
+                    ),
                   ),
                 ),
-              ),
 
-              //notif counts
-              if (totalNotif > 0)
-                Positioned(
-                    right: 0,
-                    child: Container(
-                        height: 20,
-                        width: 20,
-                        child: Container(
-                          padding: const EdgeInsets.all(1.0),
-                          decoration: BoxDecoration(color: white, borderRadius: BorderRadius.circular(100)),
-                          child: CircleAvatar(
-                              backgroundColor: Colors.red,
-                              child: Text(
-                                totalNotif >= 99 ? '99+' : '${totalNotif}',
-                                style: TextStyle(
-                                    color: white,
-                                    fontSize: totalNotif <= 9
-                                        ? 12
-                                        : totalNotif <= 99
-                                            ? 10
-                                            : 8),
-                              )),
-                        )))
-            ],
-          ),
-        InkWell(
-          onTap: () {
-            Navigator.pushNamed(context, 'c_profile');
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(builder: (context) => C_ProfileScreen()),
-            // ).then((value) {
-            //   if (value == true) {
-            //     loadProfileImage();
-            //   }
-            // });
-          },
-          borderRadius: BorderRadius.circular(50),
-          child: Container(
-            margin: EdgeInsets.all(5),
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: deepPurple,
-              shape: BoxShape.circle,
-              boxShadow: shadowLowColor,
-              border: Border.all(width: 2, color: deepPurple),
+                //notif counts
+                if (totalNotif > 0)
+                  Positioned(
+                      right: 0,
+                      child: Container(
+                          height: 20,
+                          width: 20,
+                          child: Container(
+                            padding: const EdgeInsets.all(1.0),
+                            decoration: BoxDecoration(color: white, borderRadius: BorderRadius.circular(100)),
+                            child: CircleAvatar(
+                                backgroundColor: Colors.red,
+                                child: Text(
+                                  totalNotif >= 99 ? '99+' : '${totalNotif}',
+                                  style: TextStyle(
+                                      color: white,
+                                      fontSize: totalNotif <= 9
+                                          ? 12
+                                          : totalNotif <= 99
+                                              ? 10
+                                              : 8),
+                                )),
+                          )))
+              ],
             ),
-            //child: imageBytes != null
-            child: userModel!.profile != null
-                ? CircleAvatar(
-                    backgroundImage: MemoryImage(userModel!.profile!),
-                  )
-                : Icon(
-                    Icons.person,
-                    size: 30,
-                  ),
+          ),
+        Tooltip(
+          message: 'Profile',
+          child: InkWell(
+            onTap: () {
+              Navigator.pushNamed(context, 'c_profile');
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(builder: (context) => C_ProfileScreen()),
+              // ).then((value) {
+              //   if (value == true) {
+              //     loadProfileImage();
+              //   }
+              // });
+            },
+            borderRadius: BorderRadius.circular(50),
+            child: Container(
+              margin: EdgeInsets.all(5),
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: deepPurple,
+                shape: BoxShape.circle,
+                boxShadow: shadowLowColor,
+                border: Border.all(width: 2, color: deepPurple),
+              ),
+              //child: imageBytes != null
+              child: userModel!.profile != null
+                  ? CircleAvatar(
+                      backgroundImage: MemoryImage(userModel!.profile!),
+                    )
+                  : Icon(
+                      Icons.person,
+                      size: 30,
+                    ),
+            ),
           ),
         ),
         SizedBox(

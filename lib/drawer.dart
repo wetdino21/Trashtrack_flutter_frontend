@@ -4,7 +4,7 @@ import 'package:trashtrack/home.dart';
 import 'package:trashtrack/profile.dart';
 import 'package:trashtrack/settings.dart';
 import 'package:trashtrack/about_us.dart';
-import 'package:trashtrack/waste_info.dart';
+import 'package:trashtrack/service_guidelines.dart';
 import 'package:trashtrack/privacy_policy.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:trashtrack/terms_conditions.dart';
@@ -164,7 +164,7 @@ class _C_DrawerState extends State<C_Drawer> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => C_WasteInfo()),
+                        MaterialPageRoute(builder: (context) => ServiceGuidelines()),
                       );
                     },
                   ),

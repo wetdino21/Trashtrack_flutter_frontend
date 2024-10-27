@@ -401,28 +401,24 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              mainAxisAlignment: MainAxisAlignment.end,
                                               children: [
-                                                SizedBox(),
-                                                Container(
-                                                  alignment: Alignment.centerRight,
-                                                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                                                  decoration: BoxDecoration(
-                                                      borderRadius: BorderRadius.circular(5),
-                                                      color: Colors.blue,
-                                                      boxShadow: shadowColor),
-                                                  child: InkWell(
-                                                    onTap: () {
-                                                      setState(() {
-                                                        onAddress = false;
-                                                      });
-                                                    },
-                                                    child: Text(
-                                                      'Minimize',
-                                                      style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 12,
-                                                          fontWeight: FontWeight.bold),
+                                                InkWell(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      onAddress = false;
+                                                    });
+                                                  },
+                                                  child: Container(
+                                                    alignment: Alignment.centerRight,
+                                                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                                                    decoration: BoxDecoration(
+                                                        borderRadius: BorderRadius.circular(5),
+                                                        color: deepPurple,
+                                                        boxShadow: shadowColor),
+                                                    child: Icon(
+                                                      Icons.copy_all_sharp,
+                                                      color: white,
                                                     ),
                                                   ),
                                                 ),
@@ -886,27 +882,24 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
                                             child: Column(
                                               crossAxisAlignment: CrossAxisAlignment.end,
                                               children: [
-                                                Container(
-                                                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                                                  decoration: BoxDecoration(
-                                                      borderRadius: BorderRadius.circular(5),
-                                                      color: Colors.blue,
-                                                      boxShadow: shadowColor),
-                                                  child: InkWell(
-                                                    onTap: () {
-                                                      setState(() {
-                                                        if (selectedPoint != null)
-                                                          _mapController.move(selectedPoint!, 13);
-                                                        onMap = false;
-                                                        pinLocValidator = '';
-                                                      });
-                                                    },
-                                                    child: Text(
-                                                      'Minimize',
-                                                      style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 12,
-                                                          fontWeight: FontWeight.bold),
+                                                InkWell(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      if (selectedPoint != null)
+                                                        _mapController.move(selectedPoint!, 13);
+                                                      onMap = false;
+                                                      pinLocValidator = '';
+                                                    });
+                                                  },
+                                                  child: Container(
+                                                    padding: EdgeInsets.all(15),
+                                                    decoration: BoxDecoration(
+                                                        borderRadius: BorderRadius.circular(5),
+                                                        color: deepPurple,
+                                                        boxShadow: shadowColor),
+                                                    child: Icon(
+                                                      Icons.copy_all_sharp,
+                                                      color: white,
                                                     ),
                                                   ),
                                                 ),

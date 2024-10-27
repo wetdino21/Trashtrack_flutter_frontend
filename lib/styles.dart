@@ -110,6 +110,14 @@ List<BoxShadow> shadowTopColor = [
   ),
 ];
 
+List<BoxShadow> shadowTopCenterColor = [
+  BoxShadow(
+    color: Colors.black.withOpacity(.2),
+    spreadRadius: 5,
+    blurRadius: 5,
+    offset: Offset(0, -2),
+  ),
+];
 // List<BoxShadow> shadowTextColor = [
 //   BoxShadow(
 //     color: Colors.black.withOpacity(0.3),

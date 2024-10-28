@@ -1439,6 +1439,8 @@ Future<String?> arrivalNotify(int bookID) async {
 
     if (response.statusCode == 200) {
       return 'success';
+    } else if (response.statusCode == 429) {
+      return 'done';
     } else {
       if (response.statusCode == 401) {
         // Access token might be expired, attempt to refresh it

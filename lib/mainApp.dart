@@ -236,7 +236,7 @@ class _MainAppState extends State<MainApp> {
       children: [
         if (!loading)
           Scaffold(
-            backgroundColor: white,
+            backgroundColor: deepGreen,
             drawer: C_Drawer(),
             appBar: C_CustomAppBar(
                 title: _selectedIndex == 0
@@ -255,12 +255,14 @@ class _MainAppState extends State<MainApp> {
             ),
             floatingActionButton: Container(
               decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: shadowTopCenterColor),
-              child: FloatingActionButton(
-                onPressed: () {},
-                backgroundColor: deepGreen,
+              child: Container(
+                // onPressed: () {},
+                // backgroundColor: white,
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(color: white, shape: BoxShape.circle),
                 child: Icon(user == 'hauler' && _selectedIndex == 3 ? Icons.directions_car : icons[_selectedIndex],
-                    color: white),
-                shape: CircleBorder(side: BorderSide(width: 0.1, color: white)),
+                    color: deepGreen),
+                //shape: CircleBorder(side: BorderSide(width: 0.1, color: white)),
               ),
             ),
             floatingActionButtonLocation: getFabLocation(), // Dynamic FAB location
@@ -309,7 +311,7 @@ class SlidingFabLocation extends FloatingActionButtonLocation {
 
   @override
   Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry) {
-    final double fabY = scaffoldGeometry.scaffoldSize.height - scaffoldGeometry.contentTop - 5;
+    final double fabY = scaffoldGeometry.scaffoldSize.height - scaffoldGeometry.contentTop + 10;
     double width = MediaQuery.of(context).size.width;
     // double width =
     //     MediaQuery.of(context).size.width - MediaQuery.of(context).padding.left - MediaQuery.of(context).padding.right;
@@ -317,7 +319,7 @@ class SlidingFabLocation extends FloatingActionButtonLocation {
     double space = 0.125 / 2;
 
     if (width > 500) {
-      space /= 0.8;
+      space /= .7;
     }
     double fabX;
     switch (index) {
@@ -332,11 +334,10 @@ class SlidingFabLocation extends FloatingActionButtonLocation {
         fabX = width * ((start * 2) + space);
         break;
       case 3: // payment/vehicle
-
         fabX = width * ((start * 3) + space);
         break;
       default:
-        fabX = scaffoldGeometry.scaffoldSize.width / 2;
+        fabX = width * space;
     }
     return Offset(fabX, fabY);
   }

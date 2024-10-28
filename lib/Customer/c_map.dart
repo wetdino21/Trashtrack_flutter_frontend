@@ -9,6 +9,7 @@ import 'package:geolocator/geolocator.dart';
 import 'dart:async';
 
 import 'package:trashtrack/user_hive_data.dart';
+import 'package:confetti/confetti.dart';
 
 ///
 LocationSettings locationSettings = AndroidSettings(
@@ -36,6 +37,8 @@ class C_MapScreen extends StatefulWidget {
 
 class _C_MapScreenState extends State<C_MapScreen> with SingleTickerProviderStateMixin {
   final GlobalKey<_C_MapScreenState> _mapScreenKey = GlobalKey<_C_MapScreenState>();
+  late ConfettiController _confettiController;
+
   bool hideScreen = false;
   final MapController _mapController = MapController();
   LatLng? _currentLocation;
@@ -101,6 +104,8 @@ class _C_MapScreenState extends State<C_MapScreen> with SingleTickerProviderStat
     //   print('finding route');
     //   pickUpDirection();
     // }
+    _confettiController = ConfettiController(duration: const Duration(seconds: 2));
+
     _controller = AnimationController(
       duration: const Duration(seconds: 1),
       vsync: this,
@@ -159,6 +164,7 @@ class _C_MapScreenState extends State<C_MapScreen> with SingleTickerProviderStat
   @override
   void dispose() {
     _stopLocationUpdates(); // Stop location updates when the widget is disposed
+    _confettiController.dispose();
 
     _mapController.dispose();
     _startController.dispose();
@@ -170,6 +176,12 @@ class _C_MapScreenState extends State<C_MapScreen> with SingleTickerProviderStat
     _controller.dispose();
     print('mappppp disposeeee');
     super.dispose();
+  }
+
+  //
+  void _onButtonPressed() {
+    console('111111111111111111111111111');
+    _confettiController.play(); // Trigger confetti
   }
 
   // Fetch user data from the server
@@ -906,6 +918,7 @@ class _C_MapScreenState extends State<C_MapScreen> with SingleTickerProviderStat
       // appBar: C_CustomAppBar(title: 'Map'),
       // drawer: C_Drawer(),
       body: Stack(
+        alignment: Alignment.center,
         children: [
           FlutterMap(
             mapController: _mapController,
@@ -1428,14 +1441,24 @@ class _C_MapScreenState extends State<C_MapScreen> with SingleTickerProviderStat
                                         boxShadow: shadowColor),
                                     child: InkWell(
                                       onTap: () async {
+                                        setState(() {
+                                           loadingAction = true;
+                                        });
+                                        //
                                         if (!isLoading) {
                                           String? msgArrival = await arrivalNotify(widget.bookID!);
                                           if (msgArrival == 'success') {
                                             showSuccessSnackBar(context, 'Sent arrival notif to customer');
+                                          } else if (msgArrival == 'done') {
+                                            showSuccessSnackBar(context, 'Already notified!');
                                           } else {
                                             showErrorSnackBar(context, 'Something went wrong. Please try again Later');
                                           }
                                         }
+                                        setState(() {
+                                          loadingAction = false;
+                                        });
+                                        _onButtonPressed();
                                       },
                                       child: Row(
                                         children: [
@@ -1568,6 +1591,17 @@ class _C_MapScreenState extends State<C_MapScreen> with SingleTickerProviderStat
                 )),
               ),
             ),
+
+          // Confetti widget positioned in the center of the screen
+          ConfettiWidget(
+            confettiController: _confettiController,
+            blastDirectionality: BlastDirectionality.explosive,
+            particleDrag: 0.05, // apply drag to the particles
+            emissionFrequency: 0.05, // frequency of particles
+            numberOfParticles: 100, // number of particles to emit
+            colors: [Colors.green, Colors.blue, Colors.pink, Colors.orange, Colors.purple], // Customize colors
+            shouldLoop: false,
+          ),
         ],
       ),
       bottomSheet: selectedPoint != null && !isLoading

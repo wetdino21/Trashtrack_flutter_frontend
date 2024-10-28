@@ -63,7 +63,8 @@ class _C_BottomNavBarState extends State<C_BottomNavBar> {
     return BottomAppBar(
       padding: EdgeInsets.zero,
       height: 70,
-      color: const Color.fromARGB(255, 21, 8, 44),
+      //color: const Color.fromARGB(255, 21, 8, 44),
+      color: white,
       shape: const CircularNotchedRectangle(),
       notchMargin: 6.0,
       child: Row(
@@ -122,15 +123,20 @@ class _C_BottomNavBarState extends State<C_BottomNavBar> {
         mainAxisSize: MainAxisSize.min,
         children: [
           index != widget.currentIndex
-              ? Icon(icon, color: widget.currentIndex == index ? Colors.green : Colors.white)
+              ? Icon(
+                  icon,
+                  //color: widget.currentIndex == index ? Colors.green : Colors.white
+                  color: blackSoft,
+                )
               : SizedBox(height: 24),
           Text(
             label,
             style: TextStyle(
-              color: widget.currentIndex == index ? Colors.green : Colors.white,
+              color: widget.currentIndex == index ? Colors.green : blackSoft,
               fontSize: 12,
+              fontWeight: FontWeight.bold
             ),
-          ),
+          )
         ],
       ),
       onPressed: () => _onItemTapped(index),

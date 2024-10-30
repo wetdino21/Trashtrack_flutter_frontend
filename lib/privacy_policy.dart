@@ -56,7 +56,6 @@ class _PrivacyPolicyState extends State<PrivacyPolicy> {
           ConfettiWidget(
             confettiController: _confettiController,
             blastDirectionality: BlastDirectionality.explosive,
-            blastDirection: 3.14 / 2, // right
             particleDrag: 0.05, // apply drag to the particles
             emissionFrequency: 0.05, // frequency of particles
             numberOfParticles: 100, // number of particles to emit

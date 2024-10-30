@@ -261,6 +261,10 @@ class _C_HomeScreenState extends State<C_HomeScreen> with SingleTickerProviderSt
                                             String? bklimit = await checkBookingLimit(context);
                                             if (bklimit == 'max') {
                                               showBookLimitDialog(context);
+                                            } else if (bklimit == 'disabled') {
+                                              showErrorSnackBar(context, 'We are not accepting booking right now!');
+                                            } else if (bklimit == 'no limit') {
+                                              showErrorSnackBar(context, 'No booking limit found');
                                             } else if (bklimit == 'success') {
                                               String? isUnpaidBIll = await checkUnpaidBIll(context);
                                               if (isUnpaidBIll == 'Unpaid') {

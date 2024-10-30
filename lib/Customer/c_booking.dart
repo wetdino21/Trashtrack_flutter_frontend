@@ -64,6 +64,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
 
   bool _acceptTerms = false;
 
+  Map<String, dynamic> _bookLimit = {};
   List<Map<String, dynamic>> _wasteTypes = [];
   List<Map<String, dynamic>> _selectedWasteTypes = [];
   //List<String> _selectedWasteTypes = [];
@@ -120,7 +121,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
     super.dispose();
   }
 
-// Fetch user data from the server
+  // Fetch user data from the server
   Future<void> _dbData() async {
     setState(() {
       isLoading = true;
@@ -128,6 +129,9 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
     try {
       //final data = await userDataFromHive();
       final data = await fetchCusData(context);
+      final bkLimitData = await fetchBookLimit();
+      List<Map<String, dynamic>>? categories = await fetchWasteCategory();
+
       if (!mounted) return;
       if (data != null) {
         setState(() {
@@ -159,35 +163,99 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
           street = (userData!['cus_street'] ?? '');
           postal = (userData!['cus_postal'] ?? '');
 
-          //isLoading = false;
-        });
+          //load book limit
+          if (bkLimitData != null) {
+            _bookLimit = bkLimitData;
+          } else {
+            console('Failed to load booking limit');
+          }
 
-        //load waste cat
-        List<Map<String, dynamic>>? categories = await fetchWasteCategory();
-        if (!mounted) return;
-        if (categories != null) {
-          setState(() {
+          //load waste cat
+          if (categories != null) {
             _wasteTypes = categories;
             isLoading = false;
-          });
-        } else {
-          print('Failed to load waste categories');
-        }
-        setState(() {
+          } else {
+            print('Failed to load waste categories');
+          }
           isLoading = false;
         });
       }
-      //await data.close();
     } catch (e) {
-      if (!mounted) return;
-      //isLoading = true;
-      print(e);
-      // setState(() {
-      //   //errorMessage = e.toString();
-      //   isLoading = true;
-      // });
+      print(e.toString());
     }
   }
+
+// // Fetch user data from the server
+//   Future<void> _dbData() async {
+//     setState(() {
+//       isLoading = true;
+//     });
+//     try {
+//       //final data = await userDataFromHive();
+//       final data = await fetchCusData(context);
+//       if (!mounted) return;
+//       if (data != null) {
+//         setState(() {
+//           userData = data;
+
+//           _fullnameController.text = (userData!['cus_fname'] ?? '') +
+//               ' ' +
+//               (userData!['cus_mname'] ?? '') +
+//               ' ' +
+//               (userData!['cus_lname'] ?? '');
+//           _contactController.text = userData!['cus_contact'].substring(1) ?? '';
+//           _selectedProvinceName = userData!['cus_province'] ?? '';
+//           _selectedCityMunicipalityName = userData!['cus_city'] ?? '';
+//           _selectedBarangayName = userData!['cus_brgy'] ?? '';
+//           _streetController.text = (userData!['cus_street'] ?? '');
+//           _postalController.text = (userData!['cus_postal'] ?? '');
+
+//           fullname = (userData!['cus_fname'] ?? '') +
+//               ' ' +
+//               (userData!['cus_mname'] ?? '') +
+//               ' ' +
+//               (userData!['cus_lname'] ?? '');
+//           contact = userData!['cus_contact'].substring(1) ?? '';
+//           address = (userData!['cus_brgy'] ?? '') +
+//               ', ' +
+//               (userData!['cus_city'] ?? '') +
+//               ', ' +
+//               (userData!['cus_province'] ?? '');
+//           street = (userData!['cus_street'] ?? '');
+//           postal = (userData!['cus_postal'] ?? '');
+
+//           //isLoading = false;
+//         });
+//         //load waste cat
+//         final bkLimitData = await fetchBookLimit();
+
+//         console(bkLimitData);
+//         //load waste cat
+//         List<Map<String, dynamic>>? categories = await fetchWasteCategory();
+//         if (!mounted) return;
+//         if (categories != null) {
+//           setState(() {
+//             _wasteTypes = categories;
+//             isLoading = false;
+//           });
+//         } else {
+//           print('Failed to load waste categories');
+//         }
+//         setState(() {
+//           isLoading = false;
+//         });
+//       } // MAKE IT INSIDE ONE SETSTATEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+//       //await data.close();
+//     } catch (e) {
+//       if (!mounted) return;
+//       //isLoading = true;
+//       print(e.toString());
+//       // setState(() {
+//       //   //errorMessage = e.toString();
+//       //   isLoading = true;
+//       // });
+//     }
+//   }
 
   // // Function to load waste categories and update the state
   // Future<void> _loadWasteCategories() async {
@@ -1631,8 +1699,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
                   Text(
                     _selectedDate == null
                         ? hint
-                        // : '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}',
-                        : DateFormat('MMM d, yyyy (EEEE)').format(_selectedDate!), // Format: Mon 1, 2024
+                        : DateFormat('MMM d, yyyy (EEEE)').format(_selectedDate!), 
                     style: TextStyle(color: _selectedDate == null ? Colors.grey : null, fontSize: 14),
                   ),
                   SizedBox(width: 10.0),
@@ -1649,25 +1716,39 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime now = DateTime.now();
-    //final DateTime firstDate = DateTime(now.year, now.month, now.day);
-    final DateTime firstDate = now.hour < 15 // 12 AM and 3 PM
-        ? DateTime(now.year, now.month, now.day)
-        : DateTime(now.year, now.month, now.day + 1);
-    final DateTime initialDate = now.hour < 15 ? DateTime.now() : firstDate;
-    final DateTime lastDate = DateTime(now.year + 1, 12, 31);
+
+    final int closeTimeInMinutes = _bookLimit['bl_close_time'];
+    final DateTime closeTime =
+        DateTime(now.year, now.month, now.day, closeTimeInMinutes ~/ 60, closeTimeInMinutes % 60);
+
+    final DateTime dbDateStart = DateTime.parse(_bookLimit['bl_date_start']).toUtc();
+    final DateTime dbDateLast = DateTime.parse(_bookLimit['bl_date_last']).toUtc();
+    //first date
+    final DateTime localStartDate = dbDateStart.toLocal(); // Convert to local time
+    final DateTime subFirstDate = DateTime(localStartDate.year, localStartDate.month, localStartDate.day);
+    final DateTime firstDate = now.isBefore(closeTime)
+        ? subFirstDate 
+        : subFirstDate.add(Duration(days: 1)); 
+
+    //Last date
+    final DateTime localLastDate = dbDateLast.toLocal(); // Convert to local time
+    final DateTime lastDate = DateTime(localLastDate.year, localLastDate.month, localLastDate.day);
+
+    //initial date
+    final DateTime initialDate = firstDate;
 
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: initialDate,
       firstDate: firstDate,
-      lastDate: lastDate, // Use the current year + 1
+      lastDate: lastDate,
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
             colorScheme: ColorScheme.light(
               primary: Colors.green, // Circle color for the selected date
               onPrimary: Colors.white, // Text color inside the circle
-              onSurface: Colors.green[900]!, // Text color for dates
+              onSurface: deepPurple, // Text color for dates
             ),
           ),
           child: child!,
@@ -1685,4 +1766,46 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
       });
     }
   }
+
+  // Future<void> _selectDate(BuildContext context) async {
+  //   final DateTime now = DateTime.now();
+  //   //final DateTime firstDate = DateTime(now.year, now.month, now.day);
+  //   final dbDateStart = _bookLimit['bl_date_start'];
+  //   final dbDateLast = _bookLimit['bl_date_last'];
+
+  //   final DateTime firstDate = now.hour < 15
+  //       ? DateTime(now.year, now.month, now.day)
+  //       : DateTime(now.year, now.month, now.day + 1);
+  //   final DateTime initialDate = now.hour < 15 ? DateTime.now() : firstDate;
+  //   final DateTime lastDate = DateTime(now.year + 1, 12, 31);
+
+  //   final DateTime? picked = await showDatePicker(
+  //     context: context,
+  //     initialDate: initialDate,
+  //     firstDate: firstDate,
+  //     lastDate: lastDate, // Use the current year + 1
+  //     builder: (BuildContext context, Widget? child) {
+  //       return Theme(
+  //         data: ThemeData.light().copyWith(
+  //           colorScheme: ColorScheme.light(
+  //             primary: Colors.green, // Circle color for the selected date
+  //             onPrimary: Colors.white, // Text color inside the circle
+  //             onSurface: Colors.green[900]!, // Text color for dates
+  //           ),
+  //         ),
+  //         child: child!,
+  //       );
+  //     },
+  //   );
+
+  //   if (picked != null && picked != _selectedDate) {
+  //     setState(() {
+  //       _selectedDate = picked;
+
+  //       if (_selectedDate != null) {
+  //         dateValidator = '';
+  //       }
+  //     });
+  //   }
+  // }
 }

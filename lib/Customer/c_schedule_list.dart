@@ -705,7 +705,8 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails> with SingleTicker
           backgroundColor: Colors.red[900],
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
           title: Text('Cancel Booking', style: TextStyle(color: Colors.white)),
-          content: Text('Are you sure to Cancel this booking?', style: TextStyle(color: Colors.white)),
+          content: Text('Are you sure to Cancel this booking? This cannot be undone.',
+              style: TextStyle(color: Colors.white)),
           actions: [
             TextButton(
               onPressed: () async {
@@ -1883,39 +1884,44 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails> with SingleTicker
 
               if (_showOptionsBox)
                 Positioned(
-                  top: AppBar().preferredSize.height - 50, // Adjust this value as needed
-                  right: 10, // Adjust to align with the IconButton
+                  top: AppBar().preferredSize.height - 50,
+                  right: 10,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
                       borderRadius: BorderRadius.circular(10),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black,
+                          color: black.withOpacity(0.5),
                           blurRadius: 20,
                           offset: Offset(0, 2),
                         ),
                       ],
                     ),
-                    padding: EdgeInsets.all(5),
-                    child: Column(
-                      children: [
-                        MaterialButton(
-                          onPressed: () {
-                            _showConfirmCancelBookingDialog(context);
-                            setState(() {
-                              _showOptionsBox = false;
-                            });
-                          },
-                          child: Container(
-                              child: Text("Cancel Booking?", style: TextStyle(fontSize: 18, color: Colors.black54))),
+                    child: Material(
+                      borderRadius: borderRadius10,
+                      child: InkWell(
+                        onTap: () {
+                          _showConfirmCancelBookingDialog(context);
+                          setState(() {
+                            _showOptionsBox = false;
+                          });
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(20),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.sentiment_very_dissatisfied,
+                                size: 24,
+                                color: Colors.red,
+                              ),
+                              SizedBox(width: 5),
+                              Container(
+                                  child: Text("Cancel Booking?", style: TextStyle(fontSize: 16, color: Colors.black54))),
+                            ],
+                          ),
                         ),
-                        Icon(
-                          Icons.sentiment_very_dissatisfied,
-                          size: 50,
-                          color: Colors.red,
-                        )
-                      ],
+                      ),
                     ),
                   ),
                 ),

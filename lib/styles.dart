@@ -41,7 +41,7 @@ Color darkRed = Color(0xFFB00020);
 
 List<BoxShadow> shadowColor = [
   BoxShadow(
-    color: Colors.grey.withOpacity(0.7),
+    color: Colors.grey.withOpacity(0.2),
     spreadRadius: 2,
     blurRadius: 5,
     offset: Offset(3, 3), //Offset(-5, -5) right  and bottom
@@ -59,7 +59,7 @@ List<BoxShadow> shadowIconColor = [
 
 List<BoxShadow> shadowLessColor = [
   BoxShadow(
-    color: Colors.black.withOpacity(0.7),
+    color: Colors.black.withOpacity(0.2),
     spreadRadius: 2,
     //blurRadius: 5,
     offset: Offset(2, 2), //Offset(-5, -5) right  and bottom
@@ -68,7 +68,7 @@ List<BoxShadow> shadowLessColor = [
 
 List<BoxShadow> shadowTextColor = [
   BoxShadow(
-    color: Colors.black.withOpacity(0.5),
+    color: Colors.black.withOpacity(0.2),
     spreadRadius: 2,
     blurRadius: 5,
     offset: Offset(0.7, 0.7), //Offset(-5, -5) right  and bottom
@@ -77,7 +77,7 @@ List<BoxShadow> shadowTextColor = [
 
 List<BoxShadow> shadowBigColor = [
   BoxShadow(
-    color: Colors.black.withOpacity(.5), spreadRadius: 5,
+    color: Colors.black.withOpacity(.2), spreadRadius: 5,
     blurRadius: 2,
     offset: Offset(5, 5), // Position of the shadow
   ),
@@ -85,7 +85,7 @@ List<BoxShadow> shadowBigColor = [
 //
 List<BoxShadow> shadowMidColor = [
   BoxShadow(
-    color: Colors.black.withOpacity(.5),
+    color: Colors.black.withOpacity(.2),
     spreadRadius: 2,
     blurRadius: 2,
     offset: Offset(5, 5), // Only right (5px) and bottom (5px) shadow
@@ -94,7 +94,7 @@ List<BoxShadow> shadowMidColor = [
 
 List<BoxShadow> shadowLowColor = [
   BoxShadow(
-    color: Colors.black.withOpacity(.5),
+    color: Colors.black.withOpacity(.2),
     spreadRadius: 1,
     blurRadius: 2,
     offset: Offset(5, 5), // Only right (5px) and bottom (5px) shadow
@@ -103,7 +103,7 @@ List<BoxShadow> shadowLowColor = [
 
 List<BoxShadow> shadowTopColor = [
   BoxShadow(
-    color: Colors.black.withOpacity(.5),
+    color: Colors.black.withOpacity(.2),
     spreadRadius: 1,
     blurRadius: 2,
     offset: Offset(5, -5), // Only right (5px) and bottom (5px) shadow

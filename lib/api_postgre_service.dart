@@ -419,6 +419,10 @@ Future<String?> checkBookingLimit(BuildContext context) async {
       return 'success';
     } else if (response.statusCode == 429) {
       return 'max';
+    } else if (response.statusCode == 400) {
+      return 'no limit';
+    } else if (response.statusCode == 409) {
+      return 'disabled';
     } else {
       if (response.statusCode == 401) {
         // Access token might be expired, attempt to refresh it
@@ -434,12 +438,9 @@ Future<String?> checkBookingLimit(BuildContext context) async {
         await deleteTokens(); // Logout use
       } else {
         print('Response: ${response.body}');
+        return null;
       }
-
-      //showErrorSnackBar(context, response.body);
     }
-    print('Cancel Booking is not successful!');
-    return response.body;
   } catch (e) {
     print(e.toString());
   }
@@ -457,7 +458,7 @@ Future<String?> checkUnpaidBIll(BuildContext context) async {
 
   try {
     final response = await http.post(
-      Uri.parse('$baseUrl/check_book_limit'),
+      Uri.parse('$baseUrl/check_unpaid_bill'),
       headers: {
         'Authorization': 'Bearer $accessToken',
       },
@@ -482,16 +483,59 @@ Future<String?> checkUnpaidBIll(BuildContext context) async {
         await deleteTokens(); // Logout use
       } else {
         print('Response: ${response.body}');
+        return null;
       }
-
-      //showErrorSnackBar(context, response.body);
     }
-    print('Cancel Booking is not successful!');
-    return response.body;
   } catch (e) {
     print(e.toString());
   }
   return null;
+}
+
+//fetch booking limit
+Future<Map<String, dynamic>?> fetchBookLimit() async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+
+  if (accessToken == null) {
+    print('No access token available. User needs to log in.');
+    await deleteTokens();
+    return null;
+  }
+
+  final response = await http.post(
+    Uri.parse('$baseUrl/fetch_book_limit'),
+    headers: {
+      'Authorization': 'Bearer $accessToken',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    return jsonDecode(response.body);
+  } else {
+    if (response.statusCode == 401) {
+      // Access token might be expired, attempt to refresh it
+      print('Access token expired. Attempting to refresh...');
+      String? refreshMsg = await refreshAccessToken();
+      if (refreshMsg == null) {
+        return await fetchBookLimit();
+      } else {
+        // Refresh token is invalid or expired, logout the user
+        await deleteTokens(); // Logout user
+        return null;
+      }
+    } else if (response.statusCode == 403) {
+      // Access token is invalid. logout
+      print('Access token invalid. Attempting to logout...');
+      await deleteTokens(); // Logout user
+    } else if (response.statusCode == 404) {
+      print('No booking limit found');
+      return null;
+    }
+
+    print('Response: ${response.body}');
+    return null;
+  }
 }
 
 //booking

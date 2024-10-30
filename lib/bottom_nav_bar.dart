@@ -126,13 +126,14 @@ class _C_BottomNavBarState extends State<C_BottomNavBar> {
               ? Icon(
                   icon,
                   //color: widget.currentIndex == index ? Colors.green : Colors.white
-                  color: blackSoft,
+                  color: black,
                 )
               : SizedBox(height: 24),
           Text(
             label,
             style: TextStyle(
-              color: widget.currentIndex == index ? Colors.green : blackSoft,
+              //color: widget.currentIndex == index ? Colors.green : black,
+              color: black,
               fontSize: 12,
               fontWeight: FontWeight.bold
             ),

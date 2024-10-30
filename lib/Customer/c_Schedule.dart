@@ -203,6 +203,10 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen> with SingleTickerPr
                                 String? bklimit = await checkBookingLimit(context);
                                 if (bklimit == 'max') {
                                   showBookLimitDialog(context);
+                                } else if (bklimit == 'disabled') {
+                                  showErrorSnackBar(context, 'We are not accepting booking right now!');
+                                } else if (bklimit == 'no limit') {
+                                  showErrorSnackBar(context, 'No booking limit found');
                                 } else if (bklimit == 'success') {
                                   String? isUnpaidBIll = await checkUnpaidBIll(context);
                                   if (isUnpaidBIll == 'Unpaid') {
@@ -439,9 +443,12 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen> with SingleTickerPr
                                                 ],
                                               );
                                             }
+                                            if (bookingList!.length - 1 == index) return const SizedBox(height: 200);
                                             return Container();
                                           },
                                         )
+
+                                      //hauler current pickup
                                       : ListView.builder(
                                           itemCount: bookingList?.length == null ? 0 : bookingList!.length,
                                           itemBuilder: (context, index) {
@@ -606,9 +613,11 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen> with SingleTickerPr
                                                 ],
                                               );
                                             }
+                                            if (bookingList!.length - 1 == index) return SizedBox(height: 200);
                                             return Container();
                                           },
                                         )
+                                      //hauler history
                                       : ListView.builder(
                                           itemCount:
                                               bookingListHistory?.length == null ? 0 : bookingListHistory!.length,

@@ -64,7 +64,11 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
 
   bool _acceptTerms = false;
 
+  //limit
   Map<String, dynamic> _bookLimit = {};
+  List<Map<String, dynamic>> _dayLimit = [];
+  List<Map<String, dynamic>> _wasteLimit = [];
+
   List<Map<String, dynamic>> _wasteTypes = [];
   List<Map<String, dynamic>> _selectedWasteTypes = [];
   //List<String> _selectedWasteTypes = [];
@@ -130,6 +134,8 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
       //final data = await userDataFromHive();
       final data = await fetchCusData(context);
       final bkLimitData = await fetchBookLimit();
+      final bkDayLimitData = await fetchDayLimit();
+      //final bkWasteLimitData = await fetchWasteLimit();
       List<Map<String, dynamic>>? categories = await fetchWasteCategory();
 
       if (!mounted) return;
@@ -168,14 +174,31 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
             _bookLimit = bkLimitData;
           } else {
             console('Failed to load booking limit');
+            return;
           }
+
+          //load day limit
+          if (bkDayLimitData != null) {
+            _dayLimit = bkDayLimitData;
+          } else {
+            console('Failed to load day limit');
+            return;
+          }
+
+          // //load waste limit
+          // if (bkWasteLimitData != null) {
+          //   _wasteLimit = bkWasteLimitData;
+          // } else {
+          //   console('Failed to load waste limit');
+          //   return;
+          // }
 
           //load waste cat
           if (categories != null) {
             _wasteTypes = categories;
             isLoading = false;
           } else {
-            print('Failed to load waste categories');
+            console('Failed to load waste categories');
           }
           isLoading = false;
         });
@@ -1061,7 +1084,22 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
                                                 color: Colors.white,
                                                 borderRadius: BorderRadius.circular(10),
                                                 boxShadow: shadowColor),
-                                            child: _wasteCategoryList(),
+                                            child: _selectedDate != null
+                                                ? _wasteCategoryList()
+                                                : Container(
+                                                    padding: EdgeInsets.all(10),
+                                                    width: double.infinity,
+                                                    child: Row(
+                                                      children: [
+                                                        Icon(Icons.library_add, color: deepGreen),
+                                                        SizedBox(width: 10.0),
+                                                        Text(
+                                                          'Choose date schedule first.',
+                                                          style: TextStyle(color: grey),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
                                           ),
                                           SizedBox(
                                             height: 5,
@@ -1235,7 +1273,13 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
                                     } else if (!_acceptTerms) {
                                       showErrorSnackBar(context, 'Accept the terms and condition');
                                     } else {
-                                      print(_selectedWasteTypes);
+                                      // bool? isDateGood = await checkDateLimit(_selectedDate!);
+                                      // if (isDateGood == false) {
+                                      //   console('goooooooooooooood');
+                                      // }
+                                      // else{
+                                      //   console('baaaaaaaaaaaaadddddd');
+                                      // }
                                       //good
                                       String? dbMessage = await booking(
                                           context,
@@ -1250,15 +1294,16 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
                                           selectedPoint!.longitude,
                                           _selectedDate!,
                                           _selectedWasteTypes);
-                                      if (dbMessage == 'success')
+                                      if (dbMessage == 'success') {
                                         Navigator.pushReplacement(
                                             context,
                                             MaterialPageRoute(
                                                 builder: (context) => MainApp(
                                                       selectedIndex: 2,
                                                     )));
-                                      else
+                                      } else {
                                         showErrorSnackBar(context, 'Somthing\'s wrong. Please try again later.');
+                                      }
                                     }
                                     setState(() {
                                       loadingAction = false;
@@ -1507,36 +1552,127 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
     return '';
   }
 
+  //waste cat ddl
+  Widget _wasteCategoryList() {
+    return ListView(
+      physics: NeverScrollableScrollPhysics(), // Stop scrolling
+      shrinkWrap: true, // Use shrinkWrap to make the list fit its content.
+      children: _wasteTypes.map((Map<String, dynamic> category) {
+        String type = category['name'];
+        var price = category['price'];
+        var unit = category['unit'];
+        var wcId = category['wc_id'];
+
+        // Check if the waste type is selected by comparing the name
+        bool isSelected = _selectedWasteTypes.any((selectedCategory) => selectedCategory['name'] == type);
+        //
+        bool isDisabled = _wasteLimit.any((limit) => limit['wc_id'] == wcId);
+
+        return CheckboxListTile(
+          title: Row(
+            children: [
+              isDisabled ? Icon(Icons.block, color: red) : Icon(Icons.library_add, color: deepGreen),
+              SizedBox(width: 10.0),
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      type,
+                      style: TextStyle(fontSize: 14),
+                    ),
+                    Text(
+                      '₱${price.toString()}\\${unit.toString()}',
+                      style: TextStyle(color: Colors.deepOrange, fontSize: 14),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          value: isSelected,
+          onChanged: isDisabled
+              ? null // Disables the checkbox if `isDisabled` is true
+              : (bool? selected) {
+                  setState(() {
+                    if (selected == true) {
+                      // Add the entire waste type object
+                      _selectedWasteTypes.add({
+                        'name': type,
+                        'price': price,
+                        'unit': unit,
+                      });
+                    } else {
+                      // Remove the waste type object
+                      _selectedWasteTypes.removeWhere((selectedCategory) => selectedCategory['name'] == type);
+                    }
+
+                    // Validator
+                    if (_selectedWasteTypes.isEmpty) {
+                      wasteCatValidator = _validateWaste(_selectedWasteTypes);
+                    } else {
+                      wasteCatValidator = '';
+                    }
+                  });
+                },
+          activeColor: Colors.blue, // Color of the checkbox when selected.
+          checkColor: Colors.white, // Color of the checkmark.
+        );
+      }).toList(),
+    );
+  }
+
+  // //waste cat ddl
   // Widget _wasteCategoryList() {
   //   return ListView(
-  //     physics: NeverScrollableScrollPhysics(), //stop scrollong
+  //     physics: NeverScrollableScrollPhysics(), // Stop scrolling
   //     shrinkWrap: true, // Use shrinkWrap to make the list fit its content.
   //     children: _wasteTypes.map((Map<String, dynamic> category) {
   //       String type = category['name'];
   //       var price = category['price'];
   //       var unit = category['unit'];
 
+  //       // Check if the waste type is selected by comparing the name
+  //       bool isSelected = _selectedWasteTypes.any((selectedCategory) => selectedCategory['name'] == type);
+
   //       return CheckboxListTile(
   //         title: Row(
-  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
   //           children: [
-  //             Text('${type}'),
-  //             Text(
-  //               '\₱${price.toString()}\\${unit.toString()}',
-  //               style: TextStyle(color: Colors.deepOrange),
+  //             Icon(Icons.library_add, color: deepGreen),
+  //             SizedBox(width: 10.0),
+  //             Expanded(
+  //               child: Row(
+  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                 children: [
+  //                   Text(
+  //                     '${type}',
+  //                     style: TextStyle(fontSize: 14),
+  //                   ),
+  //                   Text(
+  //                     '\₱${price.toString()}\\${unit.toString()}',
+  //                     style: TextStyle(color: Colors.deepOrange, fontSize: 14),
+  //                   ),
+  //                 ],
+  //               ),
   //             ),
   //           ],
   //         ),
-  //         value: _selectedWasteTypes.contains(type),
+  //         value: isSelected,
   //         onChanged: (bool? selected) {
   //           setState(() {
   //             if (selected == true) {
-  //               _selectedWasteTypes.add(type);
+  //               // Add the entire waste type object
+  //               _selectedWasteTypes.add({
+  //                 'name': type,
+  //                 'price': price,
+  //                 'unit': unit,
+  //               });
   //             } else {
-  //               _selectedWasteTypes.remove(type);
+  //               // Remove the waste type object
+  //               _selectedWasteTypes.removeWhere((selectedCategory) => selectedCategory['name'] == type);
   //             }
 
-  //             //validator
+  //             // Validator
   //             if (_selectedWasteTypes.isEmpty) {
   //               wasteCatValidator = _validateWaste(_selectedWasteTypes);
   //             } else {
@@ -1550,127 +1686,8 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
   //     }).toList(),
   //   );
   // }
-  Widget _wasteCategoryList() {
-    return ListView(
-      physics: NeverScrollableScrollPhysics(), // Stop scrolling
-      shrinkWrap: true, // Use shrinkWrap to make the list fit its content.
-      children: _wasteTypes.map((Map<String, dynamic> category) {
-        String type = category['name'];
-        var price = category['price'];
-        var unit = category['unit'];
 
-        // Check if the waste type is selected by comparing the name
-        bool isSelected = _selectedWasteTypes.any((selectedCategory) => selectedCategory['name'] == type);
-
-        return CheckboxListTile(
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '${type}',
-                style: TextStyle(fontSize: 14),
-              ),
-              Text(
-                '\₱${price.toString()}\\${unit.toString()}',
-                style: TextStyle(color: Colors.deepOrange, fontSize: 14),
-              ),
-            ],
-          ),
-          value: isSelected,
-          onChanged: (bool? selected) {
-            setState(() {
-              if (selected == true) {
-                // Add the entire waste type object
-                _selectedWasteTypes.add({
-                  'name': type,
-                  'price': price,
-                  'unit': unit,
-                });
-              } else {
-                // Remove the waste type object
-                _selectedWasteTypes.removeWhere((selectedCategory) => selectedCategory['name'] == type);
-              }
-
-              // Validator
-              if (_selectedWasteTypes.isEmpty) {
-                wasteCatValidator = _validateWaste(_selectedWasteTypes);
-              } else {
-                wasteCatValidator = '';
-              }
-            });
-          },
-          activeColor: Colors.blue, // Color of the checkbox when selected.
-          checkColor: Colors.white, // Color of the checkmark.
-        );
-      }).toList(),
-    );
-  }
-
-  // Widget _buildDropDownList() {
-  //   return DropdownButtonFormField<String>(
-  //     value: _selectedWasteType,
-  //     dropdownColor: Colors.white,
-  //     decoration: InputDecoration(
-  //       contentPadding: EdgeInsets.symmetric(horizontal: 0),
-  //       //labelText: 'Select Waste Type',
-  //       labelStyle: TextStyle(color: accentColor),
-  //       hintText: 'Select Waste Type',
-  //       hintStyle: TextStyle(color: Colors.grey),
-  //       filled: true,
-  //       fillColor: Colors.white,
-  //       border: OutlineInputBorder(
-  //         borderRadius: BorderRadius.circular(10.0),
-  //         borderSide: BorderSide.none,
-  //       ),
-  //     ),
-  //     items: _wasteTypes.map((String value) {
-  //       return DropdownMenuItem<String>(
-  //         value: value,
-  //         child: Text(
-  //           value,
-  //         ),
-  //       );
-  //     }).toList(),
-  //     onChanged: (newValue) {
-  //       setState(() {
-  //         _selectedWasteType = newValue;
-  //       });
-  //     },
-  //   );
-  // }
-
-///////////////////////////////////
-  // Widget _buildTextboxField(
-  //     TextEditingController controller, String label, String hint) {
-  //   return Padding(
-  //     padding: const EdgeInsets.symmetric(vertical: 10.0),
-  //     child: Column(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: [
-  //         Text(
-  //           label,
-  //           style: TextStyle(color: Colors.white, fontSize: 16),
-  //         ),
-  //         SizedBox(height: 5),
-  //         TextFormField(
-  //           controller: controller,
-  //           //style: TextStyle(color: Colors.white),
-  //           decoration: InputDecoration(
-  //             contentPadding: EdgeInsets.symmetric(horizontal: 15),
-  //             filled: true,
-  //             hintText: hint,
-  //             hintStyle: TextStyle(color: Colors.grey),
-  //             border: OutlineInputBorder(
-  //               borderRadius: BorderRadius.circular(10),
-  //               borderSide: BorderSide.none,
-  //             ),
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
+  //date picker
   Widget _buildDatePicker(String label, String hint) {
     return GestureDetector(
       onTap: () {
@@ -1694,12 +1711,10 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
                   BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), boxShadow: shadowColor),
               child: Row(
                 children: [
-                  Icon(Icons.calendar_today, color: Colors.green),
+                  Icon(Icons.calendar_month, size: 24, color: deepGreen),
                   SizedBox(width: 10.0),
                   Text(
-                    _selectedDate == null
-                        ? hint
-                        : DateFormat('MMM d, yyyy (EEEE)').format(_selectedDate!), 
+                    _selectedDate == null ? hint : DateFormat('MMM d, yyyy (EEEE)').format(_selectedDate!),
                     style: TextStyle(color: _selectedDate == null ? Colors.grey : null, fontSize: 14),
                   ),
                   SizedBox(width: 10.0),
@@ -1715,40 +1730,52 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
   }
 
   Future<void> _selectDate(BuildContext context) async {
+    final List<DateTime> disabledDates = _dayLimit.map((dayLimit) {
+      final DateTime dbDay = DateTime.parse(dayLimit['day']).toUtc();
+      final DateTime strippedDay = DateTime(dbDay.year, dbDay.month, dbDay.day);
+      return strippedDay;
+    }).toList();
+
     final DateTime now = DateTime.now();
 
     final int closeTimeInMinutes = _bookLimit['bl_close_time'];
     final DateTime closeTime =
         DateTime(now.year, now.month, now.day, closeTimeInMinutes ~/ 60, closeTimeInMinutes % 60);
 
-    final DateTime dbDateStart = DateTime.parse(_bookLimit['bl_date_start']).toUtc();
+    //final DateTime dbDateStart = DateTime.parse(_bookLimit['bl_date_start']).toUtc();
     final DateTime dbDateLast = DateTime.parse(_bookLimit['bl_date_last']).toUtc();
-    //first date
-    final DateTime localStartDate = dbDateStart.toLocal(); // Convert to local time
-    final DateTime subFirstDate = DateTime(localStartDate.year, localStartDate.month, localStartDate.day);
-    final DateTime firstDate = now.isBefore(closeTime)
-        ? subFirstDate 
-        : subFirstDate.add(Duration(days: 1)); 
 
-    //Last date
-    final DateTime localLastDate = dbDateLast.toLocal(); // Convert to local time
+    // // Determine first and last selectable dates
+    // final DateTime localStartDate = dbDateStart.toLocal();
+    // final DateTime subFirstDate = DateTime(localStartDate.year, localStartDate.month, localStartDate.day);
+    // final DateTime firstDate = now.isBefore(closeTime) ? subFirstDate : subFirstDate.add(Duration(days: 1));
+    final DateTime firstDate = now.isBefore(closeTime) ? now : now.add(Duration(days: 1));
+    final DateTime localLastDate = dbDateLast.toLocal();
     final DateTime lastDate = DateTime(localLastDate.year, localLastDate.month, localLastDate.day);
 
-    //initial date
-    final DateTime initialDate = firstDate;
+    // Check if initialDate is disabled
+    DateTime initialDate = firstDate;
+
+    // Find the next available date if the initialDate is disabled
+    while (disabledDates.contains(initialDate)) {
+      initialDate = initialDate.add(Duration(days: 1));
+    }
 
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: initialDate,
       firstDate: firstDate,
       lastDate: lastDate,
+      selectableDayPredicate: (DateTime date) {
+        return !disabledDates.contains(date);
+      },
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
             colorScheme: ColorScheme.light(
-              primary: Colors.green, // Circle color for the selected date
-              onPrimary: Colors.white, // Text color inside the circle
-              onSurface: deepPurple, // Text color for dates
+              primary: Colors.green,
+              onPrimary: Colors.white,
+              onSurface: deepPurple,
             ),
           ),
           child: child!,
@@ -1758,14 +1785,101 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
 
     if (picked != null && picked != _selectedDate) {
       setState(() {
+        loadingAction = true;
+      });
+      //
+      final bkWasteLimitData = await fetchWasteLimit(picked);
+      if (bkWasteLimitData != null) {
+        _wasteLimit = bkWasteLimitData;
+      } else {
+        showErrorSnackBar(context, 'Booking waste limit not found');
+        return;
+      }
+      setState(() {
         _selectedDate = picked;
 
         if (_selectedDate != null) {
           dateValidator = '';
         }
+
+        //
+        loadingAction = false;
       });
     }
   }
+
+  // Future<void> _selectDate(BuildContext context) async {
+  //   //final List<DateTime> disabledDates = _dayLimit?.map((dayLimit) => DateTime.parse(dayLimit['day'])).toList() ?? [];
+  //   //final List<DateTime> disabledDates = _dayLimit.map((dayLimit) => DateTime.parse(dayLimit['day'])).toList();
+  //   final List<DateTime> disabledDates = _dayLimit.map((dayLimit) {
+  //     // Parse the date from server but ignore time
+  //     final DateTime dbDay = DateTime.parse(dayLimit['day']).toUtc();
+
+  //     // Directly create a date from the original without converting to local
+  //     final DateTime strippedDay = DateTime(dbDay.year, dbDay.month, dbDay.day);
+
+  //     // Log for debugging
+  //     print('Stripped Day: $strippedDay'); // This should give you the correct day
+
+  //     return strippedDay;
+  //   }).toList();
+
+  //   //
+  //   final DateTime now = DateTime.now();
+
+  //   final int closeTimeInMinutes = _bookLimit['bl_close_time'];
+  //   final DateTime closeTime =
+  //       DateTime(now.year, now.month, now.day, closeTimeInMinutes ~/ 60, closeTimeInMinutes % 60);
+
+  //   final DateTime dbDateStart = DateTime.parse(_bookLimit['bl_date_start']).toUtc();
+  //   final DateTime dbDateLast = DateTime.parse(_bookLimit['bl_date_last']).toUtc();
+  //   //first date
+  //   final DateTime localStartDate = dbDateStart.toLocal(); // Convert to local time
+  //   final DateTime subFirstDate = DateTime(localStartDate.year, localStartDate.month, localStartDate.day);
+  //   final DateTime firstDate = now.isBefore(closeTime) ? subFirstDate : subFirstDate.add(Duration(days: 1));
+
+  //   //Last date
+  //   final DateTime localLastDate = dbDateLast.toLocal(); // Convert to local time
+  //   final DateTime lastDate = DateTime(localLastDate.year, localLastDate.month, localLastDate.day);
+
+  //   //initial date
+  //   final DateTime initialDate = firstDate;
+
+  //   final DateTime? picked = await showDatePicker(
+  //     context: context,
+  //     initialDate: initialDate,
+  //     firstDate: firstDate,
+  //     lastDate: lastDate,
+  //     //
+  //     selectableDayPredicate: (DateTime date) {
+  //       // Disable dates that are in the disabledDates list
+  //       return !disabledDates.contains(date);
+  //     },
+
+  //     builder: (BuildContext context, Widget? child) {
+  //       return Theme(
+  //         data: ThemeData.light().copyWith(
+  //           colorScheme: ColorScheme.light(
+  //             primary: Colors.green, // Circle color for the selected date
+  //             onPrimary: Colors.white, // Text color inside the circle
+  //             onSurface: deepPurple, // Text color for dates
+  //           ),
+  //         ),
+  //         child: child!,
+  //       );
+  //     },
+  //   );
+
+  //   if (picked != null && picked != _selectedDate) {
+  //     setState(() {
+  //       _selectedDate = picked;
+
+  //       if (_selectedDate != null) {
+  //         dateValidator = '';
+  //       }
+  //     });
+  //   }
+  // }
 
   // Future<void> _selectDate(BuildContext context) async {
   //   final DateTime now = DateTime.now();

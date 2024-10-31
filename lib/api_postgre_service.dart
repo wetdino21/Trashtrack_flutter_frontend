@@ -338,8 +338,12 @@ Future<List<Map<String, dynamic>>?> fetchWasteCategory() async {
       List<dynamic> data = jsonDecode(response.body);
       // Extracting category names and prices as a list of maps
       return data
-          .map<Map<String, dynamic>>(
-              (item) => {'name': item['wc_name'].toString(), 'unit': item['wc_unit'], 'price': item['wc_price']})
+          .map<Map<String, dynamic>>((item) => {
+                'name': item['wc_name'].toString(),
+                'unit': item['wc_unit'],
+                'price': item['wc_price'],
+                'wc_id': item['wc_id'],
+              })
           .toList();
     } else {
       print(response.body);
@@ -519,6 +523,155 @@ Future<Map<String, dynamic>?> fetchBookLimit() async {
       String? refreshMsg = await refreshAccessToken();
       if (refreshMsg == null) {
         return await fetchBookLimit();
+      } else {
+        // Refresh token is invalid or expired, logout the user
+        await deleteTokens(); // Logout user
+        return null;
+      }
+    } else if (response.statusCode == 403) {
+      // Access token is invalid. logout
+      print('Access token invalid. Attempting to logout...');
+      await deleteTokens(); // Logout user
+    } else if (response.statusCode == 404) {
+      print('No booking limit found');
+      return null;
+    }
+
+    print('Response: ${response.body}');
+    return null;
+  }
+}
+
+//fetch booking day limit
+Future<List<Map<String, dynamic>>?> fetchDayLimit() async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+
+  if (accessToken == null) {
+    print('No access token available. User needs to log in.');
+    await deleteTokens();
+    return null;
+  }
+
+  final response = await http.post(
+    Uri.parse('$baseUrl/fetch_day_limit'),
+    headers: {
+      'Authorization': 'Bearer $accessToken',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    final List<dynamic> data = jsonDecode(response.body);
+    return data.cast<Map<String, dynamic>>();
+  } else {
+    if (response.statusCode == 401) {
+      // Access token might be expired, attempt to refresh it
+      print('Access token expired. Attempting to refresh...');
+      String? refreshMsg = await refreshAccessToken();
+      if (refreshMsg == null) {
+        return await fetchDayLimit();
+      } else {
+        // Refresh token is invalid or expired, logout the user
+        await deleteTokens(); // Logout user
+        return null;
+      }
+    } else if (response.statusCode == 403) {
+      // Access token is invalid. logout
+      print('Access token invalid. Attempting to logout...');
+      await deleteTokens(); // Logout user
+    } else if (response.statusCode == 404) {
+      print('No booking limit found');
+      return null;
+    }
+
+    print('Response: ${response.body}');
+    return null;
+  }
+}
+
+//fetch waste limit
+Future<List<Map<String, dynamic>>?> fetchWasteLimit(DateTime date) async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+
+  if (accessToken == null) {
+    print('No access token available. User needs to log in.');
+    await deleteTokens();
+    return null;
+  }
+
+  final response = await http.post(
+    Uri.parse('$baseUrl/fetch_waste_limit'),
+    headers: {
+      'Authorization': 'Bearer $accessToken',
+      'Content-Type': 'application/json',
+    },
+    body: jsonEncode({
+      'date': date.toIso8601String(), // needed ! Convert DateTime to ISO 8601 string
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    final List<dynamic> data = jsonDecode(response.body);
+    return data.cast<Map<String, dynamic>>();
+  } else {
+    if (response.statusCode == 401) {
+      // Access token might be expired, attempt to refresh it
+      print('Access token expired. Attempting to refresh...');
+      String? refreshMsg = await refreshAccessToken();
+      if (refreshMsg == null) {
+        return await fetchWasteLimit(date);
+      } else {
+        // Refresh token is invalid or expired, logout the user
+        await deleteTokens(); // Logout user
+        return null;
+      }
+    } else if (response.statusCode == 403) {
+      // Access token is invalid. logout
+      print('Access token invalid. Attempting to logout...');
+      await deleteTokens(); // Logout user
+    } else if (response.statusCode == 404) {
+      print('No booking limit found');
+      return null;
+    }
+
+    print('Response: ${response.body}');
+    return null;
+  }
+}
+
+//fetch waste limit
+Future<bool?> checkDateLimit(DateTime date) async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+
+  if (accessToken == null) {
+    print('No access token available. User needs to log in.');
+    await deleteTokens();
+    return null;
+  }
+
+  final response = await http.post(
+    Uri.parse('$baseUrl/check_date_limit'),
+    headers: {
+      'Authorization': 'Bearer $accessToken',
+      'Content-Type': 'application/json',
+    },
+    body: jsonEncode({
+      'date': date.toIso8601String(), // needed ! Convert DateTime to ISO 8601 string
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+    return data['isExceeding']; // Return true or false
+  } else {
+    if (response.statusCode == 401) {
+      // Access token might be expired, attempt to refresh it
+      print('Access token expired. Attempting to refresh...');
+      String? refreshMsg = await refreshAccessToken();
+      if (refreshMsg == null) {
+        return await checkDateLimit(date);
       } else {
         // Refresh token is invalid or expired, logout the user
         await deleteTokens(); // Logout user

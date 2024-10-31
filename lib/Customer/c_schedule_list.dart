@@ -254,6 +254,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails> with SingleTicker
   late Animation<Color?> _colorTweenCar;
 
   bool isLoading = true;
+  bool loadingAction = false;
 
   String fullname = '';
   String contact = '';
@@ -262,6 +263,11 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails> with SingleTicker
   String postal = '';
 
   bool _acceptTerms = true;
+
+  //limit
+  Map<String, dynamic> _bookLimit = {};
+  List<Map<String, dynamic>> _dayLimit = [];
+  List<Map<String, dynamic>> _wasteLimit = [];
 
   List<Map<String, dynamic>> _wasteTypes = [];
   List<Map<String, dynamic>> _selectedWasteTypes = [];
@@ -337,6 +343,10 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails> with SingleTicker
     try {
       //final data = await fetchBookingData(context);
       final data = await fetchBookingDetails(context, widget.bookId);
+      //
+      final bkLimitData = await fetchBookLimit();
+      final bkDayLimitData = await fetchDayLimit();
+
       if (!mounted) {
         return;
       }
@@ -397,6 +407,23 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails> with SingleTicker
               _mapController.move(selectedPoint!, 13.0);
             });
           }
+
+          //load book limit
+          if (bkLimitData != null) {
+            _bookLimit = bkLimitData;
+          } else {
+            console('Failed to load booking limit');
+            return;
+          }
+
+          //load day limit
+          if (bkDayLimitData != null) {
+            _dayLimit = bkDayLimitData;
+          } else {
+            console('Failed to load day limit');
+            return;
+          }
+
           isLoading = false;
         });
       } else {
@@ -779,9 +806,14 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails> with SingleTicker
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: deepGreen,
-      body: Column(
+      body: Stack(
         children: [
-          Expanded(child: _buildFirstStep()),
+          Column(
+            children: [
+              Expanded(child: _buildFirstStep()),
+            ],
+          ),
+          if (loadingAction) showLoadingAction(),
         ],
       ),
     );
@@ -1632,7 +1664,22 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails> with SingleTicker
                                                 color: Colors.white,
                                                 boxShadow: shadowColor,
                                                 borderRadius: BorderRadius.circular(10)),
-                                            child: _wasteCategoryList(),
+                                            child: _selectedDate != null
+                                                ? _wasteCategoryList()
+                                                : Container(
+                                                    padding: EdgeInsets.all(10),
+                                                    width: double.infinity,
+                                                    child: Row(
+                                                      children: [
+                                                        Icon(Icons.library_add, color: deepGreen),
+                                                        SizedBox(width: 10.0),
+                                                        Text(
+                                                          'Choose date schedule first.',
+                                                          style: TextStyle(color: grey),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
                                           ),
                                         ],
                                       ),
@@ -1917,7 +1964,8 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails> with SingleTicker
                               ),
                               SizedBox(width: 5),
                               Container(
-                                  child: Text("Cancel Booking?", style: TextStyle(fontSize: 16, color: Colors.black54))),
+                                  child:
+                                      Text("Cancel Booking?", style: TextStyle(fontSize: 16, color: Colors.black54))),
                             ],
                           ),
                         ),
@@ -2097,6 +2145,7 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails> with SingleTicker
     return '';
   }
 
+  // waste cat ddl
   Widget _wasteCategoryList() {
     return ListView(
       physics: NeverScrollableScrollPhysics(), // Stop scrolling
@@ -2106,47 +2155,60 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails> with SingleTicker
               String type = category['name'];
               var price = category['price'];
               var unit = category['unit'];
+              var wcId = category['wc_id'];
 
               // Check if the waste type is selected by comparing the name
               bool isSelected = _selectedWasteTypes.any((selectedCategory) => selectedCategory['name'] == type);
+              //
+              bool isDisabled = _wasteLimit.any((limit) => limit['wc_id'] == wcId);
 
               return CheckboxListTile(
                 title: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      '${type}',
-                      style: TextStyle(fontSize: 14),
-                    ),
-                    Text(
-                      '\₱${price.toString()}\\${unit.toString()}',
-                      style: TextStyle(color: Colors.deepOrange, fontSize: 14),
+                    isDisabled ? Icon(Icons.block, color: red) : Icon(Icons.library_add, color: deepGreen),
+                    SizedBox(width: 10.0),
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            type,
+                            style: TextStyle(fontSize: 14),
+                          ),
+                          Text(
+                            '₱${price.toString()}\\${unit.toString()}',
+                            style: TextStyle(color: Colors.deepOrange, fontSize: 14),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
                 value: isSelected,
-                onChanged: (bool? selected) {
-                  setState(() {
-                    if (selected == true) {
-                      // Add the entire waste type object
-                      _selectedWasteTypes.add({
-                        'name': type,
-                        'price': price,
-                        'unit': unit,
-                      });
-                    } else {
-                      // Remove the waste type object
-                      _selectedWasteTypes.removeWhere((selectedCategory) => selectedCategory['name'] == type);
-                    }
+                onChanged: isDisabled
+                    ? null // Disables the checkbox if `isDisabled` is true
+                    : (bool? selected) {
+                        setState(() {
+                          if (selected == true) {
+                            // Add the entire waste type object
+                            _selectedWasteTypes.add({
+                              'name': type,
+                              'price': price,
+                              'unit': unit,
+                            });
+                          } else {
+                            // Remove the waste type object
+                            _selectedWasteTypes.removeWhere((selectedCategory) => selectedCategory['name'] == type);
+                          }
 
-                    // Validator
-                    if (_selectedWasteTypes.isEmpty) {
-                      wasteCatValidator = _validateWaste(_selectedWasteTypes);
-                    } else {
-                      wasteCatValidator = '';
-                    }
-                  });
-                },
+                          // Validator
+                          if (_selectedWasteTypes.isEmpty) {
+                            wasteCatValidator = _validateWaste(_selectedWasteTypes);
+                          } else {
+                            wasteCatValidator = '';
+                          }
+                        });
+                      },
                 activeColor: Colors.blue, // Color of the checkbox when selected.
                 checkColor: Colors.white, // Color of the checkmark.
               );
@@ -2172,6 +2234,83 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails> with SingleTicker
             }).toList(),
     );
   }
+
+  //// waste cat ddl
+  // Widget _wasteCategoryList() {
+  //   return ListView(
+  //     physics: NeverScrollableScrollPhysics(), // Stop scrolling
+  //     shrinkWrap: true, // Use shrinkWrap to make the list fit its content.
+  //     children: _isEditing
+  //         ? _wasteTypes.map((Map<String, dynamic> category) {
+  //             String type = category['name'];
+  //             var price = category['price'];
+  //             var unit = category['unit'];
+
+  //             // Check if the waste type is selected by comparing the name
+  //             bool isSelected = _selectedWasteTypes.any((selectedCategory) => selectedCategory['name'] == type);
+
+  //             return CheckboxListTile(
+  //               title: Row(
+  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                 children: [
+  //                   Text(
+  //                     '${type}',
+  //                     style: TextStyle(fontSize: 14),
+  //                   ),
+  //                   Text(
+  //                     '\₱${price.toString()}\\${unit.toString()}',
+  //                     style: TextStyle(color: Colors.deepOrange, fontSize: 14),
+  //                   ),
+  //                 ],
+  //               ),
+  //               value: isSelected,
+  //               onChanged: (bool? selected) {
+  //                 setState(() {
+  //                   if (selected == true) {
+  //                     // Add the entire waste type object
+  //                     _selectedWasteTypes.add({
+  //                       'name': type,
+  //                       'price': price,
+  //                       'unit': unit,
+  //                     });
+  //                   } else {
+  //                     // Remove the waste type object
+  //                     _selectedWasteTypes.removeWhere((selectedCategory) => selectedCategory['name'] == type);
+  //                   }
+
+  //                   // Validator
+  //                   if (_selectedWasteTypes.isEmpty) {
+  //                     wasteCatValidator = _validateWaste(_selectedWasteTypes);
+  //                   } else {
+  //                     wasteCatValidator = '';
+  //                   }
+  //                 });
+  //               },
+  //               activeColor: Colors.blue, // Color of the checkbox when selected.
+  //               checkColor: Colors.white, // Color of the checkmark.
+  //             );
+  //           }).toList()
+  //         : _selectedWasteTypes.map((Map<String, dynamic> category) {
+  //             String type = category['name'];
+  //             var price = category['price'];
+  //             var unit = category['unit'];
+
+  //             return Container(
+  //               padding: EdgeInsets.all(10),
+  //               child: Row(
+  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                 children: [
+  //                   Text('${type}'),
+  //                   Text(
+  //                     '\₱${price.toString()}\\${unit.toString()}',
+  //                     style: TextStyle(color: Colors.deepOrange),
+  //                   ),
+  //                 ],
+  //               ),
+  //             );
+  //           }).toList(),
+  //   );
+  // }
 
 //date picker
   Widget _buildDatePicker(String label, String hint) {
@@ -2223,16 +2362,49 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails> with SingleTicker
   }
 
   Future<void> _selectDate(BuildContext context) async {
+    final List<DateTime> disabledDates = _dayLimit.map((dayLimit) {
+      final DateTime dbDay = DateTime.parse(dayLimit['day']).toUtc();
+      final DateTime strippedDay = DateTime(dbDay.year, dbDay.month, dbDay.day);
+      return strippedDay;
+    }).toList();
+
     final DateTime now = DateTime.now();
-    final DateTime firstDate = DateTime(now.year);
-    final DateTime lastDate = DateTime(now.year + 1, 12, 31);
+
+    final int closeTimeInMinutes = _bookLimit['bl_close_time'];
+    final DateTime closeTime =
+        DateTime(now.year, now.month, now.day, closeTimeInMinutes ~/ 60, closeTimeInMinutes % 60);
+
+    //final DateTime dbDateStart = DateTime.parse(_bookLimit['bl_date_start']).toUtc();
+    final DateTime dbDateLast = DateTime.parse(_bookLimit['bl_date_last']).toUtc();
+
+    // // Determine first and last selectable dates
+    // final DateTime localStartDate = dbDateStart.toLocal();
+    // final DateTime subFirstDate = DateTime(localStartDate.year, localStartDate.month, localStartDate.day);
+    // final DateTime firstDate = now.isBefore(closeTime) ? subFirstDate : subFirstDate.add(Duration(days: 1));
+    final DateTime firstDate = now.isBefore(closeTime) ? now : now.add(Duration(days: 1));
+    final DateTime localLastDate = dbDateLast.toLocal();
+    final DateTime lastDate = DateTime(localLastDate.year, localLastDate.month, localLastDate.day);
+
+    // Check if initialDate is disabled
+    DateTime initialDate = firstDate;
+
+    // Find the next available date if the initialDate is disabled
+    while (disabledDates.contains(initialDate)) {
+      initialDate = initialDate.add(Duration(days: 1));
+    }
+    //
+    if (_selectedDate == null || _selectedDate!.isBefore(firstDate) || _selectedDate!.isAfter(lastDate)) {
+      _selectedDate = firstDate;
+    }
 
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: _selectedDate,
-      //initialDate: DateTime.now(),
       firstDate: firstDate,
-      lastDate: lastDate, // Use the current year + 1
+      lastDate: lastDate,
+      selectableDayPredicate: (DateTime date) {
+        return !disabledDates.contains(date);
+      },
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
@@ -2249,277 +2421,63 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails> with SingleTicker
 
     if (picked != null && picked != _selectedDate) {
       setState(() {
+        loadingAction = true;
+      });
+      //
+      final bkWasteLimitData = await fetchWasteLimit(picked);
+      if (bkWasteLimitData != null) {
+        _wasteLimit = bkWasteLimitData;
+      } else {
+        showErrorSnackBar(context, 'Booking waste limit not found');
+        return;
+      }
+      console(picked);
+      setState(() {
         _selectedDate = picked;
 
         if (_selectedDate != null) {
           dateValidator = '';
         }
+
+        //
+        loadingAction = false;
       });
     }
   }
+
+  // Future<void> _selectDate(BuildContext context) async {
+  //   final DateTime now = DateTime.now();
+  //   final DateTime firstDate = DateTime(now.year);
+  //   final DateTime lastDate = DateTime(now.year + 1, 12, 31);
+
+  //   final DateTime? picked = await showDatePicker(
+  //     context: context,
+  //     initialDate: _selectedDate,
+  //     //initialDate: DateTime.now(),
+  //     firstDate: firstDate,
+  //     lastDate: lastDate, // Use the current year + 1
+  //     builder: (BuildContext context, Widget? child) {
+  //       return Theme(
+  //         data: ThemeData.light().copyWith(
+  //           colorScheme: ColorScheme.light(
+  //             primary: Colors.green, // Circle color for the selected date
+  //             onPrimary: Colors.white, // Text color inside the circle
+  //             onSurface: Colors.green[900]!, // Text color for dates
+  //           ),
+  //         ),
+  //         child: child!,
+  //       );
+  //     },
+  //   );
+
+  //   if (picked != null && picked != _selectedDate) {
+  //     setState(() {
+  //       _selectedDate = picked;
+
+  //       if (_selectedDate != null) {
+  //         dateValidator = '';
+  //       }
+  //     });
+  //   }
+  // }
 }
-
-// Widget _buildDropDownList() {
-//   return DropdownButtonFormField<String>(
-//     value: _selectedWasteType,
-//     dropdownColor: Colors.white,
-//     decoration: InputDecoration(
-//       contentPadding: EdgeInsets.symmetric(horizontal: 0),
-//       //labelText: 'Select Waste Type',
-//       labelStyle: TextStyle(color: accentColor),
-//       hintText: 'Select Waste Type',
-//       hintStyle: TextStyle(color: Colors.grey),
-//       filled: true,
-//       fillColor: Colors.white,
-//       border: OutlineInputBorder(
-//         borderRadius: BorderRadius.circular(10.0),
-//         borderSide: BorderSide.none,
-//       ),
-//     ),
-//     items: _wasteTypes.map((String value) {
-//       return DropdownMenuItem<String>(
-//         value: value,
-//         child: Text(
-//           value,
-//         ),
-//       );
-//     }).toList(),
-//     onChanged: (newValue) {
-//       setState(() {
-//         _selectedWasteType = newValue;
-//       });
-//     },
-//   );
-// }
-
-///////////////////////////////////
-// Widget _buildTextboxField(
-//     TextEditingController controller, String label, String hint) {
-//   return Padding(
-//     padding: const EdgeInsets.symmetric(vertical: 10.0),
-//     child: Column(
-//       crossAxisAlignment: CrossAxisAlignment.start,
-//       children: [
-//         Text(
-//           label,
-//           style: TextStyle(color: Colors.white, fontSize: 16),
-//         ),
-//         SizedBox(height: 5),
-//         TextFormField(
-//           controller: controller,
-//           //style: TextStyle(color: Colors.white),
-//           decoration: InputDecoration(
-//             contentPadding: EdgeInsets.symmetric(horizontal: 15),
-//             filled: true,
-//             hintText: hint,
-//             hintStyle: TextStyle(color: Colors.grey),
-//             border: OutlineInputBorder(
-//               borderRadius: BorderRadius.circular(10),
-//               borderSide: BorderSide.none,
-//             ),
-//           ),
-//         ),
-//       ],
-//     ),
-//   );
-// }
-
-// class C_PickUpSchedule extends StatefulWidget {
-//   @override
-//   _C_PickUpScheduleState createState() => _C_PickUpScheduleState();
-// }
-
-// class _C_PickUpScheduleState extends State<C_PickUpSchedule> {
-//   int selectedPage = 0;
-//   late PageController _pageController;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     _pageController = PageController(initialPage: selectedPage);
-//   }
-
-//   void onPageSelected(int pageIndex) {
-//     setState(() {
-//       selectedPage = pageIndex;
-//     });
-//     _pageController.jumpToPage(pageIndex);
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: backgroundColor,
-//       appBar: AppBar(
-//         backgroundColor: backgroundColor,
-//         foregroundColor: Colors.white,
-//         title: Text('Schedule'),
-//       ),
-//       body: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           SizedBox(height: 20.0),
-//           Center(
-//             child: Text(
-//               'List Of Pickup Schedules',
-//               style: TextStyle(
-//                 color: Colors.white70,
-//                 fontSize: 18.0,
-//               ),
-//             ),
-//           ),
-//           SizedBox(height: 20.0),
-//           Container(
-//             padding: EdgeInsets.all(5.0),
-//             decoration: BoxDecoration(
-//               color: Color(0xFF103510),
-//               borderRadius: BorderRadius.circular(30.0),
-//             ),
-//             child: Row(
-//               children: [
-//                 Container(
-//                   child: ElevatedButton(
-//                     onPressed: () => onPageSelected(0),
-//                     style: ElevatedButton.styleFrom(
-//                       backgroundColor:
-//                           selectedPage == 0 ? buttonColor : Color(0xFF001E00),
-//                       shape: RoundedRectangleBorder(
-//                         borderRadius: BorderRadius.circular(30.0),
-//                       ),
-//                     ),
-//                     child: Text(
-//                       'All',
-//                       style: TextStyle(
-//                         color:
-//                             selectedPage == 0 ? Colors.white : Colors.white70,
-//                       ),
-//                     ),
-//                   ),
-//                 ),
-//                 Expanded(
-//                   child: ElevatedButton(
-//                     onPressed: () => onPageSelected(1),
-//                     style: ElevatedButton.styleFrom(
-//                       backgroundColor:
-//                           selectedPage == 1 ? buttonColor : Color(0xFF001E00),
-//                       shape: RoundedRectangleBorder(
-//                         borderRadius: BorderRadius.circular(30.0),
-//                       ),
-//                     ),
-//                     child: Text(
-//                       'Contractual',
-//                       style: TextStyle(
-//                         color:
-//                             selectedPage == 1 ? Colors.white : Colors.white70,
-//                       ),
-//                     ),
-//                   ),
-//                 ),
-//                 Expanded(
-//                   child: ElevatedButton(
-//                     onPressed: () => onPageSelected(2),
-//                     style: ElevatedButton.styleFrom(
-//                       backgroundColor:
-//                           selectedPage == 2 ? buttonColor : Color(0xFF001E00),
-//                       shape: RoundedRectangleBorder(
-//                         borderRadius: BorderRadius.circular(30.0),
-//                       ),
-//                     ),
-//                     child: Text(
-//                       'Non-Contractual',
-//                       style: TextStyle(
-//                         color:
-//                             selectedPage == 2 ? Colors.white : Colors.white70,
-//                       ),
-//                     ),
-//                   ),
-//                 ),
-//               ],
-//             ),
-//           ),
-//           SizedBox(height: 20.0),
-//           Container(
-//             //height: MediaQuery.of(context).size.height * .6,
-//             padding: EdgeInsets.symmetric(horizontal: 10),
-//             child: PageView(
-//               controller: _pageController,
-//               onPageChanged: (index) {
-//                 setState(() {
-//                   selectedPage = index;
-//                 });
-//               },
-//               children: [
-//                 // All Waste Collection Cards
-//                 // ListView(
-//                 //   shrinkWrap: true,
-//                 //   children: [
-//                 //     C_CurrentScheduleCard(
-//                 //       dateCreated: 'Mon Jun 20',
-//                 //       time: '8:30 AM',
-//                 //       wasteType: 'Municipal Waste',
-//                 //       status: 'Pending',
-//                 //     ),
-//                 //     C_CurrentScheduleCard(
-//                 //       dateCreated: 'Wed Jun 20',
-//                 //       time: '8:30 AM',
-//                 //       wasteType: 'Construction Waste',
-//                 //       status: 'Complete',
-//                 //     ),
-//                 //     C_CurrentScheduleCard(
-//                 //       dateCreated: 'Fri Jun 20',
-//                 //       time: '8:30 AM',
-//                 //       wasteType: 'Food Waste',
-//                 //       status: 'Pending',
-//                 //     ),
-//                 //     C_CurrentScheduleCard(
-//                 //       dateCreated: 'Fri Jun 20',
-//                 //       time: '8:30 AM',
-//                 //       wasteType: 'Construction Waste',
-//                 //       status: 'Pending',
-//                 //     ),
-//                 //   ],
-//                 // ),
-//                 // // Contractual Waste Collection Cards
-//                 // ListView(
-//                 //   shrinkWrap: true,
-//                 //   children: [
-//                 //     C_CurrentScheduleCard(
-//                 //       dateCreated: 'Mon Jun 20',
-//                 //       time: '8:30 AM',
-//                 //       wasteType: 'Municipal Waste',
-//                 //       status: 'Pending',
-//                 //     ),
-//                 //     C_CurrentScheduleCard(
-//                 //       dateCreated: 'Wed Jun 20',
-//                 //       time: '8:30 AM',
-//                 //       wasteType: 'Construction Waste',
-//                 //       status: 'Pending',
-//                 //     ),
-//                 //   ],
-//                 // ),
-//                 // // Non-Contractual Waste Collection Cards
-//                 // ListView(
-//                 //   shrinkWrap: true,
-//                 //   children: [
-//                 //     C_CurrentScheduleCard(
-//                 //       dateCreated: 'Fri Jun 20',
-//                 //       time: '8:30 AM',
-//                 //       wasteType: 'Food Waste',
-//                 //       status: 'Pending',
-//                 //     ),
-//                 //     C_CurrentScheduleCard(
-//                 //       dateCreated: 'Fri Jun 20',
-//                 //       time: '8:30 AM',
-//                 //       wasteType: 'Construction Waste',
-//                 //       status: 'Pending',
-//                 //     ),
-//                 //   ],
-//                 // ),
-//               ],
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }

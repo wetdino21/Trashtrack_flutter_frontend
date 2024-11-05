@@ -27,8 +27,11 @@ globalAddressUrl() {
 //my pc network
 
 globalUrl() {
-  return 'http://192.168.254.187:3000';
+  return 'http://192.168.119.156:3000';
 }
+// globalUrl() {
+//   return 'http://192.168.254.187:3000';
+// }
 
 ////// COMMENT THIS IF IP STATIC ///////////////////////////////////////////////////////////////////
 

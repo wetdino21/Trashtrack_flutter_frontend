@@ -26,6 +26,7 @@ class _Booking_ListState extends State<Booking_List> with SingleTickerProviderSt
   late AnimationController _controller;
   late Animation<Color?> _colorTween;
   late Animation<Color?> _colorTween2;
+  late Animation<Color?> _colorPriority;
 
   List<Map<String, dynamic>>? bookingTodayList;
   List<Map<String, dynamic>>? wasteTodayList;
@@ -58,6 +59,11 @@ class _Booking_ListState extends State<Booking_List> with SingleTickerProviderSt
     _colorTween2 = ColorTween(
       begin: Colors.grey,
       end: Colors.white,
+    ).animate(_controller);
+
+    _colorPriority = ColorTween(
+      begin: Colors.pinkAccent,
+      end: deepPurple,
     ).animate(_controller);
   }
 
@@ -309,18 +315,36 @@ class _Booking_ListState extends State<Booking_List> with SingleTickerProviderSt
                                     }
 
                                     final String status = booking['bk_status'] ?? 'No status';
+                                    final bool priority = booking['bk_priority'] ?? false;
 
                                     // Pass the extracted data to the C_CurrentScheduleCard widget
                                     return Column(
                                       children: [
-                                        C_ScheduleCardList(
-                                          bookId: book_Id,
-                                          date: date,
-                                          dateCreated: dateCreated,
-                                          wasteType: wasteTypes,
-                                          status: status,
-                                          today: true,
-                                        ),
+                                        AnimatedBuilder(
+                                            animation: _controller,
+                                            builder: (context, child) {
+                                              return Container(
+                                                color: priority == true ? _colorPriority.value : Colors.transparent,
+                                                padding: priority == true && index == 0
+                                                    ? EdgeInsets.only(top: 20)
+                                                    : EdgeInsets.zero,
+                                                //padding: priority == true ? EdgeInsets.all(5) : EdgeInsets.zero,
+                                                //margin: priority == true ? EdgeInsets.all(5) : EdgeInsets.zero,
+                                                // decoration: BoxDecoration(
+                                                //     color: priority == true ? _colorPriority.value : Colors.transparent,
+                                                //     borderRadius: borderRadius10),
+                                                child: C_ScheduleCardList(
+                                                  priority: priority,
+                                                  bookId: book_Id,
+                                                  date: date,
+                                                  dateCreated: dateCreated,
+                                                  wasteType: wasteTypes,
+                                                  status: status,
+                                                  today: true,
+                                                ),
+                                              );
+                                            }),
+                                        if (priority == false) SizedBox(height: 10),
                                         if (bookingTodayList!.length - 1 == index) SizedBox(height: 200),
                                       ],
                                     );
@@ -409,11 +433,12 @@ class _Booking_ListState extends State<Booking_List> with SingleTickerProviderSt
                                     }
 
                                     final String status = booking['bk_status'] ?? 'No status';
-
+                                    final bool priority = booking['bk_priority'] ?? false;
                                     // Pass the extracted data to the C_CurrentScheduleCard widget
                                     return Column(
                                       children: [
                                         C_ScheduleCardList(
+                                          priority: priority,
                                           bookId: book_Id,
                                           date: date,
                                           dateCreated: dateCreated,
@@ -1182,7 +1207,9 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
                                                       ? Colors.green
                                                       : bookingData!['bk_status'] == 'Cancelled'
                                                           ? Colors.red
-                                                          : Colors.blue,
+                                                          : bookingData!['bk_status'] == 'Failed'
+                                                              ? Colors.pink
+                                                              : Colors.blue,
                                               borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
                                             ),
                                             child: Column(
@@ -1194,18 +1221,17 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
                                                               bookingData!['bk_status'] == 'Ongoing'
                                                           ? 'Request Pickup is ${bookingData!['bk_status']}'
                                                           //? 'Your Request Pickup is ${bookingData!['bk_status']}'
-                                                          : 'Your Request Pickup was ${bookingData!['bk_status']}',
+                                                          : 'Request Pickup was ${bookingData!['bk_status']}',
                                                   style: TextStyle(
                                                       color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
                                                 ),
-                                                bookingData!['bk_status'] == 'Ongoing'
-                                                    ? Text(
-                                                        'Today is your waste collection day!',
-                                                        style: TextStyle(
-                                                          color: Colors.white,
-                                                        ),
-                                                      )
-                                                    : SizedBox()
+                                                if (bookingData!['bk_status'] == 'Ongoing')
+                                                  const Text(
+                                                    'Ride and safety first!',
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
                                               ],
                                             ),
                                           ),
@@ -2150,8 +2176,14 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
                               Navigator.push(
                                   context, MaterialPageRoute(builder: (context) => MainApp(selectedIndex: 2)));
                             } else if (resultDb == 'ongoing') {
+                              // Navigator.push(
+                              //     context, MaterialPageRoute(builder: (context) => MainApp(selectedIndex: 2)));
                               Navigator.push(
-                                  context, MaterialPageRoute(builder: (context) => MainApp(selectedIndex: 2)));
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => Booking_List(),
+                                ),
+                              );
                             } else {
                               showErrorSnackBar(context, 'Something wrong, Please try again later.');
                             }

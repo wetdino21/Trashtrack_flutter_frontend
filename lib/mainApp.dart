@@ -33,7 +33,7 @@ class _MainAppState extends State<MainApp> {
 
   int _selectedIndex = 0;
   bool loading = false;
-  bool firstLoad = true;
+  //bool firstLoad = true;
   //animate
   bool isHome = false;
   double height = 0.3;
@@ -56,9 +56,9 @@ class _MainAppState extends State<MainApp> {
       _selectedIndex = widget.selectedIndex!;
     }
 
-    if (_selectedIndex != 0) {
-      firstLoad = false;
-    }
+    // if (_selectedIndex != 0) {
+    //   firstLoad = false;
+    // }
   }
 
   @override
@@ -93,21 +93,18 @@ class _MainAppState extends State<MainApp> {
         user = usertype;
         loading = false;
 
-        //load all resource
-        if (firstLoad && _selectedIndex == 0) {
-          Future.delayed(const Duration(seconds: 2), () {
-            setState(() {
-              firstLoad = false;
-            });
-          });
-        }
+        // //load all resource
+        // if (firstLoad && _selectedIndex == 0) {
+        //   Future.delayed(const Duration(seconds: 2), () {
+        //     setState(() {
+        //       firstLoad = false;
+        //     });
+        //   });
+        // }
       });
     } catch (e) {
       console(e.toString());
       if (!mounted) return;
-      // setState(() {
-      //   Loading = false;
-      // });
     }
   }
 
@@ -159,34 +156,42 @@ class _MainAppState extends State<MainApp> {
 
   //ontappppppppppppppp
   void _onItemTapped(int index) {
-    if (index == 0) {
-      setState(() {
-        loading = true;
-      });
-      _startAnimation();
-      userModel!.setIsHome(true);
-      //
+    // if (index == 0) {
+    //   setState(() {
+    //     loading = true;
+    //   });
+    //   _startAnimation();
+    //   userModel!.setIsHome(true);
+    //   //
 
-      if (_selectedIndex != index) {
-        _playSound();
-        setState(() {
-          _selectedIndex = index;
-        });
-      }
-      //
-      Future.delayed(const Duration(seconds: 1), () {
-        setState(() {
-          loading = false;
-        });
+    //   if (_selectedIndex != index) {
+    //     _playSound();
+    //     setState(() {
+    //       _selectedIndex = index;
+    //     });
+    //   }
+    //   // //need
+    //   // Future.delayed(const Duration(seconds: 1), () {
+    //   //   setState(() {
+    //   //     loading = false;
+    //   //   });
+    //   // });
+    // } else {
+    //   // Normal behavior for other indices
+    //   if (_selectedIndex != index) {
+    //     _playSound();
+    //     setState(() {
+    //       _selectedIndex = index;
+    //     });
+    //   }
+    // }
+
+    // removed if uncomment above
+    if (_selectedIndex != index) {
+      _playSound();
+      setState(() {
+        _selectedIndex = index;
       });
-    } else {
-      // Normal behavior for other indices
-      if (_selectedIndex != index) {
-        _playSound();
-        setState(() {
-          _selectedIndex = index;
-        });
-      }
     }
 
     // Reset data if index is not 1
@@ -199,6 +204,7 @@ class _MainAppState extends State<MainApp> {
     }
   }
 
+  /////////
   // void _onItemTapped(int index) {
   //   if (index != 1) {
   //     setState(() {
@@ -234,6 +240,17 @@ class _MainAppState extends State<MainApp> {
     return Scaffold(
         body: Stack(
       children: [
+        PopScope(
+            canPop: false,
+            onPopInvokedWithResult: (didPop, result) async {
+              if (didPop) {
+                return;
+              }
+              //_cancelEdit();
+            },
+            child: Container()),
+
+        //
         if (!loading)
           Scaffold(
             backgroundColor: deepGreen,
@@ -267,8 +284,9 @@ class _MainAppState extends State<MainApp> {
             ),
             floatingActionButtonLocation: getFabLocation(), // Dynamic FAB location
           ),
-        if (loading || firstLoad) showLoadingIconAnimate(),
-        if (userModel!.isToHome) showLoadingMovingTruck(context, height, position),
+        // if (loading || firstLoad) showLoadingIconAnimate(),
+        if (loading) showLoadingIconAnimate(),
+        //if (userModel!.isToHome) showLoadingMovingTruck(context, height, position),
       ],
     ));
 

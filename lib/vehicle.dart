@@ -9,8 +9,7 @@ class VehicleScreen extends StatefulWidget {
   State<VehicleScreen> createState() => _VehicleScreenState();
 }
 
-class _VehicleScreenState extends State<VehicleScreen>
-    with SingleTickerProviderStateMixin {
+class _VehicleScreenState extends State<VehicleScreen> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<Color?> _colorTween;
   late Animation<Color?> _colorTween2;
@@ -78,26 +77,19 @@ class _VehicleScreenState extends State<VehicleScreen>
         setState(() {
           vehicleList = data2;
           // Find the vehicle where driver_id == emp_id
-          final matchedVehicle = vehicleList
-              ?.firstWhere((vehicle) => vehicle['driver_id'] == emp_id);
+          final matchedVehicle = vehicleList?.firstWhere((vehicle) => vehicle['driver_id'] == emp_id);
 
           if (matchedVehicle != null) {
             vehicleList!.remove(matchedVehicle);
             currentVehicle = matchedVehicle;
-            plate = 'Plate # + ${currentVehicle!['v_plate']}';
-            capacity =
-                '${currentVehicle!['v_capacity'].toString()} ${currentVehicle!['v_capacity_unit'].toString()}';
+            plate = currentVehicle!['v_plate'];
+            capacity = '${currentVehicle!['v_capacity'].toString()} ${currentVehicle!['v_capacity_unit'].toString()}';
 
             name = (currentVehicle!['vtype_name'].toString());
-            DateTime dbdateCreated =
-                DateTime.parse(currentVehicle!['v_created_at']).toLocal();
-            dateCreated =
-                DateFormat('MMM dd, yyyy hh:mm a').format(dbdateCreated);
-            DateTime dbdateAssigned =
-                DateTime.parse(currentVehicle!['driver_date_assigned_at'])
-                    .toLocal();
-            dateAssigned =
-                DateFormat('MMM dd, yyyy hh:mm a').format(dbdateAssigned);
+            DateTime dbdateCreated = DateTime.parse(currentVehicle!['v_created_at']).toLocal();
+            dateCreated = DateFormat('MMM dd, yyyy hh:mm a').format(dbdateCreated);
+            DateTime dbdateAssigned = DateTime.parse(currentVehicle!['driver_date_assigned_at']).toLocal();
+            dateAssigned = DateFormat('MMM dd, yyyy hh:mm a').format(dbdateAssigned);
             status = currentVehicle!['v_status'];
           }
         });
@@ -136,8 +128,7 @@ class _VehicleScreenState extends State<VehicleScreen>
                   decoration: BoxDecoration(
                       color: white,
                       boxShadow: shadowTopColor,
-                      borderRadius:
-                          BorderRadius.only(topRight: Radius.circular(15))),
+                      borderRadius: BorderRadius.only(topRight: Radius.circular(15))),
                   height: MediaQuery.of(context).size.height * .80,
                   //height: MediaQuery.of(context).size.height - kBottomNavigationBarHeight,
                   margin: EdgeInsets.symmetric(horizontal: 10),
@@ -157,15 +148,13 @@ class _VehicleScreenState extends State<VehicleScreen>
                         child: isLoading
                             ? Container(
                                 padding: EdgeInsets.all(20),
-                                child: loadingAnimation(
-                                    _controller, _colorTween, _colorTween2),
+                                child: loadingAnimation(_controller, _colorTween, _colorTween2),
                               )
                             : vehicleList == null
                                 ? ListView(
                                     children: [
                                       Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           SizedBox(
                                             height: 100,
@@ -173,17 +162,12 @@ class _VehicleScreenState extends State<VehicleScreen>
                                           Container(
                                               alignment: Alignment.center,
                                               child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
+                                                mainAxisAlignment: MainAxisAlignment.center,
                                                 children: [
-                                                  Icon(Icons.calendar_month,
-                                                      color: blackSoft,
-                                                      size: 70),
+                                                  Icon(Icons.calendar_month, color: blackSoft, size: 70),
                                                   Text(
                                                     'No vehicle/s yet\n\n\n\n',
-                                                    style: TextStyle(
-                                                        color: blackSoft,
-                                                        fontSize: 20),
+                                                    style: TextStyle(color: blackSoft, fontSize: 20),
                                                   ),
                                                 ],
                                               )),
@@ -195,9 +179,7 @@ class _VehicleScreenState extends State<VehicleScreen>
                                     ],
                                   )
                                 : ListView.builder(
-                                    itemCount: vehicleList?.length == null
-                                        ? 0
-                                        : vehicleList!.length,
+                                    itemCount: vehicleList?.length == null ? 0 : vehicleList!.length,
                                     itemBuilder: (context, index) {
                                       // Safely retrieve the booking details from bookingList
                                       final vehicle = vehicleList?[index];
@@ -206,26 +188,14 @@ class _VehicleScreenState extends State<VehicleScreen>
                                         return SizedBox.shrink();
                                       }
 
-                                      String plate =
-                                          'Plate # ' + vehicle['v_plate'];
-                                      String capacity =
-                                          (vehicle['v_capacity']?.toString() ??
-                                                  'Load') +
-                                              ' ' +
-                                              (vehicle['v_capacity_unit']
-                                                      ?.toString() ??
-                                                  'ing');
-                                      String name =
-                                          (vehicle['vtype_name']?.toString() ??
-                                              'Loading');
-                                      DateTime dbdateCreated = DateTime.parse(
-                                              vehicle['v_created_at'] ?? '')
-                                          .toLocal();
-                                      String dateCreated =
-                                          DateFormat('MMM dd, yyyy hh:mm a')
-                                              .format(dbdateCreated);
-                                      String status =
-                                          vehicle['v_status'] ?? 'Loading';
+                                      String plate = 'Plate # ' + vehicle['v_plate'];
+                                      String capacity = (vehicle['v_capacity']?.toString() ?? 'Load') +
+                                          ' ' +
+                                          (vehicle['v_capacity_unit']?.toString() ?? 'ing');
+                                      String name = (vehicle['vtype_name']?.toString() ?? 'Loading');
+                                      DateTime dbdateCreated = DateTime.parse(vehicle['v_created_at'] ?? '').toLocal();
+                                      String dateCreated = DateFormat('MMM dd, yyyy hh:mm a').format(dbdateCreated);
+                                      String status = vehicle['v_status'] ?? 'Loading';
 
                                       return Column(
                                         children: [
@@ -236,33 +206,26 @@ class _VehicleScreenState extends State<VehicleScreen>
                                             decoration: BoxDecoration(
                                                 color: deepPurple,
                                                 boxShadow: shadowTopColor,
-                                                borderRadius: borderRadius10),
+                                                borderRadius: borderRadius5),
                                             child: Column(
                                               children: [
                                                 Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                   children: [
                                                     Text(
                                                       plate,
-                                                      style: TextStyle(
-                                                          color: whiteSoft,
-                                                          fontSize: 16),
+                                                      style: TextStyle(color: whiteSoft, fontSize: 14),
                                                     ),
                                                     Row(
                                                       children: [
                                                         Icon(
-                                                            Icons
-                                                                .linear_scale_rounded,
-                                                            color: white,
-                                                           ),
+                                                          Icons.linear_scale_rounded,
+                                                          color: white,
+                                                        ),
                                                         SizedBox(width: 5),
                                                         Text(
                                                           capacity,
-                                                          style: TextStyle(
-                                                              color: whiteSoft,
-                                                              fontSize: 20),
+                                                          style: TextStyle(color: blueSoft, fontSize: 16),
                                                         ),
                                                       ],
                                                     ),
@@ -273,48 +236,36 @@ class _VehicleScreenState extends State<VehicleScreen>
                                                     Text(
                                                       name,
                                                       style: TextStyle(
-                                                          color: white,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontSize: 20),
+                                                          color: white, fontWeight: FontWeight.bold, fontSize: 22),
                                                     ),
                                                   ],
                                                 ),
                                                 Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                   children: [
                                                     Row(
                                                       children: [
-                                                        Icon(Icons.library_add,
-                                                            color: white,
-                                                            size: 15),
+                                                        Icon(Icons.library_add, color: white, size: 15),
                                                         SizedBox(width: 5),
                                                         Text(
                                                           dateCreated,
                                                           style: TextStyle(
                                                               color: whiteSoft,
                                                               fontSize: 10,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
+                                                              fontWeight: FontWeight.bold),
                                                         ),
                                                       ],
                                                     ),
                                                     Text(
                                                       status,
-                                                      style: TextStyle(
-                                                          color: white,
-                                                          fontSize: 18),
+                                                      style: TextStyle(color: Colors.yellow, fontSize: 18),
                                                     ),
                                                   ],
                                                 ),
                                               ],
                                             ),
                                           ),
-                                          if (vehicleList!.length - 1 == index)
-                                            SizedBox(height: 200)
+                                          if (vehicleList!.length - 1 == index) SizedBox(height: 200)
                                         ],
                                       );
                                     },
@@ -328,15 +279,13 @@ class _VehicleScreenState extends State<VehicleScreen>
                         child: isLoading
                             ? Container(
                                 padding: EdgeInsets.all(20),
-                                child: loadingSingleAnimation(
-                                    _controller, _colorTween, _colorTween2),
+                                child: loadingSingleAnimation(_controller, _colorTween, _colorTween2),
                               )
                             : currentVehicle == null
                                 ? ListView(
                                     children: [
                                       Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           SizedBox(
                                             height: 100,
@@ -344,17 +293,12 @@ class _VehicleScreenState extends State<VehicleScreen>
                                           Container(
                                               alignment: Alignment.center,
                                               child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
+                                                mainAxisAlignment: MainAxisAlignment.center,
                                                 children: [
-                                                  Icon(Icons.car_repair,
-                                                      color: blackSoft,
-                                                      size: 70),
+                                                  Icon(Icons.car_repair, color: blackSoft, size: 70),
                                                   Text(
                                                     'No assigned vehicle\n\n\n\n',
-                                                    style: TextStyle(
-                                                        color: blackSoft,
-                                                        fontSize: 20),
+                                                    style: TextStyle(color: blackSoft, fontSize: 20),
                                                   ),
                                                 ],
                                               )),
@@ -370,23 +314,18 @@ class _VehicleScreenState extends State<VehicleScreen>
                                       Container(
                                         padding: EdgeInsets.all(20),
                                         child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
                                           children: [
                                             SizedBox(height: 20),
                                             Text(
                                               'Your Assigned Vehicle',
                                               style: TextStyle(
-                                                  color: blackSoft,
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.bold),
+                                                  color: blackSoft, fontSize: 20, fontWeight: FontWeight.bold),
                                             ),
                                             Text(
-                                              'Assigned Date $dateAssigned',
+                                              'Assigned Date: $dateAssigned',
                                               style: TextStyle(
-                                                  color: blackSoft,
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.bold),
+                                                  color: blackSoft, fontSize: 10, fontWeight: FontWeight.bold),
                                             ),
                                             SizedBox(height: 20),
                                             // Truck image
@@ -400,8 +339,7 @@ class _VehicleScreenState extends State<VehicleScreen>
                                                       'assets/image/default truck2.png'), // Replace with your truck image asset path
                                                   fit: BoxFit.cover,
                                                 ),
-                                                borderRadius:
-                                                    BorderRadius.circular(16.0),
+                                                borderRadius: BorderRadius.circular(10),
                                               ),
                                             ),
                                             SizedBox(height: 20),
@@ -448,12 +386,10 @@ class _VehicleScreenState extends State<VehicleScreen>
                       GestureDetector(
                         onTap: () => onPageSelected(0),
                         child: Container(
-                          padding: EdgeInsets.symmetric(
-                              vertical: 20, horizontal: 30),
+                          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
                           decoration: BoxDecoration(
                               color: selectedPage == 0 ? white : deepPurple,
-                              borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(15)),
+                              borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
                               boxShadow: shadowTopColor),
                           child: Text(
                             'All',
@@ -467,12 +403,10 @@ class _VehicleScreenState extends State<VehicleScreen>
                       GestureDetector(
                         onTap: () => onPageSelected(1),
                         child: Container(
-                          padding: EdgeInsets.symmetric(
-                              vertical: 20, horizontal: 30),
+                          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
                           decoration: BoxDecoration(
                               color: selectedPage == 1 ? white : deepPurple,
-                              borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(15)),
+                              borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
                               boxShadow: shadowTopColor),
                           child: Text(
                             'Current',
@@ -511,8 +445,7 @@ class VehicleDetailRow extends StatelessWidget {
         children: [
           Text(
             label,
-            style: TextStyle(
-                fontSize: 18, fontWeight: FontWeight.bold, color: blackSoft),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: blackSoft),
           ),
           Text(
             value,

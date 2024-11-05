@@ -10,6 +10,7 @@ import 'package:trashtrack/styles.dart';
 
 import 'package:trashtrack/user_hive_data.dart';
 import 'package:flutter_cube/flutter_cube.dart';
+import 'dart:async';
 
 class C_HomeScreen extends StatefulWidget {
   @override
@@ -35,6 +36,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> with SingleTickerProviderSt
   String? errorMessage;
   Object? _obj;
   bool _isObjectLoaded = false;
+  Completer<void>? _sceneCreationCompleter;
   // Object _obj = Object(
   //   scale: Vector3(11.0, 11.0, 11.0),
   //   //position: Vector3(0, 0, 0),
@@ -76,6 +78,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> with SingleTickerProviderSt
 
   @override
   void dispose() {
+    _sceneCreationCompleter?.complete();
     TickerCanceled;
     _controller.dispose();
     super.dispose();
@@ -83,6 +86,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> with SingleTickerProviderSt
 
 // Fetch user data from the server
   Future<void> _dbData() async {
+    if (!mounted) return;
     setState(() {
       isLoading = true;
     });
@@ -93,7 +97,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> with SingleTickerProviderSt
       final dbtotalPickup = await fetchTotalHaulerPickup();
       final dbCusWasteCollected = await fetchTotalCusWasteCollected();
       final dbHaulWasteCollected = await fetchTotalHaulWasteCollected();
-      if (!mounted) return null;
+      if (!mounted) return;
       setState(() {
         userData = data;
         user = data['user'];
@@ -113,16 +117,18 @@ class _C_HomeScreenState extends State<C_HomeScreen> with SingleTickerProviderSt
         totalHaulWasteCollected = NumberFormat('#,##0.00').format(dbHaulWasteCollected);
         //totalHaulWasteCollected = dbHaulWasteCollected;
       }
+      if (!mounted) return;
 
-      setState(() {
-        isLoading = false;
-      });
       _obj = Object(
         scale: Vector3(11.0, 11.0, 11.0),
         //position: Vector3(0, 0, 0),
         rotation: Vector3(0, -90, 0),
         fileName: 'assets/objects/base.obj',
       );
+
+      setState(() {
+        isLoading = false;
+      });
     } catch (e) {
       console(e.toString());
     }
@@ -209,30 +215,63 @@ class _C_HomeScreenState extends State<C_HomeScreen> with SingleTickerProviderSt
                                           Expanded(
                                             flex: 8,
                                             child: Container(
-                                                height: 200,
-                                                child: Cube(
-                                                  onSceneCreated: (Scene scene) async {
-                                                    scene.world.add(_obj!);
+                                              height: 200,
+                                              child:
+                                                  // Cube(
+                                                  //   onSceneCreated: (Scene scene) {
+                                                  //     _sceneCreationCompleter = Completer<void>();
 
-                                                    await Future.delayed(Duration(milliseconds: 100));
+                                                  //     scene.world.add(_obj!);
 
-                                                    if (scene.world.children.contains(_obj)) {
-                                                      if (!mounted) return;
-                                                      setState(() {
-                                                        _isObjectLoaded = true;
-                                                        //load animation
-                                                        userModel!.setIsHome(false);
-                                                        print("Object fully loaded in the scene");
-                                                      });
-                                                    }
-                                                  },
-                                                )
-                                                //  Cube(
-                                                //   onSceneCreated: (Scene scene) {
-                                                //     scene.world.add(_obj!);
-                                                //   },
-                                                // ),
-                                                ),
+                                                  //     //await Future.delayed(Duration(milliseconds: 100));
+
+                                                  //     if (scene.world.children.contains(_obj)) {
+                                                  //       if (!mounted) return;
+                                                  //       setState(() {
+                                                  //         _isObjectLoaded = true;
+                                                  //         //load animation
+                                                  //         userModel!.setIsHome(false);
+                                                  //         print("Object fully loaded in the scene");
+                                                  //       });
+                                                  //     }
+                                                  //   },
+                                                  // )
+                                                  ///////////////////////////////////////////
+                                                  //     Cube(
+                                                  //   onSceneCreated: (Scene scene) {
+                                                  //     _sceneCreationCompleter = Completer<void>();
+
+                                                  //     // Add the object to the scene
+                                                  //     if (_obj != null) {
+                                                  //       scene.world.add(_obj!);
+
+                                                  //       // Use a delayed Future to wait for processing
+                                                  //       Future.delayed(Duration(milliseconds: 100), () {
+                                                  //         // Check if the completer has been completed
+                                                  //         if (_sceneCreationCompleter?.isCompleted ?? false) return;
+
+                                                  //         // Check if the object is still in the scene
+                                                  //         if (scene.world.children.contains(_obj)) {
+                                                  //           if (!mounted) return;
+                                                  //           setState(() {
+                                                  //             _isObjectLoaded = true; // Mark object as loaded
+                                                  //             userModel!.setIsHome(false); // Example action
+                                                  //             print("Object fully loaded in the scene");
+                                                  //           });
+                                                  //         }
+                                                  //       });
+                                                  //     } else {
+                                                  //       print("Object is not initialized yet.");
+                                                  //     }
+                                                  //   },
+                                                  // ),
+                                                  //  ///////////////////////////////////////////
+                                                  Cube(
+                                                onSceneCreated: (Scene scene) {
+                                                  scene.world.add(_obj!);
+                                                },
+                                              ),
+                                            ),
                                           ),
                                           Expanded(
                                             flex: 1,
@@ -333,7 +372,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> with SingleTickerProviderSt
                                 StatisticBox(
                                   icon: Icons.delete,
                                   title: 'Total Waste Collected',
-                                  value: user == 'customer' ? totalCusWasteCollected : totalHaulWasteCollected,
+                                  value: user == 'customer' ? '$totalCusWasteCollected kg' : '$totalHaulWasteCollected kg',
                                   iconColor: accentColor,
                                 ),
                               ],
@@ -344,17 +383,17 @@ class _C_HomeScreenState extends State<C_HomeScreen> with SingleTickerProviderSt
                         ),
                       ],
                     ),
-              if (!_isObjectLoaded)
-                Positioned.fill(
-                  child: InkWell(
-                    onTap: () {},
-                    child: Container(
-                      color: deepGreen,
-                      padding: EdgeInsets.all(20),
-                      child: loadingHomeAnimation(_controller, _colorTween, _colorTween2),
-                    ),
-                  ),
-                ),
+              // if (!_isObjectLoaded)
+              //   Positioned.fill(
+              //     child: InkWell(
+              //       onTap: () {},
+              //       child: Container(
+              //         color: deepGreen,
+              //         padding: EdgeInsets.all(20),
+              //         child: loadingHomeAnimation(_controller, _colorTween, _colorTween2),
+              //       ),
+              //     ),
+              //   ),
               if (loadingAction) showLoadingAction(),
             ],
           ),

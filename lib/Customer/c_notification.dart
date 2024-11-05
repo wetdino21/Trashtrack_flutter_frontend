@@ -245,6 +245,36 @@ class NotificationDetails extends StatefulWidget {
 }
 
 class _NotificationDetailsState extends State<NotificationDetails> {
+  String? status;
+  bool loading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchBooking();
+  }
+
+  void fetchBooking() async {
+    setState(() {
+      loading = true;
+    });
+
+    //
+    if (widget.bkId != null) {
+      String? dbStatus = await fetchBookingStatus(widget.bkId!);
+      if (dbStatus != null) {
+        setState(() {
+          status = dbStatus;
+        });
+      }
+    }
+
+    //
+    setState(() {
+      loading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -290,8 +320,13 @@ class _NotificationDetailsState extends State<NotificationDetails> {
                     ],
                   ),
                   SizedBox(height: 5),
-                  if (widget.bkId != null)
+                  // if (widget.bkId != null)
+                  //   ClipRRect(borderRadius: borderRadius15, child: Image.asset('assets/image/truck_arrival.jpg')),
+                  if (widget.bkId != null && status == 'Failed' && !loading)
+                    ClipRRect(borderRadius: borderRadius15, child: Image.asset('assets/image/reschedule.jpg')),
+                  if (widget.bkId != null && status != 'Failed' && !loading)
                     ClipRRect(borderRadius: borderRadius15, child: Image.asset('assets/image/truck_arrival.jpg')),
+
                   if (widget.gbId != null)
                     ClipRRect(borderRadius: borderRadius15, child: Image.asset('assets/image/bill_ready.jpg')),
                   Container(
@@ -305,11 +340,11 @@ class _NotificationDetailsState extends State<NotificationDetails> {
                     ),
                   ),
                   SizedBox(height: 20),
-                  if (widget.bkId != null)
+                  if (widget.bkId != null && !loading)
                     InkWell(
                       onTap: () {
                         Navigator.push(
-                            context, MaterialPageRoute(builder: (context) => C_ScheduleDetails(bookId: widget.bkId!)));
+                            context, MaterialPageRoute(builder: (context) => BookingDetails(bookId: widget.bkId!)));
                       },
                       child: Container(
                         width: double.infinity,
@@ -317,7 +352,7 @@ class _NotificationDetailsState extends State<NotificationDetails> {
                         padding: EdgeInsets.all(10),
                         decoration: BoxDecoration(
                             color: deepPurple, borderRadius: BorderRadius.circular(50), boxShadow: shadowLowColor),
-                        child: Text('Check booking!',
+                        child: Text(status == 'Failed'? 'Reschedule now!':'Check booking!',
                             style: TextStyle(color: white, fontSize: 24, fontWeight: FontWeight.bold)),
                       ),
                     ),
@@ -333,7 +368,7 @@ class _NotificationDetailsState extends State<NotificationDetails> {
                         padding: EdgeInsets.all(10),
                         decoration: BoxDecoration(
                             color: deepPurple, borderRadius: BorderRadius.circular(50), boxShadow: shadowLowColor),
-                        child: Text('Check bill!',
+                        child: Text('Check bill',
                             style: TextStyle(color: white, fontSize: 24, fontWeight: FontWeight.bold)),
                       ),
                     ),

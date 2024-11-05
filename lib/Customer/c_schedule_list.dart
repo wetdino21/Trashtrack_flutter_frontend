@@ -24,6 +24,7 @@ class C_ScheduleCardList extends StatefulWidget {
   final String wasteType; // food waste, municipal waste ...
   final String status;
   final bool? today;
+  final bool? priority;
 
   C_ScheduleCardList({
     required this.bookId,
@@ -32,6 +33,7 @@ class C_ScheduleCardList extends StatefulWidget {
     required this.wasteType,
     required this.status,
     this.today,
+    this.priority,
   });
 
   @override
@@ -63,7 +65,7 @@ class _C_ScheduleCardListState extends State<C_ScheduleCardList> {
     return InkWell(
       onTap: () {
         if (user == 'customer') {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => C_ScheduleDetails(bookId: widget.bookId)));
+          Navigator.push(context, MaterialPageRoute(builder: (context) => BookingDetails(bookId: widget.bookId)));
         } else if (user == 'hauler') {
           if (widget.today != null) {
             Navigator.push(
@@ -92,12 +94,30 @@ class _C_ScheduleCardListState extends State<C_ScheduleCardList> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: EdgeInsets.all(5),
-                child: Text(
-                  'BOOKING# ${widget.bookId}',
-                  style: TextStyle(color: blackSoft, fontWeight: FontWeight.bold, fontSize: 12),
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(5),
+                    child: Text(
+                      'BOOKING# ${widget.bookId}',
+                      style: TextStyle(color: blackSoft, fontWeight: FontWeight.bold, fontSize: 12),
+                    ),
+                  ),
+                  if (widget.priority == true)
+                    Container(
+                      padding: EdgeInsets.all(5),
+                      child: Row(
+                        children: [
+                          Icon(Icons.loyalty, color: red),
+                          Text(
+                            'Priority',
+                            style: TextStyle(color: red, fontWeight: FontWeight.bold, fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
               ),
               Container(
                 padding: EdgeInsets.all(5),
@@ -116,10 +136,14 @@ class _C_ScheduleCardListState extends State<C_ScheduleCardList> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                            widget.status == 'Cancelled' || widget.status == 'Collected'
+                            widget.status == 'Cancelled' || widget.status == 'Collected' || widget.status == 'Failed'
                                 ? Icons.history
                                 : Icons.calendar_month,
-                            size: widget.status == 'Cancelled' || widget.status == 'Collected' ? 35 : 25,
+                            size: widget.status == 'Cancelled' ||
+                                    widget.status == 'Collected' ||
+                                    widget.status == 'Failed'
+                                ? 35
+                                : 25,
                             color: Colors.white),
                         Text(
                           widget.date,
@@ -165,7 +189,9 @@ class _C_ScheduleCardListState extends State<C_ScheduleCardList> {
                                 ? Colors.green
                                 : widget.status == 'Cancelled'
                                     ? Colors.red
-                                    : Colors.blue,
+                                    : widget.status == 'Failed'
+                                        ? Colors.pink
+                                        : Colors.blue,
                         fontSize: 18.0,
                         //shadows: shadowTextColor,
                         fontWeight: FontWeight.bold
@@ -207,18 +233,18 @@ class _C_ScheduleCardListState extends State<C_ScheduleCardList> {
   }
 }
 
-class C_ScheduleDetails extends StatefulWidget {
+class BookingDetails extends StatefulWidget {
   final int bookId;
 
-  const C_ScheduleDetails({
+  const BookingDetails({
     required this.bookId,
   });
 
   @override
-  _C_ScheduleDetailsState createState() => _C_ScheduleDetailsState();
+  _BookingDetailsState createState() => _BookingDetailsState();
 }
 
-class _C_ScheduleDetailsState extends State<C_ScheduleDetails> with SingleTickerProviderStateMixin {
+class _BookingDetailsState extends State<BookingDetails> with SingleTickerProviderStateMixin {
   // Controllers for the input fields
   final _fullnameController = TextEditingController();
   final _contactController = TextEditingController();
@@ -1025,7 +1051,9 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails> with SingleTicker
                                                       ? Colors.green
                                                       : bookingData!['bk_status'] == 'Cancelled'
                                                           ? Colors.red
-                                                          : Colors.blue,
+                                                          : bookingData!['bk_status'] == 'Failed'
+                                                              ? Colors.pink
+                                                              : Colors.blue,
                                               borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
                                             ),
                                             child: Column(
@@ -1037,17 +1065,23 @@ class _C_ScheduleDetailsState extends State<C_ScheduleDetails> with SingleTicker
                                                               bookingData!['bk_status'] == 'Ongoing'
                                                           ? 'Your Request Pickup is ${bookingData!['bk_status']}'
                                                           : 'Your Request Pickup was ${bookingData!['bk_status']}',
-                                                  style: TextStyle(
+                                                  style: const TextStyle(
                                                       color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
                                                 ),
-                                                bookingData!['bk_status'] == 'Ongoing'
-                                                    ? Text(
-                                                        'Today is your waste collection day!',
-                                                        style: TextStyle(
-                                                          color: Colors.white,
-                                                        ),
-                                                      )
-                                                    : SizedBox()
+                                                if (bookingData!['bk_status'] == 'Ongoing')
+                                                  const Text(
+                                                    'Today is your waste collection day!',
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                if (bookingData!['bk_status'] == 'Failed')
+                                                  const Text(
+                                                    'Reschedule now to be our top priority!',
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                    ),
+                                                  )
                                               ],
                                             ),
                                           ),

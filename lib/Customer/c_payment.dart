@@ -795,7 +795,7 @@ class _PaymentDetailsState extends State<PaymentDetails> with SingleTickerProvid
                                             context,
                                             MaterialPageRoute(
                                                 builder: (context) =>
-                                                    C_ScheduleDetails(bookId: billDetails!['bk_id']))),
+                                                    BookingDetails(bookId: billDetails!['bk_id']))),
                                         child: Container(
                                           //decoration: BoxDecoration(boxShadow: shadowTextColor),
                                           child: Row(

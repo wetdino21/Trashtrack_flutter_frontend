@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:trashtrack/api_postgre_service.dart';
 import 'package:trashtrack/api_google.dart';
+import 'package:trashtrack/api_token.dart';
 import 'package:trashtrack/styles.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  String? action;
+  //final VoidCallback? onClearExpired;
+
+  LoginPage({super.key, this.action});
+  //LoginPage({super.key, this.expired, this.onClearExpired});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -21,10 +26,30 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
 
   @override
+  void initState() {
+    super.initState();
+    console('5555555555555');
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        expiredDialog();
+      }
+      console('766666666666666666666');
+    });
+  }
+
+  @override
   void dispose() {
     _emailController.dispose();
     _passController.dispose();
     super.dispose();
+  }
+
+  void expiredDialog() {
+    console(widget.action);
+    if (widget.action != null && widget.action == 'exp') {
+      console('Displaying expired session dialog');
+      showExpiredSessionDialog(context);
+    }
   }
 
   @override
@@ -62,19 +87,15 @@ class _LoginPageState extends State<LoginPage> {
                         child: Container()),
                     GestureDetector(
                       onTap: () {
-                        FocusScope.of(context)
-                            .unfocus(); // Unfocus all TextFields
+                        FocusScope.of(context).unfocus(); // Unfocus all TextFields
                       },
                       child: Container(
                         padding: EdgeInsets.all(16.0),
                         decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(20.0),
-                            boxShadow: shadowBigColor),
+                            color: Colors.white, borderRadius: BorderRadius.circular(20.0), boxShadow: shadowBigColor),
                         child: Column(
                           children: [
-                            Image.asset('assets/icon/trashtrack_icon_trans.png',
-                                scale: 5),
+                            Image.asset('assets/icon/trashtrack_icon_trans.png', scale: 5),
                             const Text(
                               'TRASHTRACK',
                               style: TextStyle(
@@ -85,9 +106,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             const Text(
                               'Please enter your account details below!',
-                              style: TextStyle(
-                                  color: Colors.grey,
-                                  fontWeight: FontWeight.bold),
+                              style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 20),
                             // _buildTextField(
@@ -126,9 +145,7 @@ class _LoginPageState extends State<LoginPage> {
                               icon: Icons.lock_outline,
                               suffixIcon: IconButton(
                                 icon: Icon(
-                                  _passwordVisible
-                                      ? Icons.visibility
-                                      : Icons.visibility_off,
+                                  _passwordVisible ? Icons.visibility : Icons.visibility_off,
                                   color: deepPurple,
                                 ),
                                 onPressed: () {
@@ -139,8 +156,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               onChanged: (value) {
                                 setState(() {
-                                  passvalidator = _validatePassword(
-                                      value); // Trigger validation on text change
+                                  passvalidator = _validatePassword(value); // Trigger validation on text change
                                 });
                               },
                             ),
@@ -189,12 +205,10 @@ class _LoginPageState extends State<LoginPage> {
                                 child: Text(
                                   'Forget password?',
                                   style: TextStyle(
-                                    color:
-                                        const Color.fromARGB(255, 196, 52, 41),
+                                    color: const Color.fromARGB(255, 196, 52, 41),
                                     fontSize: 16.0,
                                     decoration: TextDecoration.underline,
-                                    decorationColor:
-                                        const Color.fromARGB(255, 170, 40, 31),
+                                    decorationColor: const Color.fromARGB(255, 170, 40, 31),
                                   ),
                                 ),
                               ),
@@ -207,22 +221,18 @@ class _LoginPageState extends State<LoginPage> {
                                 Center(
                                     child: Text(
                                   'By Signing In, you agree to TrashTrack\'s ',
-                                  style: TextStyle(
-                                      color: Colors.grey,
-                                      fontWeight: FontWeight.bold),
+                                  style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
                                 )),
                                 Center(
                                   child: TextButton(
                                       onPressed: () {
                                         Navigator.pushNamed(context, 'terms');
                                       },
-                                      style: TextButton.styleFrom(
-                                          padding: EdgeInsets.zero),
+                                      style: TextButton.styleFrom(padding: EdgeInsets.zero),
                                       child: Text('Terms and Conditions.',
                                           style: TextStyle(
                                               color: Colors.green,
-                                              decoration:
-                                                  TextDecoration.underline,
+                                              decoration: TextDecoration.underline,
                                               decorationColor: Colors.green))),
                                 ),
                               ],
@@ -236,34 +246,25 @@ class _LoginPageState extends State<LoginPage> {
                                     loadingAction = true;
                                   });
 
-                                  if ((_emailController.text.isEmpty ||
-                                          emailvalidator.isNotEmpty) ||
-                                      (_passController.text.isEmpty ||
-                                          passvalidator.isNotEmpty)) {
+                                  if ((_emailController.text.isEmpty || emailvalidator.isNotEmpty) ||
+                                      (_passController.text.isEmpty || passvalidator.isNotEmpty)) {
                                     setState(() {
-                                      emailvalidator =
-                                          _validateEmail(_emailController.text);
-                                      passvalidator = _validatePassword(
-                                          _passController.text);
+                                      emailvalidator = _validateEmail(_emailController.text);
+                                      passvalidator = _validatePassword(_passController.text);
                                     });
                                     // Show any existing error message
                                   } else {
-                                    String? dbMessage = await loginAccount(
-                                        context,
-                                        _emailController.text,
-                                        _passController.text);
+                                    String? dbMessage =
+                                        await loginAccount(context, _emailController.text, _passController.text);
 
                                     // If there's an error, show it in a SnackBar
                                     if (dbMessage != null) {
                                       if (dbMessage == 'success') {
-                                        Navigator.pushReplacementNamed(
-                                            context, '/mainApp');
+                                        Navigator.pushReplacementNamed(context, '/mainApp');
                                       } else if (dbMessage == '202') {
-                                        Navigator.pushNamed(
-                                            context, 'deactivated');
+                                        Navigator.pushNamed(context, 'deactivated');
                                       } else if (dbMessage == '203') {
-                                        Navigator.pushNamed(
-                                            context, 'suspended');
+                                        Navigator.pushNamed(context, 'suspended');
                                       } else {
                                         showErrorSnackBar(context, dbMessage);
                                       }
@@ -299,19 +300,14 @@ class _LoginPageState extends State<LoginPage> {
                                   });
                                 },
                                 child: Container(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 70.0, vertical: 10),
+                                    padding: EdgeInsets.symmetric(horizontal: 70.0, vertical: 10),
                                     decoration: BoxDecoration(
                                         color: Colors.green,
-                                        borderRadius:
-                                            BorderRadius.circular(15.0),
+                                        borderRadius: BorderRadius.circular(15.0),
                                         boxShadow: shadowLowColor),
                                     child: const Text(
                                       'Login',
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 25,
-                                          fontWeight: FontWeight.bold),
+                                      style: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.bold),
                                     )),
                               ),
                             ),
@@ -320,9 +316,7 @@ class _LoginPageState extends State<LoginPage> {
                             Center(
                                 child: Text(
                               'Or Sign in with',
-                              style: TextStyle(
-                                  color: Colors.grey,
-                                  fontWeight: FontWeight.bold),
+                              style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
                             )),
                             const SizedBox(height: 10),
                             Center(
@@ -348,14 +342,10 @@ class _LoginPageState extends State<LoginPage> {
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: deepPurple,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(30.0),
-                                          side: BorderSide(
-                                              color: Colors.white54,
-                                              width: 2.0),
+                                          borderRadius: BorderRadius.circular(30.0),
+                                          side: BorderSide(color: Colors.white54, width: 2.0),
                                         ),
-                                        padding: EdgeInsets.symmetric(
-                                            vertical: 10.0, horizontal: 35.0),
+                                        padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 35.0),
                                       ),
                                       icon: Image.asset(
                                         'assets/Brands.png',
@@ -363,9 +353,7 @@ class _LoginPageState extends State<LoginPage> {
                                       ),
                                       label: Text(
                                         'Google',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 18.0),
+                                        style: TextStyle(color: Colors.white, fontSize: 18.0),
                                       ),
                                     ),
                                   ),
@@ -387,8 +375,7 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                   TextButton(
                                     onPressed: () {
-                                      Navigator.pushNamed(
-                                          context, 'create_acc');
+                                      Navigator.pushNamed(context, 'create_acc');
                                     },
                                     style: TextButton.styleFrom(
                                       padding: EdgeInsets.zero,
@@ -477,8 +464,7 @@ class _LoginPageState extends State<LoginPage> {
         obscureText: obscureText,
         keyboardType: keyboardType,
         decoration: InputDecoration(
-          labelText:
-              hintText, // This will move the hint text to the upper left when focused
+          labelText: hintText, // This will move the hint text to the upper left when focused
           floatingLabelBehavior: FloatingLabelBehavior.auto,
           labelStyle: TextStyle(color: Colors.grey),
           //hintText: hintText,
@@ -487,9 +473,7 @@ class _LoginPageState extends State<LoginPage> {
           suffixIcon: suffixIcon,
           filled: true,
           fillColor: Colors.white,
-          border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide.none),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
           // border: OutlineInputBorder(
           //   borderRadius: BorderRadius.circular(10), // Rounded corners
           // ),

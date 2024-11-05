@@ -5,6 +5,7 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:flutter/material.dart';
 import 'package:trashtrack/api_network.dart';
 import 'package:trashtrack/data_model.dart';
+import 'package:trashtrack/login.dart';
 import 'package:trashtrack/main.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:hive/hive.dart';
@@ -101,7 +102,7 @@ Future<bool> loggedIn() async {
 }
 
 // Delete tokens (for logout)
-Future<void> deleteTokens() async {
+Future<void> deleteTokens({String? action}) async {
   await storage.delete(key: 'access_token');
   await storage.delete(key: 'refresh_token');
 
@@ -113,11 +114,26 @@ Future<void> deleteTokens() async {
   globalUserModel.clearModelData();
   //navigatorKey.currentState?.pushNamedAndRemoveUntil('/logout');
 
-  // no context that's why use global key
-  navigatorKey.currentState?.pushNamedAndRemoveUntil(
-    '/logout',
+  //
+  // void clearExpired() {
+  //   isExpired = null; // Update expired state here
+  // }
+
+  action = action ?? 'exp';
+
+  console('tokeennnnnnnnnnn $action');
+  navigatorKey.currentState?.pushAndRemoveUntil(
+    MaterialPageRoute(
+      builder: (context) => LoginPage(action: action),
+    ),
     (Route<dynamic> route) => false,
   );
+
+  // // no context that's why use global key
+  // navigatorKey.currentState?.pushNamedAndRemoveUntil(
+  //   '/logout',
+  //   (Route<dynamic> route) => false,
+  // );
 }
 
 // Function to make API call (with token verification)
@@ -307,7 +323,7 @@ void showLogoutConfirmationDialog(BuildContext context) {
         actions: [
           TextButton(
             onPressed: () {
-              deleteTokens();
+              deleteTokens(action: 'logout');
               Navigator.of(context).pop();
             },
             child: Text('Yes', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -324,9 +340,9 @@ void showLogoutConfirmationDialog(BuildContext context) {
   );
 }
 
-void showExpiredSessionDialog() {
+void showExpiredSessionDialog(BuildContext context) {
   showDialog(
-    context: navigatorKey.currentContext!,
+    context: context,
     builder: (BuildContext context) {
       return AlertDialog(
         backgroundColor: white,

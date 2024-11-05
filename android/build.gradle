@@ -1,3 +1,84 @@
+
+//// new added comment if needed if error and uncomment below
+buildscript {
+    ext.kotlin_version = '1.9.0' // Update to the latest version if needed
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.0.2' // Ensure this version matches your Android Studio
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.google.gms:google-services:4.3.15' // Required for Google Sign-In and Firebase
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.buildDir = "../build"
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+    project.evaluationDependsOn(":app")
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}
+
+
+//// old uncomment if needed if error
+// // allprojects {
+// //     repositories {
+// //         google()
+// //         mavenCentral()
+// //     }
+// // }
+
+// // rootProject.buildDir = "../build"
+// // subprojects {
+// //     project.buildDir = "${rootProject.buildDir}/${project.name}"
+// // }
+// // subprojects {
+// //     project.evaluationDependsOn(":app")
+// // }
+
+// // tasks.register("clean", Delete) {
+// //     delete rootProject.buildDir
+// // }
+
+
+// //old
+// buildscript {
+//     repositories {
+//         google()
+//         mavenCentral()
+//     }
+//     dependencies {
+//         classpath 'com.android.tools.build:gradle:7.0.2' // Adjust the version to match your setup
+//         classpath 'com.google.gms:google-services:4.3.15' // Required for Google Sign-In and Firebase
+//     }
+// }
+
+// // //added
+// // buildscript {
+// //     ext.kotlin_version = '1.6.0' // Use a version compatible with the libraries
+// //     repositories {
+// //         google()
+// //         mavenCentral()
+// //     }
+
+// //     dependencies {
+// //         classpath 'com.android.tools.build:gradle:7.0.2'
+// //         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+// //     }
+// // }
+
+
 // allprojects {
 //     repositories {
 //         google()
@@ -17,55 +98,8 @@
 //     delete rootProject.buildDir
 // }
 
-
-//old
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:7.0.2' // Adjust the version to match your setup
-        classpath 'com.google.gms:google-services:4.3.15' // Required for Google Sign-In and Firebase
-    }
-}
-
-// //added
-// buildscript {
-//     ext.kotlin_version = '1.6.0' // Use a version compatible with the libraries
-//     repositories {
-//         google()
-//         mavenCentral()
-//     }
-
-//     dependencies {
-//         classpath 'com.android.tools.build:gradle:7.0.2'
-//         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-//     }
+// ext {
+//     kotlin_version = '1.6.0' // Update this to the latest version 1.9.0
 // }
-
-
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
-
-rootProject.buildDir = "../build"
-subprojects {
-    project.buildDir = "${rootProject.buildDir}/${project.name}"
-}
-subprojects {
-    project.evaluationDependsOn(":app")
-}
-
-tasks.register("clean", Delete) {
-    delete rootProject.buildDir
-}
-
-ext {
-    kotlin_version = '1.9.0' // Update this to the latest version
-}
 
 

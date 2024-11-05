@@ -76,8 +76,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
 
   UserModel? userModel;
   //email verification
-  final List<TextEditingController> _codeControllers =
-      List.generate(6, (_) => TextEditingController());
+  final List<TextEditingController> _codeControllers = List.generate(6, (_) => TextEditingController());
   int _timerSeconds = 300;
   late Timer _timer;
   late int onResendCode;
@@ -212,15 +211,13 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
   // Function to combine the text of all controllers
   void updateEnteredCode() {
     setState(() {
-      enteredCode =
-          _codeControllers.map((controller) => controller.text).join();
+      enteredCode = _codeControllers.map((controller) => controller.text).join();
     });
   }
 
   //verify code validator
   String? _validateCode() {
-    String enteredCode =
-        _codeControllers.map((controller) => controller.text).join();
+    String enteredCode = _codeControllers.map((controller) => controller.text).join();
     if (enteredCode.length < 6) {
       return 'Please enter the full code';
     }
@@ -304,7 +301,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
     return Container(
       height: 200,
       width: 200,
-      color: Colors.deepPurple, // Set the desired color here
+      color: deepPurple, // Set the desired color here
       child: imageFile != null
           ? Image.file(File(imageFile!.path)) // Display the selected image
           : Center(child: Text('No image selected')),
@@ -325,8 +322,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
 
   Future<void> _loadCitiesMunicipalities(String provinceCode) async {
     try {
-      final citiesMunicipalities =
-          await fetchCitiesMunicipalities(provinceCode);
+      final citiesMunicipalities = await fetchCitiesMunicipalities(provinceCode);
       setState(() {
         _citiesMunicipalities = citiesMunicipalities;
         _showCityMunicipalityDropdown = true;
@@ -397,9 +393,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
   }
 
   String _validateMname(String? value) {
-    if (value != null &&
-        value.isNotEmpty &&
-        !RegExp(r'^[a-zA-Z]+$').hasMatch(value)) {
+    if (value != null && value.isNotEmpty && !RegExp(r'^[a-zA-Z]+$').hasMatch(value)) {
       return 'Name must contain only letters';
     }
     return '';
@@ -517,12 +511,10 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: Colors.deepPurple,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(20.0))),
+          backgroundColor: deepPurple,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
           title: Text('Unsave Changes', style: TextStyle(color: Colors.white)),
-          content: Text('Any changes will be reset.',
-              style: TextStyle(color: Colors.white)),
+          content: Text('Any changes will be reset.', style: TextStyle(color: Colors.white)),
           actions: [
             TextButton(
               onPressed: () {
@@ -843,10 +835,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                       Container(
                         //width: double.infinity,
                         margin: EdgeInsets.all(20),
-                        padding: _isEditing
-                            ? EdgeInsets.symmetric(
-                                horizontal: 100, vertical: 20)
-                            : EdgeInsets.zero,
+                        padding: _isEditing ? EdgeInsets.symmetric(horizontal: 100, vertical: 20) : EdgeInsets.zero,
                         decoration: BoxDecoration(
                             color: Colors.grey[200],
                             boxShadow: shadowBigColor,
@@ -861,8 +850,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => _imagePreview(
-                                          context, imageFile, imageBytes)),
+                                      builder: (context) => _imagePreview(context, imageFile, imageBytes)),
                                 );
                               },
                               child: Stack(
@@ -871,25 +859,22 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                       ? Container(
                                           padding: EdgeInsets.all(7),
                                           decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(80),
+                                              borderRadius: BorderRadius.circular(80),
                                               boxShadow: shadowColor,
-                                              color: Colors.deepPurple),
+                                              color: deepPurple),
                                           child: CircleAvatar(
                                             radius: 50,
                                             backgroundImage: imageFile != null
-                                                ? FileImage(
-                                                    File(imageFile!.path))
+                                                ? FileImage(File(imageFile!.path))
                                                 : MemoryImage(imageBytes!),
                                           ),
                                         )
                                       : Container(
                                           padding: EdgeInsets.all(7),
                                           decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(80),
+                                              borderRadius: BorderRadius.circular(80),
                                               boxShadow: shadowColor,
-                                              color: Colors.deepPurple),
+                                              color: deepPurple),
                                           child: Icon(
                                             Icons.person,
                                             size: 100,
@@ -916,15 +901,11 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                           child: Container(
                                             padding: EdgeInsets.all(7),
                                             decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(50),
-                                                color: Colors.grey[200]),
+                                                borderRadius: BorderRadius.circular(50), color: Colors.grey[200]),
                                             child: Container(
                                               padding: EdgeInsets.all(5),
                                               decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(50),
-                                                  color: Colors.deepPurple),
+                                                  borderRadius: BorderRadius.circular(50), color: deepPurple),
                                               child: Icon(
                                                 Icons.photo_camera,
                                                 color: Colors.white,
@@ -949,16 +930,13 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                       },
                                       child: Container(
                                         margin: EdgeInsets.all(5),
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 20, vertical: 10),
+                                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                         decoration: BoxDecoration(
                                             boxShadow: shadowColor,
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            color: Colors.deepPurple),
+                                            borderRadius: BorderRadius.circular(10),
+                                            color: deepPurple),
                                         child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
+                                          mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
                                             Expanded(
                                               flex: 2,
@@ -971,10 +949,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                               flex: 5,
                                               child: Text(
                                                 'Edit Profile',
-                                                style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontWeight:
-                                                        FontWeight.bold),
+                                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                                               ),
                                             ),
                                           ],
@@ -1007,8 +982,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                     hintText: 'First Name',
                                     onChanged: (value) {
                                       setState(() {
-                                        fnamevalidator = _validateFname(
-                                            value); // Trigger validation on text change
+                                        fnamevalidator = _validateFname(value); // Trigger validation on text change
                                       });
                                     },
                                   ),
@@ -1019,8 +993,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                     hintText: 'Middle Name (Optional)',
                                     onChanged: (value) {
                                       setState(() {
-                                        mnamevalidator = _validateMname(
-                                            value); // Trigger validation on text change
+                                        mnamevalidator = _validateMname(value); // Trigger validation on text change
                                       });
                                     },
                                   ),
@@ -1031,8 +1004,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                     hintText: 'Last Name',
                                     onChanged: (value) {
                                       setState(() {
-                                        lnamevalidator = _validateLname(
-                                            value); // Trigger validation on text change
+                                        lnamevalidator = _validateLname(value); // Trigger validation on text change
                                       });
                                     },
                                   ),
@@ -1043,8 +1015,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                     hintText: 'Email',
                                     onChanged: (value) {
                                       setState(() {
-                                        emailvalidator = _validateEmail(
-                                            value); // Trigger validation on text change
+                                        emailvalidator = _validateEmail(value); // Trigger validation on text change
                                       });
                                     },
                                   ),
@@ -1061,8 +1032,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                   Center(
                                       child: Text(
                                     'Complete Address',
-                                    style: TextStyle(
-                                        fontSize: 20, color: Colors.grey),
+                                    style: TextStyle(fontSize: 20, color: Colors.grey),
                                   )),
                                   const SizedBox(height: 20),
 
@@ -1071,87 +1041,63 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                     Column(
                                       children: [
                                         Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               '  Province/City or Municipality/Barangay',
                                               style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: greytitleColor),
+                                                  fontSize: 16, fontWeight: FontWeight.bold, color: greytitleColor),
                                             ),
                                             Padding(
                                               padding: const EdgeInsets.all(5),
                                               child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
+                                                crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
                                                   Container(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            vertical: 5.0,
-                                                            horizontal: 15),
+                                                    padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 15),
                                                     decoration: BoxDecoration(
                                                         color: Colors.white,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10.0),
+                                                        borderRadius: BorderRadius.circular(10.0),
                                                         boxShadow: shadowColor),
                                                     child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                       children: [
                                                         // Show selected values
                                                         Expanded(
                                                           child: Text(
-                                                            _selectedProvinceName ==
-                                                                    null
+                                                            _selectedProvinceName == null
                                                                 ? 'Select Province'
-                                                                : _selectedCityMunicipalityName ==
-                                                                        null
+                                                                : _selectedCityMunicipalityName == null
                                                                     ? '${_selectedProvinceName} / '
-                                                                    : _selectedBarangayName ==
-                                                                            null
+                                                                    : _selectedBarangayName == null
                                                                         ? '${_selectedProvinceName} / ${_selectedCityMunicipalityName} / '
                                                                         : '${_selectedProvinceName} / '
                                                                             '${_selectedCityMunicipalityName} / '
                                                                             '${_selectedBarangayName}',
-                                                            style: TextStyle(
-                                                                fontSize: 16.0),
-                                                            overflow: TextOverflow
-                                                                .visible, // Allow wrapping
-                                                            softWrap:
-                                                                true, // Enable soft wrapping
+                                                            style: TextStyle(fontSize: 16.0),
+                                                            overflow: TextOverflow.visible, // Allow wrapping
+                                                            softWrap: true, // Enable soft wrapping
                                                           ),
                                                         ),
                                                         IconButton(
                                                             icon: Icon(
                                                               Icons.clear,
-                                                              color: Colors
-                                                                  .deepPurple,
+                                                              color: deepPurple,
                                                             ),
                                                             onPressed: () {
                                                               //close
                                                               _loadProvinces();
                                                               setState(() {
                                                                 _provinces = [];
-                                                                _citiesMunicipalities =
-                                                                    [];
+                                                                _citiesMunicipalities = [];
                                                                 _barangays = [];
 
-                                                                _showCityMunicipalityDropdown =
-                                                                    false;
-                                                                _showBarangayDropdown =
-                                                                    false;
+                                                                _showCityMunicipalityDropdown = false;
+                                                                _showBarangayDropdown = false;
 
-                                                                _selectedProvinceName =
-                                                                    null;
-                                                                _selectedCityMunicipalityName =
-                                                                    null;
-                                                                _selectedBarangayName =
-                                                                    null;
+                                                                _selectedProvinceName = null;
+                                                                _selectedCityMunicipalityName = null;
+                                                                _selectedBarangayName = null;
                                                               });
                                                             })
                                                       ],
@@ -1160,67 +1106,38 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                                   if (_showProvinceDropdown)
                                                     Container(
                                                       height: 100,
-                                                      margin:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 10),
+                                                      margin: EdgeInsets.symmetric(horizontal: 10),
                                                       decoration: BoxDecoration(
-                                                          color: Colors
-                                                              .deepPurple
-                                                              .withOpacity(0.7),
+                                                          color: deepPurple.withOpacity(0.7),
                                                           borderRadius:
-                                                              BorderRadius.vertical(
-                                                                  bottom: Radius
-                                                                      .circular(
-                                                                          15)),
-                                                          boxShadow:
-                                                              shadowColor),
+                                                              BorderRadius.vertical(bottom: Radius.circular(15)),
+                                                          boxShadow: shadowColor),
                                                       child: ListView.builder(
-                                                        itemCount:
-                                                            _provinces.length,
-                                                        itemBuilder:
-                                                            (context, index) {
-                                                          final city =
-                                                              _provinces[index];
+                                                        itemCount: _provinces.length,
+                                                        itemBuilder: (context, index) {
+                                                          final city = _provinces[index];
 
                                                           return InkWell(
                                                             onTap: () {
                                                               setState(() {
-                                                                _loadCitiesMunicipalities(
-                                                                    city[
-                                                                        'code']); // Load barangays for the selected city
+                                                                _loadCitiesMunicipalities(city[
+                                                                    'code']); // Load barangays for the selected city
 
-                                                                _selectedProvinceName =
-                                                                    city[
-                                                                        'name']; // Set by name
-                                                                _showProvinceDropdown =
-                                                                    false;
-                                                                _showCityMunicipalityDropdown =
-                                                                    true;
+                                                                _selectedProvinceName = city['name']; // Set by name
+                                                                _showProvinceDropdown = false;
+                                                                _showCityMunicipalityDropdown = true;
                                                               });
                                                             },
                                                             child: Container(
-                                                              padding: EdgeInsets
-                                                                  .symmetric(
-                                                                      vertical:
-                                                                          10,
-                                                                      horizontal:
-                                                                          15),
-                                                              decoration:
-                                                                  BoxDecoration(
+                                                              padding:
+                                                                  EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                                                              decoration: BoxDecoration(
                                                                 border: Border(
-                                                                    bottom: BorderSide(
-                                                                        color: Colors
-                                                                            .grey
-                                                                            .shade300)),
+                                                                    bottom: BorderSide(color: Colors.grey.shade300)),
                                                               ),
                                                               child: Text(
-                                                                city[
-                                                                    'name'], // Display the name
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        16,
-                                                                    color: Colors
-                                                                        .white),
+                                                                city['name'], // Display the name
+                                                                style: TextStyle(fontSize: 16, color: Colors.white),
                                                               ),
                                                             ),
                                                           );
@@ -1230,69 +1147,37 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                                   if (_showCityMunicipalityDropdown)
                                                     Container(
                                                       height: 400,
-                                                      margin:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 10),
+                                                      margin: EdgeInsets.symmetric(horizontal: 10),
                                                       decoration: BoxDecoration(
-                                                          color: Colors
-                                                              .deepPurple
-                                                              .withOpacity(0.7),
+                                                          color: deepPurple.withOpacity(0.7),
                                                           borderRadius:
-                                                              BorderRadius.vertical(
-                                                                  bottom: Radius
-                                                                      .circular(
-                                                                          15)),
-                                                          boxShadow:
-                                                              shadowColor),
+                                                              BorderRadius.vertical(bottom: Radius.circular(15)),
+                                                          boxShadow: shadowColor),
                                                       child: ListView.builder(
-                                                        itemCount:
-                                                            _citiesMunicipalities
-                                                                .length,
-                                                        itemBuilder:
-                                                            (context, index) {
-                                                          final city =
-                                                              _citiesMunicipalities[
-                                                                  index];
+                                                        itemCount: _citiesMunicipalities.length,
+                                                        itemBuilder: (context, index) {
+                                                          final city = _citiesMunicipalities[index];
 
                                                           return InkWell(
                                                             onTap: () {
                                                               setState(() {
-                                                                _loadBarangays(
-                                                                    city[
-                                                                        'code']);
+                                                                _loadBarangays(city['code']);
 
-                                                                _selectedCityMunicipalityName =
-                                                                    city[
-                                                                        'name'];
-                                                                _showCityMunicipalityDropdown =
-                                                                    false;
-                                                                _showBarangayDropdown =
-                                                                    true;
+                                                                _selectedCityMunicipalityName = city['name'];
+                                                                _showCityMunicipalityDropdown = false;
+                                                                _showBarangayDropdown = true;
                                                               });
                                                             },
                                                             child: Container(
-                                                              padding: EdgeInsets
-                                                                  .symmetric(
-                                                                      vertical:
-                                                                          10,
-                                                                      horizontal:
-                                                                          15),
-                                                              decoration:
-                                                                  BoxDecoration(
+                                                              padding:
+                                                                  EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                                                              decoration: BoxDecoration(
                                                                 border: Border(
-                                                                    bottom: BorderSide(
-                                                                        color: Colors
-                                                                            .grey
-                                                                            .shade300)),
+                                                                    bottom: BorderSide(color: Colors.grey.shade300)),
                                                               ),
                                                               child: Text(
-                                                                city[
-                                                                    'name'], // Display the name
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        16,
-                                                                    color: Colors
-                                                                        .white),
+                                                                city['name'], // Display the name
+                                                                style: TextStyle(fontSize: 16, color: Colors.white),
                                                               ),
                                                             ),
                                                           );
@@ -1304,61 +1189,34 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                                   if (_showBarangayDropdown)
                                                     Container(
                                                       height: 400,
-                                                      margin:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 10),
+                                                      margin: EdgeInsets.symmetric(horizontal: 10),
                                                       decoration: BoxDecoration(
-                                                          color: Colors
-                                                              .deepPurple
-                                                              .withOpacity(0.7),
+                                                          color: deepPurple.withOpacity(0.7),
                                                           borderRadius:
-                                                              BorderRadius.vertical(
-                                                                  bottom: Radius
-                                                                      .circular(
-                                                                          15)),
-                                                          boxShadow:
-                                                              shadowColor),
+                                                              BorderRadius.vertical(bottom: Radius.circular(15)),
+                                                          boxShadow: shadowColor),
                                                       child: ListView.builder(
-                                                        itemCount:
-                                                            _barangays.length,
-                                                        itemBuilder:
-                                                            (context, index) {
-                                                          final city =
-                                                              _barangays[index];
+                                                        itemCount: _barangays.length,
+                                                        itemBuilder: (context, index) {
+                                                          final city = _barangays[index];
 
                                                           return InkWell(
                                                             onTap: () {
                                                               setState(() {
-                                                                _selectedBarangayName =
-                                                                    city[
-                                                                        'name'];
-                                                                _showBarangayDropdown =
-                                                                    false;
+                                                                _selectedBarangayName = city['name'];
+                                                                _showBarangayDropdown = false;
                                                               });
                                                             },
                                                             child: Container(
-                                                              padding: EdgeInsets
-                                                                  .symmetric(
-                                                                      vertical:
-                                                                          10,
-                                                                      horizontal:
-                                                                          15),
-                                                              decoration:
-                                                                  BoxDecoration(
+                                                              padding:
+                                                                  EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                                                              decoration: BoxDecoration(
                                                                 border: Border(
-                                                                    bottom: BorderSide(
-                                                                        color: Colors
-                                                                            .grey
-                                                                            .shade300)),
+                                                                    bottom: BorderSide(color: Colors.grey.shade300)),
                                                               ),
                                                               child: Text(
-                                                                city[
-                                                                    'name'], // Display the name
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        16,
-                                                                    color: Colors
-                                                                        .white),
+                                                                city['name'], // Display the name
+                                                                style: TextStyle(fontSize: 16, color: Colors.white),
                                                               ),
                                                             ),
                                                           );
@@ -1371,8 +1229,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                           ],
                                         ),
                                         if (_selectedProvinceName == null ||
-                                            _selectedCityMunicipalityName ==
-                                                null ||
+                                            _selectedCityMunicipalityName == null ||
                                             _selectedBarangayName == null)
                                           Text(
                                             'Please select your adrress.',
@@ -1381,12 +1238,11 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                         const SizedBox(height: 5),
                                         _buildTextField(
                                           controller: _streetController,
-                                          hintText:
-                                              'Street Name, Building, House No.',
+                                          hintText: 'Street Name, Building, House No.',
                                           onChanged: (value) {
                                             setState(() {
-                                              streetvalidator = _validateStreet(
-                                                  value); // Trigger validation on text change
+                                              streetvalidator =
+                                                  _validateStreet(value); // Trigger validation on text change
                                             });
                                           },
                                         ),
@@ -1396,15 +1252,14 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                           controller: _postalController,
                                           keyboardType: TextInputType.number,
                                           inputFormatters: [
-                                            FilteringTextInputFormatter
-                                                .digitsOnly,
+                                            FilteringTextInputFormatter.digitsOnly,
                                             LengthLimitingTextInputFormatter(4),
                                           ],
                                           hintText: 'Postal Code',
                                           onChanged: (value) {
                                             setState(() {
-                                              postalvalidator = _validatePostalCode(
-                                                  value); // Trigger validation on text change
+                                              postalvalidator =
+                                                  _validatePostalCode(value); // Trigger validation on text change
                                               //print(_postalController.text);
                                             });
                                           },
@@ -1419,8 +1274,8 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                       hintText: 'Address',
                                       onChanged: (value) {
                                         setState(() {
-                                          addressvalidator = _validateAddress(
-                                              value); // Trigger validation on text change
+                                          addressvalidator =
+                                              _validateAddress(value); // Trigger validation on text change
                                         });
                                       },
                                     ),
@@ -1428,8 +1283,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                   const SizedBox(height: 20),
                                   SizedBox(height: 20),
                                   Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       InkWell(
                                         onTap: () {
@@ -1440,19 +1294,15 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                           }
                                         },
                                         child: Container(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 40.0, vertical: 10),
+                                          padding: EdgeInsets.symmetric(horizontal: 40.0, vertical: 10),
                                           decoration: BoxDecoration(
                                               color: Colors.green[500],
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
+                                              borderRadius: BorderRadius.circular(10),
                                               boxShadow: shadowColor),
                                           child: Text(
                                             'SAVE',
                                             style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold),
+                                                color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
                                           ),
                                         ),
                                       ),
@@ -1462,19 +1312,15 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                           _cancelEdit();
                                         },
                                         child: Container(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 30.0, vertical: 10),
+                                          padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 10),
                                           decoration: BoxDecoration(
                                               color: Colors.blue[700],
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
+                                              borderRadius: BorderRadius.circular(10),
                                               boxShadow: shadowColor),
                                           child: Text(
                                             'CANCEL',
                                             style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold),
+                                                color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
                                           ),
                                         ),
                                       ),
@@ -1490,21 +1336,15 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                       label: 'Full Name',
                                       value:
                                           '${userData?['fname'] ?? ''} ${userData?['mname'] ?? ''} ${userData?['lname'] ?? ''}'),
-                                  _labelField(
-                                      label: 'Email',
-                                      value: userData?['email'] ?? ''),
-                                  _labelField(
-                                      label: 'Phone Number',
-                                      value: userData?['contact'] ?? ''),
+                                  _labelField(label: 'Email', value: userData?['email'] ?? ''),
+                                  _labelField(label: 'Phone Number', value: userData?['contact'] ?? ''),
                                   //address condition
                                   _labelField(
                                       label: 'Address',
                                       value: user == 'hauler'
                                           ? '${userData?['address'] ?? ''}'
                                           : '${userData?['street'] ?? ''}, ${userData?['brgy'] ?? ''}, ${userData?['city'] ?? ''}, ${userData?['province'] ?? ''}, ${userData?['postal'] ?? ''}'),
-                                  _labelField(
-                                      label: 'Status',
-                                      value: userData?['status'] ?? ''),
+                                  _labelField(label: 'Status', value: userData?['status'] ?? ''),
                                   // _labelField(
                                   //     label: 'Type',
                                   //     value: userData?['type'] ?? ''),
@@ -1617,9 +1457,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
             child: Container(
               padding: EdgeInsets.all(16.0),
               decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(15.0),
-                  boxShadow: shadowBigColor),
+                  color: Colors.white, borderRadius: BorderRadius.circular(15.0), boxShadow: shadowBigColor),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1670,10 +1508,8 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                           child: TextFormField(
                             cursorColor: deepGreen,
                             controller: _codeControllers[index],
-                            keyboardType: TextInputType
-                                .number, // Accept characters instead of numbers
-                            textInputAction: TextInputAction
-                                .next, // Moves focus to next field
+                            keyboardType: TextInputType.number, // Accept characters instead of numbers
+                            textInputAction: TextInputAction.next, // Moves focus to next field
                             maxLength: 1,
                             textAlign: TextAlign.center,
                             style: TextStyle(color: Colors.white, fontSize: 24),
@@ -1698,8 +1534,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                               final upperCaseValue = value.toUpperCase();
                               if (upperCaseValue.length == 1) {
                                 _codeControllers[index].text = upperCaseValue;
-                                _codeControllers[index].selection =
-                                    TextSelection.fromPosition(
+                                _codeControllers[index].selection = TextSelection.fromPosition(
                                   TextPosition(offset: upperCaseValue.length),
                                 );
 
@@ -1753,16 +1588,14 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                       String? error = _validateCode();
                       if (error == null) {
                         updateEnteredCode(); //to update stored enteredCode
-                        String? errorMessage = await verifyEmailCode(
-                            _emailController.text, enteredCode);
+                        String? errorMessage = await verifyEmailCode(_emailController.text, enteredCode);
                         if (errorMessage != null) {
                           showErrorSnackBar(context, errorMessage);
                         } else {
                           //convert the pic
                           Uint8List? photoBytes;
                           if (imageFile != null) {
-                            photoBytes = await imageFile!
-                                .readAsBytes(); // Read bytes from the XFile
+                            photoBytes = await imageFile!.readAsBytes(); // Read bytes from the XFile
                           } else if (userData!['profile'] != null) {
                             photoBytes = userData!['profile'];
                           }
@@ -1807,8 +1640,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                               _currentStep--; // Separate this update
                             });
                           } else {
-                            showErrorSnackBar(context,
-                                'Something went wrong. Please try again later.');
+                            showErrorSnackBar(context, 'Something went wrong. Please try again later.');
                           }
                         }
                       } else {
@@ -1819,15 +1651,10 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                       alignment: Alignment.center,
                       padding: EdgeInsets.all(16.0),
                       decoration: BoxDecoration(
-                          color: Colors.green,
-                          borderRadius: BorderRadius.circular(10.0),
-                          boxShadow: shadowColor),
+                          color: Colors.green, borderRadius: BorderRadius.circular(10.0), boxShadow: shadowColor),
                       child: Text(
                         'Verify',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold),
+                        style: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
@@ -1852,18 +1679,12 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
         children: [
           Text(
             label,
-            style: TextStyle(
-                color: Colors.grey,
-                fontSize: 16.0,
-                fontWeight: FontWeight.bold),
+            style: TextStyle(color: Colors.grey, fontSize: 16.0, fontWeight: FontWeight.bold),
           ),
           Container(
             width: double.infinity,
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            decoration: BoxDecoration(
-                color: white,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: shadowColor),
+            decoration: BoxDecoration(color: white, borderRadius: BorderRadius.circular(10), boxShadow: shadowColor),
             child: Text(
               value,
               style: TextStyle(
@@ -1875,15 +1696,14 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
           ),
           SizedBox(height: 10)
           // Divider(
-          //   color: Colors.deepPurple.withOpacity(0.5),
+          //   color: deepPurple.withOpacity(0.5),
           // ),
         ],
       ),
     );
   }
 
-  Widget _imagePreview(BuildContext context, final XFile? imageFile,
-      final Uint8List? imageBytes) {
+  Widget _imagePreview(BuildContext context, final XFile? imageFile, final Uint8List? imageBytes) {
     return Scaffold(
       appBar: AppBar(),
       body: Stack(
@@ -1921,9 +1741,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                       ? Image.memory(imageBytes)
                       : Container(
                           padding: EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                              color: Colors.deepPurple,
-                              borderRadius: BorderRadius.circular(100)),
+                          decoration: BoxDecoration(color: deepPurple, borderRadius: BorderRadius.circular(100)),
                           child: Icon(
                             Icons.person,
                             size: 100,
@@ -1972,10 +1790,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
         children: [
           Text(
             ' ' + hintText,
-            style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey[700]),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey[700]),
           ),
           Container(
             decoration: BoxDecoration(boxShadow: shadowColor),
@@ -1988,9 +1803,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                 labelStyle: TextStyle(color: Colors.grey),
                 filled: true,
                 fillColor: Colors.white,
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
               ),
               inputFormatters: inputFormatters,
               onChanged: onChanged,
@@ -2011,10 +1824,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
         children: [
           Text(
             ' Contact',
-            style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey[700]),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey[700]),
           ),
           Container(
             decoration: BoxDecoration(boxShadow: shadowColor),
@@ -2027,11 +1837,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                     SizedBox(
                       height: 12,
                     ),
-                    Text('+63',
-                        style: TextStyle(
-                            color: Colors.deepPurple,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16)),
+                    Text('+63', style: TextStyle(color: deepPurple, fontWeight: FontWeight.bold, fontSize: 16)),
                   ],
                 ),
                 //prefixIcon: Icon(Icons.abc),
@@ -2039,17 +1845,15 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                 hintStyle: TextStyle(color: Colors.grey),
                 filled: true,
                 fillColor: Colors.white,
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
               ),
               keyboardType: TextInputType.number,
               inputFormatters: inputFormatters,
               onChanged: (value) {
                 if (value.length > 10) {
                   _contactController.text = value.substring(0, 10);
-                  _contactController.selection = TextSelection.fromPosition(
-                      TextPosition(offset: _contactController.text.length));
+                  _contactController.selection =
+                      TextSelection.fromPosition(TextPosition(offset: _contactController.text.length));
                 }
                 setState(() {
                   contactvalidator = _validateContact(value);
@@ -2076,10 +1880,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
         children: [
           Text(
             ' ${hintText}',
-            style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey[700]),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey[700]),
           ),
           Container(
             decoration: BoxDecoration(boxShadow: shadowColor),
@@ -2087,22 +1888,19 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
               value: selectedValue,
               icon: Icon(
                 Icons.arrow_drop_down,
-                color: Colors.deepPurple,
+                color: deepPurple,
                 size: 30,
               ),
               decoration: InputDecoration(
                 contentPadding: EdgeInsets.symmetric(horizontal: 15),
                 filled: true,
                 fillColor: Colors.white,
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
               ),
               items: items.map<DropdownMenuItem<String>>((item) {
                 return DropdownMenuItem<String>(
                   value: item['code'],
-                  child: Text(
-                      item['name']), // Use the appropriate field for display
+                  child: Text(item['name']), // Use the appropriate field for display
                 );
               }).toList(),
               onChanged: onChanged,
@@ -2119,11 +1917,9 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Colors.green[900],
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(20.0))),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
           title: Text('Confirm Changes', style: TextStyle(color: Colors.white)),
-          content: Text('Save changes to your profile details?',
-              style: TextStyle(color: Colors.white)),
+          content: Text('Save changes to your profile details?', style: TextStyle(color: Colors.white)),
           actions: [
             TextButton(
               onPressed: () {
@@ -2140,8 +1936,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                 //convert the pic
                 Uint8List? photoBytes;
                 if (imageFile != null) {
-                  photoBytes = await imageFile!
-                      .readAsBytes(); // Read bytes from the XFile
+                  photoBytes = await imageFile!.readAsBytes(); // Read bytes from the XFile
                 } else if (userData!['profile'] != null) {
                   photoBytes = userData!['profile'];
                 }
@@ -2168,9 +1963,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                   setState(() {
                     // Update the user data in the provider
                     userModel!.setUserData(
-                        newEmail: _emailController.text,
-                        newFname: _fnameController.text,
-                        newProfile: photoBytes);
+                        newEmail: _emailController.text, newFname: _fnameController.text, newProfile: photoBytes);
 
                     _resetData();
                     _isEditing = false;
@@ -2179,8 +1972,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                     //Navigator.pop(context);
                   });
                 } else {
-                  showErrorSnackBar(
-                      context, 'Something went wrong. Please try again later.');
+                  showErrorSnackBar(context, 'Something went wrong. Please try again later.');
                 }
 
                 //_showConfirmationDialog(context);

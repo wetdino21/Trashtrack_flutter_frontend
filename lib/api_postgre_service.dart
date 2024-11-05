@@ -766,7 +766,7 @@ Future<String?> booking(
 }
 
 //fetch_booking
-Future<Map<String, List<Map<String, dynamic>>>?> fetchBookingData(BuildContext context) async {
+Future<Map<String, List<Map<String, dynamic>>>?> fetchCusBooking(BuildContext context) async {
   Map<String, String?> tokens = await getTokens();
   String? accessToken = tokens['access_token'];
 
@@ -792,16 +792,34 @@ Future<Map<String, List<Map<String, dynamic>>>?> fetchBookingData(BuildContext c
     // Extract 'booking' and 'wasteTypes' from the response
     List<Map<String, dynamic>> bookingList = List<Map<String, dynamic>>.from(data['booking']);
     List<Map<String, dynamic>> wasteTypeList = List<Map<String, dynamic>>.from(data['wasteTypes']);
+    List<Map<String, dynamic>> bookingList2 = List<Map<String, dynamic>>.from(data['booking2']);
+    List<Map<String, dynamic>> wasteTypeList2 = List<Map<String, dynamic>>.from(data['wasteTypes2']);
 
     // Optionally: Combine them if needed or pass them individually
-    return {'booking': bookingList, 'wasteTypes': wasteTypeList};
+    return {
+      'booking': bookingList,
+      'wasteTypes': wasteTypeList,
+      'booking2': bookingList2,
+      'wasteTypes2': wasteTypeList2
+    };
+    /////////
+    // //print(response.body);
+    // //return List<Map<String, dynamic>>.from(jsonDecode(response.body));
+    // Map<String, dynamic> data = jsonDecode(response.body);
+
+    // // Extract 'booking' and 'wasteTypes' from the response
+    // List<Map<String, dynamic>> bookingList = List<Map<String, dynamic>>.from(data['booking']);
+    // List<Map<String, dynamic>> wasteTypeList = List<Map<String, dynamic>>.from(data['wasteTypes']);
+
+    // // Optionally: Combine them if needed or pass them individually
+    // return {'booking': bookingList, 'wasteTypes': wasteTypeList};
   } else {
     if (response.statusCode == 401) {
       // Access token might be expired, attempt to refresh it
       print('Access token expired. Attempting to refresh...');
       String? refreshMsg = await refreshAccessToken();
       if (refreshMsg == null) {
-        return await fetchBookingData(context);
+        return await fetchCusBooking(context);
       } else {
         // Refresh token is invalid or expired, logout the user
         await deleteTokens(); // Logout user
@@ -1311,7 +1329,7 @@ Future<String?> updateHaulLatLong(int bookID, double lat, double long) async {
 }
 
 //fetch_pending_booking pickup
-Future<Map<String, List<Map<String, dynamic>>>?> fetchCurrentPickup() async {
+Future<Map<String, List<Map<String, dynamic>>>?> fetchHaulerPickup() async {
   Map<String, String?> tokens = await getTokens();
   String? accessToken = tokens['access_token'];
 
@@ -1353,7 +1371,7 @@ Future<Map<String, List<Map<String, dynamic>>>?> fetchCurrentPickup() async {
       print('Access token expired. Attempting to refresh...');
       String? refreshMsg = await refreshAccessToken();
       if (refreshMsg == null) {
-        return await fetchCurrentPickup();
+        return await fetchHaulerPickup();
       } else {
         // Refresh token is invalid or expired, logout the user
         await deleteTokens(); // Logout user
@@ -1717,6 +1735,28 @@ Future<String?> readNotif(int notif_id) async {
   } catch (e) {
     print('Error occurred: $e'); // Handle exceptions
     return null;
+  }
+}
+
+//
+Future<String?> fetchBookingStatus(int bkId) async {
+  final response = await http.post(
+    Uri.parse('$baseUrl/fetch_notif_status'),
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      'bkId': bkId,
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+    return data['bk_status'];
+  } else if (response.statusCode == 404) {
+    console('Email is already taken');
+    return 'Email is already taken'; // Return the error message from the server
+  } else {
+    console('Failed to check customer email');
+    return 'error';
   }
 }
 

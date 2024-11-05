@@ -68,7 +68,6 @@ class C_CustomAppBarState extends State<C_CustomAppBar> {
     if (channel != null) channel!.sink.close();
     _audioService.dispose();
     //notificationService.closeConnection();
-    console('appbar disposeddddddddddddd');
     super.dispose();
   }
 

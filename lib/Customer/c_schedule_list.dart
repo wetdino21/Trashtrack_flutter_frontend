@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:trashtrack/Customer/c_booking.dart';
 import 'package:trashtrack/Customer/c_map.dart';
 import 'package:trashtrack/api_address.dart';
 import 'package:trashtrack/booking_pending_list.dart';
@@ -468,6 +469,18 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
     }
   }
 
+  // day limit
+  Future<void> loadDayLimit() async {
+    final bkDayLimitData = await fetchDayLimit();
+    //load day limit
+    if (bkDayLimitData != null) {
+      _dayLimit = bkDayLimitData;
+    } else {
+      console('Failed to load day limit');
+      return;
+    }
+  }
+
 // Fetch user data from the server
   Future<void> _dbData() async {
     try {
@@ -635,6 +648,10 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
             ),
             TextButton(
               onPressed: () async {
+                setState(() {
+                  loadingAction = true;
+                });
+
                 if (bookingData != null) {
                   String? dbMessage = await bookingUpdate(
                       context,
@@ -657,13 +674,30 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
                       onAddress = false;
                       onMap = false;
                     });
+                  } else if (dbMessage == 'full date') {
+                    if (!mounted) return;
+                    Navigator.pop(context);
+                    showFullyBookDayDialog(context, _selectedDate);
+                    await loadDayLimit(); // reload day limit
+                    setState(() {
+                      _selectedDate = DateTime.parse(bookingData!['bk_date']).toLocal();
+                    });
                   } else if (dbMessage == 'ongoing') {
+                    if (!mounted) return;
+                    Navigator.pop(context);
                     Navigator.pushReplacement(
                         context, MaterialPageRoute(builder: (context) => MainApp(selectedIndex: 2)));
                   } else {
+                    if (!mounted) return;
+                    Navigator.pop(context);
                     showErrorSnackBar(context, 'Somthing\'s wrong. Please try again later.');
                   }
                 }
+
+                //
+                setState(() {
+                  loadingAction = false;
+                });
               },
               child: Text('Yes', style: TextStyle(color: Colors.white)),
             ),
@@ -692,7 +726,8 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
     );
 
     if (!_isEditing) {
-      Navigator.of(context).pop();
+      //Navigator.of(context).pop();
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainApp(selectedIndex: 2)));
     } else if (_fullnameController.text == (bookingData!['bk_fullname']) &&
         _contactController.text == bookingData!['bk_contact'].substring(1) &&
         _selectedProvinceName == bookingData!['bk_province'] &&
@@ -739,7 +774,8 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
                   onAddress = false;
                   boxColorTheme = Colors.teal;
                 });
-                Navigator.of(context).pop();
+                //Navigator.of(context).pop();
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainApp(selectedIndex: 2)));
               },
               child: Text('Yes', style: TextStyle(color: Colors.white)),
             ),
@@ -1099,25 +1135,23 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
                                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                         children: [
                                                           SizedBox(),
-                                                          Container(
-                                                            alignment: Alignment.centerRight,
-                                                            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                                                            decoration: BoxDecoration(
-                                                                borderRadius: BorderRadius.circular(5),
-                                                                color: Colors.blue,
-                                                                boxShadow: shadowColor),
-                                                            child: InkWell(
-                                                              onTap: () {
-                                                                setState(() {
-                                                                  onAddress = false;
-                                                                });
-                                                              },
-                                                              child: Text(
-                                                                'Minimize',
-                                                                style: TextStyle(
-                                                                    color: Colors.white,
-                                                                    fontSize: 12,
-                                                                    fontWeight: FontWeight.bold),
+                                                          InkWell(
+                                                            onTap: () {
+                                                              setState(() {
+                                                                onAddress = false;
+                                                              });
+                                                            },
+                                                            child: Container(
+                                                              alignment: Alignment.centerRight,
+                                                              padding:
+                                                                  EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                                                              decoration: BoxDecoration(
+                                                                  borderRadius: BorderRadius.circular(5),
+                                                                  color: deepPurple,
+                                                                  boxShadow: shadowColor),
+                                                              child: Icon(
+                                                                Icons.remove,
+                                                                color: white,
                                                               ),
                                                             ),
                                                           ),
@@ -1587,28 +1621,25 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
                                             child: Column(
                                               crossAxisAlignment: CrossAxisAlignment.end,
                                               children: [
-                                                Container(
-                                                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                                                  decoration: BoxDecoration(
-                                                      borderRadius: BorderRadius.circular(5),
-                                                      color: Colors.blue,
-                                                      boxShadow: shadowColor),
-                                                  child: InkWell(
-                                                    onTap: () {
+                                                InkWell(
+                                                  onTap: () {
+                                                    onMap = false;
+                                                    setState(() {
+                                                      if (selectedPoint != null)
+                                                        _mapController.move(selectedPoint!, 13);
                                                       onMap = false;
-                                                      setState(() {
-                                                        if (selectedPoint != null)
-                                                          _mapController.move(selectedPoint!, 13);
-                                                        onMap = false;
-                                                        pinLocValidator = '';
-                                                      });
-                                                    },
-                                                    child: Text(
-                                                      'Minimize',
-                                                      style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 12,
-                                                          fontWeight: FontWeight.bold),
+                                                      pinLocValidator = '';
+                                                    });
+                                                  },
+                                                  child: Container(
+                                                    padding: EdgeInsets.all(15),
+                                                    decoration: BoxDecoration(
+                                                        borderRadius: BorderRadius.circular(5),
+                                                        color: deepPurple,
+                                                        boxShadow: shadowColor),
+                                                    child: Icon(
+                                                      Icons.remove,
+                                                      color: white,
                                                     ),
                                                   ),
                                                 ),
@@ -2397,7 +2428,7 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
 
   Future<void> _selectDate(BuildContext context) async {
     final List<DateTime> disabledDates = _dayLimit.map((dayLimit) {
-      final DateTime dbDay = DateTime.parse(dayLimit['day']).toUtc();
+      final DateTime dbDay = DateTime.parse(dayLimit['day']).toLocal();
       final DateTime strippedDay = DateTime(dbDay.year, dbDay.month, dbDay.day);
       return strippedDay;
     }).toList();
@@ -2410,11 +2441,6 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
 
     //final DateTime dbDateStart = DateTime.parse(_bookLimit['bl_date_start']).toUtc();
     final DateTime dbDateLast = DateTime.parse(_bookLimit['bl_date_last']).toUtc();
-
-    // // Determine first and last selectable dates
-    // final DateTime localStartDate = dbDateStart.toLocal();
-    // final DateTime subFirstDate = DateTime(localStartDate.year, localStartDate.month, localStartDate.day);
-    // final DateTime firstDate = now.isBefore(closeTime) ? subFirstDate : subFirstDate.add(Duration(days: 1));
     final DateTime firstDate = now.isBefore(closeTime) ? now : now.add(Duration(days: 1));
     final DateTime localLastDate = dbDateLast.toLocal();
     final DateTime lastDate = DateTime(localLastDate.year, localLastDate.month, localLastDate.day);
@@ -2437,6 +2463,9 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
       firstDate: firstDate,
       lastDate: lastDate,
       selectableDayPredicate: (DateTime date) {
+        if (date == DateTime.parse(bookingData!['bk_date']).toLocal()) {
+          return true;
+        }
         return !disabledDates.contains(date);
       },
       builder: (BuildContext context, Widget? child) {

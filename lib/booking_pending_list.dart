@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_cube/flutter_cube.dart';
+//import 'package:flutter_cube/flutter_cube.dart';
 import 'package:intl/intl.dart';
 import 'package:trashtrack/Customer/c_schedule_list.dart';
 import 'package:trashtrack/api_postgre_service.dart';
@@ -956,17 +956,16 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
         return AlertDialog(
           backgroundColor: Colors.red[900],
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
-          title: Text('Cancel Booking', style: TextStyle(color: Colors.white)),
-          content: Text('Are you sure to Cancel this booking?', style: TextStyle(color: Colors.white)),
+          title: Text('Return Booking', style: TextStyle(color: Colors.white)),
+          content: Text(
+              'This will change the status of the booking to ' 'Pending' ' and it will appear on the pickup list.',
+              style: TextStyle(color: Colors.white)),
           actions: [
             TextButton(
               onPressed: () async {
                 if (bookingData != null) {
-                  String? dbMessage = await bookingCancel(context, bookingData!['bk_id']);
+                  String? dbMessage = await bookingReturn(context, bookingData!['bk_id']);
                   if (dbMessage == 'success') {
-                    Navigator.pushReplacement(
-                        context, MaterialPageRoute(builder: (context) => MainApp(selectedIndex: 2)));
-                  } else if (dbMessage == 'ongoing') {
                     Navigator.pushReplacement(
                         context, MaterialPageRoute(builder: (context) => MainApp(selectedIndex: 2)));
                   } else {
@@ -1127,6 +1126,22 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
                     ),
                   );
                 }),
+          if (bookingData != null)
+            if (bookingData!['bk_status'] == 'Ongoing')
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.deepPurpleAccent,
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _showOptionsBox = !_showOptionsBox;
+                    });
+                  },
+                  icon: Icon(Icons.more_vert),
+                ),
+              ),
 
           SizedBox(width: 5),
         ],
@@ -2111,39 +2126,45 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
 
               if (_showOptionsBox)
                 Positioned(
-                  top: AppBar().preferredSize.height - 50, // Adjust this value as needed
-                  right: 10, // Adjust to align with the IconButton
+                  top: AppBar().preferredSize.height - 50,
+                  right: 10,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: white,
                       borderRadius: BorderRadius.circular(10),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black,
+                          color: black.withOpacity(0.5),
                           blurRadius: 20,
                           offset: Offset(0, 2),
                         ),
                       ],
                     ),
-                    padding: EdgeInsets.all(5),
-                    child: Column(
-                      children: [
-                        MaterialButton(
-                          onPressed: () {
-                            _showConfirmCancelBookingDialog(context);
-                            setState(() {
-                              _showOptionsBox = false;
-                            });
-                          },
-                          child: Container(
-                              child: Text("Cancel Booking?", style: TextStyle(fontSize: 18, color: Colors.black54))),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () {
+                          _showConfirmCancelBookingDialog(context);
+                          setState(() {
+                            _showOptionsBox = false;
+                          });
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.all(20),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.keyboard_return,
+                                color: Colors.red,
+                              ),
+                              SizedBox(width: 5),
+                              Container(
+                                  child: Text("Return to pending?",
+                                      style: TextStyle(fontSize: 16, color: Colors.black54))),
+                            ],
+                          ),
                         ),
-                        Icon(
-                          Icons.sentiment_very_dissatisfied,
-                          size: 50,
-                          color: Colors.red,
-                        )
-                      ],
+                      ),
                     ),
                   ),
                 ),

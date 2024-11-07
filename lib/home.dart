@@ -21,7 +21,6 @@ class _C_HomeScreenState extends State<C_HomeScreen> with SingleTickerProviderSt
   late AnimationController _controller;
   late Animation<Color?> _colorTween;
   late Animation<Color?> _colorTween2;
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   String? user;
   int totalRequest = 0;
@@ -35,7 +34,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> with SingleTickerProviderSt
   bool loadingAction = false;
   String? errorMessage;
   Object? _obj;
-  bool _isObjectLoaded = false;
+  //bool _isObjectLoaded = false;
   Completer<void>? _sceneCreationCompleter;
   // Object _obj = Object(
   //   scale: Vector3(11.0, 11.0, 11.0),
@@ -140,17 +139,12 @@ class _C_HomeScreenState extends State<C_HomeScreen> with SingleTickerProviderSt
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
-        if (_scaffoldKey.currentState!.isDrawerOpen) {
-          _scaffoldKey.currentState!.closeDrawer();
-        } else {
-          if (didPop) {
-            return;
-          }
-          showLogoutConfirmationDialog(context);
+        if (didPop) {
+          return;
         }
+        showLogoutConfirmationDialog(context);
       },
       child: Scaffold(
-        key: _scaffoldKey,
         backgroundColor: deepGreen,
         body: RefreshIndicator(
           onRefresh: _dbData,
@@ -372,7 +366,8 @@ class _C_HomeScreenState extends State<C_HomeScreen> with SingleTickerProviderSt
                                 StatisticBox(
                                   icon: Icons.delete,
                                   title: 'Total Waste Collected',
-                                  value: user == 'customer' ? '$totalCusWasteCollected kg' : '$totalHaulWasteCollected kg',
+                                  value:
+                                      user == 'customer' ? '$totalCusWasteCollected kg' : '$totalHaulWasteCollected kg',
                                   iconColor: accentColor,
                                 ),
                               ],

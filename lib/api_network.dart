@@ -24,14 +24,15 @@ globalAddressUrl() {
   return 'https://psgc.gitlab.io/api';
 }
 
-//my pc network
-
-globalUrl() {
-  return 'http://192.168.119.156:3000';
-}
+////my phone data
 // globalUrl() {
-//   return 'http://192.168.254.187:3000';
+//   return 'http://192.168.119.156:3000';
 // }
+
+//my pc
+globalUrl() {
+  return 'http://192.168.254.187:3000';
+}
 
 ////// COMMENT THIS IF IP STATIC ///////////////////////////////////////////////////////////////////
 
@@ -42,8 +43,7 @@ class NetworkglobalUrl {
   NetworkglobalUrl._privateConstructor();
 
   // Static instance of the class
-  static final NetworkglobalUrl _instance =
-      NetworkglobalUrl._privateConstructor();
+  static final NetworkglobalUrl _instance = NetworkglobalUrl._privateConstructor();
 
   // Variable to store the base URL
   String? _baseUrl;
@@ -61,8 +61,7 @@ class NetworkglobalUrl {
 
   // Method to retrieve the base URL
   String? getBaseUrl() {
-    return _baseUrl ??
-        networkURL; // Return _baseUrl if set, otherwise return default global URL
+    return _baseUrl ?? networkURL; // Return _baseUrl if set, otherwise return default global URL
   }
 }
 
@@ -98,8 +97,7 @@ class _StoreNetworkState extends State<StoreNetwork> {
     String? BaseUrl = NetworkglobalUrl().getBaseUrl();
 
     if (BaseUrl != null) {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => TokenCheck()));
+      Navigator.push(context, MaterialPageRoute(builder: (context) => TokenCheck()));
     }
   }
 
@@ -126,8 +124,7 @@ class _StoreNetworkState extends State<StoreNetwork> {
                 children: [
                   TextField(
                     style: TextStyle(fontWeight: FontWeight.bold),
-                    decoration:
-                        InputDecoration(contentPadding: EdgeInsets.all(10)),
+                    decoration: InputDecoration(contentPadding: EdgeInsets.all(10)),
                     controller: _networkController,
                   ),
                 ],
@@ -141,8 +138,7 @@ class _StoreNetworkState extends State<StoreNetwork> {
                     // String? baseUrl = NetworkglobalUrl().getBaseUrl();
                     // showErrorSnackBar(context, baseUrl!);
                     // Navigate to the next screen
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => TokenCheck()));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => TokenCheck()));
                   }
                 },
                 child: Container(
@@ -151,8 +147,7 @@ class _StoreNetworkState extends State<StoreNetwork> {
                       borderRadius: borderRadius15,
                       color: deepGreen,
                     ),
-                    child: Text('Set Network',
-                        style: TextStyle(fontSize: 20, color: white)))),
+                    child: Text('Set Network', style: TextStyle(fontSize: 20, color: white)))),
           ],
         ), // Show a loading screen while checking the token
       ),

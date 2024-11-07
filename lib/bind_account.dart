@@ -1135,10 +1135,9 @@ class BindWithNothing extends StatelessWidget {
                   child: Column(
                     children: [
                       CircleAvatar(
-                        backgroundColor: deepPurple,
+                        backgroundColor: white,
                         child: Image.asset(
                           'assets/Brands.png',
-                          height: 24.0,
                         ),
                       ),
                       SizedBox(height: 5.0),

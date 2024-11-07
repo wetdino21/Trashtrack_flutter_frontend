@@ -737,6 +737,8 @@ Future<String?> booking(
     if (response.statusCode == 200) {
       showSuccessSnackBar(context, 'Pending booking');
       return 'success';
+    } else if (response.statusCode == 429) {
+      return 'full date';
     } else {
       if (response.statusCode == 401) {
         // Access token might be expired, attempt to refresh it
@@ -952,6 +954,8 @@ Future<String?> bookingUpdate(
     if (response.statusCode == 200) {
       showSuccessSnackBar(context, 'Saved Changes');
       return 'success';
+    } else if (response.statusCode == 429) {
+      return 'full date';
     } else if (response.statusCode == 409) {
       showErrorSnackBar(context, 'Unable to update booking, Already ongoing!');
       return 'ongoing';
@@ -1015,6 +1019,55 @@ Future<String?> bookingCancel(BuildContext context, int bookId) async {
         String? refreshMsg = await refreshAccessToken();
         if (refreshMsg == null) {
           return await bookingCancel(context, bookId);
+        }
+      } else if (response.statusCode == 403) {
+        // Access token is invalid. logout
+        print('Access token invalid. Attempting to logout...');
+        showErrorSnackBar(context, 'Active time has been expired please login again.');
+        await deleteTokens(); // Logout use
+      } else {
+        print('Response: ${response.body}');
+      }
+
+      //showErrorSnackBar(context, response.body);
+    }
+    print('Cancel Booking is not successful!');
+    return response.body;
+  } catch (e) {
+    print(e.toString());
+  }
+  return null;
+}
+
+//booking return
+Future<String?> bookingReturn(BuildContext context, int bookId) async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+  if (accessToken == null) {
+    print('No access token available. User needs to log in.');
+    await deleteTokens(); // Logout use
+  }
+
+  try {
+    final response = await http.post(
+      Uri.parse('$baseUrl/booking_return'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({'bookingId': bookId}),
+    );
+
+    if (response.statusCode == 200) {
+      showSuccessSnackBar(context, 'Successfully returned to pending');
+      return 'success';
+    } else {
+      if (response.statusCode == 401) {
+        // Access token might be expired, attempt to refresh it
+        print('Access token expired. Attempting to refresh...');
+        String? refreshMsg = await refreshAccessToken();
+        if (refreshMsg == null) {
+          return await bookingReturn(context, bookId);
         }
       } else if (response.statusCode == 403) {
         // Access token is invalid. logout

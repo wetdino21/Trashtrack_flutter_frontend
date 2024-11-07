@@ -208,100 +208,17 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
     }
   }
 
-// // Fetch user data from the server
-//   Future<void> _dbData() async {
-//     setState(() {
-//       isLoading = true;
-//     });
-//     try {
-//       //final data = await userDataFromHive();
-//       final data = await fetchCusData(context);
-//       if (!mounted) return;
-//       if (data != null) {
-//         setState(() {
-//           userData = data;
-
-//           _fullnameController.text = (userData!['cus_fname'] ?? '') +
-//               ' ' +
-//               (userData!['cus_mname'] ?? '') +
-//               ' ' +
-//               (userData!['cus_lname'] ?? '');
-//           _contactController.text = userData!['cus_contact'].substring(1) ?? '';
-//           _selectedProvinceName = userData!['cus_province'] ?? '';
-//           _selectedCityMunicipalityName = userData!['cus_city'] ?? '';
-//           _selectedBarangayName = userData!['cus_brgy'] ?? '';
-//           _streetController.text = (userData!['cus_street'] ?? '');
-//           _postalController.text = (userData!['cus_postal'] ?? '');
-
-//           fullname = (userData!['cus_fname'] ?? '') +
-//               ' ' +
-//               (userData!['cus_mname'] ?? '') +
-//               ' ' +
-//               (userData!['cus_lname'] ?? '');
-//           contact = userData!['cus_contact'].substring(1) ?? '';
-//           address = (userData!['cus_brgy'] ?? '') +
-//               ', ' +
-//               (userData!['cus_city'] ?? '') +
-//               ', ' +
-//               (userData!['cus_province'] ?? '');
-//           street = (userData!['cus_street'] ?? '');
-//           postal = (userData!['cus_postal'] ?? '');
-
-//           //isLoading = false;
-//         });
-//         //load waste cat
-//         final bkLimitData = await fetchBookLimit();
-
-//         console(bkLimitData);
-//         //load waste cat
-//         List<Map<String, dynamic>>? categories = await fetchWasteCategory();
-//         if (!mounted) return;
-//         if (categories != null) {
-//           setState(() {
-//             _wasteTypes = categories;
-//             isLoading = false;
-//           });
-//         } else {
-//           print('Failed to load waste categories');
-//         }
-//         setState(() {
-//           isLoading = false;
-//         });
-//       } // MAKE IT INSIDE ONE SETSTATEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
-//       //await data.close();
-//     } catch (e) {
-//       if (!mounted) return;
-//       //isLoading = true;
-//       print(e.toString());
-//       // setState(() {
-//       //   //errorMessage = e.toString();
-//       //   isLoading = true;
-//       // });
-//     }
-//   }
-
-  // // Function to load waste categories and update the state
-  // Future<void> _loadWasteCategories() async {
-  //   try {
-  //     List<Map<String, dynamic>>? categories = await fetchWasteCategory();
-  //     if (!mounted) return;
-  //     if (categories != null) {
-  //       setState(() {
-  //         _wasteTypes = categories;
-  //         isLoading = false;
-  //       });
-  //     } else {
-  //       print('Failed to load waste categories');
-  //     }
-  //   } catch (e) {
-  //     if (!mounted) return;
-  //     print(e);
-  //     setState(() {
-  //       //errorMessage = e.toString();
-  //       //isLoading = true;
-  //     });
-  //   }
-  // }
+  // day limit
+  Future<void> loadDayLimit() async {
+    final bkDayLimitData = await fetchDayLimit();
+    //load day limit
+    if (bkDayLimitData != null) {
+      _dayLimit = bkDayLimitData;
+    } else {
+      console('Failed to load day limit');
+      return;
+    }
+  }
 
   void handleOnePoint(LatLng point) {
     setState(() {
@@ -508,7 +425,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
                                                         color: deepPurple,
                                                         boxShadow: shadowColor),
                                                     child: Icon(
-                                                      Icons.copy_all_sharp,
+                                                      Icons.remove,
                                                       color: white,
                                                     ),
                                                   ),
@@ -985,11 +902,11 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
                                                   child: Container(
                                                     padding: EdgeInsets.all(15),
                                                     decoration: BoxDecoration(
-                                                        borderRadius: BorderRadius.circular(5),
+                                                        borderRadius: BorderRadius.circular(10),
                                                         color: deepPurple,
                                                         boxShadow: shadowColor),
                                                     child: Icon(
-                                                      Icons.copy_all_sharp,
+                                                      Icons.remove,
                                                       color: white,
                                                     ),
                                                   ),
@@ -1295,13 +1212,22 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
                                           _selectedDate!,
                                           _selectedWasteTypes);
                                       if (dbMessage == 'success') {
+                                        if (!mounted) return;
                                         Navigator.pushReplacement(
                                             context,
                                             MaterialPageRoute(
                                                 builder: (context) => MainApp(
                                                       selectedIndex: 2,
                                                     )));
+                                      } else if (dbMessage == 'full date') {
+                                        if (!mounted) return;
+                                        showFullyBookDayDialog(context, _selectedDate);
+                                        await loadDayLimit(); // reload day limit
+                                        setState(() {
+                                          _selectedDate = null;
+                                        });
                                       } else {
+                                        if (!mounted) return;
                                         showErrorSnackBar(context, 'Somthing\'s wrong. Please try again later.');
                                       }
                                     }
@@ -1731,7 +1657,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
 
   Future<void> _selectDate(BuildContext context) async {
     final List<DateTime> disabledDates = _dayLimit.map((dayLimit) {
-      final DateTime dbDay = DateTime.parse(dayLimit['day']).toUtc();
+      final DateTime dbDay = DateTime.parse(dayLimit['day']).toLocal();
       final DateTime strippedDay = DateTime(dbDay.year, dbDay.month, dbDay.day);
       return strippedDay;
     }).toList();
@@ -1763,7 +1689,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
 
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: initialDate,
+      initialDate: _selectedDate ?? initialDate,
       firstDate: firstDate,
       lastDate: lastDate,
       selectableDayPredicate: (DateTime date) {
@@ -1807,119 +1733,29 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
       });
     }
   }
+}
 
-  // Future<void> _selectDate(BuildContext context) async {
-  //   //final List<DateTime> disabledDates = _dayLimit?.map((dayLimit) => DateTime.parse(dayLimit['day'])).toList() ?? [];
-  //   //final List<DateTime> disabledDates = _dayLimit.map((dayLimit) => DateTime.parse(dayLimit['day'])).toList();
-  //   final List<DateTime> disabledDates = _dayLimit.map((dayLimit) {
-  //     // Parse the date from server but ignore time
-  //     final DateTime dbDay = DateTime.parse(dayLimit['day']).toUtc();
-
-  //     // Directly create a date from the original without converting to local
-  //     final DateTime strippedDay = DateTime(dbDay.year, dbDay.month, dbDay.day);
-
-  //     // Log for debugging
-  //     print('Stripped Day: $strippedDay'); // This should give you the correct day
-
-  //     return strippedDay;
-  //   }).toList();
-
-  //   //
-  //   final DateTime now = DateTime.now();
-
-  //   final int closeTimeInMinutes = _bookLimit['bl_close_time'];
-  //   final DateTime closeTime =
-  //       DateTime(now.year, now.month, now.day, closeTimeInMinutes ~/ 60, closeTimeInMinutes % 60);
-
-  //   final DateTime dbDateStart = DateTime.parse(_bookLimit['bl_date_start']).toUtc();
-  //   final DateTime dbDateLast = DateTime.parse(_bookLimit['bl_date_last']).toUtc();
-  //   //first date
-  //   final DateTime localStartDate = dbDateStart.toLocal(); // Convert to local time
-  //   final DateTime subFirstDate = DateTime(localStartDate.year, localStartDate.month, localStartDate.day);
-  //   final DateTime firstDate = now.isBefore(closeTime) ? subFirstDate : subFirstDate.add(Duration(days: 1));
-
-  //   //Last date
-  //   final DateTime localLastDate = dbDateLast.toLocal(); // Convert to local time
-  //   final DateTime lastDate = DateTime(localLastDate.year, localLastDate.month, localLastDate.day);
-
-  //   //initial date
-  //   final DateTime initialDate = firstDate;
-
-  //   final DateTime? picked = await showDatePicker(
-  //     context: context,
-  //     initialDate: initialDate,
-  //     firstDate: firstDate,
-  //     lastDate: lastDate,
-  //     //
-  //     selectableDayPredicate: (DateTime date) {
-  //       // Disable dates that are in the disabledDates list
-  //       return !disabledDates.contains(date);
-  //     },
-
-  //     builder: (BuildContext context, Widget? child) {
-  //       return Theme(
-  //         data: ThemeData.light().copyWith(
-  //           colorScheme: ColorScheme.light(
-  //             primary: Colors.green, // Circle color for the selected date
-  //             onPrimary: Colors.white, // Text color inside the circle
-  //             onSurface: deepPurple, // Text color for dates
-  //           ),
-  //         ),
-  //         child: child!,
-  //       );
-  //     },
-  //   );
-
-  //   if (picked != null && picked != _selectedDate) {
-  //     setState(() {
-  //       _selectedDate = picked;
-
-  //       if (_selectedDate != null) {
-  //         dateValidator = '';
-  //       }
-  //     });
-  //   }
-  // }
-
-  // Future<void> _selectDate(BuildContext context) async {
-  //   final DateTime now = DateTime.now();
-  //   //final DateTime firstDate = DateTime(now.year, now.month, now.day);
-  //   final dbDateStart = _bookLimit['bl_date_start'];
-  //   final dbDateLast = _bookLimit['bl_date_last'];
-
-  //   final DateTime firstDate = now.hour < 15
-  //       ? DateTime(now.year, now.month, now.day)
-  //       : DateTime(now.year, now.month, now.day + 1);
-  //   final DateTime initialDate = now.hour < 15 ? DateTime.now() : firstDate;
-  //   final DateTime lastDate = DateTime(now.year + 1, 12, 31);
-
-  //   final DateTime? picked = await showDatePicker(
-  //     context: context,
-  //     initialDate: initialDate,
-  //     firstDate: firstDate,
-  //     lastDate: lastDate, // Use the current year + 1
-  //     builder: (BuildContext context, Widget? child) {
-  //       return Theme(
-  //         data: ThemeData.light().copyWith(
-  //           colorScheme: ColorScheme.light(
-  //             primary: Colors.green, // Circle color for the selected date
-  //             onPrimary: Colors.white, // Text color inside the circle
-  //             onSurface: Colors.green[900]!, // Text color for dates
-  //           ),
-  //         ),
-  //         child: child!,
-  //       );
-  //     },
-  //   );
-
-  //   if (picked != null && picked != _selectedDate) {
-  //     setState(() {
-  //       _selectedDate = picked;
-
-  //       if (_selectedDate != null) {
-  //         dateValidator = '';
-  //       }
-  //     });
-  //   }
-  // }
+//
+void showFullyBookDayDialog(BuildContext context, DateTime? selectedDate) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
+        title: Text('Fully Booked', style: TextStyle(color: redSoft)),
+        content: Text(
+            'Oops Too slow! ${DateFormat('MM-dd-yyyy').format(selectedDate!)} was fully booked. Please select another date.',
+            style: TextStyle(color: blackSoft)),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('OK', style: TextStyle(color: blackSoft, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      );
+    },
+  );
 }

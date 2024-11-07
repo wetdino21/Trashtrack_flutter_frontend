@@ -26,6 +26,7 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final AudioService _audioService = AudioService(); //from modal
   //user data
   Map<String, dynamic>? userData;
@@ -243,16 +244,21 @@ class _MainAppState extends State<MainApp> {
         PopScope(
             canPop: false,
             onPopInvokedWithResult: (didPop, result) async {
-              if (didPop) {
-                return;
+              if (_scaffoldKey.currentState!.isDrawerOpen) {
+                _scaffoldKey.currentState!.closeDrawer();
+              } else {
+                if (didPop) {
+                  return;
+                }
+                _scaffoldKey.currentState!.closeDrawer();
               }
-              //_cancelEdit();
             },
             child: Container()),
 
         //
         if (!loading)
           Scaffold(
+            key: _scaffoldKey,
             backgroundColor: deepGreen,
             drawer: C_Drawer(),
             appBar: C_CustomAppBar(

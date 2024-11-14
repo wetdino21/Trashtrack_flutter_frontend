@@ -17,6 +17,9 @@ import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:trashtrack/user_hive_data.dart';
 import 'package:trashtrack/validator_data.dart';
+import 'package:trashtrack/waste_pricing_info.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class C_ScheduleCardList extends StatefulWidget {
   final int bookId;
@@ -137,11 +140,11 @@ class _C_ScheduleCardListState extends State<C_ScheduleCardList> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                            widget.status == 'Cancelled' || widget.status == 'Collected' || widget.status == 'Failed'
+                            widget.status == 'Cancelled' || widget.status == 'Paid' || widget.status == 'Failed'
                                 ? Icons.history
                                 : Icons.calendar_month,
                             size: widget.status == 'Cancelled' ||
-                                    widget.status == 'Collected' ||
+                                    widget.status == 'Paid' ||
                                     widget.status == 'Failed'
                                 ? 35
                                 : 25,
@@ -318,6 +321,7 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
   bool _isEditing = false;
   Color? boxColorTheme = Colors.teal;
   bool _showOptionsBox = false;
+  List<dynamic> _locations = [];
 
   @override
   void initState() {
@@ -431,7 +435,8 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
             selectedPoint = LatLng(latitude, longitude);
             WidgetsBinding.instance.addPostFrameCallback((_) {
               // _selectedDate = DateTime.parse(bookingData!['bk_date']).toLocal();
-              _mapController.move(selectedPoint!, 13.0);
+              _mapController.move(selectedPoint!, 13);
+              _mapController.rotate(0.0);
             });
           }
 
@@ -543,11 +548,34 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
     }
   }
 
+  // fetch latlong
+  Future<void> _searchLocation(String query) async {
+    final response = await http.get(
+      Uri.parse('https://nominatim.openstreetmap.org/search?q=$query&format=json'),
+    );
+
+    if (response.statusCode == 200) {
+      setState(() {
+        _locations = json.decode(response.body);
+        if (_locations.isEmpty) {
+          if (!mounted) return;
+          showErrorSnackBar(context, 'No pin location found.');
+        } else {
+          var location = _locations[0];
+          selectedPoint = LatLng(double.parse(location['lat']), double.parse(location['lon']));
+          _mapController.move(selectedPoint!, 13.0);
+          _mapController.rotate(0.0);
+        }
+      });
+    } else {
+      if (!mounted) return;
+      showErrorSnackBar(context, 'Unable to load pin location.');
+    }
+  }
+
   void handleOnePoint(LatLng point) {
     setState(() {
       selectedPoint = point;
-      //_mapController.move(selectedPoint!, 16);
-      //fetchSelectedPlaceNames();
     });
   }
 
@@ -584,14 +612,10 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
       Position position = await Geolocator.getCurrentPosition(
         locationSettings: locationSettings,
       );
-      // String? getCurrentName =
-      //     await getPlaceName(position.latitude, position.longitude);
-
       setState(() {
         selectedPoint = LatLng(position.latitude, position.longitude);
-        _mapController.move(selectedPoint!, 13.0); // Move to current location
-
-        // selectedPlaceName = getCurrentName;
+        _mapController.move(selectedPoint!, 13);
+        _mapController.rotate(0.0);
       });
     } catch (e) {
       print('fail to get current location!');
@@ -640,12 +664,6 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
           title: Text('Save Changes', style: TextStyle(color: Colors.white)),
           content: Text('Are you sure to update booking details?', style: TextStyle(color: Colors.white)),
           actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancel', style: TextStyle(color: Colors.white)),
-            ),
             TextButton(
               onPressed: () async {
                 setState(() {
@@ -700,6 +718,12 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
                 });
               },
               child: Text('Yes', style: TextStyle(color: Colors.white)),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel', style: TextStyle(color: Colors.white)),
             ),
           ],
         );
@@ -893,7 +917,7 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
 
         actions: [
           if (bookingData != null)
-            bookingData!['bk_status'] == 'Pending' && !_isEditing
+            (bookingData!['bk_status'] == 'Pending' || bookingData!['bk_status'] == 'Failed') && !_isEditing
                 ? Container(
                     decoration: BoxDecoration(
                       color: Colors.deepPurpleAccent,
@@ -912,7 +936,7 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
                 : SizedBox(),
           SizedBox(width: 5),
           if (bookingData != null)
-            if (bookingData!['bk_status'] == 'Pending')
+            if (bookingData!['bk_status'] == 'Pending' || bookingData!['bk_status'] == 'Failed')
               Container(
                 decoration: BoxDecoration(
                   color: Colors.deepPurpleAccent,
@@ -1375,8 +1399,10 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
                                                                           final city = _barangays[index];
 
                                                                           return InkWell(
-                                                                            onTap: () {
+                                                                            onTap: () async {
                                                                               setState(() {
+                                                                                isLoadingLoc = true;
+
                                                                                 _selectedBarangayName = city['name'];
                                                                                 _showBarangayDropdown = false;
 
@@ -1385,6 +1411,14 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
                                                                                     _selectedCityMunicipalityName! +
                                                                                     ', ' +
                                                                                     _selectedProvinceName!;
+                                                                              });
+
+                                                                              //
+                                                                              String loc =
+                                                                                  '${_selectedProvinceName!} ${_selectedCityMunicipalityName!} ${_selectedBarangayName!}';
+                                                                              await _searchLocation(loc);
+                                                                              setState(() {
+                                                                                isLoadingLoc = false;
                                                                               });
                                                                             },
                                                                             child: Container(
@@ -1602,8 +1636,8 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
                                                           width: 80.0,
                                                           height: 80.0,
                                                           point: selectedPoint!,
-                                                          builder: (ctx) =>
-                                                              Icon(Icons.location_pin, color: Colors.red, size: 40),
+                                                          builder: (ctx) => Icon(Icons.location_pin,
+                                                              color: Colors.red, size: 40, shadows: shadowIconColor),
                                                           rotate: true),
                                                     ],
                                                   ),
@@ -1625,8 +1659,10 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
                                                   onTap: () {
                                                     onMap = false;
                                                     setState(() {
-                                                      if (selectedPoint != null)
+                                                      if (selectedPoint != null) {
                                                         _mapController.move(selectedPoint!, 13);
+                                                        _mapController.rotate(0.0);
+                                                      }
                                                       onMap = false;
                                                       pinLocValidator = '';
                                                     });
@@ -1674,11 +1710,24 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
                                               child: Container(
                                             color: const Color.fromARGB(0, 163, 145, 145),
                                             child: InkWell(
-                                              onTap: () {
+                                              onTap: () async {
                                                 setState(() {
+                                                  isLoadingLoc = true;
                                                   onMap = true;
                                                 });
-                                                if (selectedPoint == null) _getCurrentLocation();
+                                                if (selectedPoint == null) {
+                                                  if (_selectedProvinceName != null &&
+                                                      _selectedCityMunicipalityName != null &&
+                                                      _selectedBarangayName != null) {
+                                                    String loc =
+                                                        '${_selectedProvinceName!} ${_selectedCityMunicipalityName!} ${_selectedBarangayName!}';
+                                                    await _searchLocation(loc);
+                                                  }
+                                                }
+
+                                                setState(() {
+                                                  isLoadingLoc = false;
+                                                });
                                               },
                                             ),
                                           )),
@@ -1718,10 +1767,28 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.center,
                                         children: [
-                                          Text(
-                                            'Waste Type',
-                                            style: TextStyle(
-                                                color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16),
+                                          InkWell(
+                                            onTap: () => Navigator.push(
+                                                context, MaterialPageRoute(builder: (context) => WastePricingInfo())),
+                                            child: SizedBox(
+                                              width: 150,
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  const SizedBox(width: 5),
+                                                  const Text(
+                                                    'Waste Type',
+                                                    style: TextStyle(
+                                                        fontWeight: FontWeight.bold, color: Colors.black, fontSize: 16),
+                                                  ),
+                                                  const SizedBox(width: 10),
+                                                  Icon(
+                                                    Icons.info,
+                                                    color: deepGreen,
+                                                  )
+                                                ],
+                                              ),
+                                            ),
                                           ),
                                           Container(
                                             padding: EdgeInsets.all(5),
@@ -2218,6 +2285,7 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
       children: _isEditing
           ? _wasteTypes.map((Map<String, dynamic> category) {
               String type = category['name'];
+              String desc = category['desc'];
               var price = category['price'];
               var unit = category['unit'];
               var wcId = category['wc_id'];
@@ -2227,55 +2295,65 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
               //
               bool isDisabled = _wasteLimit.any((limit) => limit['wc_id'] == wcId);
 
-              return CheckboxListTile(
-                title: Row(
-                  children: [
-                    isDisabled ? Icon(Icons.block, color: red) : Icon(Icons.library_add, color: deepGreen),
-                    SizedBox(width: 10.0),
-                    Expanded(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            type,
-                            style: TextStyle(fontSize: 14),
-                          ),
-                          Text(
-                            '₱${price.toString()}\\${unit.toString()}',
-                            style: TextStyle(color: Colors.deepOrange, fontSize: 14),
-                          ),
-                        ],
+              return Tooltip(
+                message: desc,
+                child: CheckboxListTile(
+                  title: Row(
+                    children: [
+                      isDisabled ? Icon(Icons.block, color: red) : Icon(Icons.library_add, color: deepGreen),
+                      SizedBox(width: 10.0),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              type,
+                              style: TextStyle(fontSize: 14),
+                              overflow: TextOverflow.ellipsis,
+                              softWrap: true,
+                            ),
+                            Text(
+                              '₱${price.toString()}\\${unit.toString()}',
+                              style: TextStyle(color: Colors.deepOrange, fontSize: 14),
+                              textAlign: TextAlign.end,
+                            ),
+                            Text(
+                              desc,
+                              style: TextStyle(fontSize: 9),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                value: isSelected,
-                onChanged: isDisabled
-                    ? null // Disables the checkbox if `isDisabled` is true
-                    : (bool? selected) {
-                        setState(() {
-                          if (selected == true) {
-                            // Add the entire waste type object
-                            _selectedWasteTypes.add({
-                              'name': type,
-                              'price': price,
-                              'unit': unit,
-                            });
-                          } else {
-                            // Remove the waste type object
-                            _selectedWasteTypes.removeWhere((selectedCategory) => selectedCategory['name'] == type);
-                          }
+                    ],
+                  ),
+                  value: isSelected,
+                  onChanged: isDisabled
+                      ? null // Disables the checkbox if `isDisabled` is true
+                      : (bool? selected) {
+                          setState(() {
+                            if (selected == true) {
+                              // Add the entire waste type object
+                              _selectedWasteTypes.add({
+                                'name': type,
+                                'price': price,
+                                'unit': unit,
+                              });
+                            } else {
+                              // Remove the waste type object
+                              _selectedWasteTypes.removeWhere((selectedCategory) => selectedCategory['name'] == type);
+                            }
 
-                          // Validator
-                          if (_selectedWasteTypes.isEmpty) {
-                            wasteCatValidator = _validateWaste(_selectedWasteTypes);
-                          } else {
-                            wasteCatValidator = '';
-                          }
-                        });
-                      },
-                activeColor: Colors.blue, // Color of the checkbox when selected.
-                checkColor: Colors.white, // Color of the checkmark.
+                            // Validator
+                            if (_selectedWasteTypes.isEmpty) {
+                              wasteCatValidator = _validateWaste(_selectedWasteTypes);
+                            } else {
+                              wasteCatValidator = '';
+                            }
+                          });
+                        },
+                  activeColor: Colors.blue, // Color of the checkbox when selected.
+                  checkColor: Colors.white, // Color of the checkmark.
+                ),
               );
             }).toList()
           : _selectedWasteTypes.map((Map<String, dynamic> category) {

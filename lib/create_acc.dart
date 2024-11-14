@@ -72,8 +72,7 @@ class _CreateAccState extends State<CreateAcc> {
   final _formKey = GlobalKey<FormState>();
 
   //email verification
-  final List<TextEditingController> _codeControllers =
-      List.generate(6, (_) => TextEditingController());
+  final List<TextEditingController> _codeControllers = List.generate(6, (_) => TextEditingController());
   int _timerSeconds = 300;
   late Timer _timer;
   late int onResendCode;
@@ -117,8 +116,7 @@ class _CreateAccState extends State<CreateAcc> {
 
   Future<void> _loadCitiesMunicipalities(String provinceCode) async {
     try {
-      final citiesMunicipalities =
-          await fetchCitiesMunicipalities(provinceCode);
+      final citiesMunicipalities = await fetchCitiesMunicipalities(provinceCode);
       setState(() {
         _citiesMunicipalities = citiesMunicipalities;
         _showCityMunicipalityDropdown = true;
@@ -233,15 +231,13 @@ class _CreateAccState extends State<CreateAcc> {
   // Function to combine the text of all controllers
   void updateEnteredCode() {
     setState(() {
-      enteredCode =
-          _codeControllers.map((controller) => controller.text).join();
+      enteredCode = _codeControllers.map((controller) => controller.text).join();
     });
   }
 
   //verify code validator
   String? _validateCode() {
-    String enteredCode =
-        _codeControllers.map((controller) => controller.text).join();
+    String enteredCode = _codeControllers.map((controller) => controller.text).join();
     if (enteredCode.length < 6) {
       return 'Please enter the full code';
     }
@@ -297,25 +293,19 @@ class _CreateAccState extends State<CreateAcc> {
                 //page 1 to 2
                 if ((_currentStep == 1) && (index + 1 == 2)) {
                   // Check if any validation error or email sending error exists
-                  if ((_emailController.text.isEmpty ||
-                          emailvalidator.isNotEmpty) ||
-                      (_passController.text.isEmpty ||
-                          passvalidator.isNotEmpty) ||
-                      (_repassController.text.isEmpty ||
-                          confpassvalidator.isNotEmpty) ||
+                  if ((_emailController.text.isEmpty || emailvalidator.isNotEmpty) ||
+                      (_passController.text.isEmpty || passvalidator.isNotEmpty) ||
+                      (_repassController.text.isEmpty || confpassvalidator.isNotEmpty) ||
                       (_passController.text != _repassController.text)) {
                     setState(() {
                       emailvalidator = _validateEmail(_emailController.text);
                       passvalidator = _validatePassword(_passController.text);
-                      confpassvalidator =
-                          _validateConfirmPassword(_repassController.text);
+                      confpassvalidator = _validateConfirmPassword(_repassController.text);
                     });
                   } else if (_emailController.text.isNotEmpty) {
-                    String? errorMessage =
-                        await emailCheck(_emailController.text);
+                    String? errorMessage = await emailCheck(_emailController.text);
                     // Show any existing error message
-                    if (errorMessage != null &&
-                        _emailController.text.isNotEmpty) {
+                    if (errorMessage != null && _emailController.text.isNotEmpty) {
                       setState(() {
                         emailvalidator = errorMessage;
                       });
@@ -334,64 +324,42 @@ class _CreateAccState extends State<CreateAcc> {
                 //page 1 to 3
                 if ((_currentStep == 1) && (index + 1 == 3)) {
                   // Check if any validation error or email sending error exists
-                  if ((_emailController.text.isEmpty ||
-                          emailvalidator.isNotEmpty) ||
-                      (_passController.text.isEmpty ||
-                          passvalidator.isNotEmpty) ||
-                      (_repassController.text.isEmpty ||
-                          confpassvalidator.isNotEmpty) ||
+                  if ((_emailController.text.isEmpty || emailvalidator.isNotEmpty) ||
+                      (_passController.text.isEmpty || passvalidator.isNotEmpty) ||
+                      (_repassController.text.isEmpty || confpassvalidator.isNotEmpty) ||
                       (_passController.text != _repassController.text)) {
                     setState(() {
                       emailvalidator = _validateEmail(_emailController.text);
                       passvalidator = _validatePassword(_passController.text);
-                      confpassvalidator =
-                          _validateConfirmPassword(_repassController.text);
+                      confpassvalidator = _validateConfirmPassword(_repassController.text);
                     });
                   } else if (_emailController.text.isNotEmpty) {
-                    String? errorMessage =
-                        await emailCheck(_emailController.text);
+                    String? errorMessage = await emailCheck(_emailController.text);
                     // Show any existing error message
-                    if (errorMessage != null &&
-                        _emailController.text.isNotEmpty) {
+                    if (errorMessage != null && _emailController.text.isNotEmpty) {
                       setState(() {
                         emailvalidator = errorMessage;
                       });
                     } else {
-                      if ((_fnameController.text.isEmpty ||
-                              fnamevalidator.isNotEmpty) ||
+                      if ((_fnameController.text.isEmpty || fnamevalidator.isNotEmpty) ||
                           (mnamevalidator.isNotEmpty) ||
-                          (_lnameController.text.isEmpty ||
-                              lnamevalidator.isNotEmpty) ||
-                          (_contactController.text.isEmpty ||
-                              contactvalidator.isNotEmpty) ||
-                          (_selectedProvinceName == null ||
-                              provincevalidator.isNotEmpty) ||
-                          (_selectedCityMunicipalityName == null ||
-                              cityvalidator.isNotEmpty) ||
-                          (_selectedBarangayName == null ||
-                              brgyvalidator.isNotEmpty) ||
-                          (_streetController.text.isEmpty ||
-                              streetvalidator.isNotEmpty) ||
-                          (_postalController.text.isEmpty ||
-                              postalvalidator.isNotEmpty)) {
+                          (_lnameController.text.isEmpty || lnamevalidator.isNotEmpty) ||
+                          (_contactController.text.isEmpty || contactvalidator.isNotEmpty) ||
+                          (_selectedProvinceName == null || provincevalidator.isNotEmpty) ||
+                          (_selectedCityMunicipalityName == null || cityvalidator.isNotEmpty) ||
+                          (_selectedBarangayName == null || brgyvalidator.isNotEmpty) ||
+                          (_streetController.text.isEmpty || streetvalidator.isNotEmpty) ||
+                          (_postalController.text.isEmpty || postalvalidator.isNotEmpty)) {
                         setState(() {
-                          fnamevalidator =
-                              _validateFname(_fnameController.text);
-                          mnamevalidator =
-                              _validateMname(_mnameController.text);
-                          lnamevalidator =
-                              _validateLname(_lnameController.text);
-                          contactvalidator =
-                              _validateContact(_contactController.text);
-                          provincevalidator =
-                              _validateProvince(_selectedProvinceName);
-                          cityvalidator =
-                              _validateCity(_selectedCityMunicipalityName);
+                          fnamevalidator = _validateFname(_fnameController.text);
+                          mnamevalidator = _validateMname(_mnameController.text);
+                          lnamevalidator = _validateLname(_lnameController.text);
+                          contactvalidator = _validateContact(_contactController.text);
+                          provincevalidator = _validateProvince(_selectedProvinceName);
+                          cityvalidator = _validateCity(_selectedCityMunicipalityName);
                           brgyvalidator = _validateBrgy(_selectedBarangayName);
-                          streetvalidator =
-                              _validateStreet(_streetController.text);
-                          postalvalidator =
-                              _validatePostalCode(_postalController.text);
+                          streetvalidator = _validateStreet(_streetController.text);
+                          postalvalidator = _validatePostalCode(_postalController.text);
                         });
                       } else {
                         // If no errors, proceed with incrementing the step
@@ -406,8 +374,7 @@ class _CreateAccState extends State<CreateAcc> {
                               // _startTimer();
                             });
                           } else {
-                            showErrorSnackBar(context,
-                                'You must accept the terms and conditions');
+                            showErrorSnackBar(context, 'You must accept the terms and conditions');
                           }
                         }
                       }
@@ -429,38 +396,25 @@ class _CreateAccState extends State<CreateAcc> {
                     fnamevalidator = _validateFname(_fnameController.text);
                     mnamevalidator = _validateMname(_mnameController.text);
                     lnamevalidator = _validateLname(_lnameController.text);
-                    contactvalidator =
-                        _validateContact(_contactController.text);
-                    provincevalidator =
-                        _validateProvince(_selectedProvinceName);
-                    cityvalidator =
-                        _validateCity(_selectedCityMunicipalityName);
+                    contactvalidator = _validateContact(_contactController.text);
+                    provincevalidator = _validateProvince(_selectedProvinceName);
+                    cityvalidator = _validateCity(_selectedCityMunicipalityName);
                     brgyvalidator = _validateBrgy(_selectedBarangayName);
                     streetvalidator = _validateStreet(_streetController.text);
-                    postalvalidator =
-                        _validatePostalCode(_postalController.text);
+                    postalvalidator = _validatePostalCode(_postalController.text);
                   });
 
-                  if ((_fnameController.text.isEmpty ||
-                          fnamevalidator.isNotEmpty) ||
+                  if ((_fnameController.text.isEmpty || fnamevalidator.isNotEmpty) ||
                       (mnamevalidator.isNotEmpty) ||
-                      (_lnameController.text.isEmpty ||
-                          lnamevalidator.isNotEmpty) ||
-                      (_contactController.text.isEmpty ||
-                          contactvalidator.isNotEmpty) ||
-                      (_selectedProvinceName == null ||
-                          provincevalidator.isNotEmpty) ||
-                      (_selectedCityMunicipalityName == null ||
-                          cityvalidator.isNotEmpty) ||
-                      (_selectedBarangayName == null ||
-                          brgyvalidator.isNotEmpty) ||
-                      (_streetController.text.isEmpty ||
-                          streetvalidator.isNotEmpty) ||
-                      (_postalController.text.isEmpty ||
-                          postalvalidator.isNotEmpty)) {
+                      (_lnameController.text.isEmpty || lnamevalidator.isNotEmpty) ||
+                      (_contactController.text.isEmpty || contactvalidator.isNotEmpty) ||
+                      (_selectedProvinceName == null || provincevalidator.isNotEmpty) ||
+                      (_selectedCityMunicipalityName == null || cityvalidator.isNotEmpty) ||
+                      (_selectedBarangayName == null || brgyvalidator.isNotEmpty) ||
+                      (_streetController.text.isEmpty || streetvalidator.isNotEmpty) ||
+                      (_postalController.text.isEmpty || postalvalidator.isNotEmpty)) {
                   } else if (_contactController.text.isNotEmpty) {
-                    String? dbContactMsg =
-                        await contactCheck(_contactController.text);
+                    String? dbContactMsg = await contactCheck(_contactController.text);
                     // Show any existing error message
                     if (dbContactMsg != null) {
                       setState(() {
@@ -479,8 +433,7 @@ class _CreateAccState extends State<CreateAcc> {
                             //_startTimer();
                           });
                         } else {
-                          showErrorSnackBar(context,
-                              'You must accept the terms and conditions');
+                          showErrorSnackBar(context, 'You must accept the terms and conditions');
                         }
                       }
                     }
@@ -588,9 +541,7 @@ class _CreateAccState extends State<CreateAcc> {
   }
 
   String _validateMname(String? value) {
-    if (value != null &&
-        value.isNotEmpty &&
-        !RegExp(r'^[a-zA-Z]+$').hasMatch(value)) {
+    if (value != null && value.isNotEmpty && !RegExp(r'^[a-zA-Z]+$').hasMatch(value)) {
       return 'Middle Name must contain only letters';
     }
     return '';
@@ -729,9 +680,7 @@ class _CreateAccState extends State<CreateAcc> {
               margin: EdgeInsets.all(20.0),
               padding: EdgeInsets.all(20.0),
               decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20.0),
-                  boxShadow: shadowBigColor),
+                  color: Colors.white, borderRadius: BorderRadius.circular(20.0), boxShadow: shadowBigColor),
               child: Column(
                 //crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -739,8 +688,7 @@ class _CreateAccState extends State<CreateAcc> {
                   const SizedBox(height: 60),
                   const Text(
                     'Please enter your account details below!',
-                    style: TextStyle(
-                        color: Colors.grey, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
                   _buildTextField(
@@ -760,8 +708,7 @@ class _CreateAccState extends State<CreateAcc> {
                     // },
                     onChanged: (value) {
                       setState(() {
-                        emailvalidator = _validateEmail(
-                            value); // Trigger validation on text change
+                        emailvalidator = _validateEmail(value); // Trigger validation on text change
                         emailChanged = true;
                       });
                     },
@@ -775,9 +722,7 @@ class _CreateAccState extends State<CreateAcc> {
                     icon: Icons.lock_outline,
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _passwordVisible
-                            ? Icons.visibility
-                            : Icons.visibility_off,
+                        _passwordVisible ? Icons.visibility : Icons.visibility_off,
                         color: deepPurple,
                       ),
                       onPressed: () {
@@ -786,27 +731,9 @@ class _CreateAccState extends State<CreateAcc> {
                         });
                       },
                     ),
-                    // validator: (value) {
-                    //   if (value == null || value.isEmpty) {
-                    //     return 'Please enter your password';
-                    //   }
-                    //   if (value.length < 8) {
-                    //     return 'Password must be at least 8 characters long';
-                    //   }
-                    //   final hasLetter = RegExp(r'[a-zA-Z]').hasMatch(value);
-                    //   final hasNumber = RegExp(r'[0-9]').hasMatch(value);
-                    //   if (!hasLetter || !hasNumber) {
-                    //     return 'Password must contain both letters and numbers';
-                    //   }
-                    //   // if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
-                    //   //   return 'Password must contain a special character';
-                    //   // }
-                    //   return null;
-                    // },
                     onChanged: (value) {
                       setState(() {
-                        passvalidator = _validatePassword(
-                            value); // Trigger validation on text change
+                        passvalidator = _validatePassword(value); // Trigger validation on text change
                       });
                     },
                   ),
@@ -819,9 +746,7 @@ class _CreateAccState extends State<CreateAcc> {
                     icon: Icons.lock,
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _confirmPasswordVisible
-                            ? Icons.visibility
-                            : Icons.visibility_off,
+                        _confirmPasswordVisible ? Icons.visibility : Icons.visibility_off,
                         color: deepPurple,
                       ),
                       onPressed: () {
@@ -830,19 +755,9 @@ class _CreateAccState extends State<CreateAcc> {
                         });
                       },
                     ),
-                    // validator: (value) {
-                    //   if (value == null || value.isEmpty) {
-                    //     return 'Please confirm your password';
-                    //   }
-                    //   if (value != _passController.text) {
-                    //     return 'Passwords do not match';
-                    //   }
-                    //   return null;
-                    // },
                     onChanged: (value) {
                       setState(() {
-                        confpassvalidator = _validateConfirmPassword(
-                            value); // Trigger validation on text change
+                        confpassvalidator = _validateConfirmPassword(value);
                       });
                     },
                   ),
@@ -856,28 +771,20 @@ class _CreateAccState extends State<CreateAcc> {
                           loadingAction = true;
                         });
                         // Check if any validation error or email sending error exists
-                        if ((_emailController.text.isEmpty ||
-                                emailvalidator.isNotEmpty) ||
-                            (_passController.text.isEmpty ||
-                                passvalidator.isNotEmpty) ||
-                            (_repassController.text.isEmpty ||
-                                confpassvalidator.isNotEmpty) ||
+                        if ((_emailController.text.isEmpty || emailvalidator.isNotEmpty) ||
+                            (_passController.text.isEmpty || passvalidator.isNotEmpty) ||
+                            (_repassController.text.isEmpty || confpassvalidator.isNotEmpty) ||
                             (_passController.text != _repassController.text)) {
                           setState(() {
-                            emailvalidator =
-                                _validateEmail(_emailController.text);
-                            passvalidator =
-                                _validatePassword(_passController.text);
-                            confpassvalidator = _validateConfirmPassword(
-                                _repassController.text);
+                            emailvalidator = _validateEmail(_emailController.text);
+                            passvalidator = _validatePassword(_passController.text);
+                            confpassvalidator = _validateConfirmPassword(_repassController.text);
                           });
                           // Show any existing error message
                         } else if (_emailController.text.isNotEmpty) {
-                          String? errorMessage =
-                              await emailCheck(_emailController.text);
+                          String? errorMessage = await emailCheck(_emailController.text);
                           // Show any existing error message
-                          if (errorMessage != null &&
-                              _emailController.text.isNotEmpty) {
+                          if (errorMessage != null && _emailController.text.isNotEmpty) {
                             setState(() {
                               emailvalidator = errorMessage;
                             });
@@ -895,29 +802,24 @@ class _CreateAccState extends State<CreateAcc> {
                         });
                       },
                       child: Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 70.0, vertical: 10),
+                          padding: EdgeInsets.symmetric(horizontal: 70.0, vertical: 10),
                           decoration: BoxDecoration(
                               color: Colors.green,
                               borderRadius: BorderRadius.circular(20.0),
                               boxShadow: shadowLowColor),
                           child: const Text(
                             'Continue',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 25,
-                                fontWeight: FontWeight.bold),
+                            style: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.bold),
                           )),
                     ),
                   ),
                   Center(
                     child: Column(
                       children: [
-                        SizedBox(height: 10.0),
+                        const SizedBox(height: 20),
                         Text(
                           'Or continue with',
-                          style:
-                              TextStyle(color: Colors.white70, fontSize: 16.0),
+                          style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
                         ),
                         SizedBox(height: 10.0),
                         Container(
@@ -931,8 +833,7 @@ class _CreateAccState extends State<CreateAcc> {
                                 loadingAction = true;
                               });
                               //handleGoogleSignUp(context);
-                              GoogleAccountDetails? accountDetails =
-                                  await handleGoogleSignUp(context);
+                              GoogleAccountDetails? accountDetails = await handleGoogleSignUp(context);
                               if (accountDetails != null) {
                                 if (_emailController.text.isNotEmpty ||
                                     _passController.text.isNotEmpty ||
@@ -947,20 +848,16 @@ class _CreateAccState extends State<CreateAcc> {
                                     _selectedBarangayName != null ||
                                     _streetController.text.isNotEmpty ||
                                     _postalController.text.isNotEmpty) {
-                                  _showGoogleSignInConfirmationDialog(
-                                      context, accountDetails);
+                                  _showGoogleSignInConfirmationDialog(context, accountDetails);
                                 } else {
                                   _currentStep++;
                                   isGoogle = true;
                                   setState(() {
-                                    _accountDetails =
-                                        accountDetails; //to store the google acc details
+                                    _accountDetails = accountDetails; //to store the google acc details
                                     handleSignOut();
                                     print('isGoogle: {$isGoogle}');
-                                    _fnameController.text =
-                                        _accountDetails!.fname;
-                                    _lnameController.text =
-                                        _accountDetails!.lname;
+                                    _fnameController.text = _accountDetails!.fname;
+                                    _lnameController.text = _accountDetails!.lname;
                                   });
                                 }
                               }
@@ -972,11 +869,9 @@ class _CreateAccState extends State<CreateAcc> {
                               backgroundColor: deepPurple,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30.0),
-                                side: BorderSide(
-                                    color: Colors.white54, width: 2.0),
+                                side: BorderSide(color: Colors.white54, width: 2.0),
                               ),
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 10.0, horizontal: 35.0),
+                              padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 35.0),
                             ),
                             icon: Image.asset(
                               'assets/Brands.png',
@@ -984,8 +879,7 @@ class _CreateAccState extends State<CreateAcc> {
                             ),
                             label: Text(
                               'Google',
-                              style: TextStyle(
-                                  color: Colors.white, fontSize: 18.0),
+                              style: TextStyle(color: Colors.white, fontSize: 18.0),
                             ),
                           ),
                         ),
@@ -1072,19 +966,15 @@ class _CreateAccState extends State<CreateAcc> {
     }
   }
 
-  void _showGoogleSignInConfirmationDialog(
-      BuildContext context, GoogleAccountDetails accountDetails) {
+  void _showGoogleSignInConfirmationDialog(BuildContext context, GoogleAccountDetails accountDetails) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Colors.deepPurple,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(20.0))),
-          title: Text('Sign Up with Google',
-              style: TextStyle(color: Colors.white)),
-          content: Text('Certain data from this form will be remove!',
-              style: TextStyle(color: Colors.white)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
+          title: Text('Sign Up with Google', style: TextStyle(color: Colors.white)),
+          content: Text('Certain data from this form will be remove!', style: TextStyle(color: Colors.white)),
           actions: [
             TextButton(
               onPressed: () async {
@@ -1098,8 +988,7 @@ class _CreateAccState extends State<CreateAcc> {
                 _currentStep++;
                 isGoogle = true;
                 setState(() {
-                  _accountDetails =
-                      accountDetails; //to store the google acc details
+                  _accountDetails = accountDetails; //to store the google acc details
                   handleSignOut();
                   Navigator.pop(context);
                   print('isGoogle: {$isGoogle}');
@@ -1121,12 +1010,9 @@ class _CreateAccState extends State<CreateAcc> {
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Colors.deepPurple,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(20.0))),
-          title: Text('Cancel google Sign Up',
-              style: TextStyle(color: Colors.white)),
-          content: Text('Google Account will be remove from the form!',
-              style: TextStyle(color: Colors.white)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
+          title: Text('Cancel google Sign Up', style: TextStyle(color: Colors.white)),
+          content: Text('Google Account will be remove from the form!', style: TextStyle(color: Colors.white)),
           actions: [
             TextButton(
               onPressed: () async {
@@ -1220,19 +1106,13 @@ class _CreateAccState extends State<CreateAcc> {
                             ),
                             InkWell(
                               onTap: () async {
-                                //handleGoogleSignUp(context);
-                                GoogleAccountDetails? accountDetails =
-                                    await handleGoogleSignUp(context);
+                                GoogleAccountDetails? accountDetails = await handleGoogleSignUp(context);
                                 if (accountDetails != null) {
                                   setState(() {
-                                    _accountDetails =
-                                        accountDetails; //to store the google acc details
+                                    _accountDetails = accountDetails;
                                     handleSignOut();
-                                    print('isGoogle: {$isGoogle}');
-                                    _fnameController.text =
-                                        _accountDetails!.fname;
-                                    _lnameController.text =
-                                        _accountDetails!.lname;
+                                    _fnameController.text = _accountDetails!.fname;
+                                    _lnameController.text = _accountDetails!.lname;
                                   });
                                 }
                               },
@@ -1245,12 +1125,10 @@ class _CreateAccState extends State<CreateAcc> {
                                 child: Container(
                                   decoration: BoxDecoration(
                                       color: Colors.green, // Background color
-                                      borderRadius: BorderRadius.circular(
-                                          10.0), // Border radius
+                                      borderRadius: BorderRadius.circular(10.0), // Border radius
                                       boxShadow: shadowColor),
                                   child: ListTile(
-                                    contentPadding: EdgeInsets.all(
-                                        8.0), // Padding inside the container
+                                    contentPadding: EdgeInsets.all(8.0), // Padding inside the container
                                     leading: _accountDetails != null
                                         ? (_accountDetails!.photoBytes != null
                                             ? ClipOval(
@@ -1262,15 +1140,15 @@ class _CreateAccState extends State<CreateAcc> {
                                                 child: Container(
                                                     padding: EdgeInsets.all(8),
                                                     color: Colors.white,
-                                                    child: Icon(Icons.person,
-                                                        size: 40))))
+                                                    child: Icon(Icons.person, size: 40))))
                                         : SizedBox(),
                                     title: _accountDetails != null
-                                        ? Text(
-                                            _accountDetails!.email,
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold),
+                                        ? FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            child: Text(
+                                              _accountDetails!.email,
+                                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                            ),
                                           )
                                         : Text('No email available'),
                                     trailing: Icon(
@@ -1289,18 +1167,13 @@ class _CreateAccState extends State<CreateAcc> {
                   Container(
                     padding: EdgeInsets.all(16.0),
                     decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15.0),
-                        boxShadow: shadowBigColor),
+                        color: Colors.white, borderRadius: BorderRadius.circular(15.0), boxShadow: shadowBigColor),
                     child: Column(
                       children: [
                         Center(
                             child: Text(
                           'Personal Information',
-                          style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: greytitleColor),
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: greytitleColor),
                         )),
                         const SizedBox(height: 20),
                         _buildTextField(
@@ -1309,8 +1182,7 @@ class _CreateAccState extends State<CreateAcc> {
                           icon: Icons.person,
                           onChanged: (value) {
                             setState(() {
-                              fnamevalidator = _validateFname(
-                                  value); // Trigger validation on text change
+                              fnamevalidator = _validateFname(value); // Trigger validation on text change
                             });
                           },
                         ),
@@ -1322,8 +1194,7 @@ class _CreateAccState extends State<CreateAcc> {
                           icon: Icons.person_outline,
                           onChanged: (value) {
                             setState(() {
-                              mnamevalidator = _validateMname(
-                                  value); // Trigger validation on text change
+                              mnamevalidator = _validateMname(value); // Trigger validation on text change
                             });
                           },
                         ),
@@ -1335,8 +1206,7 @@ class _CreateAccState extends State<CreateAcc> {
                           icon: Icons.person,
                           onChanged: (value) {
                             setState(() {
-                              lnamevalidator = _validateLname(
-                                  value); // Trigger validation on text change
+                              lnamevalidator = _validateLname(value); // Trigger validation on text change
                             });
                           },
                         ),
@@ -1353,10 +1223,7 @@ class _CreateAccState extends State<CreateAcc> {
                         Center(
                             child: Text(
                           'Complete Address',
-                          style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: greytitleColor),
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: greytitleColor),
                         )),
                         const SizedBox(height: 20),
                         Column(
@@ -1364,8 +1231,7 @@ class _CreateAccState extends State<CreateAcc> {
                           children: [
                             Text(
                               '  Province/City or Municipality/Barangay',
-                              style: TextStyle(
-                                  fontSize: 16, color: greytitleColor),
+                              style: TextStyle(fontSize: 16, color: greytitleColor),
                             ),
                             InkWell(
                               onTap: () async {
@@ -1392,42 +1258,31 @@ class _CreateAccState extends State<CreateAcc> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Container(
-                                      padding: EdgeInsets.symmetric(
-                                          vertical: 5.0, horizontal: 15),
+                                      padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 15),
                                       decoration: BoxDecoration(
                                           color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(10.0),
+                                          borderRadius: BorderRadius.circular(10.0),
                                           boxShadow: shadowColor),
                                       child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           // Show selected values
                                           Expanded(
                                             child: Text(
                                               _selectedProvinceName == null
                                                   ? 'Select Province'
-                                                  : _selectedCityMunicipalityName ==
-                                                          null
+                                                  : _selectedCityMunicipalityName == null
                                                       ? '${_selectedProvinceName} / '
-                                                      : _selectedBarangayName ==
-                                                              null
+                                                      : _selectedBarangayName == null
                                                           ? '${_selectedProvinceName} / ${_selectedCityMunicipalityName} / '
                                                           : '${_selectedProvinceName} / '
                                                               '${_selectedCityMunicipalityName} / '
                                                               '${_selectedBarangayName}',
                                               style: TextStyle(
                                                   fontSize: 16.0,
-                                                  color:
-                                                      _selectedProvinceName ==
-                                                              null
-                                                          ? Colors.grey
-                                                          : Colors.black),
-                                              overflow: TextOverflow
-                                                  .visible, // Allow wrapping
-                                              softWrap:
-                                                  true, // Enable soft wrapping
+                                                  color: _selectedProvinceName == null ? Colors.grey : Colors.black),
+                                              overflow: TextOverflow.visible, // Allow wrapping
+                                              softWrap: true, // Enable soft wrapping
                                             ),
                                           ),
                                           _selectedProvinceName != null
@@ -1441,26 +1296,19 @@ class _CreateAccState extends State<CreateAcc> {
                                                     _loadProvinces();
                                                     setState(() {
                                                       _provinces = [];
-                                                      _citiesMunicipalities =
-                                                          [];
+                                                      _citiesMunicipalities = [];
                                                       _barangays = [];
 
-                                                      _showCityMunicipalityDropdown =
-                                                          false;
-                                                      _showBarangayDropdown =
-                                                          false;
+                                                      _showCityMunicipalityDropdown = false;
+                                                      _showBarangayDropdown = false;
 
-                                                      _selectedProvinceName =
-                                                          null;
-                                                      _selectedCityMunicipalityName =
-                                                          null;
-                                                      _selectedBarangayName =
-                                                          null;
+                                                      _selectedProvinceName = null;
+                                                      _selectedCityMunicipalityName = null;
+                                                      _selectedBarangayName = null;
                                                     });
                                                   })
                                               : IconButton(
-                                                  highlightColor:
-                                                      Colors.transparent,
+                                                  highlightColor: Colors.transparent,
                                                   onPressed: () {
                                                     //null
                                                   },
@@ -1476,15 +1324,10 @@ class _CreateAccState extends State<CreateAcc> {
                                       if (_showProvinceDropdown)
                                         Container(
                                           height: 100,
-                                          margin: EdgeInsets.symmetric(
-                                              horizontal: 10),
+                                          margin: EdgeInsets.symmetric(horizontal: 10),
                                           decoration: BoxDecoration(
-                                              color: Colors.deepPurple
-                                                  .withOpacity(0.7),
-                                              borderRadius:
-                                                  BorderRadius.vertical(
-                                                      bottom:
-                                                          Radius.circular(15)),
+                                              color: Colors.deepPurple.withOpacity(0.7),
+                                              borderRadius: BorderRadius.vertical(bottom: Radius.circular(15)),
                                               boxShadow: shadowColor),
                                           child: ListView.builder(
                                             itemCount: _provinces.length,
@@ -1494,33 +1337,22 @@ class _CreateAccState extends State<CreateAcc> {
                                               return InkWell(
                                                 onTap: () async {
                                                   setState(() {
-                                                    _showProvinceDropdown =
-                                                        false;
-                                                    _showCityMunicipalityDropdown =
-                                                        true;
-                                                    _loadCitiesMunicipalities(city[
-                                                        'code']); // Load barangays for the selected city
+                                                    _showProvinceDropdown = false;
+                                                    _showCityMunicipalityDropdown = true;
+                                                    _loadCitiesMunicipalities(
+                                                        city['code']); // Load barangays for the selected city
 
-                                                    _selectedProvinceName = city[
-                                                        'name']; // Set by name
+                                                    _selectedProvinceName = city['name']; // Set by name
                                                   });
                                                 },
                                                 child: Container(
-                                                  padding: EdgeInsets.symmetric(
-                                                      vertical: 10,
-                                                      horizontal: 15),
+                                                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                                                   decoration: BoxDecoration(
-                                                    border: Border(
-                                                        bottom: BorderSide(
-                                                            color: Colors.grey
-                                                                .shade300)),
+                                                    border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
                                                   ),
                                                   child: Text(
-                                                    city[
-                                                        'name'], // Display the name
-                                                    style: TextStyle(
-                                                        fontSize: 16,
-                                                        color: Colors.white),
+                                                    city['name'], // Display the name
+                                                    style: TextStyle(fontSize: 16, color: Colors.white),
                                                   ),
                                                 ),
                                               );
@@ -1530,48 +1362,33 @@ class _CreateAccState extends State<CreateAcc> {
                                     if (_showCityMunicipalityDropdown)
                                       Container(
                                         height: 400,
-                                        margin: EdgeInsets.symmetric(
-                                            horizontal: 10),
+                                        margin: EdgeInsets.symmetric(horizontal: 10),
                                         decoration: BoxDecoration(
-                                            color: Colors.deepPurple
-                                                .withOpacity(0.7),
-                                            borderRadius: BorderRadius.vertical(
-                                                bottom: Radius.circular(15)),
+                                            color: Colors.deepPurple.withOpacity(0.7),
+                                            borderRadius: BorderRadius.vertical(bottom: Radius.circular(15)),
                                             boxShadow: shadowColor),
                                         child: ListView.builder(
-                                          itemCount:
-                                              _citiesMunicipalities.length,
+                                          itemCount: _citiesMunicipalities.length,
                                           itemBuilder: (context, index) {
-                                            final city =
-                                                _citiesMunicipalities[index];
+                                            final city = _citiesMunicipalities[index];
 
                                             return InkWell(
                                               onTap: () async {
                                                 setState(() {
-                                                  _showCityMunicipalityDropdown =
-                                                      false;
+                                                  _showCityMunicipalityDropdown = false;
                                                   _showBarangayDropdown = true;
                                                   _loadBarangays(city['code']);
-                                                  _selectedCityMunicipalityName =
-                                                      city['name'];
+                                                  _selectedCityMunicipalityName = city['name'];
                                                 });
                                               },
                                               child: Container(
-                                                padding: EdgeInsets.symmetric(
-                                                    vertical: 10,
-                                                    horizontal: 15),
+                                                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                                                 decoration: BoxDecoration(
-                                                  border: Border(
-                                                      bottom: BorderSide(
-                                                          color: Colors
-                                                              .grey.shade300)),
+                                                  border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
                                                 ),
                                                 child: Text(
-                                                  city[
-                                                      'name'], // Display the name
-                                                  style: TextStyle(
-                                                      fontSize: 16,
-                                                      color: Colors.white),
+                                                  city['name'], // Display the name
+                                                  style: TextStyle(fontSize: 16, color: Colors.white),
                                                 ),
                                               ),
                                             );
@@ -1583,13 +1400,10 @@ class _CreateAccState extends State<CreateAcc> {
                                     if (_showBarangayDropdown)
                                       Container(
                                         height: 400,
-                                        margin: EdgeInsets.symmetric(
-                                            horizontal: 10),
+                                        margin: EdgeInsets.symmetric(horizontal: 10),
                                         decoration: BoxDecoration(
-                                            color: Colors.deepPurple
-                                                .withOpacity(0.7),
-                                            borderRadius: BorderRadius.vertical(
-                                                bottom: Radius.circular(15)),
+                                            color: Colors.deepPurple.withOpacity(0.7),
+                                            borderRadius: BorderRadius.vertical(bottom: Radius.circular(15)),
                                             boxShadow: shadowColor),
                                         child: ListView.builder(
                                           itemCount: _barangays.length,
@@ -1600,26 +1414,17 @@ class _CreateAccState extends State<CreateAcc> {
                                               onTap: () async {
                                                 setState(() {
                                                   _showBarangayDropdown = false;
-                                                  _selectedBarangayName =
-                                                      city['name'];
+                                                  _selectedBarangayName = city['name'];
                                                 });
                                               },
                                               child: Container(
-                                                padding: EdgeInsets.symmetric(
-                                                    vertical: 10,
-                                                    horizontal: 15),
+                                                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                                                 decoration: BoxDecoration(
-                                                  border: Border(
-                                                      bottom: BorderSide(
-                                                          color: Colors
-                                                              .grey.shade300)),
+                                                  border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
                                                 ),
                                                 child: Text(
-                                                  city[
-                                                      'name'], // Display the name
-                                                  style: TextStyle(
-                                                      fontSize: 16,
-                                                      color: Colors.white),
+                                                  city['name'], // Display the name
+                                                  style: TextStyle(fontSize: 16, color: Colors.white),
                                                 ),
                                               ),
                                             );
@@ -1706,8 +1511,7 @@ class _CreateAccState extends State<CreateAcc> {
                           icon: Icons.home,
                           onChanged: (value) {
                             setState(() {
-                              streetvalidator = _validateStreet(
-                                  value); // Trigger validation on text change
+                              streetvalidator = _validateStreet(value); // Trigger validation on text change
                             });
                           },
                         ),
@@ -1724,8 +1528,7 @@ class _CreateAccState extends State<CreateAcc> {
                           icon: Icons.local_post_office,
                           onChanged: (value) {
                             setState(() {
-                              postalvalidator = _validatePostalCode(
-                                  value); // Trigger validation on text change
+                              postalvalidator = _validatePostalCode(value); // Trigger validation on text change
                               print(_postalController.text);
                             });
                           },
@@ -1776,46 +1579,28 @@ class _CreateAccState extends State<CreateAcc> {
 
                               _ddlClicked = true;
 
-                              if ((_fnameController.text.isEmpty ||
-                                      fnamevalidator.isNotEmpty) ||
+                              if ((_fnameController.text.isEmpty || fnamevalidator.isNotEmpty) ||
                                   (mnamevalidator.isNotEmpty) ||
-                                  (_lnameController.text.isEmpty ||
-                                      lnamevalidator.isNotEmpty) ||
-                                  (_contactController.text.isEmpty ||
-                                      contactvalidator.isNotEmpty) ||
-                                  (_selectedProvinceName == null ||
-                                      provincevalidator.isNotEmpty) ||
-                                  (_selectedCityMunicipalityName == null ||
-                                      cityvalidator.isNotEmpty) ||
-                                  (_selectedBarangayName == null ||
-                                      brgyvalidator.isNotEmpty) ||
-                                  (_streetController.text.isEmpty ||
-                                      streetvalidator.isNotEmpty) ||
-                                  (_postalController.text.isEmpty ||
-                                      postalvalidator.isNotEmpty)) {
+                                  (_lnameController.text.isEmpty || lnamevalidator.isNotEmpty) ||
+                                  (_contactController.text.isEmpty || contactvalidator.isNotEmpty) ||
+                                  (_selectedProvinceName == null || provincevalidator.isNotEmpty) ||
+                                  (_selectedCityMunicipalityName == null || cityvalidator.isNotEmpty) ||
+                                  (_selectedBarangayName == null || brgyvalidator.isNotEmpty) ||
+                                  (_streetController.text.isEmpty || streetvalidator.isNotEmpty) ||
+                                  (_postalController.text.isEmpty || postalvalidator.isNotEmpty)) {
                                 setState(() {
-                                  fnamevalidator =
-                                      _validateFname(_fnameController.text);
-                                  mnamevalidator =
-                                      _validateMname(_mnameController.text);
-                                  lnamevalidator =
-                                      _validateLname(_lnameController.text);
-                                  contactvalidator =
-                                      _validateContact(_contactController.text);
-                                  provincevalidator =
-                                      _validateProvince(_selectedProvinceName);
-                                  cityvalidator = _validateCity(
-                                      _selectedCityMunicipalityName);
-                                  brgyvalidator =
-                                      _validateBrgy(_selectedBarangayName);
-                                  streetvalidator =
-                                      _validateStreet(_streetController.text);
-                                  postalvalidator = _validatePostalCode(
-                                      _postalController.text);
+                                  fnamevalidator = _validateFname(_fnameController.text);
+                                  mnamevalidator = _validateMname(_mnameController.text);
+                                  lnamevalidator = _validateLname(_lnameController.text);
+                                  contactvalidator = _validateContact(_contactController.text);
+                                  provincevalidator = _validateProvince(_selectedProvinceName);
+                                  cityvalidator = _validateCity(_selectedCityMunicipalityName);
+                                  brgyvalidator = _validateBrgy(_selectedBarangayName);
+                                  streetvalidator = _validateStreet(_streetController.text);
+                                  postalvalidator = _validatePostalCode(_postalController.text);
                                 });
                               } else if (_contactController.text.isNotEmpty) {
-                                String? dbContactMsg =
-                                    await contactCheck(_contactController.text);
+                                String? dbContactMsg = await contactCheck(_contactController.text);
                                 // Show any existing error message
                                 if (dbContactMsg != null) {
                                   setState(() {
@@ -1829,9 +1614,7 @@ class _CreateAccState extends State<CreateAcc> {
                                         await createGoogleAccount(
                                             context,
                                             _accountDetails?.email ?? '',
-                                            _accountDetails?.photoBytes != null
-                                                ? _accountDetails!.photoBytes!
-                                                : null,
+                                            _accountDetails?.photoBytes != null ? _accountDetails!.photoBytes! : null,
                                             _fnameController.text,
                                             _mnameController.text,
                                             _lnameController.text,
@@ -1851,8 +1634,7 @@ class _CreateAccState extends State<CreateAcc> {
                                         });
                                       }
                                     } else {
-                                      showErrorSnackBar(context,
-                                          'You must accept the terms and conditions');
+                                      showErrorSnackBar(context, 'You must accept the terms and conditions');
                                     }
                                   }
                                 }
@@ -1862,18 +1644,14 @@ class _CreateAccState extends State<CreateAcc> {
                               });
                             },
                             child: Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 70.0, vertical: 10),
+                                padding: EdgeInsets.symmetric(horizontal: 70.0, vertical: 10),
                                 decoration: BoxDecoration(
                                     color: Colors.green,
                                     borderRadius: BorderRadius.circular(15.0),
                                     boxShadow: shadowColor),
                                 child: Text(
                                   isGoogle ? 'Done' : 'Next',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 25,
-                                      fontWeight: FontWeight.bold),
+                                  style: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.bold),
                                 )),
                           ),
                         ),
@@ -1944,9 +1722,7 @@ class _CreateAccState extends State<CreateAcc> {
               child: Container(
                 padding: EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(15.0),
-                    boxShadow: shadowBigColor),
+                    color: Colors.white, borderRadius: BorderRadius.circular(15.0), boxShadow: shadowBigColor),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1997,14 +1773,11 @@ class _CreateAccState extends State<CreateAcc> {
                             child: TextFormField(
                               cursorColor: deepGreen,
                               controller: _codeControllers[index],
-                              keyboardType: TextInputType
-                                  .number, // Accept characters instead of numbers
-                              textInputAction: TextInputAction
-                                  .next, // Moves focus to next field
+                              keyboardType: TextInputType.number, // Accept characters instead of numbers
+                              textInputAction: TextInputAction.next, // Moves focus to next field
                               maxLength: 1,
                               textAlign: TextAlign.center,
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 24),
+                              style: TextStyle(color: Colors.white, fontSize: 24),
                               decoration: InputDecoration(
                                 counterText: '',
                                 filled: true,
@@ -2026,8 +1799,7 @@ class _CreateAccState extends State<CreateAcc> {
                                 final upperCaseValue = value.toUpperCase();
                                 if (upperCaseValue.length == 1) {
                                   _codeControllers[index].text = upperCaseValue;
-                                  _codeControllers[index].selection =
-                                      TextSelection.fromPosition(
+                                  _codeControllers[index].selection = TextSelection.fromPosition(
                                     TextPosition(offset: upperCaseValue.length),
                                   );
 
@@ -2085,8 +1857,7 @@ class _CreateAccState extends State<CreateAcc> {
                         String? error = _validateCode();
                         if (error == null) {
                           updateEnteredCode();
-                          String? errorMessage = await verifyEmailCode(
-                              _emailController.text, enteredCode);
+                          String? errorMessage = await verifyEmailCode(_emailController.text, enteredCode);
                           if (errorMessage != null) {
                             showErrorSnackBar(context, errorMessage);
                           } else {
@@ -2127,15 +1898,10 @@ class _CreateAccState extends State<CreateAcc> {
                         alignment: Alignment.center,
                         padding: EdgeInsets.all(16.0),
                         decoration: BoxDecoration(
-                            color: Colors.green,
-                            borderRadius: BorderRadius.circular(10.0),
-                            boxShadow: shadowColor),
+                            color: Colors.green, borderRadius: BorderRadius.circular(10.0), boxShadow: shadowColor),
                         child: Text(
                           'Verify',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 25,
-                              fontWeight: FontWeight.bold),
+                          style: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
@@ -2186,12 +1952,10 @@ class _CreateAccState extends State<CreateAcc> {
                 hintText: hintText,
                 hintStyle: TextStyle(color: Colors.grey[300]),
                 // prefixIcon: Icon(icon, color: Colors.green),
-                // suffixIcon: suffixIcon,
+                suffixIcon: suffixIcon,
                 filled: true,
                 fillColor: Colors.white,
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
                 // enabledBorder: OutlineInputBorder(
                 //   borderRadius: BorderRadius.circular(10), // Rounded corners
                 //   borderSide: const BorderSide(color: Colors.grey, width: 3.0),
@@ -2243,11 +2007,7 @@ class _CreateAccState extends State<CreateAcc> {
                     SizedBox(
                       height: 12,
                     ),
-                    Text('+63',
-                        style: TextStyle(
-                            color: Colors.green,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16)),
+                    Text('+63', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 16)),
                   ],
                 ),
                 //prefixIcon: Icon(Icons.abc),
@@ -2286,8 +2046,8 @@ class _CreateAccState extends State<CreateAcc> {
               onChanged: (value) {
                 if (value.length > 10) {
                   _contactController.text = value.substring(0, 10);
-                  _contactController.selection = TextSelection.fromPosition(
-                      TextPosition(offset: _contactController.text.length));
+                  _contactController.selection =
+                      TextSelection.fromPosition(TextPosition(offset: _contactController.text.length));
                 }
                 setState(() {
                   contactvalidator = _validateContact(value);
@@ -2315,16 +2075,13 @@ class _CreateAccState extends State<CreateAcc> {
         //hint: Text(hintText, style: TextStyle(color: Colors.grey)),
         icon: Icon(Icons.arrow_drop_down, color: Colors.grey),
         decoration: InputDecoration(
-          labelText:
-              hintText, // This will move the hint text to the upper left when focused
+          labelText: hintText, // This will move the hint text to the upper left when focused
           floatingLabelBehavior: FloatingLabelBehavior.auto,
           labelStyle: TextStyle(color: Colors.grey),
           filled: true,
           fillColor: Colors.white,
           prefixIcon: Icon(icon, color: Colors.green),
-          border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide.none),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
           // enabledBorder: OutlineInputBorder(
           //   borderRadius: BorderRadius.circular(10),
           //   borderSide: const BorderSide(color: Colors.grey, width: 3.0),
@@ -2436,8 +2193,7 @@ class SuccessfulGoogleRegistration extends StatelessWidget {
                     //
                   },
                   child: Container()),
-              Icon(Icons.check_circle,
-                  color: Colors.lightGreenAccent, size: 100),
+              Icon(Icons.check_circle, color: Colors.lightGreenAccent, size: 100),
               SizedBox(height: 20),
               Text(
                 'Successful Account Registration !',
@@ -2548,11 +2304,9 @@ void _showSignInConfirmationDialog(BuildContext context) {
     builder: (BuildContext context) {
       return AlertDialog(
         backgroundColor: Colors.deepPurple,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(20.0))),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
         title: Text('Sign In', style: TextStyle(color: Colors.white)),
-        content: Text(
-            'Back to sign in now? Any data from this form will be removed!',
+        content: Text('Back to sign in now? Any data from this form will be removed!',
             style: TextStyle(color: Colors.white)),
         actions: [
           TextButton(

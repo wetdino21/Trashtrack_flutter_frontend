@@ -340,6 +340,7 @@ Future<List<Map<String, dynamic>>?> fetchWasteCategory() async {
       return data
           .map<Map<String, dynamic>>((item) => {
                 'name': item['wc_name'].toString(),
+                'desc': item['wc_desc'].toString(),
                 'unit': item['wc_unit'],
                 'price': item['wc_price'],
                 'wc_id': item['wc_id'],

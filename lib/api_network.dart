@@ -34,34 +34,33 @@ globalUrl() {
   return 'http://192.168.254.187:3000';
 }
 
-////// COMMENT THIS IF IP STATIC ///////////////////////////////////////////////////////////////////
+//// CTU network
+// globalUrl() {
+//   return 'http://172.16.14.83:3000';
+// }
 
+
+////// COMMENT THIS IF IP STATIC ///////////////////////////////////////////////////////////////////
 String? networkURL;
 
 class NetworkglobalUrl {
-  // Private constructor to prevent instantiation
   NetworkglobalUrl._privateConstructor();
 
-  // Static instance of the class
   static final NetworkglobalUrl _instance = NetworkglobalUrl._privateConstructor();
 
-  // Variable to store the base URL
   String? _baseUrl;
 
-  // Factory constructor to return the same instance every time
   factory NetworkglobalUrl() {
     return _instance;
   }
 
-  // Method to set the base URL
   void setBaseUrl(String ipAddress) {
     _baseUrl = 'http://$ipAddress:3000';
-    networkURL = _baseUrl!; // Update global variable as well
+    networkURL = _baseUrl!; 
   }
 
-  // Method to retrieve the base URL
   String? getBaseUrl() {
-    return _baseUrl ?? networkURL; // Return _baseUrl if set, otherwise return default global URL
+    return _baseUrl ?? networkURL;
   }
 }
 
@@ -71,12 +70,12 @@ class NetworkglobalUrl {
 // }
 
 //for storing network on open
-class StoreNetwork extends StatefulWidget {
+class DynamicNetwork extends StatefulWidget {
   @override
-  _StoreNetworkState createState() => _StoreNetworkState();
+  _DynamicNetworkState createState() => _DynamicNetworkState();
 }
 
-class _StoreNetworkState extends State<StoreNetwork> {
+class _DynamicNetworkState extends State<DynamicNetwork> {
   TextEditingController _networkController = TextEditingController();
 
   @override

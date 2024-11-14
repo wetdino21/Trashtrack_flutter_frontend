@@ -3,8 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:trashtrack/appbar.dart';
 import 'package:trashtrack/api_network.dart';
 import 'package:trashtrack/data_model.dart';
-
-//Customer library
 import 'package:trashtrack/Customer/c_Schedule.dart';
 import 'package:trashtrack/about_us.dart';
 import 'package:trashtrack/change_pass.dart';
@@ -13,12 +11,8 @@ import 'package:trashtrack/Customer/c_map.dart';
 import 'package:trashtrack/Customer/c_notification.dart';
 import 'package:trashtrack/Customer/c_payment.dart';
 import 'package:trashtrack/profile.dart';
-
 import 'package:trashtrack/api_token.dart';
-
-//global
 import 'package:trashtrack/create_acc.dart';
-
 import 'package:trashtrack/deactivated.dart';
 import 'package:trashtrack/forgot_pass.dart';
 import 'package:trashtrack/login.dart';
@@ -28,9 +22,7 @@ import 'package:trashtrack/splash_screen.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:trashtrack/suspended.dart';
 import 'package:trashtrack/terms_conditions.dart';
-////asds
 import 'package:hive_flutter/hive_flutter.dart';
-
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/io.dart';
 import 'dart:convert';
@@ -46,12 +38,6 @@ void main() async {
   );
 }
 
-// void main() async {
-//   WidgetsFlutterBinding.ensureInitialized();
-//   await Hive.initFlutter();
-//   runApp(MyApp());
-//   // runApp(const MyApp());
-// }
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>(); // for logout complex
 
 class MyApp extends StatelessWidget {
@@ -62,13 +48,10 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       //initialRoute: initialRoute,
       home: TokenCheck(), // final firt route
-      //home: StoreNetwork(), // for testing with network
+      //home: DynamicNetwork(), // for testing with network
       //home: PdfDownloader(), //for testing
 
       //home: WebsocketMultiple(), //for testing
-      //home: WebSocketExample(), //for testing
-      //initialRoute: 'c_home', //for testing
-      //initialRoute: 'splash', //for testing
       routes: {
         '/mainApp': (context) => MainApp(),
         '/logout': (context) => LoginPage(),
@@ -90,6 +73,66 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+//check token when open app
+class TokenCheck extends StatefulWidget {
+  @override
+  _TokenCheckState createState() => _TokenCheckState();
+}
+
+class _TokenCheckState extends State<TokenCheck> {
+  @override
+  void initState() {
+    super.initState();
+    _initializeApp();
+  }
+
+  Future<void> _initializeApp() async {
+    String initialRoute = await onOpenApp(context);
+
+    if (initialRoute.isNotEmpty) {
+      Navigator.pushReplacementNamed(context, initialRoute);
+    } else {
+      // Fallback to login if something goes wrong
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage(action: 'login')),
+        (Route<dynamic> route) => false,
+      );
+
+      //Navigator.pushReplacementNamed(context, 'login');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: deepPurple,
+      body: MainApp(),
+
+      // Column(
+      //   mainAxisAlignment: MainAxisAlignment.center,
+      //   children: [
+      //     Text(
+      //       'NO INTERNET CONNECTION',
+      //       style: TextStyle(color: white, fontSize: 20),
+      //     ),
+      //     Center(
+      //       child: Image.asset('assets/icon/trashtrack_icon_trans.png', scale: 3),
+      //     ),
+      //     ElevatedButton(
+      //         onPressed: () {
+      //           deleteTokens();
+      //         },
+      //         child: Text('Delete token')),
+      //   ],
+      // ),
+    );
+  }
+}
+
+
+
 
 // class WebsocketMultiple extends StatefulWidget {
 //   @override
@@ -160,113 +203,4 @@ class MyApp extends StatelessWidget {
 //     );
 //   }
 // }
-
-////////
-class TokenCheck extends StatefulWidget {
-  @override
-  _TokenCheckState createState() => _TokenCheckState();
-}
-
-class _TokenCheckState extends State<TokenCheck> {
-  @override
-  void initState() {
-    super.initState();
-    _initializeApp();
-  }
-
-  Future<void> _initializeApp() async {
-    String initialRoute = await onOpenApp(context);
-
-    if (initialRoute.isNotEmpty) {
-      Navigator.pushReplacementNamed(context, initialRoute);
-    } else {
-      // Fallback to login if something goes wrong
-      Navigator.pushReplacementNamed(context, 'login');
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: deepPurple,
-      body: MainApp(),
-
-      // Column(
-      //   mainAxisAlignment: MainAxisAlignment.center,
-      //   children: [
-      //     Text(
-      //       'NO INTERNET CONNECTION',
-      //       style: TextStyle(color: white, fontSize: 20),
-      //     ),
-      //     Center(
-      //       child: Image.asset('assets/icon/trashtrack_icon_trans.png', scale: 3),
-      //     ),
-      //     ElevatedButton(
-      //         onPressed: () {
-      //           deleteTokens();
-      //         },
-      //         child: Text('Delete token')),
-      //   ],
-      // ),
-    );
-  }
-}
-
-// class WebSocketExample extends StatefulWidget {
-//   @override
-//   _WebSocketExampleState createState() => _WebSocketExampleState();
-// }
-
-// class _WebSocketExampleState extends State<WebSocketExample> {
-//   //late WebSocketChannel channel;
-//   WebSocketChannel channel = WebSocketChannel.connect(
-//     Uri.parse('ws://192.168.254.187:8080'),
-//   );
-
-//   @override
-//   void dispose() {
-//     channel.sink.close();
-//     super.dispose();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('WebSocket Example'),
-//       ),
-//       body: Container(
-//         padding: const EdgeInsets.all(8.0),
-//         child: StreamBuilder(
-//           stream: channel.stream,
-//           builder: (context, snapshot) {
-//             if (snapshot.hasData) {
-//               //return Text('Received: ${snapshot.data}');
-//               try {
-//                 // Decode the incoming data from JSON string to Dart object
-//                 List<String> notifications = []; // To store notifications
-//                 final notification = json.decode(snapshot.data as String);
-//                 notifications.add(notification['notif_message']);
-//                 return ListView.builder(
-//                   itemCount: notifications.length,
-//                   itemBuilder: (context, index) {
-//                     //final notification = notifications[index];
-//                     return ListTile(
-//                       title: Text(notifications[index]),
-//                     );
-//                   },
-//                 );
-//               } catch (e) {
-//                 return Center(child: Text('Error decoding notifications: $e'));
-//               }
-//             } else {
-//               return Text('Waiting for messagessss...');
-//             }
-//           },
-//         ),
-//       ),
-//     );
-//   }
-// }
-
 

@@ -390,11 +390,12 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen> with SingleTickerPr
                                         }
 
                                         final String status = booking['bk_status'] ?? 'No status';
-
+                                        final bool priority = booking['bk_priority'] ?? false;
                                         // Pass the extracted data to the C_CurrentScheduleCard widget
                                         return Column(
                                           children: [
                                             C_ScheduleCardList(
+                                              priority: priority,
                                               bookId: book_Id,
                                               date: date,
                                               dateCreated: dateCreated,

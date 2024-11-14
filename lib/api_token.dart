@@ -121,7 +121,6 @@ Future<void> deleteTokens({String? action}) async {
 
   action = action ?? 'exp';
 
-  console('tokeennnnnnnnnnn $action');
   navigatorKey.currentState?.pushAndRemoveUntil(
     MaterialPageRoute(
       builder: (context) => LoginPage(action: action),
@@ -221,7 +220,7 @@ Future<String> onOpenApp(BuildContext context) async {
   }
   if (accessToken == null) {
     print('No access token available. User needs to log in.');
-    await deleteTokens(); // Logout use
+    await deleteTokens(action: 'logout'); // Logout use
     return 'login';
   }
 
@@ -243,7 +242,6 @@ Future<String> onOpenApp(BuildContext context) async {
       // }
     } else {
       if (response.statusCode == 401) {
-        // Access token might be expired, attempt to refresh it
         print('Access token expired. Attempting to refresh...');
         String? refreshMsg = await refreshAccessToken();
         if (refreshMsg == null) {
@@ -251,65 +249,24 @@ Future<String> onOpenApp(BuildContext context) async {
         } else {
           // Refresh token is invalid or expired, logout the user
           await deleteTokens(); // Logout user
-          return 'login';
+          //return 'login';
         }
       } else if (response.statusCode == 403) {
         // Access token is invalid. logout
         print('Access token invalid. Attempting to logout...');
-        await deleteTokens(); // Logout use
+        await deleteTokens();
       } else {
         print('Response: ${response.body}');
       }
 
       showErrorSnackBar(context, response.body);
-      return 'login';
+      return 'err';
     }
   } catch (e) {
     print(e.toString());
-    return 'login';
+    return 'err';
   }
 }
-
-////update user
-// Future<void> updateProfile(BuildContext context, String fname, String lname) async {
-//   Map<String, String?> tokens = await getTokens();
-//   String? accessToken = tokens['access_token'];
-
-//   if (accessToken == null) {
-//     print('No access token available. User needs to log in.');
-//       await deleteTokens(context); // Logout use
-//     return;
-//   }
-
-//   final response = await http.post(
-//     Uri.parse('$baseUrl/update_profile'),
-//     headers: {
-//       'Authorization': 'Bearer $accessToken',
-//       'Content-Type': 'application/json',
-//     },
-//     body: jsonEncode({
-//       'fname': fname,
-//       'lname': lname,  // Assume base64-encoded image
-//     }),
-//   );
-
-//   if (response.statusCode == 200) {
-//     print('name updated successfully');
-//   } else if (response.statusCode == 401) {
-//     // Access token might be expired, attempt to refresh it
-//     print('Access token expired. Attempting to refresh...');
-//     String? refreshMsg = await refreshAccessToken();
-//     if (refreshMsg == null) {
-//       await makeApiRequest(context);
-//     }
-//   } else if (response.statusCode == 403) {
-//     // Access token is invalid. logout
-//     print('Access token invalid. Attempting to logout...');
-//     await deleteTokens(context); // Logout use
-//   } else {
-//     print('Response: ${response.body}');
-//   }
-// }
 
 void showLogoutConfirmationDialog(BuildContext context) {
   showDialog(

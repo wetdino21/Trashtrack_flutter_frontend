@@ -70,7 +70,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 SizedBox(height: 20),
 
                 Text(
-                  "Welcome to TrashTrack! \n We've got your waste needs covered, \n from residential to commercial, big or small.",
+                  "Welcome to TrashTrack! \n We've got your waste needs covered, \n from residential, big or small.",
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.white,

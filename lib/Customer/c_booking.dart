@@ -13,6 +13,9 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:trashtrack/validator_data.dart';
+import 'package:trashtrack/waste_pricing_info.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class RequestPickupScreen extends StatefulWidget {
   @override
@@ -84,6 +87,8 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
   String pinLocValidator = '';
   String wasteCatValidator = '';
   String dateValidator = '';
+
+  List<dynamic> _locations = [];
 
   @override
   void initState() {
@@ -220,11 +225,34 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
     }
   }
 
+  // fetch latlong
+  Future<void> _searchLocation(String query) async {
+    final response = await http.get(
+      Uri.parse('https://nominatim.openstreetmap.org/search?q=$query&format=json'),
+    );
+
+    if (response.statusCode == 200) {
+      setState(() {
+        _locations = json.decode(response.body);
+        if (_locations.isEmpty) {
+          if (!mounted) return;
+          showErrorSnackBar(context, 'No pin location found.');
+        } else {
+          var location = _locations[0];
+          selectedPoint = LatLng(double.parse(location['lat']), double.parse(location['lon']));
+          _mapController.move(selectedPoint!, 13.0); // Move to current location
+          _mapController.rotate(0.0);
+        }
+      });
+    } else {
+      if (!mounted) return;
+      showErrorSnackBar(context, 'Unable to load pin location.');
+    }
+  }
+
   void handleOnePoint(LatLng point) {
     setState(() {
       selectedPoint = point;
-      //_mapController.move(selectedPoint!, 16);
-      //fetchSelectedPlaceNames();
     });
   }
 
@@ -269,7 +297,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
       setState(() {
         selectedPoint = LatLng(position.latitude, position.longitude);
         _mapController.move(selectedPoint!, 13.0); // Move to current location
-
+        _mapController.rotate(0.0);
         // selectedPlaceName = getCurrentName;
       });
     } catch (e) {
@@ -645,8 +673,10 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
                                                                 final city = _barangays[index];
 
                                                                 return InkWell(
-                                                                  onTap: () {
+                                                                  onTap: () async {
                                                                     setState(() {
+                                                                      isLoadingLoc = true;
+
                                                                       _selectedBarangayName = city['name'];
                                                                       _showBarangayDropdown = false;
 
@@ -655,6 +685,14 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
                                                                           _selectedCityMunicipalityName! +
                                                                           ', ' +
                                                                           _selectedProvinceName!;
+                                                                    });
+
+                                                                    //
+                                                                    String loc =
+                                                                        '${_selectedProvinceName!} ${_selectedCityMunicipalityName!} ${_selectedBarangayName!}';
+                                                                    await _searchLocation(loc);
+                                                                    setState(() {
+                                                                      isLoadingLoc = false;
                                                                     });
                                                                   },
                                                                   child: Container(
@@ -871,8 +909,8 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
                                                           width: 80.0,
                                                           height: 80.0,
                                                           point: selectedPoint!,
-                                                          builder: (ctx) =>
-                                                              Icon(Icons.location_pin, color: Colors.red, size: 40),
+                                                          builder: (ctx) => Icon(Icons.location_pin,
+                                                              color: Colors.red, size: 40, shadows: shadowIconColor),
                                                           rotate: true),
                                                     ],
                                                   ),
@@ -893,8 +931,10 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
                                                 InkWell(
                                                   onTap: () {
                                                     setState(() {
-                                                      if (selectedPoint != null)
+                                                      if (selectedPoint != null) {
                                                         _mapController.move(selectedPoint!, 13);
+                                                        _mapController.rotate(0.0);
+                                                      }
                                                       onMap = false;
                                                       pinLocValidator = '';
                                                     });
@@ -922,9 +962,6 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
                                                       boxShadow: shadowColor),
                                                   child: InkWell(
                                                     onTap: () async {
-                                                      // setState(() {
-
-                                                      // });
                                                       await _getCurrentLocation();
                                                     },
                                                     child: Icon(
@@ -944,11 +981,22 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
                                             child: InkWell(
                                               onTap: () async {
                                                 setState(() {
+                                                  isLoadingLoc = true;
                                                   onMap = true;
                                                 });
                                                 if (selectedPoint == null) {
-                                                  await _getCurrentLocation();
+                                                  if (_selectedProvinceName != null &&
+                                                      _selectedCityMunicipalityName != null &&
+                                                      _selectedBarangayName != null) {
+                                                    String loc =
+                                                        '${_selectedProvinceName!} ${_selectedCityMunicipalityName!} ${_selectedBarangayName!}';
+                                                    await _searchLocation(loc);
+                                                  }
                                                 }
+
+                                                setState(() {
+                                                  isLoadingLoc = false;
+                                                });
                                               },
                                             ),
                                           )),
@@ -990,13 +1038,30 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.center,
                                         children: [
-                                          Text(
-                                            'Waste Type',
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold, color: Colors.black, fontSize: 16),
+                                          InkWell(
+                                            onTap: () => Navigator.push(
+                                                context, MaterialPageRoute(builder: (context) => WastePricingInfo())),
+                                            child: SizedBox(
+                                              width: 150,
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  const SizedBox(width: 5),
+                                                  const Text(
+                                                    'Waste Type',
+                                                    style: TextStyle(
+                                                        fontWeight: FontWeight.bold, color: Colors.black, fontSize: 16),
+                                                  ),
+                                                  const SizedBox(width: 10),
+                                                  Icon(
+                                                    Icons.info,
+                                                    color: deepGreen,
+                                                  )
+                                                ],
+                                              ),
+                                            ),
                                           ),
                                           Container(
-                                            padding: EdgeInsets.all(5),
                                             decoration: BoxDecoration(
                                                 color: Colors.white,
                                                 borderRadius: BorderRadius.circular(10),
@@ -1427,8 +1492,8 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-                Navigator.of(context).pop(); // Close the page
+                Navigator.of(context).pop(); // x the dialog
+                Navigator.of(context).pop(); // x the page
               },
               child: Text('Yes', style: TextStyle(color: Colors.white)),
             ),
@@ -1485,6 +1550,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
       shrinkWrap: true, // Use shrinkWrap to make the list fit its content.
       children: _wasteTypes.map((Map<String, dynamic> category) {
         String type = category['name'];
+        String desc = category['desc'];
         var price = category['price'];
         var unit = category['unit'];
         var wcId = category['wc_id'];
@@ -1494,55 +1560,66 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
         //
         bool isDisabled = _wasteLimit.any((limit) => limit['wc_id'] == wcId);
 
-        return CheckboxListTile(
-          title: Row(
-            children: [
-              isDisabled ? Icon(Icons.block, color: red) : Icon(Icons.library_add, color: deepGreen),
-              SizedBox(width: 10.0),
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      type,
-                      style: TextStyle(fontSize: 14),
-                    ),
-                    Text(
-                      '₱${price.toString()}\\${unit.toString()}',
-                      style: TextStyle(color: Colors.deepOrange, fontSize: 14),
-                    ),
-                  ],
+        return Tooltip(
+          message: desc,
+          child: CheckboxListTile(
+            title: Row(
+              children: [
+                isDisabled ? Icon(Icons.block, color: red) : Icon(Icons.library_add, color: deepGreen),
+                SizedBox(width: 5),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        type,
+                        style: TextStyle(fontSize: 14),
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: true,
+                      ),
+                      Text(
+                        '₱${price.toString()}\\${unit.toString()}',
+                        style: TextStyle(color: Colors.deepOrange, fontSize: 14),
+                        textAlign: TextAlign.end,
+                      ),
+                      Text(
+                        desc,
+                        style: TextStyle(fontSize: 9),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-          value: isSelected,
-          onChanged: isDisabled
-              ? null // Disables the checkbox if `isDisabled` is true
-              : (bool? selected) {
-                  setState(() {
-                    if (selected == true) {
-                      // Add the entire waste type object
-                      _selectedWasteTypes.add({
-                        'name': type,
-                        'price': price,
-                        'unit': unit,
-                      });
-                    } else {
-                      // Remove the waste type object
-                      _selectedWasteTypes.removeWhere((selectedCategory) => selectedCategory['name'] == type);
-                    }
+              ],
+            ),
 
-                    // Validator
-                    if (_selectedWasteTypes.isEmpty) {
-                      wasteCatValidator = _validateWaste(_selectedWasteTypes);
-                    } else {
-                      wasteCatValidator = '';
-                    }
-                  });
-                },
-          activeColor: Colors.blue, // Color of the checkbox when selected.
-          checkColor: Colors.white, // Color of the checkmark.
+            value: isSelected,
+            onChanged: isDisabled
+                ? null // Disables the checkbox if `isDisabled` is true
+                : (bool? selected) {
+                    setState(() {
+                      if (selected == true) {
+                        // Add the entire waste type object
+                        _selectedWasteTypes.add({
+                          'name': type,
+                          'price': price,
+                          'unit': unit,
+                        });
+                      } else {
+                        // Remove the waste type object
+                        _selectedWasteTypes.removeWhere((selectedCategory) => selectedCategory['name'] == type);
+                      }
+
+                      // Validator
+                      if (_selectedWasteTypes.isEmpty) {
+                        wasteCatValidator = _validateWaste(_selectedWasteTypes);
+                      } else {
+                        wasteCatValidator = '';
+                      }
+                    });
+                  },
+            activeColor: Colors.blue, // Color of the checkbox when selected.
+            checkColor: Colors.white, // Color of the checkmark.
+          ),
         );
       }).toList(),
     );
@@ -1668,18 +1745,12 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
     final DateTime closeTime =
         DateTime(now.year, now.month, now.day, closeTimeInMinutes ~/ 60, closeTimeInMinutes % 60);
 
-    //final DateTime dbDateStart = DateTime.parse(_bookLimit['bl_date_start']).toUtc();
     final DateTime dbDateLast = DateTime.parse(_bookLimit['bl_date_last']).toUtc();
 
-    // // Determine first and last selectable dates
-    // final DateTime localStartDate = dbDateStart.toLocal();
-    // final DateTime subFirstDate = DateTime(localStartDate.year, localStartDate.month, localStartDate.day);
-    // final DateTime firstDate = now.isBefore(closeTime) ? subFirstDate : subFirstDate.add(Duration(days: 1));
     final DateTime firstDate = now.isBefore(closeTime) ? now : now.add(Duration(days: 1));
     final DateTime localLastDate = dbDateLast.toLocal();
     final DateTime lastDate = DateTime(localLastDate.year, localLastDate.month, localLastDate.day);
 
-    // Check if initialDate is disabled
     DateTime initialDate = firstDate;
 
     // Find the next available date if the initialDate is disabled

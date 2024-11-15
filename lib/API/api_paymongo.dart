@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:trashtrack/api_network.dart';
-import 'package:trashtrack/api_token.dart';
+import 'package:trashtrack/API/api_network.dart';
+import 'package:trashtrack/API/api_token.dart';
 import 'package:trashtrack/styles.dart';
 import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';

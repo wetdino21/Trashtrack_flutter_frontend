@@ -1,28 +1,29 @@
 import 'package:hive/hive.dart';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:trashtrack/Customer/c_api_cus_data.dart'; // For imageBytes if applicable
+import 'package:trashtrack/Customer/api_cus_data.dart'; // For imageBytes if applicable
 import 'dart:convert';
 import 'package:trashtrack/styles.dart';
 
 // import 'package:logger/logger.dart';
 // final Logger logger = Logger();
 
-Future<void> storeDataInHive(BuildContext context) async {
+Future<void> storeDataInHive() async {
   try {
     // Fetch data from the API or another source
-    final data = await fetchCusData(context);
+    final data = await fetchCusData();
 
     if (data == null) {
-      //showErrorSnackBar(context, 'nulllllllllllllllllllllll');
-      print('FETCH USER DATA IS NULL');
+      console('FETCH USER DATA IS NULL');
     } else {
 // Determine the prefix based on the data
       String prefix;
+      bool verified = false;
       String usertype = 'type';
       String address = '';
       if (data.containsKey('cus_id')) {
         prefix = 'cus_';
+        verified = data['cus_isverified'];
       } else if (data.containsKey('emp_id')) {
         prefix = 'emp_';
         usertype = 'role';
@@ -41,8 +42,7 @@ Future<void> storeDataInHive(BuildContext context) async {
       final String? mname = data['${prefix}mname'];
       final String? lname = data['${prefix}lname'];
       final String? contact = data['${prefix}contact'];
-      final String? province =
-          prefix == 'cus_' ? data['${prefix}province'] : '';
+      final String? province = prefix == 'cus_' ? data['${prefix}province'] : '';
       final String? city = prefix == 'cus_' ? data['${prefix}city'] : '';
       final String? brgy = prefix == 'cus_' ? data['${prefix}brgy'] : '';
       final String? street = prefix == 'cus_' ? data['${prefix}street'] : '';
@@ -53,9 +53,7 @@ Future<void> storeDataInHive(BuildContext context) async {
 //////////////
       final String? email = data['${prefix}email'];
       final String? auth = data['${prefix}auth_method'];
-      final Uint8List? imageBytes = data['profileImage'] != null
-          ? base64Decode(data['profileImage'])
-          : null;
+      final Uint8List? imageBytes = data['profileImage'] != null ? base64Decode(data['profileImage']) : null;
 
       // Open Hive box
       var box = await Hive.openBox('mybox');
@@ -78,6 +76,7 @@ Future<void> storeDataInHive(BuildContext context) async {
       await box.put('auth', auth);
       await box.put('profile', imageBytes);
       await box.put('address', address);
+      await box.put('verified', verified);
 
       if (user == 'customer') {
         //notification count
@@ -92,10 +91,10 @@ Future<void> storeDataInHive(BuildContext context) async {
               return notification['notif_read'] == false;
             }).length;
           } else {
-            print('NOTIFICATION USER DATA IS NULL');
+            console('NOTIFICATION USER DATA IS NULL');
           }
         } catch (e) {
-          showErrorSnackBar(context, e.toString());
+          console(e.toString());
         }
 
         await box.put('notif_count', unreadCount);
@@ -136,6 +135,8 @@ Future<void> storeDataInHive(BuildContext context) async {
 
 /////////////////////////
 Future<Map<String, dynamic>> userDataFromHive() async {
+  //fetch and store to hive
+  await storeDataInHive();
   // Open Hive box
   var box = await Hive.openBox('mybox');
 
@@ -158,6 +159,7 @@ Future<Map<String, dynamic>> userDataFromHive() async {
     'auth': box.get('auth'),
     'profile': box.get('profile'),
     'address': box.get('address'),
+    'verified': box.get('verified'),
     'notif_count': box.get('notif_count'),
   };
   // Optionally, print a message or handle UI updates

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:trashtrack/api_token.dart';
+import 'package:trashtrack/API/api_token.dart';
 
 class SplashScreen extends StatefulWidget {
   @override

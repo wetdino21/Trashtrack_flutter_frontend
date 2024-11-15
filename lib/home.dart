@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:trashtrack/Customer/c_booking.dart';
+import 'package:trashtrack/Customer/booking.dart';
 import 'package:trashtrack/ZPractice.dart';
-import 'package:trashtrack/api_postgre_service.dart';
-import 'package:trashtrack/api_token.dart';
-import 'package:trashtrack/booking_pending_list.dart';
+import 'package:trashtrack/API/api_postgre_service.dart';
+import 'package:trashtrack/API/api_token.dart';
+import 'package:trashtrack/Hauler/booking_pickup_list.dart';
 import 'package:trashtrack/data_model.dart';
 import 'package:trashtrack/styles.dart';
 

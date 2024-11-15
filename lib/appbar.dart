@@ -2,7 +2,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:trashtrack/api_network.dart';
+import 'package:trashtrack/API/api_network.dart';
 
 import 'package:trashtrack/data_model.dart';
 import 'package:trashtrack/styles.dart';

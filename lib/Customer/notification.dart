@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:trashtrack/Customer/c_api_cus_data.dart';
-import 'package:trashtrack/Customer/c_payment.dart';
-import 'package:trashtrack/Customer/c_schedule_list.dart';
-import 'package:trashtrack/api_postgre_service.dart';
+import 'package:trashtrack/Customer/api_cus_data.dart';
+import 'package:trashtrack/Customer/payment.dart';
+import 'package:trashtrack/schedule_list.dart';
+import 'package:trashtrack/API/api_postgre_service.dart';
 import 'package:trashtrack/data_model.dart';
 import 'package:trashtrack/mainApp.dart';
 import 'package:trashtrack/styles.dart';

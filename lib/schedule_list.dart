@@ -1,482 +1,254 @@
-import 'package:flutter/material.dart';
-//import 'package:flutter_cube/flutter_cube.dart';
-import 'package:intl/intl.dart';
-import 'package:trashtrack/Customer/c_schedule_list.dart';
-import 'package:trashtrack/api_postgre_service.dart';
-import 'package:trashtrack/styles.dart';
-import 'package:trashtrack/user_hive_data.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:trashtrack/Customer/c_map.dart';
-import 'package:trashtrack/api_address.dart';
+import 'package:trashtrack/Customer/booking.dart';
+import 'package:trashtrack/map.dart';
+import 'package:trashtrack/API/api_address.dart';
+import 'package:trashtrack/Hauler/booking_pickup_list.dart';
 import 'package:trashtrack/mainApp.dart';
-import 'package:trashtrack/Customer/c_api_cus_data.dart';
+import 'package:trashtrack/styles.dart';
+import 'package:intl/intl.dart';
+import 'package:trashtrack/Customer/api_cus_data.dart';
+import 'package:trashtrack/API/api_postgre_service.dart';
 import 'dart:async';
+
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:trashtrack/user_hive_data.dart';
 import 'package:trashtrack/validator_data.dart';
+import 'package:trashtrack/waste_pricing_info.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
-class Booking_List extends StatefulWidget {
+class C_ScheduleCardList extends StatefulWidget {
+  final int bookId;
+  final String date; //September 15, 2024 (Mon);
+  final String dateCreated; // Sept. 10, 2024
+  final String wasteType; // food waste, municipal waste ...
+  final String status;
+  final bool? today;
+  final bool? priority;
+
+  C_ScheduleCardList({
+    required this.bookId,
+    required this.date,
+    required this.dateCreated,
+    required this.wasteType,
+    required this.status,
+    this.today,
+    this.priority,
+  });
+
   @override
-  State<Booking_List> createState() => _Booking_ListState();
+  State<C_ScheduleCardList> createState() => _C_ScheduleCardListState();
 }
 
-class _Booking_ListState extends State<Booking_List> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<Color?> _colorTween;
-  late Animation<Color?> _colorTween2;
-  late Animation<Color?> _colorPriority;
-
-  List<Map<String, dynamic>>? bookingTodayList;
-  List<Map<String, dynamic>>? wasteTodayList;
-  List<Map<String, dynamic>>? bookingUpcomingList;
-  List<Map<String, dynamic>>? wasteUpcomingList;
-  bool isLoading = false;
-
+class _C_ScheduleCardListState extends State<C_ScheduleCardList> {
   String? user;
-  int selectedPage = 0;
-  late PageController _pageController;
 
   @override
   void initState() {
     super.initState();
-    _fetchBookingData();
-
-    _pageController = PageController(initialPage: selectedPage);
-
-    _controller = AnimationController(
-      duration: const Duration(seconds: 1),
-      vsync: this,
-    )..repeat(reverse: true); // The animation will repeat back and forth
-
-    // Define a color tween animation that transitions between two colors
-    _colorTween = ColorTween(
-      begin: Colors.white,
-      end: Colors.grey,
-    ).animate(_controller);
-
-    _colorTween2 = ColorTween(
-      begin: Colors.grey,
-      end: Colors.white,
-    ).animate(_controller);
-
-    _colorPriority = ColorTween(
-      begin: Colors.pinkAccent,
-      end: deepPurple,
-    ).animate(_controller);
+    _dbData();
   }
 
-  @override
-  void dispose() {
-    TickerCanceled;
-    _controller.dispose();
-    _pageController.dispose();
-    super.dispose();
-  }
-
-  // Fetch booking from the server
-  Future<void> _fetchBookingData() async {
-    setState(() {
-      isLoading = true;
-    });
+  // Fetch user data from the server
+  Future<void> _dbData() async {
     try {
-      final userdata = await userDataFromHive();
+      final data = await userDataFromHive();
+      if (!mounted) return null;
       setState(() {
-        user = userdata['user'];
+        user = data['user'];
       });
-
-      final data = await fetchTodayBooking();
-      final data2 = await fetchUpcomingBooking();
-      if (!mounted) {
-        return;
-      }
-      if (data != null && data2 != null) {
-        setState(() {
-          bookingTodayList = data['booking'];
-          wasteTodayList = data['wasteTypes'];
-          //
-          bookingUpcomingList = data2['booking'];
-          wasteUpcomingList = data2['wasteTypes'];
-
-          isLoading = false;
-        });
-      } else {
-        setState(() {
-          isLoading = false;
-        });
-      }
-    } catch (e) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        isLoading = true;
-      });
-    }
-  }
-
-  void onPageSelected(int pageIndex) {
-    setState(() {
-      selectedPage = pageIndex;
-    });
-    _pageController.jumpToPage(pageIndex);
+    } catch (e) {}
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: deepGreen,
-      appBar: AppBar(
-        foregroundColor: white,
-        backgroundColor: deepGreen,
-      ),
-      body: ListView(
-        children: [
-          SizedBox(height: 10),
-          Center(
-            child: Text(
-              'List of booking waiting for pickup.',
-              style: TextStyle(color: white, fontSize: 16),
-            ),
-          ),
-          SizedBox(height: 5),
-          Container(
-            margin: EdgeInsets.symmetric(horizontal: 10),
-            padding: EdgeInsets.all(10),
-            decoration: boxDecorationBig,
-            child: Row(
-              children: [
-                Expanded(
-                  child: InkWell(
-                    onTap: () => onPageSelected(0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: selectedPage == 0 ? deepPurple : white,
-                          boxShadow: shadowColor,
-                          borderRadius: BorderRadius.horizontal(left: Radius.circular(10))),
-                      child: Column(
-                        children: [
-                          SizedBox(height: 10),
-                          Center(
-                            child: Text(
-                              'Today',
-                              style: TextStyle(
-                                  color: selectedPage == 0 ? white : deepPurple,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: InkWell(
-                    onTap: () => onPageSelected(1),
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: selectedPage == 1 ? deepPurple : white,
-                          boxShadow: shadowColor,
-                          borderRadius: BorderRadius.horizontal(right: Radius.circular(10))),
-                      child: Column(
-                        children: [
-                          SizedBox(height: 10),
-                          Center(
-                            child: Text(
-                              'Upcoming',
-                              style: TextStyle(
-                                  color: selectedPage == 1 ? white : deepPurple,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            height: 30,
-            child: Row(
-              children: [
-                Expanded(flex: 5, child: Container()),
-                Expanded(
-                    flex: 1,
-                    child: Container(
-                      decoration: BoxDecoration(color: white, boxShadow: shadowMidColor),
-                    )),
-                Expanded(flex: 5, child: Container()),
-                Expanded(
-                    flex: 1,
-                    child: Container(
-                      decoration: BoxDecoration(color: white, boxShadow: shadowMidColor),
-                    )),
-                Expanded(flex: 5, child: Container()),
-              ],
-            ),
-          ),
-          Column(
+    return InkWell(
+      onTap: () {
+        if (user == 'customer') {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => BookingDetails(bookId: widget.bookId)));
+        } else if (user == 'hauler') {
+          if (widget.today != null) {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => Booking_Pending_Details(bookId: widget.bookId, today: widget.today!)));
+          } else {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => Booking_Pending_Details(bookId: widget.bookId)));
+          }
+        }
+      },
+      splashColor: Colors.green,
+      highlightColor: Colors.green.withOpacity(0.2),
+      child: Container(
+        padding: EdgeInsets.only(bottom: 20, left: 10, right: 10),
+        //color: boxColor,
+        // decoration: BoxDecoration(
+        //   borderRadius: BorderRadius.circular(10),
+        //   color: boxColor,
+        // ),
+        child: Container(
+          padding: EdgeInsets.all(10.0),
+          decoration:
+              BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10.0), boxShadow: shadowMidColor),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                height: MediaQuery.of(context).size.height * .8,
-                child: PageView(
-                  controller: _pageController,
-                  onPageChanged: (index) {
-                    setState(() {
-                      selectedPage = index;
-                    });
-                  },
-                  children: [
-                    // TODAY
-                    RefreshIndicator(
-                      onRefresh: () async {
-                        await _fetchBookingData();
-                      },
-                      child: isLoading
-                          ? loadingAnimation(_controller, _colorTween, _colorTween2)
-                          : bookingTodayList == null
-                              ? ListView(
-                                  children: [
-                                    Column(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        SizedBox(
-                                          height: 100,
-                                        ),
-                                        Container(
-                                            alignment: Alignment.center,
-                                            child: Column(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: [
-                                                Icon(Icons.calendar_month, color: whiteSoft, size: 70),
-                                                Text(
-                                                  'No List for Pickup\n\n\n\n',
-                                                  style: TextStyle(color: whiteSoft, fontSize: 20),
-                                                ),
-                                              ],
-                                            )),
-                                        SizedBox(
-                                          height: 100,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                )
-                              : ListView.builder(
-                                  itemCount: bookingTodayList?.length == null ? 0 : bookingTodayList!.length,
-                                  itemBuilder: (context, index) {
-                                    // if (index == 0) {
-                                    //   return SizedBox(height: 20.0);
-                                    // }
-
-                                    // Safely retrieve the booking details from bookingList
-                                    final booking = bookingTodayList?[index];
-
-                                    if (booking == null) {
-                                      return SizedBox.shrink();
-                                    }
-                                    int book_Id = booking['bk_id'];
-                                    DateTime dbdate = DateTime.parse(booking['bk_date'] ?? '').toLocal();
-                                    final String date = DateFormat('MMM dd, yyyy (EEEE)').format(dbdate);
-
-                                    DateTime dbdateCreated = DateTime.parse(booking['bk_created_at'] ?? '').toLocal();
-                                    final String dateCreated = DateFormat('MMM dd, yyyy hh:mm a').format(dbdateCreated);
-
-                                    // Filter waste types for the current booking's bk_id
-                                    String wasteTypes = '';
-                                    if (wasteTodayList != null) {
-                                      List<Map<String, dynamic>> filteredWasteList = wasteTodayList!.where((waste) {
-                                        return waste['bk_id'] == booking['bk_id'];
-                                      }).toList();
-
-                                      // Build the waste types string
-                                      int count = 0;
-                                      for (var waste in filteredWasteList) {
-                                        count++;
-                                        wasteTypes += waste['bw_name'] + ', ';
-                                        if (count == 2) break;
-                                      }
-
-                                      // Remove the trailing comma and space
-                                      if (wasteTypes.isNotEmpty) {
-                                        if (filteredWasteList.length > 2) {
-                                          wasteTypes = wasteTypes + '. . .';
-                                        } else {
-                                          wasteTypes = wasteTypes.substring(0, wasteTypes.length - 2);
-                                        }
-                                      }
-                                    }
-
-                                    final String status = booking['bk_status'] ?? 'No status';
-                                    final bool priority = booking['bk_priority'] ?? false;
-
-                                    // Pass the extracted data to the C_CurrentScheduleCard widget
-                                    return Column(
-                                      children: [
-                                        AnimatedBuilder(
-                                            animation: _controller,
-                                            builder: (context, child) {
-                                              return Container(
-                                                color: priority == true ? _colorPriority.value : Colors.transparent,
-                                                padding: priority == true && index == 0
-                                                    ? EdgeInsets.only(top: 20)
-                                                    : EdgeInsets.zero,
-                                                //padding: priority == true ? EdgeInsets.all(5) : EdgeInsets.zero,
-                                                //margin: priority == true ? EdgeInsets.all(5) : EdgeInsets.zero,
-                                                // decoration: BoxDecoration(
-                                                //     color: priority == true ? _colorPriority.value : Colors.transparent,
-                                                //     borderRadius: borderRadius10),
-                                                child: C_ScheduleCardList(
-                                                  priority: priority,
-                                                  bookId: book_Id,
-                                                  date: date,
-                                                  dateCreated: dateCreated,
-                                                  wasteType: wasteTypes,
-                                                  status: status,
-                                                  today: true,
-                                                ),
-                                              );
-                                            }),
-                                        if (priority == false) SizedBox(height: 10),
-                                        if (bookingTodayList!.length - 1 == index) SizedBox(height: 200),
-                                      ],
-                                    );
-                                  },
-                                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(5),
+                    child: Text(
+                      'BOOKING# ${widget.bookId}',
+                      style: TextStyle(color: blackSoft, fontWeight: FontWeight.bold, fontSize: 12),
                     ),
-
-                    //UPCOMING
-                    RefreshIndicator(
-                      onRefresh: () async {
-                        await _fetchBookingData();
-                      },
-                      child: isLoading
-                          ? loadingAnimation(_controller, _colorTween, _colorTween2)
-                          : bookingUpcomingList == null
-                              ? ListView(
-                                  children: [
-                                    Column(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        SizedBox(
-                                          height: 100,
-                                        ),
-                                        Container(
-                                            alignment: Alignment.center,
-                                            child: Column(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: [
-                                                Icon(Icons.calendar_month, color: whiteSoft, size: 70),
-                                                Text(
-                                                  'No List for Pickup\n\n\n\n',
-                                                  style: TextStyle(color: whiteSoft, fontSize: 20),
-                                                ),
-                                              ],
-                                            )),
-                                        SizedBox(
-                                          height: 100,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                )
-                              : ListView.builder(
-                                  itemCount: bookingUpcomingList?.length == null ? 0 : bookingUpcomingList!.length,
-                                  itemBuilder: (context, index) {
-                                    // if (index == 0) {
-                                    //   return SizedBox(height: 20.0);
-                                    // }
-
-                                    // Safely retrieve the booking details from bookingList
-                                    final booking = bookingUpcomingList?[index];
-
-                                    if (booking == null) {
-                                      return SizedBox.shrink();
-                                    }
-                                    int book_Id = booking['bk_id'];
-                                    DateTime dbdate = DateTime.parse(booking['bk_date'] ?? '').toLocal();
-                                    final String date = DateFormat('MMM dd, yyyy (EEEE)').format(dbdate);
-
-                                    DateTime dbdateCreated = DateTime.parse(booking['bk_created_at'] ?? '').toLocal();
-                                    final String dateCreated = DateFormat('MMM dd, yyyy hh:mm a').format(dbdateCreated);
-
-                                    // Filter waste types for the current booking's bk_id
-                                    String wasteTypes = '';
-                                    if (wasteUpcomingList != null) {
-                                      List<Map<String, dynamic>> filteredWasteList = wasteUpcomingList!.where((waste) {
-                                        return waste['bk_id'] == booking['bk_id'];
-                                      }).toList();
-
-                                      // Build the waste types string
-                                      int count = 0;
-                                      for (var waste in filteredWasteList) {
-                                        count++;
-                                        wasteTypes += waste['bw_name'] + ', ';
-                                        if (count == 2) break;
-                                      }
-
-                                      // Remove the trailing comma and space
-                                      if (wasteTypes.isNotEmpty) {
-                                        if (filteredWasteList.length > 2) {
-                                          wasteTypes = wasteTypes + '. . .';
-                                        } else {
-                                          wasteTypes = wasteTypes.substring(0, wasteTypes.length - 2);
-                                        }
-                                      }
-                                    }
-
-                                    final String status = booking['bk_status'] ?? 'No status';
-                                    final bool priority = booking['bk_priority'] ?? false;
-                                    // Pass the extracted data to the C_CurrentScheduleCard widget
-                                    return Column(
-                                      children: [
-                                        C_ScheduleCardList(
-                                          priority: priority,
-                                          bookId: book_Id,
-                                          date: date,
-                                          dateCreated: dateCreated,
-                                          wasteType: wasteTypes,
-                                          status: status,
-                                          today: false,
-                                        ),
-                                        if (bookingUpcomingList!.length - 1 == index) SizedBox(height: 200),
-                                      ],
-                                    );
-                                  },
-                                ),
+                  ),
+                  if (widget.priority == true)
+                    Container(
+                      padding: EdgeInsets.all(5),
+                      child: Row(
+                        children: [
+                          Icon(Icons.loyalty, color: red),
+                          Text(
+                            'Priority',
+                            style: TextStyle(color: red, fontWeight: FontWeight.bold, fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+              Container(
+                padding: EdgeInsets.all(5),
+                decoration:
+                    BoxDecoration(borderRadius: BorderRadius.circular(7), color: deepPurple, boxShadow: shadowColor),
+                child: Column(
+                  children: [
+                    Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Pickup Date',
+                        style: TextStyle(color: Colors.white, fontSize: 14),
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                            widget.status == 'Cancelled' || widget.status == 'Paid' || widget.status == 'Failed'
+                                ? Icons.history
+                                : Icons.calendar_month,
+                            size: widget.status == 'Cancelled' ||
+                                    widget.status == 'Paid' ||
+                                    widget.status == 'Failed'
+                                ? 35
+                                : 25,
+                            color: Colors.white),
+                        Text(
+                          widget.date,
+                          style: TextStyle(color: Colors.white, fontSize: 20.0, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        widget.wasteType,
+                        style: TextStyle(color: Colors.white70, fontSize: 16.0),
+                      ),
                     ),
                   ],
                 ),
               ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.send,
+                        size: 15,
+                        color: Colors.grey,
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Text(
+                        widget.dateCreated,
+                        style: TextStyle(color: Colors.grey, fontSize: 12.0),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    widget.status,
+                    style: TextStyle(
+                        color: widget.status == 'Pending'
+                            ? Colors.orange
+                            : widget.status == 'Ongoing'
+                                ? Colors.green
+                                : widget.status == 'Cancelled'
+                                    ? Colors.red
+                                    : widget.status == 'Failed'
+                                        ? Colors.pink
+                                        : Colors.blue,
+                        fontSize: 18.0,
+                        //shadows: shadowTextColor,
+                        fontWeight: FontWeight.bold
+                        // shadows: [
+                        //   Shadow(
+                        //     blurRadius:
+                        //         50.0, // How much blur you want for the glow
+                        //     color: status == 'Pending'
+                        //         ? Colors.orangeAccent
+                        //         : status == 'Ongoing'
+                        //             ? Colors.greenAccent
+                        //             : status == 'Cancelled'
+                        //                 ? Colors.pinkAccent
+                        //                 : Colors
+                        //                     .lightBlueAccent, // The glow color
+                        //     offset: Offset(1, 1), // Position of the shadow
+                        //   ),
+                        //   Shadow(
+                        //     blurRadius: 50.0, // Increase blur for a stronger glow
+                        //     color: status == 'Pending'
+                        //         ? Colors.orangeAccent
+                        //         : status == 'Ongoing'
+                        //             ? Colors.greenAccent
+                        //             : status == 'Cancelled'
+                        //                 ? Colors.pinkAccent
+                        //                 : Colors.lightBlueAccent,
+                        //     offset: Offset(0, 0),
+                        //   ),
+                        // ],
+                        ),
+                  ),
+                ],
+              ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
 }
 
-class Booking_Pending_Details extends StatefulWidget {
+class BookingDetails extends StatefulWidget {
   final int bookId;
-  final bool? today;
 
-  const Booking_Pending_Details({
+  const BookingDetails({
     required this.bookId,
-    this.today,
   });
 
   @override
-  _Booking_Pending_DetailsState createState() => _Booking_Pending_DetailsState();
+  _BookingDetailsState createState() => _BookingDetailsState();
 }
 
-class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with SingleTickerProviderStateMixin {
+class _BookingDetailsState extends State<BookingDetails> with SingleTickerProviderStateMixin {
   // Controllers for the input fields
   final _fullnameController = TextEditingController();
   final _contactController = TextEditingController();
@@ -512,6 +284,7 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
   late Animation<Color?> _colorTweenCar;
 
   bool isLoading = true;
+  bool loadingAction = false;
 
   String fullname = '';
   String contact = '';
@@ -520,6 +293,11 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
   String postal = '';
 
   bool _acceptTerms = true;
+
+  //limit
+  Map<String, dynamic> _bookLimit = {};
+  List<Map<String, dynamic>> _dayLimit = [];
+  List<Map<String, dynamic>> _wasteLimit = [];
 
   List<Map<String, dynamic>> _wasteTypes = [];
   List<Map<String, dynamic>> _selectedWasteTypes = [];
@@ -543,7 +321,8 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
   bool _isEditing = false;
   Color? boxColorTheme = Colors.teal;
   bool _showOptionsBox = false;
-  bool loadingAction = false;
+  List<dynamic> _locations = [];
+
   @override
   void initState() {
     super.initState();
@@ -593,7 +372,12 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
 // Fetch booking from the server
   Future<void> _fetchBookingData() async {
     try {
+      //final data = await fetchBookingData(context);
       final data = await fetchBookingDetails(context, widget.bookId);
+      //
+      final bkLimitData = await fetchBookLimit();
+      final bkDayLimitData = await fetchDayLimit();
+
       if (!mounted) {
         return;
       }
@@ -604,10 +388,16 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
 
           if (bookingListdb != null) {
             bookingData = Map<String, dynamic>.from(bookingListdb[0]);
+            // bookingData = bookingListdb
+            //   .firstWhere((booking) => booking['bk_id'] == widget.bookId);
           }
+
           if (bookingWasteListdb != null) {
             bookingWasteList = List<Map<String, dynamic>>.from(bookingWasteListdb);
-
+            // bookingWasteList = bookingWasteListdb
+            //     .where((waste) => waste['bk_id'] == widget.bookId)
+            //     .toList();
+            // Initialize _selectedWasteTypes with the bookingWasteList
             _selectedWasteTypes = List<Map<String, dynamic>>.from(bookingWasteList!.map((waste) => {
                   'name': waste['bw_name'],
                   'price': waste['bw_price'],
@@ -645,9 +435,27 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
             selectedPoint = LatLng(latitude, longitude);
             WidgetsBinding.instance.addPostFrameCallback((_) {
               // _selectedDate = DateTime.parse(bookingData!['bk_date']).toLocal();
-              _mapController.move(selectedPoint!, 13.0);
+              _mapController.move(selectedPoint!, 13);
+              _mapController.rotate(0.0);
             });
           }
+
+          //load book limit
+          if (bkLimitData != null) {
+            _bookLimit = bkLimitData;
+          } else {
+            console('Failed to load booking limit');
+            return;
+          }
+
+          //load day limit
+          if (bkDayLimitData != null) {
+            _dayLimit = bkDayLimitData;
+          } else {
+            console('Failed to load day limit');
+            return;
+          }
+
           isLoading = false;
         });
       } else {
@@ -666,11 +474,23 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
     }
   }
 
+  // day limit
+  Future<void> loadDayLimit() async {
+    final bkDayLimitData = await fetchDayLimit();
+    //load day limit
+    if (bkDayLimitData != null) {
+      _dayLimit = bkDayLimitData;
+    } else {
+      console('Failed to load day limit');
+      return;
+    }
+  }
+
 // Fetch user data from the server
   Future<void> _dbData() async {
     try {
       //final data = await userDataFromHive();
-      final data = await fetchCusData(context);
+      final data = await fetchCusData();
       if (!mounted) return;
       setState(() {
         userData = data;
@@ -714,9 +534,9 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
           // isLoading = false;
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('No internet connection')),
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text('Failed to load waste categories')),
+        // );
       }
     } catch (e) {
       if (!mounted) return;
@@ -728,11 +548,34 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
     }
   }
 
+  // fetch latlong
+  Future<void> _searchLocation(String query) async {
+    final response = await http.get(
+      Uri.parse('https://nominatim.openstreetmap.org/search?q=$query&format=json'),
+    );
+
+    if (response.statusCode == 200) {
+      setState(() {
+        _locations = json.decode(response.body);
+        if (_locations.isEmpty) {
+          if (!mounted) return;
+          showErrorSnackBar(context, 'No pin location found.');
+        } else {
+          var location = _locations[0];
+          selectedPoint = LatLng(double.parse(location['lat']), double.parse(location['lon']));
+          _mapController.move(selectedPoint!, 13.0);
+          _mapController.rotate(0.0);
+        }
+      });
+    } else {
+      if (!mounted) return;
+      showErrorSnackBar(context, 'Unable to load pin location.');
+    }
+  }
+
   void handleOnePoint(LatLng point) {
     setState(() {
       selectedPoint = point;
-      //_mapController.move(selectedPoint!, 16);
-      //fetchSelectedPlaceNames();
     });
   }
 
@@ -769,14 +612,10 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
       Position position = await Geolocator.getCurrentPosition(
         locationSettings: locationSettings,
       );
-      // String? getCurrentName =
-      //     await getPlaceName(position.latitude, position.longitude);
-
       setState(() {
         selectedPoint = LatLng(position.latitude, position.longitude);
-        _mapController.move(selectedPoint!, 13.0); // Move to current location
-
-        // selectedPlaceName = getCurrentName;
+        _mapController.move(selectedPoint!, 13);
+        _mapController.rotate(0.0);
       });
     } catch (e) {
       print('fail to get current location!');
@@ -826,13 +665,11 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
           content: Text('Are you sure to update booking details?', style: TextStyle(color: Colors.white)),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancel', style: TextStyle(color: Colors.white)),
-            ),
-            TextButton(
               onPressed: () async {
+                setState(() {
+                  loadingAction = true;
+                });
+
                 if (bookingData != null) {
                   String? dbMessage = await bookingUpdate(
                       context,
@@ -855,15 +692,38 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
                       onAddress = false;
                       onMap = false;
                     });
+                  } else if (dbMessage == 'full date') {
+                    if (!mounted) return;
+                    Navigator.pop(context);
+                    showFullyBookDayDialog(context, _selectedDate);
+                    await loadDayLimit(); // reload day limit
+                    setState(() {
+                      _selectedDate = DateTime.parse(bookingData!['bk_date']).toLocal();
+                    });
                   } else if (dbMessage == 'ongoing') {
+                    if (!mounted) return;
+                    Navigator.pop(context);
                     Navigator.pushReplacement(
                         context, MaterialPageRoute(builder: (context) => MainApp(selectedIndex: 2)));
                   } else {
+                    if (!mounted) return;
+                    Navigator.pop(context);
                     showErrorSnackBar(context, 'Somthing\'s wrong. Please try again later.');
                   }
                 }
+
+                //
+                setState(() {
+                  loadingAction = false;
+                });
               },
               child: Text('Yes', style: TextStyle(color: Colors.white)),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel', style: TextStyle(color: Colors.white)),
             ),
           ],
         );
@@ -873,12 +733,11 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
 
 ////
   void _confirmDiscardUpdateBooking() {
-    // check if nothing change
-    if (isLoading) {
+    if (bookingWasteList == null) {
       Navigator.of(context).pop();
       return;
     }
-
+    // check if nothing change
     bool isWasteEqual = const DeepCollectionEquality().equals(
       _selectedWasteTypes,
       List<Map<String, dynamic>>.from(bookingWasteList!.map(
@@ -891,7 +750,8 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
     );
 
     if (!_isEditing) {
-      Navigator.of(context).pop();
+      //Navigator.of(context).pop();
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainApp(selectedIndex: 2)));
     } else if (_fullnameController.text == (bookingData!['bk_fullname']) &&
         _contactController.text == bookingData!['bk_contact'].substring(1) &&
         _selectedProvinceName == bookingData!['bk_province'] &&
@@ -938,7 +798,8 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
                   onAddress = false;
                   boxColorTheme = Colors.teal;
                 });
-                Navigator.of(context).pop();
+                //Navigator.of(context).pop();
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainApp(selectedIndex: 2)));
               },
               child: Text('Yes', style: TextStyle(color: Colors.white)),
             ),
@@ -956,16 +817,18 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
         return AlertDialog(
           backgroundColor: Colors.red[900],
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
-          title: Text('Return Booking', style: TextStyle(color: Colors.white)),
-          content: Text(
-              'This will change the status of the booking to ' 'Pending' ' and it will appear on the pickup list.',
+          title: Text('Cancel Booking', style: TextStyle(color: Colors.white)),
+          content: Text('Are you sure to Cancel this booking? This cannot be undone.',
               style: TextStyle(color: Colors.white)),
           actions: [
             TextButton(
               onPressed: () async {
                 if (bookingData != null) {
-                  String? dbMessage = await bookingReturn(context, bookingData!['bk_id']);
+                  String? dbMessage = await bookingCancel(context, bookingData!['bk_id']);
                   if (dbMessage == 'success') {
+                    Navigator.pushReplacement(
+                        context, MaterialPageRoute(builder: (context) => MainApp(selectedIndex: 2)));
+                  } else if (dbMessage == 'ongoing') {
                     Navigator.pushReplacement(
                         context, MaterialPageRoute(builder: (context) => MainApp(selectedIndex: 2)));
                   } else {
@@ -1029,9 +892,14 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: deepGreen,
-      body: Column(
+      body: Stack(
         children: [
-          Expanded(child: _buildFirstStep()),
+          Column(
+            children: [
+              Expanded(child: _buildFirstStep()),
+            ],
+          ),
+          if (loadingAction) showLoadingAction(),
         ],
       ),
     );
@@ -1048,86 +916,27 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
         // Declare a boolean variable to track the visibility of the options box
 
         actions: [
-          // if (bookingData != null)
-          //   bookingData!['bk_status'] == 'Pending' && !_isEditing
-          //       ? Container(
-          //           decoration: BoxDecoration(
-          //             color: Colors.deepPurpleAccent,
-          //             borderRadius: BorderRadius.circular(30),
-          //           ),
-          //           child: IconButton(
-          //             onPressed: () {
-          //               setState(() {
-          //                 _isEditing = true;
-          //                 boxColorTheme = Colors.deepPurple;
-          //               });
-          //             },
-          //             icon: Icon(Icons.edit_outlined),
-          //           ),
-          //         )
-          //       : SizedBox(),
-          // SizedBox(width: 5),
-          // if (bookingData != null)
-          //   if (bookingData!['bk_status'] == 'Pending')
-          //     Container(
-          //       decoration: BoxDecoration(
-          //         color: Colors.deepPurpleAccent,
-          //         borderRadius: BorderRadius.circular(30),
-          //       ),
-          //       child: IconButton(
-          //         onPressed: () {
-          //           setState(() {
-          //             // Toggle the visibility of the options box
-          //             _showOptionsBox = !_showOptionsBox;
-          //           });
-          //         },
-          //         icon: Icon(Icons.more_vert),
-          //       ),
-          //     ),
-
-          //go to map
-          if (!isLoading)
-            AnimatedBuilder(
-                animation: _controller,
-                builder: (context, child) {
-                  return TextButton(
-                    onPressed: () async {
-                      //Navigator.push(context, MaterialPageRoute(builder: (context) => C_MapScreen()));
-                      bool onLocation = await checkLocationPermission();
-                      if (onLocation) {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => MainApp(
-                                      selectedIndex: 1,
-                                      bookID: widget.bookId,
-                                      bookStatus: bookingData!['bk_status'],
-                                      pickupPoint: LatLng(selectedPoint!.latitude, selectedPoint!.longitude),
-                                    )));
-                      }
-                    },
-                    child: Container(
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(100),
-                        color: _colorTweenCar.value,
-                      ),
-                      child: Container(
-                          padding: EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(100),
-                            color: Colors.white,
-                          ),
-                          child: Icon(
-                            Icons.location_pin,
-                            color: Colors.red,
-                            size: 30,
-                          )),
-                    ),
-                  );
-                }),
           if (bookingData != null)
-            if (bookingData!['bk_status'] == 'Ongoing')
+            (bookingData!['bk_status'] == 'Pending' || bookingData!['bk_status'] == 'Failed') && !_isEditing
+                ? Container(
+                    decoration: BoxDecoration(
+                      color: Colors.deepPurpleAccent,
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _isEditing = true;
+                          boxColorTheme = Colors.deepPurple;
+                        });
+                      },
+                      icon: Icon(Icons.edit_outlined),
+                    ),
+                  )
+                : SizedBox(),
+          SizedBox(width: 5),
+          if (bookingData != null)
+            if (bookingData!['bk_status'] == 'Pending' || bookingData!['bk_status'] == 'Failed')
               Container(
                 decoration: BoxDecoration(
                   color: Colors.deepPurpleAccent,
@@ -1136,6 +945,7 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
                 child: IconButton(
                   onPressed: () {
                     setState(() {
+                      // Toggle the visibility of the options box
                       _showOptionsBox = !_showOptionsBox;
                     });
                   },
@@ -1143,6 +953,52 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
                 ),
               ),
 
+          //go to map
+          if (bookingData != null)
+            bookingData!['bk_status'] == 'Ongoing'
+                ? AnimatedBuilder(
+                    animation: _controller,
+                    builder: (context, child) {
+                      return TextButton(
+                        onPressed: () async {
+                          final data = await fetchAllLatLong(widget.bookId);
+                          if (data != null) {
+                            //Navigator.push(context, MaterialPageRoute(builder: (context) => C_MapScreen()));
+                            bool onLocation = await checkLocationPermission();
+                            if (onLocation) {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => MainApp(
+                                          selectedIndex: 1,
+                                          bookID: widget.bookId,
+                                          pickupPoint: LatLng(data['haul_lat'], data['haul_long']))));
+                            }
+                          }
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(50),
+                            color: _colorTweenCar.value,
+                          ),
+                          child: Container(
+                              padding: EdgeInsets.only(left: 15, top: 5, right: 5, bottom: 5),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(50),
+                                color: Colors.white,
+                              ),
+                              child: Icon(
+                                Icons.bus_alert,
+                                color: Colors.black,
+                                size: 30,
+                              )),
+                        ),
+                      );
+                    })
+                : SizedBox(
+                    height: 30,
+                  ),
           SizedBox(width: 5),
         ],
       ),
@@ -1178,6 +1034,39 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
                           _confirmDiscardUpdateBooking();
                         },
                         child: Container()),
+
+                    // //go to map
+                    // if (bookingData != null)
+                    //   bookingData!['bk_status'] == 'Ongoing'
+                    //       ? AnimatedBuilder(
+                    //           animation: _controller,
+                    //           builder: (context, child) {
+                    //             return TextButton(
+                    //               onPressed: () {},
+                    //               child: Container(
+                    //                 padding: EdgeInsets.all(10),
+                    //                 decoration: BoxDecoration(
+                    //                   borderRadius: BorderRadius.circular(50),
+                    //                   color: _colorTweenCar.value,
+                    //                 ),
+                    //                 child: Container(
+                    //                     padding: EdgeInsets.all(5),
+                    //                     decoration: BoxDecoration(
+                    //                       borderRadius: BorderRadius.circular(50),
+                    //                       color: Colors.white,
+                    //                     ),
+                    //                     child: Icon(
+                    //                       Icons.drive_eta,
+                    //                       color: Colors.black,
+                    //                       size: 30,
+                    //                     )),
+                    //               ),
+                    //             );
+                    //           })
+                    //       : SizedBox(
+                    //           height: 30,
+                    //         ),
+
                     isLoading
                         ? loadingBookingAnimation(_controller, _colorTween, _colorTween2)
 
@@ -1234,19 +1123,25 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
                                                       ? 'Loading ...'
                                                       : bookingData!['bk_status'] == 'Pending' ||
                                                               bookingData!['bk_status'] == 'Ongoing'
-                                                          ? 'Request Pickup is ${bookingData!['bk_status']}'
-                                                          //? 'Your Request Pickup is ${bookingData!['bk_status']}'
-                                                          : 'Request Pickup was ${bookingData!['bk_status']}',
-                                                  style: TextStyle(
+                                                          ? 'Your Request Pickup is ${bookingData!['bk_status']}'
+                                                          : 'Your Request Pickup was ${bookingData!['bk_status']}',
+                                                  style: const TextStyle(
                                                       color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
                                                 ),
                                                 if (bookingData!['bk_status'] == 'Ongoing')
                                                   const Text(
-                                                    'Ride and safety first!',
+                                                    'Today is your waste collection day!',
                                                     style: TextStyle(
                                                       color: Colors.white,
                                                     ),
                                                   ),
+                                                if (bookingData!['bk_status'] == 'Failed')
+                                                  const Text(
+                                                    'Reschedule now to be our top priority!',
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                    ),
+                                                  )
                                               ],
                                             ),
                                           ),
@@ -1264,25 +1159,23 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
                                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                         children: [
                                                           SizedBox(),
-                                                          Container(
-                                                            alignment: Alignment.centerRight,
-                                                            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                                                            decoration: BoxDecoration(
-                                                                borderRadius: BorderRadius.circular(5),
-                                                                color: Colors.blue,
-                                                                boxShadow: shadowColor),
-                                                            child: InkWell(
-                                                              onTap: () {
-                                                                setState(() {
-                                                                  onAddress = false;
-                                                                });
-                                                              },
-                                                              child: Text(
-                                                                'Minimize',
-                                                                style: TextStyle(
-                                                                    color: Colors.white,
-                                                                    fontSize: 12,
-                                                                    fontWeight: FontWeight.bold),
+                                                          InkWell(
+                                                            onTap: () {
+                                                              setState(() {
+                                                                onAddress = false;
+                                                              });
+                                                            },
+                                                            child: Container(
+                                                              alignment: Alignment.centerRight,
+                                                              padding:
+                                                                  EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                                                              decoration: BoxDecoration(
+                                                                  borderRadius: BorderRadius.circular(5),
+                                                                  color: deepPurple,
+                                                                  boxShadow: shadowColor),
+                                                              child: Icon(
+                                                                Icons.remove,
+                                                                color: white,
                                                               ),
                                                             ),
                                                           ),
@@ -1506,8 +1399,10 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
                                                                           final city = _barangays[index];
 
                                                                           return InkWell(
-                                                                            onTap: () {
+                                                                            onTap: () async {
                                                                               setState(() {
+                                                                                isLoadingLoc = true;
+
                                                                                 _selectedBarangayName = city['name'];
                                                                                 _showBarangayDropdown = false;
 
@@ -1516,6 +1411,14 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
                                                                                     _selectedCityMunicipalityName! +
                                                                                     ', ' +
                                                                                     _selectedProvinceName!;
+                                                                              });
+
+                                                                              //
+                                                                              String loc =
+                                                                                  '${_selectedProvinceName!} ${_selectedCityMunicipalityName!} ${_selectedBarangayName!}';
+                                                                              await _searchLocation(loc);
+                                                                              setState(() {
+                                                                                isLoadingLoc = false;
                                                                               });
                                                                             },
                                                                             child: Container(
@@ -1733,8 +1636,8 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
                                                           width: 80.0,
                                                           height: 80.0,
                                                           point: selectedPoint!,
-                                                          builder: (ctx) =>
-                                                              Icon(Icons.location_pin, color: Colors.red, size: 40),
+                                                          builder: (ctx) => Icon(Icons.location_pin,
+                                                              color: Colors.red, size: 40, shadows: shadowIconColor),
                                                           rotate: true),
                                                     ],
                                                   ),
@@ -1752,28 +1655,27 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
                                             child: Column(
                                               crossAxisAlignment: CrossAxisAlignment.end,
                                               children: [
-                                                Container(
-                                                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                                                  decoration: BoxDecoration(
-                                                      borderRadius: BorderRadius.circular(5),
-                                                      color: Colors.blue,
-                                                      boxShadow: shadowColor),
-                                                  child: InkWell(
-                                                    onTap: () {
+                                                InkWell(
+                                                  onTap: () {
+                                                    onMap = false;
+                                                    setState(() {
+                                                      if (selectedPoint != null) {
+                                                        _mapController.move(selectedPoint!, 13);
+                                                        _mapController.rotate(0.0);
+                                                      }
                                                       onMap = false;
-                                                      setState(() {
-                                                        if (selectedPoint != null)
-                                                          _mapController.move(selectedPoint!, 13);
-                                                        onMap = false;
-                                                        pinLocValidator = '';
-                                                      });
-                                                    },
-                                                    child: Text(
-                                                      'Minimize',
-                                                      style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 12,
-                                                          fontWeight: FontWeight.bold),
+                                                      pinLocValidator = '';
+                                                    });
+                                                  },
+                                                  child: Container(
+                                                    padding: EdgeInsets.all(15),
+                                                    decoration: BoxDecoration(
+                                                        borderRadius: BorderRadius.circular(5),
+                                                        color: deepPurple,
+                                                        boxShadow: shadowColor),
+                                                    child: Icon(
+                                                      Icons.remove,
+                                                      color: white,
                                                     ),
                                                   ),
                                                 ),
@@ -1808,11 +1710,24 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
                                               child: Container(
                                             color: const Color.fromARGB(0, 163, 145, 145),
                                             child: InkWell(
-                                              onTap: () {
+                                              onTap: () async {
                                                 setState(() {
+                                                  isLoadingLoc = true;
                                                   onMap = true;
                                                 });
-                                                if (selectedPoint == null) _getCurrentLocation();
+                                                if (selectedPoint == null) {
+                                                  if (_selectedProvinceName != null &&
+                                                      _selectedCityMunicipalityName != null &&
+                                                      _selectedBarangayName != null) {
+                                                    String loc =
+                                                        '${_selectedProvinceName!} ${_selectedCityMunicipalityName!} ${_selectedBarangayName!}';
+                                                    await _searchLocation(loc);
+                                                  }
+                                                }
+
+                                                setState(() {
+                                                  isLoadingLoc = false;
+                                                });
                                               },
                                             ),
                                           )),
@@ -1852,10 +1767,28 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.center,
                                         children: [
-                                          Text(
-                                            'Waste Type',
-                                            style: TextStyle(
-                                                color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16),
+                                          InkWell(
+                                            onTap: () => Navigator.push(
+                                                context, MaterialPageRoute(builder: (context) => WastePricingInfo())),
+                                            child: SizedBox(
+                                              width: 150,
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  const SizedBox(width: 5),
+                                                  const Text(
+                                                    'Waste Type',
+                                                    style: TextStyle(
+                                                        fontWeight: FontWeight.bold, color: Colors.black, fontSize: 16),
+                                                  ),
+                                                  const SizedBox(width: 10),
+                                                  Icon(
+                                                    Icons.info,
+                                                    color: deepGreen,
+                                                  )
+                                                ],
+                                              ),
+                                            ),
                                           ),
                                           Container(
                                             padding: EdgeInsets.all(5),
@@ -1863,111 +1796,119 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
                                                 color: Colors.white,
                                                 boxShadow: shadowColor,
                                                 borderRadius: BorderRadius.circular(10)),
-                                            child: _wasteCategoryList(),
+                                            child: _selectedDate != null
+                                                ? _wasteCategoryList()
+                                                : Container(
+                                                    padding: EdgeInsets.all(10),
+                                                    width: double.infinity,
+                                                    child: Row(
+                                                      children: [
+                                                        Icon(Icons.library_add, color: deepGreen),
+                                                        SizedBox(width: 10.0),
+                                                        Text(
+                                                          'Choose date schedule first.',
+                                                          style: TextStyle(color: grey),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
                                           ),
                                         ],
                                       ),
                                     ),
                               _labelValidator(wasteCatValidator),
-
-                              // Container(
-                              //   padding: EdgeInsets.all(10),
-                              //   margin: EdgeInsets.all(10),
-                              //   decoration: BoxDecoration(
-                              //       borderRadius: BorderRadius.circular(10),
-                              //       color: Colors.grey[200],
-                              //       boxShadow: shadowBigColor),
-                              //   child: Container(
-                              //     padding: EdgeInsets.all(10),
-                              //     decoration: BoxDecoration(
-                              //         color: Colors.white,
-                              //         borderRadius: BorderRadius.circular(10),
-                              //         boxShadow: shadowColor),
-                              //     child: Column(
-                              //       children: [
-                              //         Center(
-                              //             child: Text(
-                              //           'Payment later with',
-                              //           style: TextStyle(color: grey),
-                              //         )),
-                              //         Image.asset('assets/paymongo.png'),
-                              //         Row(
-                              //           crossAxisAlignment:
-                              //               CrossAxisAlignment.center,
-                              //           mainAxisAlignment:
-                              //               MainAxisAlignment.center,
-                              //           children: [
-                              //             Padding(
-                              //               padding: const EdgeInsets.all(5),
-                              //               child: ClipRRect(
-                              //                   borderRadius:
-                              //                       BorderRadius.circular(10),
-                              //                   child: Container(
-                              //                       height: 50,
-                              //                       width: 50,
-                              //                       child: Image.asset(
-                              //                         'assets/visa.png',
-                              //                         scale: 2,
-                              //                       ))),
-                              //             ),
-                              //             Padding(
-                              //               padding: const EdgeInsets.all(5),
-                              //               child: ClipRRect(
-                              //                   borderRadius:
-                              //                       BorderRadius.circular(10),
-                              //                   child: Container(
-                              //                       height: 50,
-                              //                       width: 50,
-                              //                       child: Image.asset(
-                              //                         'assets/gcash.png',
-                              //                         scale: 2,
-                              //                       ))),
-                              //             ),
-                              //             Padding(
-                              //               padding: const EdgeInsets.all(5),
-                              //               child: ClipRRect(
-                              //                   borderRadius:
-                              //                       BorderRadius.circular(10),
-                              //                   child: Container(
-                              //                       height: 50,
-                              //                       width: 50,
-                              //                       child: Image.asset(
-                              //                         'assets/paymaya.png',
-                              //                         scale: 2,
-                              //                       ))),
-                              //             ),
-                              //             Padding(
-                              //               padding: const EdgeInsets.all(5),
-                              //               child: ClipRRect(
-                              //                   borderRadius:
-                              //                       BorderRadius.circular(10),
-                              //                   child: Container(
-                              //                       height: 50,
-                              //                       width: 50,
-                              //                       child: Image.asset(
-                              //                         'assets/grabpay.png',
-                              //                         scale: 2,
-                              //                       ))),
-                              //             ),
-                              //             Padding(
-                              //               padding: const EdgeInsets.all(5),
-                              //               child: ClipRRect(
-                              //                   borderRadius:
-                              //                       BorderRadius.circular(10),
-                              //                   child: Container(
-                              //                       height: 50,
-                              //                       width: 50,
-                              //                       child: Image.asset(
-                              //                         'assets/methods.png',
-                              //                         scale: 2,
-                              //                       ))),
-                              //             ),
-                              //           ],
-                              //         )
-                              //       ],
-                              //     ),
-                              //   ),
-                              // ),
+                              if (bookingData!['bk_status'] == 'Pending' || bookingData!['bk_status'] == 'Ongoing')
+                                Container(
+                                  padding: EdgeInsets.all(10),
+                                  margin: EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: Colors.grey[200],
+                                      boxShadow: shadowBigColor),
+                                  child: Container(
+                                    padding: EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(10),
+                                        boxShadow: shadowColor),
+                                    child: Column(
+                                      children: [
+                                        Center(
+                                            child: Text(
+                                          'Payment later with Cash /with',
+                                          style: TextStyle(color: grey),
+                                        )),
+                                        Image.asset('assets/paymongo.png'),
+                                        Row(
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.all(5),
+                                              child: ClipRRect(
+                                                  borderRadius: BorderRadius.circular(10),
+                                                  child: Container(
+                                                      height: 50,
+                                                      width: 50,
+                                                      child: Image.asset(
+                                                        'assets/visa.png',
+                                                        scale: 2,
+                                                      ))),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.all(5),
+                                              child: ClipRRect(
+                                                  borderRadius: BorderRadius.circular(10),
+                                                  child: Container(
+                                                      height: 50,
+                                                      width: 50,
+                                                      child: Image.asset(
+                                                        'assets/gcash.png',
+                                                        scale: 2,
+                                                      ))),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.all(5),
+                                              child: ClipRRect(
+                                                  borderRadius: BorderRadius.circular(10),
+                                                  child: Container(
+                                                      height: 50,
+                                                      width: 50,
+                                                      child: Image.asset(
+                                                        'assets/paymaya.png',
+                                                        scale: 2,
+                                                      ))),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.all(5),
+                                              child: ClipRRect(
+                                                  borderRadius: BorderRadius.circular(10),
+                                                  child: Container(
+                                                      height: 50,
+                                                      width: 50,
+                                                      child: Image.asset(
+                                                        'assets/grabpay.png',
+                                                        scale: 2,
+                                                      ))),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.all(5),
+                                              child: ClipRRect(
+                                                  borderRadius: BorderRadius.circular(10),
+                                                  child: Container(
+                                                      height: 50,
+                                                      width: 50,
+                                                      child: Image.asset(
+                                                        'assets/methods.png',
+                                                        scale: 2,
+                                                      ))),
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
                               SizedBox(height: 10),
 
                               _isEditing
@@ -2094,14 +2035,10 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
                                     )
                                   : SizedBox(),
                             ],
-                          ),
-                    Container(
-                      height: MediaQuery.of(context).size.height * .1,
-                    ),
+                          )
                   ],
                 ),
               ),
-              //
               _isEditing == false
                   ? Positioned.fill(
                       child: GestureDetector(
@@ -2130,7 +2067,6 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
                   right: 10,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: white,
                       borderRadius: BorderRadius.circular(10),
                       boxShadow: [
                         BoxShadow(
@@ -2141,7 +2077,7 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
                       ],
                     ),
                     child: Material(
-                      color: Colors.transparent,
+                      borderRadius: borderRadius10,
                       child: InkWell(
                         onTap: () {
                           _showConfirmCancelBookingDialog(context);
@@ -2149,18 +2085,19 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
                             _showOptionsBox = false;
                           });
                         },
-                        child: Padding(
+                        child: Container(
                           padding: EdgeInsets.all(20),
                           child: Row(
                             children: [
                               Icon(
-                                Icons.keyboard_return,
+                                Icons.sentiment_very_dissatisfied,
+                                size: 24,
                                 color: Colors.red,
                               ),
                               SizedBox(width: 5),
                               Container(
-                                  child: Text("Return to pending?",
-                                      style: TextStyle(fontSize: 16, color: Colors.black54))),
+                                  child:
+                                      Text("Cancel Booking?", style: TextStyle(fontSize: 16, color: Colors.black54))),
                             ],
                           ),
                         ),
@@ -2168,81 +2105,6 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
                     ),
                   ),
                 ),
-              //accept
-              if (widget.today != null)
-                if (!isLoading && bookingData!['bk_status'] == 'Pending' && widget.today!)
-                  Positioned(
-                    bottom: 0,
-                    child: Container(
-                      padding: EdgeInsets.all(15),
-                      height: MediaQuery.of(context).size.height * .1,
-                      width: MediaQuery.of(context).size.width * 1,
-                      color: deepPurple,
-                      child: InkWell(
-                        onTap: () async {
-                          setState(() {
-                            loadingAction = true;
-                          });
-                          bool onLocation = await checkLocationPermission();
-                          if (onLocation) {
-                            ///current pstion
-                            LocationSettings locationSettings = const LocationSettings(accuracy: LocationAccuracy.high);
-                            Position position = await Geolocator.getCurrentPosition(locationSettings: locationSettings);
-
-                            ////
-                            String? resultDb =
-                                await bookingAccept(context, widget.bookId, position.latitude, position.longitude);
-
-                            if (resultDb == 'success') {
-                              Navigator.push(
-                                  context, MaterialPageRoute(builder: (context) => MainApp(selectedIndex: 2)));
-                            } else if (resultDb == 'ongoing') {
-                              // Navigator.push(
-                              //     context, MaterialPageRoute(builder: (context) => MainApp(selectedIndex: 2)));
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => Booking_List(),
-                                ),
-                              );
-                            } else {
-                              showErrorSnackBar(context, 'Something wrong, Please try again later.');
-                            }
-                          }
-                          setState(() {
-                            loadingAction = false;
-                          });
-                        },
-                        child: Center(
-                          child: Container(
-                              // margin: EdgeInsets.symmetric(
-                              //     horizontal: MediaQuery.of(context).size.width * .3),
-                              width: MediaQuery.of(context).size.width * .4,
-                              decoration: BoxDecoration(
-                                  color: Colors.green,
-                                  borderRadius: BorderRadius.circular(10.0),
-                                  boxShadow: shadowMidColor),
-                              child: Center(
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.drive_eta,
-                                      color: white,
-                                      size: 30,
-                                    ),
-                                    const Text(
-                                      'Accept',
-                                      style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
-                                    ),
-                                  ],
-                                ),
-                              )),
-                        ),
-                      ),
-                    ),
-                  ),
-              if (loadingAction) showLoadingAction(),
             ],
           ),
         ),
@@ -2415,6 +2277,7 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
     return '';
   }
 
+  // waste cat ddl
   Widget _wasteCategoryList() {
     return ListView(
       physics: NeverScrollableScrollPhysics(), // Stop scrolling
@@ -2422,51 +2285,75 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
       children: _isEditing
           ? _wasteTypes.map((Map<String, dynamic> category) {
               String type = category['name'];
+              String desc = category['desc'];
               var price = category['price'];
               var unit = category['unit'];
+              var wcId = category['wc_id'];
 
               // Check if the waste type is selected by comparing the name
               bool isSelected = _selectedWasteTypes.any((selectedCategory) => selectedCategory['name'] == type);
+              //
+              bool isDisabled = _wasteLimit.any((limit) => limit['wc_id'] == wcId);
 
-              return CheckboxListTile(
-                title: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '${type}',
-                      style: TextStyle(fontSize: 14),
-                    ),
-                    Text(
-                      '\₱${price.toString()}\\${unit.toString()}',
-                      style: TextStyle(color: Colors.deepOrange, fontSize: 14),
-                    ),
-                  ],
+              return Tooltip(
+                message: desc,
+                child: CheckboxListTile(
+                  title: Row(
+                    children: [
+                      isDisabled ? Icon(Icons.block, color: red) : Icon(Icons.library_add, color: deepGreen),
+                      SizedBox(width: 10.0),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              type,
+                              style: TextStyle(fontSize: 14),
+                              overflow: TextOverflow.ellipsis,
+                              softWrap: true,
+                            ),
+                            Text(
+                              '₱${price.toString()}\\${unit.toString()}',
+                              style: TextStyle(color: Colors.deepOrange, fontSize: 14),
+                              textAlign: TextAlign.end,
+                            ),
+                            Text(
+                              desc,
+                              style: TextStyle(fontSize: 9),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  value: isSelected,
+                  onChanged: isDisabled
+                      ? null // Disables the checkbox if `isDisabled` is true
+                      : (bool? selected) {
+                          setState(() {
+                            if (selected == true) {
+                              // Add the entire waste type object
+                              _selectedWasteTypes.add({
+                                'name': type,
+                                'price': price,
+                                'unit': unit,
+                              });
+                            } else {
+                              // Remove the waste type object
+                              _selectedWasteTypes.removeWhere((selectedCategory) => selectedCategory['name'] == type);
+                            }
+
+                            // Validator
+                            if (_selectedWasteTypes.isEmpty) {
+                              wasteCatValidator = _validateWaste(_selectedWasteTypes);
+                            } else {
+                              wasteCatValidator = '';
+                            }
+                          });
+                        },
+                  activeColor: Colors.blue, // Color of the checkbox when selected.
+                  checkColor: Colors.white, // Color of the checkmark.
                 ),
-                value: isSelected,
-                onChanged: (bool? selected) {
-                  setState(() {
-                    if (selected == true) {
-                      // Add the entire waste type object
-                      _selectedWasteTypes.add({
-                        'name': type,
-                        'price': price,
-                        'unit': unit,
-                      });
-                    } else {
-                      // Remove the waste type object
-                      _selectedWasteTypes.removeWhere((selectedCategory) => selectedCategory['name'] == type);
-                    }
-
-                    // Validator
-                    if (_selectedWasteTypes.isEmpty) {
-                      wasteCatValidator = _validateWaste(_selectedWasteTypes);
-                    } else {
-                      wasteCatValidator = '';
-                    }
-                  });
-                },
-                activeColor: Colors.blue, // Color of the checkbox when selected.
-                checkColor: Colors.white, // Color of the checkmark.
               );
             }).toList()
           : _selectedWasteTypes.map((Map<String, dynamic> category) {
@@ -2490,6 +2377,83 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
             }).toList(),
     );
   }
+
+  //// waste cat ddl
+  // Widget _wasteCategoryList() {
+  //   return ListView(
+  //     physics: NeverScrollableScrollPhysics(), // Stop scrolling
+  //     shrinkWrap: true, // Use shrinkWrap to make the list fit its content.
+  //     children: _isEditing
+  //         ? _wasteTypes.map((Map<String, dynamic> category) {
+  //             String type = category['name'];
+  //             var price = category['price'];
+  //             var unit = category['unit'];
+
+  //             // Check if the waste type is selected by comparing the name
+  //             bool isSelected = _selectedWasteTypes.any((selectedCategory) => selectedCategory['name'] == type);
+
+  //             return CheckboxListTile(
+  //               title: Row(
+  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                 children: [
+  //                   Text(
+  //                     '${type}',
+  //                     style: TextStyle(fontSize: 14),
+  //                   ),
+  //                   Text(
+  //                     '\₱${price.toString()}\\${unit.toString()}',
+  //                     style: TextStyle(color: Colors.deepOrange, fontSize: 14),
+  //                   ),
+  //                 ],
+  //               ),
+  //               value: isSelected,
+  //               onChanged: (bool? selected) {
+  //                 setState(() {
+  //                   if (selected == true) {
+  //                     // Add the entire waste type object
+  //                     _selectedWasteTypes.add({
+  //                       'name': type,
+  //                       'price': price,
+  //                       'unit': unit,
+  //                     });
+  //                   } else {
+  //                     // Remove the waste type object
+  //                     _selectedWasteTypes.removeWhere((selectedCategory) => selectedCategory['name'] == type);
+  //                   }
+
+  //                   // Validator
+  //                   if (_selectedWasteTypes.isEmpty) {
+  //                     wasteCatValidator = _validateWaste(_selectedWasteTypes);
+  //                   } else {
+  //                     wasteCatValidator = '';
+  //                   }
+  //                 });
+  //               },
+  //               activeColor: Colors.blue, // Color of the checkbox when selected.
+  //               checkColor: Colors.white, // Color of the checkmark.
+  //             );
+  //           }).toList()
+  //         : _selectedWasteTypes.map((Map<String, dynamic> category) {
+  //             String type = category['name'];
+  //             var price = category['price'];
+  //             var unit = category['unit'];
+
+  //             return Container(
+  //               padding: EdgeInsets.all(10),
+  //               child: Row(
+  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                 children: [
+  //                   Text('${type}'),
+  //                   Text(
+  //                     '\₱${price.toString()}\\${unit.toString()}',
+  //                     style: TextStyle(color: Colors.deepOrange),
+  //                   ),
+  //                 ],
+  //               ),
+  //             );
+  //           }).toList(),
+  //   );
+  // }
 
 //date picker
   Widget _buildDatePicker(String label, String hint) {
@@ -2541,15 +2505,47 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
   }
 
   Future<void> _selectDate(BuildContext context) async {
+    final List<DateTime> disabledDates = _dayLimit.map((dayLimit) {
+      final DateTime dbDay = DateTime.parse(dayLimit['day']).toLocal();
+      final DateTime strippedDay = DateTime(dbDay.year, dbDay.month, dbDay.day);
+      return strippedDay;
+    }).toList();
+
     final DateTime now = DateTime.now();
-    final DateTime firstDate = DateTime(now.year);
-    final DateTime lastDate = DateTime(now.year + 1, 12, 31);
+
+    final int closeTimeInMinutes = _bookLimit['bl_close_time'];
+    final DateTime closeTime =
+        DateTime(now.year, now.month, now.day, closeTimeInMinutes ~/ 60, closeTimeInMinutes % 60);
+
+    //final DateTime dbDateStart = DateTime.parse(_bookLimit['bl_date_start']).toUtc();
+    final DateTime dbDateLast = DateTime.parse(_bookLimit['bl_date_last']).toUtc();
+    final DateTime firstDate = now.isBefore(closeTime) ? now : now.add(Duration(days: 1));
+    final DateTime localLastDate = dbDateLast.toLocal();
+    final DateTime lastDate = DateTime(localLastDate.year, localLastDate.month, localLastDate.day);
+
+    // Check if initialDate is disabled
+    DateTime initialDate = firstDate;
+
+    // Find the next available date if the initialDate is disabled
+    while (disabledDates.contains(initialDate)) {
+      initialDate = initialDate.add(Duration(days: 1));
+    }
+    //
+    if (_selectedDate == null || _selectedDate!.isBefore(firstDate) || _selectedDate!.isAfter(lastDate)) {
+      _selectedDate = firstDate;
+    }
 
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: _selectedDate,
       firstDate: firstDate,
-      lastDate: lastDate, // Use the current year + 1
+      lastDate: lastDate,
+      selectableDayPredicate: (DateTime date) {
+        if (date == DateTime.parse(bookingData!['bk_date']).toLocal()) {
+          return true;
+        }
+        return !disabledDates.contains(date);
+      },
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
@@ -2566,12 +2562,63 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
 
     if (picked != null && picked != _selectedDate) {
       setState(() {
+        loadingAction = true;
+      });
+      //
+      final bkWasteLimitData = await fetchWasteLimit(picked);
+      if (bkWasteLimitData != null) {
+        _wasteLimit = bkWasteLimitData;
+      } else {
+        showErrorSnackBar(context, 'Booking waste limit not found');
+        return;
+      }
+      console(picked);
+      setState(() {
         _selectedDate = picked;
 
         if (_selectedDate != null) {
           dateValidator = '';
         }
+
+        //
+        loadingAction = false;
       });
     }
   }
+
+  // Future<void> _selectDate(BuildContext context) async {
+  //   final DateTime now = DateTime.now();
+  //   final DateTime firstDate = DateTime(now.year);
+  //   final DateTime lastDate = DateTime(now.year + 1, 12, 31);
+
+  //   final DateTime? picked = await showDatePicker(
+  //     context: context,
+  //     initialDate: _selectedDate,
+  //     //initialDate: DateTime.now(),
+  //     firstDate: firstDate,
+  //     lastDate: lastDate, // Use the current year + 1
+  //     builder: (BuildContext context, Widget? child) {
+  //       return Theme(
+  //         data: ThemeData.light().copyWith(
+  //           colorScheme: ColorScheme.light(
+  //             primary: Colors.green, // Circle color for the selected date
+  //             onPrimary: Colors.white, // Text color inside the circle
+  //             onSurface: Colors.green[900]!, // Text color for dates
+  //           ),
+  //         ),
+  //         child: child!,
+  //       );
+  //     },
+  //   );
+
+  //   if (picked != null && picked != _selectedDate) {
+  //     setState(() {
+  //       _selectedDate = picked;
+
+  //       if (_selectedDate != null) {
+  //         dateValidator = '';
+  //       }
+  //     });
+  //   }
+  // }
 }

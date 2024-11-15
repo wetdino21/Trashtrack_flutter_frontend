@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:trashtrack/api_postgre_service.dart';
+import 'package:trashtrack/API/api_postgre_service.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:trashtrack/user_hive_data.dart';
 

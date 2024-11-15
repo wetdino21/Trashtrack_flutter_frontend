@@ -3,12 +3,12 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:trashtrack/Customer/c_schedule_list.dart';
-import 'package:trashtrack/api_network.dart';
-import 'package:trashtrack/api_paymongo.dart';
-import 'package:trashtrack/api_postgre_service.dart';
-import 'package:trashtrack/api_token.dart';
-import 'package:trashtrack/billing_list.dart';
+import 'package:trashtrack/schedule_list.dart';
+import 'package:trashtrack/API/api_network.dart';
+import 'package:trashtrack/API/api_paymongo.dart';
+import 'package:trashtrack/API/api_postgre_service.dart';
+import 'package:trashtrack/API/api_token.dart';
+import 'package:trashtrack/Customer/pdf_billing_list.dart';
 import 'package:trashtrack/styles.dart';
 
 import 'package:dio/dio.dart';
@@ -299,14 +299,10 @@ class _C_PaymentScreenState extends State<C_PaymentScreen> with SingleTickerProv
                                                       ),
                                                       Row(
                                                         children: [
-                                                          Transform.rotate(
-                                                            angle: -0.7854, // 45 degrees in radians
-                                                            child: Icon(
-                                                              Icons.push_pin,
-                                                              color: Colors.red,
-                                                              size: 20,
-                                                              shadows: shadowColor,
-                                                            ),
+                                                          Icon(
+                                                            Icons.error,
+                                                            color: Colors.red,
+                                                            shadows: shadowColor,
                                                           ),
                                                           Text(
                                                             status,

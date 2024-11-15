@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:trashtrack/api_postgre_service.dart';
-import 'package:trashtrack/api_google.dart';
-import 'package:trashtrack/api_token.dart';
+import 'package:trashtrack/API/api_postgre_service.dart';
+import 'package:trashtrack/API/api_google.dart';
+import 'package:trashtrack/API/api_token.dart';
 import 'package:trashtrack/styles.dart';
 
 class LoginPage extends StatefulWidget {

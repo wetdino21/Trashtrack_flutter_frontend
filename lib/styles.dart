@@ -44,7 +44,7 @@ List<BoxShadow> shadowColor = [
     color: Colors.grey.withOpacity(0.2),
     spreadRadius: 2,
     blurRadius: 5,
-    offset: Offset(3, 3), //Offset(-5, -5) right  and bottom
+    offset: Offset(3, 3), //Offset(-5, 5) right  and bottom
   ),
 ];
 
@@ -53,7 +53,7 @@ List<BoxShadow> shadowIconColor = [
     color: Colors.black.withOpacity(0.2),
     spreadRadius: 2,
     blurRadius: 2,
-    offset: Offset(2, 2), //Offset(-5, -5) right  and bottom
+    offset: Offset(2, 2), //Offset(-5, 5) right  and bottom
   ),
 ];
 
@@ -62,7 +62,7 @@ List<BoxShadow> shadowLessColor = [
     color: Colors.black.withOpacity(0.2),
     spreadRadius: 2,
     //blurRadius: 5,
-    offset: Offset(2, 2), //Offset(-5, -5) right  and bottom
+    offset: Offset(2, 2), 
   ),
 ];
 
@@ -71,7 +71,7 @@ List<BoxShadow> shadowTextColor = [
     color: Colors.black.withOpacity(0.2),
     spreadRadius: 2,
     blurRadius: 5,
-    offset: Offset(0.7, 0.7), //Offset(-5, -5) right  and bottom
+    offset: Offset(0.7, 0.7), //Offset(-5, 5) right  and bottom
   ),
 ];
 
@@ -118,14 +118,6 @@ List<BoxShadow> shadowTopCenterColor = [
     offset: Offset(0, -2),
   ),
 ];
-// List<BoxShadow> shadowTextColor = [
-//   BoxShadow(
-//     color: Colors.black.withOpacity(0.3),
-//     spreadRadius: 1,
-//     blurRadius: 10,
-//     offset: Offset(5, 5), //Offset(-5, -5) right  and bottom
-//   ),
-// ];
 
 BorderRadius borderRadius5 = BorderRadius.circular(5);
 BorderRadius borderRadius10 = BorderRadius.circular(10);
@@ -180,49 +172,6 @@ void showSuccessSnackBar(BuildContext context, String successMessage) {
     );
   }
 }
-
-// class CustomOverlay extends StatelessWidget {
-//   final String message;
-//   final Color backgroundColor;
-
-//   CustomOverlay({required this.message, this.backgroundColor = Colors.red});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Positioned(
-//       top: kToolbarHeight, // Position below the AppBar
-//       left: 0,
-//       right: 0,
-//       child: Material(
-//         color: Colors.transparent,
-//         child: Container(
-//           padding: EdgeInsets.all(16.0),
-//           color: backgroundColor,
-//           child: Text(
-//             message,
-//             style: TextStyle(color: Colors.white),
-//             textAlign: TextAlign.center,
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-// void showCustomSnackBar(BuildContext context, String message) {
-//   final overlay = Overlay.of(context);
-//   final overlayEntry = OverlayEntry(
-//     builder: (context) => CustomOverlay(message: message),
-//   );
-
-//   // Insert the overlay entry
-//   overlay.insert(overlayEntry);
-
-//   // Remove the overlay after a delay
-//   Future.delayed(Duration(seconds: 2), () {
-//     overlayEntry.remove();
-//   });
-// }
 
 // for loading
 Widget loadingAnimation(

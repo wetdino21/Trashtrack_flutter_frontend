@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:http/http.dart' as http;
-import 'package:trashtrack/api_postgre_service.dart';
+import 'package:trashtrack/API/api_postgre_service.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:geolocator/geolocator.dart';
 import 'dart:async';

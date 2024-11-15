@@ -3,17 +3,14 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:trashtrack/api_network.dart';
-import 'package:trashtrack/api_postgre_service.dart';
-import 'package:trashtrack/api_token.dart';
+import 'package:trashtrack/API/api_network.dart';
+import 'package:trashtrack/API/api_postgre_service.dart';
+import 'package:trashtrack/API/api_token.dart';
 import 'package:trashtrack/create_acc.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:trashtrack/user_hive_data.dart';
 
-// final String baseUrl = 'http://192.168.254.187:3000';
 String baseUrl = globalUrl();
-//String? baseUrl = globalUrl().getBaseUrl();
 
 // Google Sign-In instance
 final GoogleSignIn _googleSignIn = GoogleSignIn();
@@ -38,14 +35,9 @@ Future<GoogleAccountDetails?> handleGoogleSignUp(BuildContext context) async {
     GoogleSignInAccount? user = await _googleSignIn.signIn();
 
     if (user != null) {
-      // final GoogleSignInAuthentication auth = await user.authentication;
-      // final String? accessToken = auth.accessToken;
-      // final String? idToken = auth.idToken;
 
       // Extract user info
       String fullname = user.displayName == null ? '' : user.displayName!;
-      // String fname = fullname != null ? fullname.split(' ').first : '';
-      // String lname = fullname != null ? fullname.split(' ').last : '';
       String email = user.email;
       String? photoUrl = user.photoUrl;
 
@@ -82,14 +74,6 @@ Future<GoogleAccountDetails?> handleGoogleSignUp(BuildContext context) async {
           lname = nameParts.sublist(3).join(' ');
       }
 
-      //// Fetch Google profile photo
-      // Uint8List? photoBytes;
-      // if (photoUrl != null) {
-      //   http.Response response = await http.get(Uri.parse(photoUrl));
-      //   if (response.statusCode == 200) {
-      //     photoBytes = response.bodyBytes;
-      //   }
-      // }
       Uint8List? photoBytes;
       if (photoUrl != null) {
         try {
@@ -111,9 +95,6 @@ Future<GoogleAccountDetails?> handleGoogleSignUp(BuildContext context) async {
         await _handleSignOut();
         return null;
       } else {
-        // If email doesn't exist, create a new Google account
-        //await createGoogleAccount(context, fname, lname, email, photoBytes);
-
         // If successful, return GoogleAccountDetails
         return GoogleAccountDetails(
           fname: fname,
@@ -209,10 +190,6 @@ Future<void> handleGoogleSignIn(BuildContext context) async {
     GoogleSignInAccount? user = await _googleSignIn.signIn();
 
     if (user != null) {
-      // print('Signed in: ${user.displayName}');
-      // print('Email: ${user.email}');
-      // print('Photo URL: ${user.photoUrl}');
-
       String email = user.email;
 
       String? dbMessage = await loginWithGoogle(context, email);
@@ -261,10 +238,7 @@ Future<String> loginWithGoogle(BuildContext context, String email) async {
         print('Login successfully');
         return 'success'; // No error
       }
-      // else if (response.statusCode == 201) {
-      //   print('Login successfully');
-      //   return 'hauler'; // No error
-      // }
+     
       print('Login successfully');
       return 'hauler'; // No error
     } else if (response.statusCode == 202) {

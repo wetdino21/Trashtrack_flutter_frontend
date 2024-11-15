@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:trashtrack/api_postgre_service.dart';
-import 'package:trashtrack/api_token.dart';
+import 'package:trashtrack/API/api_postgre_service.dart';
+import 'package:trashtrack/API/api_token.dart';
 import 'package:trashtrack/bind_account.dart';
 import 'package:trashtrack/change_pass.dart';
 import 'package:trashtrack/data_model.dart';

@@ -9,8 +9,8 @@ import 'package:trashtrack/styles.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:trashtrack/api_email_service.dart';
-import 'package:trashtrack/api_postgre_service.dart';
+import 'package:trashtrack/API/api_email_service.dart';
+import 'package:trashtrack/API/api_postgre_service.dart';
 import 'package:trashtrack/login.dart';
 import 'package:trashtrack/styles.dart';
 

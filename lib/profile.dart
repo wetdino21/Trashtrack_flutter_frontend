@@ -3,12 +3,13 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-import 'package:trashtrack/api_email_service.dart';
-import 'package:trashtrack/api_postgre_service.dart';
+import 'package:trashtrack/API/api_email_service.dart';
+import 'package:trashtrack/API/api_postgre_service.dart';
+import 'package:trashtrack/Customer/verify.dart';
 import 'package:trashtrack/data_model.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:flutter/services.dart';
-import 'package:trashtrack/api_address.dart';
+import 'package:trashtrack/API/api_address.dart';
 import 'dart:async';
 import 'package:trashtrack/user_hive_data.dart';
 import 'package:image_picker/image_picker.dart';
@@ -742,7 +743,6 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    //final userModel = Provider.of<UserModel>(context);
     return Scaffold(
       backgroundColor: deepGreen,
       body: GestureDetector(
@@ -835,7 +835,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                       Container(
                         //width: double.infinity,
                         margin: EdgeInsets.all(20),
-                        padding: _isEditing ? EdgeInsets.symmetric(horizontal: 100, vertical: 20) : EdgeInsets.zero,
+                        padding: _isEditing ? EdgeInsets.symmetric(horizontal: 100, vertical: 20) : EdgeInsets.all(20),
                         decoration: BoxDecoration(
                             color: Colors.grey[200],
                             boxShadow: shadowBigColor,
@@ -916,6 +916,42 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
                                 ],
                               ),
                             ),
+                            if (user == 'customer')
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  if (userData!['verified'] == true)
+                                    Icon(
+                                      Icons.verified,
+                                      color: deepGreen,
+                                    ),
+                                  userData!['verified'] == true
+                                      ? Text(
+                                          'Fully Verified',
+                                          style: TextStyle(
+                                              fontStyle: FontStyle.italic,
+                                              fontWeight: FontWeight.bold,
+                                              color: deepGreen,
+                                              fontSize: 16),
+                                        )
+                                      : InkWell(
+                                          onTap: () {
+                                            Navigator.push(
+                                                context, MaterialPageRoute(builder: (context) => VerifyCustomer()));
+                                          },
+                                          child: Text(
+                                            'Verify now?',
+                                            style: TextStyle(
+                                                fontStyle: FontStyle.italic,
+                                                fontWeight: FontWeight.bold,
+                                                decoration: TextDecoration.underline,
+                                                decorationColor: blue,
+                                                color: blue,
+                                                fontSize: 16),
+                                          ),
+                                        ),
+                                ],
+                              ),
                             if (!_isEditing)
                               Row(
                                 children: [
@@ -1753,26 +1789,6 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> {
         ],
       ),
     );
-    // return Scaffold(
-    //   appBar: AppBar(),
-    //   body: Center(
-    //     child: imageFile != null
-    //         ? Image.file(File(imageFile.path))
-    //         : imageBytes != null
-    //             ? Image.memory(imageBytes)
-    //             : Container(
-    //                 padding: EdgeInsets.all(20),
-    //                 decoration: BoxDecoration(
-    //                     color: deepPurple,
-    //                     borderRadius: BorderRadius.circular(100)),
-    //                 child: Icon(
-    //                   Icons.person,
-    //                   size: 100,
-    //                   color: white,
-    //                 ),
-    //               ),
-    //   ),
-    // );
   }
 
   Widget _buildTextField({

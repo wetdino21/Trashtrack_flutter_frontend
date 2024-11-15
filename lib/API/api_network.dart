@@ -2,7 +2,7 @@ import 'package:hive/hive.dart';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:trashtrack/Customer/c_api_cus_data.dart';
+import 'package:trashtrack/Customer/api_cus_data.dart';
 import 'dart:convert';
 import 'dart:io';
 
@@ -37,6 +37,11 @@ globalUrl() {
 //// CTU network
 // globalUrl() {
 //   return 'http://172.16.14.83:3000';
+// }
+
+// // ngrok network
+// globalUrl() {
+//   return 'https://a0b9-216-247-23-119.ngrok-free.app';
 // }
 
 

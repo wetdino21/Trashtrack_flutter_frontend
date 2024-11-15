@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
-import 'package:trashtrack/api_network.dart';
-import 'package:trashtrack/api_token.dart';
+import 'package:trashtrack/API/api_network.dart';
+import 'package:trashtrack/API/api_token.dart';
 import 'package:flutter/material.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:trashtrack/user_hive_data.dart';
@@ -157,7 +157,7 @@ Future<String?> createCustomer(BuildContext context, String email, String passwo
     final String accessToken = responseData['accessToken'];
     final String refreshToken = responseData['refreshToken'];
     storeTokens(accessToken, refreshToken);
-    await storeDataInHive(context); // store data to local
+    await storeDataInHive(); // store data to local
 
     return null; // No error, return null
   } else {
@@ -213,6 +213,7 @@ Future<String?> loginAccount(BuildContext context, String email, String password
     }
   } catch (e) {
     console(e.toString());
+    return null;
   }
 }
 
@@ -297,7 +298,7 @@ Future<String?> userUpdate(
       final String accessToken = responseData['accessToken'];
       final String refreshToken = responseData['refreshToken'];
       storeTokens(accessToken, refreshToken);
-      await storeDataInHive(context); // store data to local
+      await storeDataInHive(); // store data to local
 
       showSuccessSnackBar(context, 'User updated successfully');
       return 'success';
@@ -1521,7 +1522,7 @@ Future<String?> binding_trashtrack(BuildContext context, String? password) async
     );
 
     if (response.statusCode == 200) {
-      await storeDataInHive(context);
+      await storeDataInHive();
       showSuccessSnackBar(context, 'Bound Successfully');
       return 'success';
     } else {
@@ -1578,7 +1579,7 @@ Future<String?> binding_google(BuildContext context, String? email) async {
       final String accessToken = responseData['accessToken'];
       final String refreshToken = responseData['refreshToken'];
       storeTokens(accessToken, refreshToken);
-      await storeDataInHive(context); // store data to local
+      await storeDataInHive(); // store data to local
 
       showSuccessSnackBar(context, 'Bound Successfully');
       return 'success';

@@ -1,18 +1,14 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:trashtrack/api_network.dart';
-import 'package:trashtrack/api_token.dart';
+import 'package:trashtrack/API/api_network.dart';
+import 'package:trashtrack/API/api_token.dart';
 import 'package:flutter/material.dart';
 
 import 'package:trashtrack/styles.dart';
 
-//final String baseUrl = 'http://localhost:3000';
-
-//final String baseUrl = 'http://192.168.254.187:3000';
 String baseUrl = globalUrl();
-//String? baseUrl = globalUrl().getBaseUrl();
 
-Future<Map<String, dynamic>?> fetchCusData(BuildContext context) async {
+Future<Map<String, dynamic>?> fetchCusData() async {
   Map<String, String?> tokens = await getTokens();
   String? accessToken = tokens['access_token'];
 
@@ -30,16 +26,6 @@ Future<Map<String, dynamic>?> fetchCusData(BuildContext context) async {
       },
     );
     if (response.statusCode == 200) {
-      // final data = jsonDecode(response.body);
-
-      // // Access the provider and update the user data
-      // Provider.of<UserModel>(context, listen: false).setUserData(
-      //   data['cus_fname'],
-      //   data['cus_lname'],
-      //   data['cus_email'],
-      //   data['profileImage'] != null ? base64Decode(data['profileImage']) : null,
-      // );
-
       return jsonDecode(response.body);
     } else {
       if (response.statusCode == 401) {
@@ -47,7 +33,7 @@ Future<Map<String, dynamic>?> fetchCusData(BuildContext context) async {
         print('Access token expired. Attempting to refresh...');
         String? refreshMsg = await refreshAccessToken();
         if (refreshMsg == null) {
-          return await fetchCusData(context);
+          return await fetchCusData();
         } else {
           // Refresh token is invalid or expired, logout the user
           await deleteTokens(); // Logout user
@@ -62,11 +48,13 @@ Future<Map<String, dynamic>?> fetchCusData(BuildContext context) async {
       }
 
       //error user not found
-      showErrorSnackBar(context, '${response.body} in fetching data');
+      //showErrorSnackBar(context, '${response.body} in fetching data');
+      console('${response.body} in fetching data');
       return null;
     }
   } catch (e) {
     print(e.toString());
+    return null;
   }
 }
 
@@ -162,18 +150,3 @@ Future<List<Map<String, dynamic>>?> fetchCusNotifications() async {
     return null;
   }
 }
-
-
-// Future<Map<String, dynamic>?> fetchCusNotification() async {
-//   final response = await http.post(
-//     Uri.parse('$baseUrl/customer/notification'),
-//     headers: {'Content-Type': 'application/json'},
-//   );
-
-//   if (response.statusCode == 200) {
-//     return jsonDecode(response.body);
-//   } else {
-//     print('Failed to fetch user data: ${response.body}');
-//     return null;
-//   }
-// }

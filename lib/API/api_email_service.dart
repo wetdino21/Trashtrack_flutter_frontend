@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:trashtrack/api_network.dart';
+import 'package:trashtrack/API/api_network.dart';
 
 // final String Url = 'http://192.168.254.187:3000';
 String BaseUrl = globalUrl();
@@ -67,7 +67,6 @@ Future<String?> sendEmailCodeCreateAcc(String email) async {
 
     // Show the remaining time in the message
     return 'Too many requests try again later for $secondsRemaining seconds.';
-    //return 'Too many requests try again later for 1 minute.'; // Return the error message from the server
   } else {
     //print('Error response: ${response.body}');
     print('Failed to send verification code');
@@ -93,7 +92,7 @@ Future<String?> sendCodeEmailUpdate(String email) async {
   } else if (response.statusCode == 400) {
     print('Email is already taken!');
 
-    return 'Email is already taken!'; // Return the error message from the server
+    return 'Email is already taken!'; 
   } else if (response.statusCode == 429) {
     print('Too many requests. Please try again later.');
 
@@ -106,11 +105,8 @@ Future<String?> sendCodeEmailUpdate(String email) async {
     // Convert timeremain from milliseconds to seconds (or minutes, if needed)
     final int secondsRemaining = (timeremain / 1000).ceil();
 
-    // Show the remaining time in the message
     return 'Too many requests try again later for $secondsRemaining seconds.';
-    //return 'Too many requests try again later for 1 minute.'; // Return the error message from the server
   } else {
-    //print('Error response: ${response.body}');
     print('Failed to send verification code');
     return 'error';
   }

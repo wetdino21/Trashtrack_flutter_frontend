@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:trashtrack/api_email_service.dart';
-import 'package:trashtrack/api_google.dart';
-import 'package:trashtrack/api_postgre_service.dart';
+import 'package:trashtrack/API/api_email_service.dart';
+import 'package:trashtrack/API/api_google.dart';
+import 'package:trashtrack/API/api_postgre_service.dart';
 import 'package:trashtrack/data_model.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:google_sign_in/google_sign_in.dart';

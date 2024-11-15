@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:trashtrack/Customer/c_schedule_list.dart';
-import 'package:trashtrack/Customer/c_booking.dart';
-import 'package:trashtrack/api_postgre_service.dart';
-import 'package:trashtrack/booking_pending_list.dart';
+import 'package:trashtrack/schedule_list.dart';
+import 'package:trashtrack/Customer/booking.dart';
+import 'package:trashtrack/API/api_postgre_service.dart';
+import 'package:trashtrack/Hauler/booking_pickup_list.dart';
 import 'package:trashtrack/home.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:trashtrack/user_hive_data.dart';

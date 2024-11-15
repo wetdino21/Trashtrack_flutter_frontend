@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:flutter/material.dart';
-import 'package:trashtrack/api_network.dart';
+import 'package:trashtrack/API/api_network.dart';
 import 'package:trashtrack/data_model.dart';
 import 'package:trashtrack/login.dart';
 import 'package:trashtrack/main.dart';

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:trashtrack/api_postgre_service.dart';
+import 'package:trashtrack/API/api_postgre_service.dart';
 import 'package:trashtrack/styles.dart';
-import 'package:trashtrack/api_email_service.dart';
+import 'package:trashtrack/API/api_email_service.dart';
 import 'package:flutter/services.dart';
-import 'package:trashtrack/api_address.dart';
+import 'package:trashtrack/API/api_address.dart';
 import 'dart:async';
 import 'package:trashtrack/home.dart';
 
 //google
-import 'package:trashtrack/api_google.dart';
+import 'package:trashtrack/API/api_google.dart';
 
 class CreateAcc extends StatefulWidget {
   @override

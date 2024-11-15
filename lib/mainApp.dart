@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:trashtrack/Customer/c_Schedule.dart';
+import 'package:trashtrack/schedule.dart';
 import 'package:trashtrack/appbar.dart';
 import 'package:trashtrack/bottom_nav_bar.dart';
 import 'package:trashtrack/drawer.dart';
 import 'package:trashtrack/home.dart';
-import 'package:trashtrack/Customer/c_map.dart';
-import 'package:trashtrack/Customer/c_payment.dart';
+import 'package:trashtrack/map.dart';
+import 'package:trashtrack/Customer/payment.dart';
 import 'package:trashtrack/data_model.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:trashtrack/user_hive_data.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:trashtrack/vehicle.dart';
+import 'package:trashtrack/Hauler/vehicle.dart';
 
 class MainApp extends StatefulWidget {
   final int? selectedIndex;
@@ -73,9 +73,7 @@ class _MainAppState extends State<MainApp> {
       setState(() {
         loading = true;
       });
-      //await notificationCount(); //notification count
-      //if(!mounted) return;
-      await storeDataInHive(context); // user data
+      //await storeDataInHive(); // user data
       final data = await userDataFromHive();
 
       userModel!.setUserData(

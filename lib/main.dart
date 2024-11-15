@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:trashtrack/appbar.dart';
-import 'package:trashtrack/api_network.dart';
+import 'package:trashtrack/API/api_network.dart';
 import 'package:trashtrack/data_model.dart';
-import 'package:trashtrack/Customer/c_Schedule.dart';
+import 'package:trashtrack/schedule.dart';
 import 'package:trashtrack/about_us.dart';
 import 'package:trashtrack/change_pass.dart';
 import 'package:trashtrack/home.dart';
-import 'package:trashtrack/Customer/c_map.dart';
-import 'package:trashtrack/Customer/c_notification.dart';
-import 'package:trashtrack/Customer/c_payment.dart';
+import 'package:trashtrack/map.dart';
+import 'package:trashtrack/Customer/notification.dart';
+import 'package:trashtrack/Customer/payment.dart';
 import 'package:trashtrack/profile.dart';
-import 'package:trashtrack/api_token.dart';
+import 'package:trashtrack/API/api_token.dart';
 import 'package:trashtrack/create_acc.dart';
 import 'package:trashtrack/deactivated.dart';
 import 'package:trashtrack/forgot_pass.dart';
@@ -49,7 +49,6 @@ class MyApp extends StatelessWidget {
       //initialRoute: initialRoute,
       home: TokenCheck(), // final firt route
       //home: DynamicNetwork(), // for testing with network
-      //home: PdfDownloader(), //for testing
 
       //home: WebsocketMultiple(), //for testing
       routes: {

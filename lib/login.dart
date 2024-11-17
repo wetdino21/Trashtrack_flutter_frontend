@@ -49,7 +49,6 @@ class _LoginPageState extends State<LoginPage> {
       if (!mounted) return;
       setState(() {
         widget.action = null;
-        console('${widget.action} 111111111111');
       });
     }
   }

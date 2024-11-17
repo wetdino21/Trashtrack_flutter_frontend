@@ -73,7 +73,7 @@ class _MainAppState extends State<MainApp> {
       setState(() {
         loading = true;
       });
-      //await storeDataInHive(); // user data
+      await storeDataInHive(); // user data
       final data = await userDataFromHive();
 
       userModel!.setUserData(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:trashtrack/Customer/booking.dart';
+import 'package:trashtrack/Customer/verify.dart';
 import 'package:trashtrack/ZPractice.dart';
 import 'package:trashtrack/API/api_postgre_service.dart';
 import 'package:trashtrack/API/api_token.dart';
@@ -280,36 +281,39 @@ class _C_HomeScreenState extends State<C_HomeScreen> with SingleTickerProviderSt
                                   Center(
                                     child: Container(
                                       padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 30.0),
-                                      decoration: BoxDecoration(
-                                          color: deepPurple,
-                                          borderRadius: BorderRadius.circular(10.0),
-                                          boxShadow: shadowLowColor),
-                                      child: InkWell(
-                                        //
-                                        onTap: () async {
+                                     
+                                      child: Button(
+                                        color: deepPurple,
+                                        boxShadows: shadowMidColor,
+                                        onPressed: () async {
                                           setState(() {
                                             loadingAction = true;
                                           });
                                           //
                                           if (user == 'customer') {
-                                            String? bklimit = await checkBookingLimit(context);
-                                            if (bklimit == 'max') {
-                                              showBookLimitDialog(context);
-                                            } else if (bklimit == 'disabled') {
-                                              showErrorSnackBar(context, 'We are not accepting booking right now!');
-                                            } else if (bklimit == 'no limit') {
-                                              showErrorSnackBar(context, 'No booking limit found');
-                                            } else if (bklimit == 'success') {
-                                              String? isUnpaidBIll = await checkUnpaidBIll(context);
-                                              if (isUnpaidBIll == 'Unpaid') {
-                                                showUnpaidBillDialog(context);
-                                              } else if (isUnpaidBIll == 'success') {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) => RequestPickupScreen(),
-                                                  ),
-                                                );
+                                            bool? verified = await checkVerifiedCus(context);
+                                            if (verified == false) {
+                                              showUnverifiedCusDialog(context);
+                                            } else {
+                                              String? bklimit = await checkBookingLimit(context);
+                                              if (bklimit == 'max') {
+                                                showBookLimitDialog(context);
+                                              } else if (bklimit == 'disabled') {
+                                                showErrorSnackBar(context, 'We are not accepting booking right now!');
+                                              } else if (bklimit == 'no limit') {
+                                                showErrorSnackBar(context, 'No booking limit found');
+                                              } else if (bklimit == 'success') {
+                                                String? isUnpaidBIll = await checkUnpaidBIll(context);
+                                                if (isUnpaidBIll == 'Unpaid') {
+                                                  showUnpaidBillDialog(context);
+                                                } else if (isUnpaidBIll == 'success') {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) => RequestPickupScreen(),
+                                                    ),
+                                                  );
+                                                }
                                               }
                                             }
                                           } else {
@@ -454,6 +458,32 @@ class StatisticBox extends StatelessWidget {
   }
 }
 
+void showUnverifiedCusDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
+        icon: Icon(Icons.gpp_bad, size: 50),
+        iconColor: red,
+        title: Text('Unverified Account', style: TextStyle(color: redSoft)),
+        content:
+            Text('In order to request pickup, please verify your account first!', style: TextStyle(color: blackSoft)),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => VerifyCustomer()));
+            },
+            child: Text('Verify now', style: TextStyle(color: deepGreen, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      );
+    },
+  );
+}
+
 void showBookLimitDialog(BuildContext context) {
   showDialog(
     context: context,
@@ -461,6 +491,8 @@ void showBookLimitDialog(BuildContext context) {
       return AlertDialog(
         backgroundColor: white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
+        icon: Icon(Icons.report, size: 50),
+        iconColor: red,
         title: Text('Unable to request pickup', style: TextStyle(color: redSoft)),
         content: Text('You have reached the maximum booking limit.', style: TextStyle(color: blackSoft)),
         actions: [
@@ -483,6 +515,8 @@ void showUnpaidBillDialog(BuildContext context) {
       return AlertDialog(
         backgroundColor: white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
+        icon: Icon(Icons.waving_hand, size: 50),
+        iconColor: red,
         title: Text('Unable to request pickup', style: TextStyle(color: redSoft)),
         content: Text('You still have unpaid payment, please pay it first.', style: TextStyle(color: blackSoft)),
         actions: [

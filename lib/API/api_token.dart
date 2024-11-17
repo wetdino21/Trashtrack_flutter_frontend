@@ -217,11 +217,12 @@ Future<String> onOpenApp(BuildContext context) async {
     print('New user welcome');
     await storeNewUser('true'); // new user
     return 'splash';
-  }
-  if (accessToken == null) {
-    print('No access token available. User needs to log in.');
-    await deleteTokens(action: 'logout'); // Logout use
-    return 'login';
+  } else {
+    if (accessToken == null) {
+      print('No access token available. User needs to log in.');
+      await deleteTokens(action: 'logout'); // Logout use
+      return 'login';
+    }
   }
 
   try {
@@ -234,12 +235,6 @@ Future<String> onOpenApp(BuildContext context) async {
     );
     if (response.statusCode == 200 || response.statusCode == 201) {
       return '/mainApp';
-
-      // if (response.statusCode == 200) {
-      //   return 'c_home';
-      // } else if (response.statusCode == 201) {
-      //   return 'home';
-      // }
     } else {
       if (response.statusCode == 401) {
         print('Access token expired. Attempting to refresh...');
@@ -260,11 +255,11 @@ Future<String> onOpenApp(BuildContext context) async {
       }
 
       showErrorSnackBar(context, response.body);
-      return 'err';
+      return '';
     }
   } catch (e) {
     print(e.toString());
-    return 'err';
+    return '';
   }
 }
 
@@ -273,8 +268,10 @@ void showLogoutConfirmationDialog(BuildContext context) {
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        backgroundColor: Colors.red[900],
+        backgroundColor: black.withOpacity(0.8),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
+        icon: Icon(Icons.logout, size: 50),
+        iconColor: red,
         title: Text('Logout', style: TextStyle(color: Colors.white)),
         content: Text('Are you sure you want to log out?', style: TextStyle(color: Colors.white)),
         actions: [
@@ -304,6 +301,8 @@ void showExpiredSessionDialog(BuildContext context) {
       return AlertDialog(
         backgroundColor: white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
+        icon: Icon(Icons.timer_off_outlined, size: 50),
+        iconColor: red,
         title: Text('Session Expired', style: TextStyle(color: redSoft)),
         content: Text('Your time with us has come to an end. Please login again.', style: TextStyle(color: blackSoft)),
         actions: [

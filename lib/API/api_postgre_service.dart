@@ -498,6 +498,100 @@ Future<String?> checkUnpaidBIll(BuildContext context) async {
   return null;
 }
 
+// check verified customer
+Future<bool?> checkVerifiedCus(BuildContext context) async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+  if (accessToken == null) {
+    print('No access token available. User needs to log in.');
+    await deleteTokens(); // Logout use
+  }
+
+  try {
+    final response = await http.post(
+      Uri.parse('$baseUrl/check_verified_customer'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    } else if (response.statusCode == 429) {
+      return false;
+    } else {
+      if (response.statusCode == 401) {
+        // Access token might be expired, attempt to refresh it
+        print('Access token expired. Attempting to refresh...');
+        String? refreshMsg = await refreshAccessToken();
+        if (refreshMsg == null) {
+          return await checkVerifiedCus(context);
+        }
+      } else if (response.statusCode == 403) {
+        // Access token is invalid. logout
+        print('Access token invalid. Attempting to logout...');
+        showErrorSnackBar(context, 'Active time has been expired please login again.');
+        await deleteTokens(); // Logout use
+      } else {
+        print('Response: ${response.body}');
+        return null;
+      }
+    }
+  } catch (e) {
+    print(e.toString());
+  }
+  return null;
+}
+
+//submit account verification
+Future<String?> submitAccountVerification(Uint8List? validID, Uint8List? selfie) async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+  if (accessToken == null) {
+    console('No access token available. User needs to log in.');
+    await deleteTokens(); // Logout user
+    return null;
+  }
+
+  try {
+    final response = await http.post(
+      Uri.parse('$baseUrl/submit_account_verification'), // Update endpoint
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'validID': validID != null ? base64Encode(validID) : null,
+        'selfie': selfie != null ? base64Encode(selfie) : null,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return 'success';
+    } else {
+      if (response.statusCode == 401) {
+        // Access token might be expired, attempt to refresh it
+        console('Access token expired. Attempting to refresh...');
+        String? refreshMsg = await refreshAccessToken();
+        if (refreshMsg == null) {
+          return await submitAccountVerification(validID, selfie);
+        }
+      } else if (response.statusCode == 403) {
+        // Access token is invalid. Logout
+        console('Access token invalid. Attempting to logout...');
+        await deleteTokens(); // Logout user
+      } else {
+        console('Error updating user: ${response.body}');
+      }
+    }
+    console('Update user is not successful!');
+    return response.body;
+  } catch (e) {
+    console('Exception occurred: ${e.toString()}');
+  }
+  return null;
+}
+
 //fetch booking limit
 Future<Map<String, dynamic>?> fetchBookLimit() async {
   Map<String, String?> tokens = await getTokens();

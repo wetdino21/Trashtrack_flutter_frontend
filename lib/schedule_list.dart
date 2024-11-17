@@ -66,8 +66,8 @@ class _C_ScheduleCardListState extends State<C_ScheduleCardList> {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
+    return Button(
+      onPressed: () {
         if (user == 'customer') {
           Navigator.push(context, MaterialPageRoute(builder: (context) => BookingDetails(bookId: widget.bookId)));
         } else if (user == 'hauler') {
@@ -82,8 +82,11 @@ class _C_ScheduleCardListState extends State<C_ScheduleCardList> {
           }
         }
       },
-      splashColor: Colors.green,
-      highlightColor: Colors.green.withOpacity(0.2),
+      splashColor: deepPurple,
+      highlightColor: deepPurple,
+      borderRadius: BorderRadius.zero,
+      padding: EdgeInsets.zero,
+      color: Colors.transparent,
       child: Container(
         padding: EdgeInsets.only(bottom: 20, left: 10, right: 10),
         //color: boxColor,
@@ -143,9 +146,7 @@ class _C_ScheduleCardListState extends State<C_ScheduleCardList> {
                             widget.status == 'Cancelled' || widget.status == 'Paid' || widget.status == 'Failed'
                                 ? Icons.history
                                 : Icons.calendar_month,
-                            size: widget.status == 'Cancelled' ||
-                                    widget.status == 'Paid' ||
-                                    widget.status == 'Failed'
+                            size: widget.status == 'Cancelled' || widget.status == 'Paid' || widget.status == 'Failed'
                                 ? 35
                                 : 25,
                             color: Colors.white),
@@ -402,6 +403,7 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
                   'name': waste['bw_name'],
                   'price': waste['bw_price'],
                   'unit': waste['bw_unit'],
+                  'total_unit': waste['bw_total_unit'],
                 }));
           }
 
@@ -798,8 +800,8 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
                   onAddress = false;
                   boxColorTheme = Colors.teal;
                 });
-                //Navigator.of(context).pop();
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainApp(selectedIndex: 2)));
+                Navigator.of(context).pop();
+                //Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainApp(selectedIndex: 2)));
               },
               child: Text('Yes', style: TextStyle(color: Colors.white)),
             ),
@@ -2360,17 +2362,22 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
               String type = category['name'];
               var price = category['price'];
               var unit = category['unit'];
+              var total_unit = category['total_unit'];
 
               return Container(
                 padding: EdgeInsets.all(10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('${type}'),
-                    Text(
-                      '\₱${price.toString()}\\${unit.toString()}',
-                      style: TextStyle(color: Colors.deepOrange),
+                    Expanded(flex: 2, child: Text('${type}')),
+                    Expanded(
+                      flex: 1,
+                      child: Text(
+                        '\₱${price.toString()}\\${unit.toString()}',
+                        style: TextStyle(color: Colors.deepOrange),
+                      ),
                     ),
+                    if (total_unit != null) Expanded(flex: 1, child: Text('${total_unit} ${unit.toString()}')),
                   ],
                 ),
               );

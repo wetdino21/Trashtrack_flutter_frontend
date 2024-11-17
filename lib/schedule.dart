@@ -161,31 +161,39 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen> with SingleTickerPr
                           style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
                         ),
                       ),
-                    InkWell(
-                        onTap: () async {
+                    Button(
+                        margin: EdgeInsets.all(10),
+                        padding: EdgeInsets.all(10),
+                        boxShadows: shadowButtonColor,
+                        onPressed: () async {
                           setState(() {
                             loadingAction = true;
                           });
                           //
                           if (user == 'customer') {
-                            String? bklimit = await checkBookingLimit(context);
-                            if (bklimit == 'max') {
-                              showBookLimitDialog(context);
-                            } else if (bklimit == 'disabled') {
-                              showErrorSnackBar(context, 'We are not accepting booking right now!');
-                            } else if (bklimit == 'no limit') {
-                              showErrorSnackBar(context, 'No booking limit found');
-                            } else if (bklimit == 'success') {
-                              String? isUnpaidBIll = await checkUnpaidBIll(context);
-                              if (isUnpaidBIll == 'Unpaid') {
-                                showUnpaidBillDialog(context);
-                              } else if (isUnpaidBIll == 'success') {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => RequestPickupScreen(),
-                                  ),
-                                );
+                            bool? verified = await checkVerifiedCus(context);
+                            if (verified == false) {
+                              showUnverifiedCusDialog(context);
+                            } else {
+                              String? bklimit = await checkBookingLimit(context);
+                              if (bklimit == 'max') {
+                                showBookLimitDialog(context);
+                              } else if (bklimit == 'disabled') {
+                                showErrorSnackBar(context, 'We are not accepting booking right now!');
+                              } else if (bklimit == 'no limit') {
+                                showErrorSnackBar(context, 'No booking limit found');
+                              } else if (bklimit == 'success') {
+                                String? isUnpaidBIll = await checkUnpaidBIll(context);
+                                if (isUnpaidBIll == 'Unpaid') {
+                                  showUnpaidBillDialog(context);
+                                } else if (isUnpaidBIll == 'success') {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => RequestPickupScreen(),
+                                    ),
+                                  );
+                                }
                               }
                             }
                           } else {
@@ -201,15 +209,9 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen> with SingleTickerPr
                             loadingAction = false;
                           });
                         },
-                        child: Container(
-                          padding: EdgeInsets.all(10),
-                          margin: EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                              color: deepGreen, borderRadius: BorderRadius.circular(15.0), boxShadow: shadowLowColor),
-                          child: Icon(
-                            Icons.keyboard_arrow_right_outlined,
-                            color: Colors.white,
-                          ),
+                        child: Icon(
+                          Icons.keyboard_arrow_right_outlined,
+                          color: Colors.white,
                         )),
                   ],
                 ),

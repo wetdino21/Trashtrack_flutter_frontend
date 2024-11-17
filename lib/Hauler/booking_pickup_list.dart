@@ -612,6 +612,7 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
                   'name': waste['bw_name'],
                   'price': waste['bw_price'],
                   'unit': waste['bw_unit'],
+                  'total_unit': waste['bw_total_unit'],
                 }));
           }
 
@@ -2473,17 +2474,22 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
               String type = category['name'];
               var price = category['price'];
               var unit = category['unit'];
+              var total_unit = category['total_unit'];
 
               return Container(
                 padding: EdgeInsets.all(10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('${type}'),
-                    Text(
-                      '\₱${price.toString()}\\${unit.toString()}',
-                      style: TextStyle(color: Colors.deepOrange),
+                    Expanded(flex: 2, child: Text('${type}')),
+                    Expanded(
+                      flex: 1,
+                      child: Text(
+                        '\₱${price.toString()}\\${unit.toString()}',
+                        style: TextStyle(color: Colors.deepOrange),
+                      ),
                     ),
+                    if (total_unit != null) Expanded(flex: 1, child: Text('${total_unit} ${unit.toString()}')),
                   ],
                 ),
               );

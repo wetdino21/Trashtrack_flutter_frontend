@@ -135,8 +135,6 @@ Future<void> storeDataInHive() async {
 
 /////////////////////////
 Future<Map<String, dynamic>> userDataFromHive() async {
-  //fetch and store to hive
-  await storeDataInHive();
   // Open Hive box
   var box = await Hive.openBox('mybox');
 

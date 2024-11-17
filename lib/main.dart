@@ -83,11 +83,13 @@ class _TokenCheckState extends State<TokenCheck> {
   @override
   void initState() {
     super.initState();
-    _initializeApp();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeApp();
+    });
   }
 
   Future<void> _initializeApp() async {
-    String initialRoute = await onOpenApp(context);
+    String? initialRoute = await onOpenApp(context);
 
     if (initialRoute.isNotEmpty) {
       Navigator.pushReplacementNamed(context, initialRoute);
@@ -98,8 +100,6 @@ class _TokenCheckState extends State<TokenCheck> {
         MaterialPageRoute(builder: (context) => LoginPage(action: 'login')),
         (Route<dynamic> route) => false,
       );
-
-      //Navigator.pushReplacementNamed(context, 'login');
     }
   }
 
@@ -107,25 +107,7 @@ class _TokenCheckState extends State<TokenCheck> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: deepPurple,
-      body: MainApp(),
-
-      // Column(
-      //   mainAxisAlignment: MainAxisAlignment.center,
-      //   children: [
-      //     Text(
-      //       'NO INTERNET CONNECTION',
-      //       style: TextStyle(color: white, fontSize: 20),
-      //     ),
-      //     Center(
-      //       child: Image.asset('assets/icon/trashtrack_icon_trans.png', scale: 3),
-      //     ),
-      //     ElevatedButton(
-      //         onPressed: () {
-      //           deleteTokens();
-      //         },
-      //         child: Text('Delete token')),
-      //   ],
-      // ),
+      body: showLoadingIconAnimate(),
     );
   }
 }

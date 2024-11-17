@@ -216,8 +216,13 @@ class _C_PaymentScreenState extends State<C_PaymentScreen> with SingleTickerProv
                                       return Column(
                                         children: [
                                           if (index == 0) SizedBox(height: 30),
-                                          InkWell(
-                                            onTap: () {
+                                          Button(
+                                            padding: EdgeInsets.zero,
+                                            color: Colors.transparent,
+                                            borderRadius: BorderRadius.zero,
+                                            highlightColor: deepPurple,
+                                            boxShadows: [],
+                                            onPressed: () {
                                               if (gb_id != null) {
                                                 Navigator.push(
                                                         context,
@@ -309,7 +314,7 @@ class _C_PaymentScreenState extends State<C_PaymentScreen> with SingleTickerProv
                                                             style: TextStyle(
                                                               color: redSoft,
                                                               fontWeight: FontWeight.bold,
-                                                              fontSize: 18,
+                                                              fontSize: 14,
                                                               //shadows: shadowLessColor
                                                             ),
                                                           ),
@@ -392,8 +397,13 @@ class _C_PaymentScreenState extends State<C_PaymentScreen> with SingleTickerProv
                                       return Column(
                                         children: [
                                           if (index == 0) SizedBox(height: 30),
-                                          InkWell(
-                                            onTap: () {
+                                          Button(
+                                            padding: EdgeInsets.zero,
+                                            color: Colors.transparent,
+                                            borderRadius: BorderRadius.zero,
+                                            highlightColor: deepPurple,
+                                            boxShadows: [],
+                                            onPressed: () {
                                               if (gb_id != null) {
                                                 Navigator.push(
                                                         context,
@@ -488,7 +498,7 @@ class _C_PaymentScreenState extends State<C_PaymentScreen> with SingleTickerProv
                                                             style: TextStyle(
                                                               color: green,
                                                               fontWeight: FontWeight.bold,
-                                                              fontSize: 18,
+                                                              fontSize: 14,
                                                               //shadows: shadowLessColor
                                                             ),
                                                           ),
@@ -790,8 +800,7 @@ class _PaymentDetailsState extends State<PaymentDetails> with SingleTickerProvid
                                         onTap: () => Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                                builder: (context) =>
-                                                    BookingDetails(bookId: billDetails!['bk_id']))),
+                                                builder: (context) => BookingDetails(bookId: billDetails!['bk_id']))),
                                         child: Container(
                                           //decoration: BoxDecoration(boxShadow: shadowTextColor),
                                           child: Row(

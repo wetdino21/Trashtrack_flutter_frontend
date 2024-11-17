@@ -44,7 +44,6 @@ globalUrl() {
 //   return 'https://a0b9-216-247-23-119.ngrok-free.app';
 // }
 
-
 ////// COMMENT THIS IF IP STATIC ///////////////////////////////////////////////////////////////////
 String? networkURL;
 
@@ -61,7 +60,7 @@ class NetworkglobalUrl {
 
   void setBaseUrl(String ipAddress) {
     _baseUrl = 'http://$ipAddress:3000';
-    networkURL = _baseUrl!; 
+    networkURL = _baseUrl!;
   }
 
   String? getBaseUrl() {

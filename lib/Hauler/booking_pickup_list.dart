@@ -1,6 +1,11 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 //import 'package:flutter_cube/flutter_cube.dart';
 import 'package:intl/intl.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:trashtrack/schedule_list.dart';
 import 'package:trashtrack/API/api_postgre_service.dart';
 import 'package:trashtrack/styles.dart';
@@ -16,6 +21,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:trashtrack/validator_data.dart';
+import 'package:image/image.dart' as img;
 
 class Booking_List extends StatefulWidget {
   @override
@@ -544,6 +550,10 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
   Color? boxColorTheme = Colors.teal;
   bool _showOptionsBox = false;
   bool loadingAction = false;
+  late final PanelController _panelController;
+  bool _isPanelOpen = false;
+  XFile? _selectedImageSlip;
+
   @override
   void initState() {
     super.initState();
@@ -551,6 +561,7 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
     _dbData();
     _loadWasteCategories();
 
+    _panelController = PanelController();
     // Initialize the animation controller
     _controller = AnimationController(
       duration: const Duration(milliseconds: 500),
@@ -585,8 +596,6 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
 
     _controller.dispose();
 
-    // _dbData();
-    // _loadWasteCategories();
     super.dispose();
   }
 
@@ -675,33 +684,197 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
       if (!mounted) return;
       setState(() {
         userData = data;
-
-        // fullname = (userData!['cus_fname'] ?? '') +
-        //     ' ' +
-        //     (userData!['cus_mname'] ?? '') +
-        //     ' ' +
-        //     (userData!['cus_lname'] ?? '');
-        // contact = userData!['cus_contact'].substring(1) ?? '';
-        // street = (userData!['cus_street'] ?? '');
-        // address = (userData!['cus_brgy'] ?? '') +
-        //     ', ' +
-        //     (userData!['cus_city'] ?? '') +
-        //     ', ' +
-        //     (userData!['cus_province'] ?? '') +
-        //     ', ' +
-        //     (userData!['cus_postal'] ?? '');
-        //isLoading = false;
       });
-      //await data.close();
     } catch (e) {
       if (!mounted) return;
       isLoading = true;
       print(e);
       setState(() {
-        //errorMessage = e.toString();
         isLoading = true;
       });
     }
+  }
+
+  //compress image
+  Uint8List? compressImage(Uint8List imageBytes, {int quality = 70}) {
+    // Decode the image from the provided bytes
+    img.Image? image = img.decodeImage(imageBytes);
+
+    if (image == null) {
+      return null; // Return null if the image cannot be decoded
+    }
+
+    img.Image resizedImage = img.copyResize(image, width: 700);
+
+    // Encode the image to JPEG format with a specified quality
+    return Uint8List.fromList(img.encodeJpg(resizedImage, quality: quality));
+  }
+
+  Widget _imagePreview(BuildContext context, XFile? imageFile, Uint8List? dbScaleSlip, bool isViewOnly) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: deepPurple,
+        foregroundColor: white,
+        title: Text(!isViewOnly ? 'Upload Scale Slip' : 'Preview Scale Slip'),
+      ),
+      backgroundColor: deepPurple,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 20),
+                    if (!isViewOnly)
+                      Text(
+                        'Note: Please ensure the image is clear and easy to read for optimal visibility and comprehension.',
+                        style: TextStyle(color: white, fontSize: 12),
+                      ),
+                    SizedBox(height: 20),
+                    Container(
+                      child: imageFile != null
+                          ? Image.file(File(imageFile.path))
+                          : dbScaleSlip != null
+                              ? Image.memory(
+                                  dbScaleSlip,
+                                  fit: BoxFit.cover,
+                                )
+                              : Container(
+                                  padding: EdgeInsets.all(20),
+                                  decoration:
+                                      BoxDecoration(color: deepPurple, borderRadius: BorderRadius.circular(100)),
+                                  child: Icon(
+                                    Icons.person,
+                                    size: 100,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                    ),
+                    SizedBox(height: 30),
+                    if (!isViewOnly)
+                      Button(
+                          onPressed: () async {
+                            setState(() {
+                              loadingAction = true;
+                            });
+                            Uint8List? slipImage;
+                            Uint8List originalImage = await _selectedImageSlip!.readAsBytes();
+                            slipImage = compressImage(originalImage);
+
+                            String? uploadResult = await uploadScaleSlip(slipImage, bookingData!['bk_id']);
+                            if (uploadResult == 'success') {
+                              await _fetchBookingData(); // refresh the booking data
+                              if (!mounted) return;
+                              Navigator.pop(context);
+                              showSuccessSnackBar(context, 'Uploaded Scale Slip Successfully');
+                            } else {
+                              showErrorSnackBar(context, 'Something went wrong please try again later.');
+                            }
+                            setState(() {
+                              loadingAction = false;
+                            });
+                          },
+                          child: Text(
+                            'Submit',
+                            style: TextStyle(color: white, fontWeight: FontWeight.bold, fontSize: 18),
+                          )),
+                    SizedBox(height: 30),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          if (loadingAction) showLoadingAction(),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    setState(() {
+      _panelController.close();
+      _isPanelOpen = false;
+    });
+
+    final picker = ImagePicker();
+    final XFile? pickedFile = await picker.pickImage(source: source);
+
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImageSlip = pickedFile;
+      });
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => _imagePreview(context, pickedFile, null, false)),
+      );
+    }
+  }
+
+  Widget _panelContent() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: 20),
+        Center(
+          child: Container(
+            width: 60,
+            height: 5,
+            decoration: BoxDecoration(
+              color: Colors.grey[400],
+              borderRadius: BorderRadius.circular(2.5),
+            ),
+          ),
+        ),
+        SizedBox(height: 20),
+        Center(
+          child: Text(
+            'Upload Scale Slip',
+            style: TextStyle(
+              fontSize: 20,
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 20),
+          height: MediaQuery.of(context).size.height * .2,
+          child: Material(
+            color: Colors.transparent,
+            child: ListView(
+              children: [
+                ListTile(
+                  onTap: () async {
+                    _pickImage(ImageSource.camera);
+                  },
+                  leading: Icon(Icons.camera_alt, color: deepPurple),
+                  title: Text(
+                    "Take Photo",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ),
+                ListTile(
+                  onTap: () async {
+                    _pickImage(ImageSource.gallery);
+                  },
+                  leading: Icon(Icons.photo_library, color: deepPurple),
+                  title: Text(
+                    "Choose from Gallery",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   // Function to load waste categories and update the state
@@ -959,7 +1132,7 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
           title: Text('Return Booking', style: TextStyle(color: Colors.white)),
           content: Text(
-              'This will change the status of the booking to ' 'Pending' ' and it will appear on the pickup list.',
+              'This will change the status of the booking to ' 'Pending' ' and it will re-appear on the pickup list.',
               style: TextStyle(color: Colors.white)),
           actions: [
             TextButton(
@@ -2143,28 +2316,69 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
                     ),
                     child: Material(
                       color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () {
-                          _showConfirmCancelBookingDialog(context);
-                          setState(() {
-                            _showOptionsBox = false;
-                          });
-                        },
-                        child: Padding(
-                          padding: EdgeInsets.all(20),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.keyboard_return,
-                                color: Colors.red,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                _showOptionsBox = false;
+
+                                if (bookingData!['bk_waste_scale_slip'] == null) {
+                                  _panelController.open();
+                                  _isPanelOpen = true;
+                                } else {
+                                  Uint8List dbSlipImage = base64Decode(bookingData!['bk_waste_scale_slip']);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => _imagePreview(context, null, dbSlipImage, true)),
+                                  );
+                                }
+                              });
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.all(20),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Icon(
+                                    bookingData!['bk_waste_scale_slip'] == null ? Icons.upload : Icons.wallpaper,
+                                    color: green,
+                                  ),
+                                  SizedBox(width: 5),
+                                  Text(
+                                      bookingData!['bk_waste_scale_slip'] == null
+                                          ? "Upload scale slip"
+                                          : "View Scale Slip",
+                                      style: TextStyle(fontSize: 16, color: Colors.black54)),
+                                ],
                               ),
-                              SizedBox(width: 5),
-                              Container(
-                                  child: Text("Return to pending?",
-                                      style: TextStyle(fontSize: 16, color: Colors.black54))),
-                            ],
+                            ),
                           ),
-                        ),
+                          InkWell(
+                            onTap: () {
+                              _showConfirmCancelBookingDialog(context);
+                              setState(() {
+                                _showOptionsBox = false;
+                              });
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.all(20),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Icon(
+                                    Icons.keyboard_return,
+                                    color: red,
+                                  ),
+                                  SizedBox(width: 5),
+                                  Text("Return to pending", style: TextStyle(fontSize: 16, color: Colors.black54)),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -2243,6 +2457,32 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
                       ),
                     ),
                   ),
+              if (_isPanelOpen)
+                Positioned.fill(
+                  child: InkWell(
+                    onTap: () {
+                      _panelController.close();
+                      setState(() {
+                        _isPanelOpen = false;
+                      });
+                    },
+                    child: Container(
+                      color: Colors.black.withOpacity(0.3),
+                    ),
+                  ),
+                ),
+              SlidingUpPanel(
+                controller: _panelController,
+                minHeight: 0, // Start closed
+                maxHeight: MediaQuery.of(context).size.height * 0.3,
+                panel: _panelContent(),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                onPanelClosed: () {
+                  setState(() {
+                    _isPanelOpen = false;
+                  });
+                },
+              ),
               if (loadingAction) showLoadingAction(),
             ],
           ),

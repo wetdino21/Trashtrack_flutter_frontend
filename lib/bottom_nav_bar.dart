@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:trashtrack/main.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:trashtrack/user_hive_data.dart';
 

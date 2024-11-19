@@ -34,7 +34,6 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen> with SingleTickerPr
   void initState() {
     super.initState();
 
-    //_dbData();
     _fetchBookingData();
     _pageController = PageController(initialPage: selectedPage);
 
@@ -62,20 +61,6 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen> with SingleTickerPr
     _pageController.dispose();
     super.dispose();
   }
-
-  // Future<void> _dbData() async {
-  //   try {
-  //     final data = await userDataFromHive();
-  //     setState(() {
-  //       user = data['user'];
-  //     });
-  //   } catch (e) {
-  //     // setState(() {
-  //     //   errorMessage = e.toString();
-  //     //   isLoading = false;
-  //     // });
-  //   }
-  // }
 
   // Fetch booking from the server
   Future<void> _fetchBookingData() async {
@@ -171,9 +156,11 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen> with SingleTickerPr
                           });
                           //
                           if (user == 'customer') {
-                            bool? verified = await checkVerifiedCus(context);
-                            if (verified == false) {
+                            String? verified = await checkVerifiedCus(context);
+                            if (verified == 'unverified') {
                               showUnverifiedCusDialog(context);
+                            } else if (verified == 'pending') {
+                              showPendingVerifiedCusDialog(context);
                             } else {
                               String? bklimit = await checkBookingLimit(context);
                               if (bklimit == 'max') {
@@ -313,7 +300,6 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen> with SingleTickerPr
 
                         RefreshIndicator(
                           onRefresh: () async {
-                            //await _dbData();
                             await _fetchBookingData();
                           },
                           child: isLoading
@@ -334,7 +320,7 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen> with SingleTickerPr
                                                   children: [
                                                     Icon(Icons.calendar_month, color: whiteSoft, size: 70),
                                                     Text(
-                                                      'No upcoming booking\n\n\n\n',
+                                                      'No Current booking\n\n\n\n',
                                                       style: TextStyle(color: whiteSoft, fontSize: 20),
                                                     ),
                                                   ],
@@ -414,7 +400,6 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen> with SingleTickerPr
                         // History Schedule
                         RefreshIndicator(
                           onRefresh: () async {
-                            //await _dbData();
                             await _fetchBookingData();
                           },
                           child: isLoading

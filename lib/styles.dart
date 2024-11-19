@@ -644,63 +644,61 @@ Widget showLoadingIconAnimate() {
 }
 
 class Button extends StatelessWidget {
-  final Widget child; // Replace text with child
+  final Widget child; 
   final VoidCallback? onPressed;
   final Color? color;
   final Color? splashColor;
   final Color? highlightColor;
-  final BorderRadiusGeometry? borderRadius; // Customizable borderRadius
-  final List<BoxShadow>? boxShadows; // Customizable shadows
-  final EdgeInsetsGeometry? padding; // Customizable padding
-  final EdgeInsetsGeometry? margin; // Customizable margin
+  final BorderRadiusGeometry? borderRadius; 
+  final List<BoxShadow>? boxShadows;
+  final EdgeInsetsGeometry? padding; 
+  final EdgeInsetsGeometry? margin; 
 
   const Button({
     Key? key,
-    required this.child, // Accept any widget as child
+    required this.child, 
     this.onPressed,
     this.color = const Color.fromARGB(255, 97, 218, 101),
     this.splashColor = Colors.grey,
     this.highlightColor = Colors.grey,
-    this.borderRadius = const BorderRadius.all(Radius.circular(8.0)), // Default to 8.0 if not provided
-    this.boxShadows, // Accept customizable shadows
-    this.padding = const EdgeInsets.symmetric(vertical: 15), // Default padding is zero
-    this.margin = EdgeInsets.zero, // Default margin is zero
+    this.borderRadius = const BorderRadius.all(Radius.circular(8.0)), 
+    this.boxShadows, 
+    this.padding = const EdgeInsets.symmetric(vertical: 15), 
+    this.margin = EdgeInsets.zero, 
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // Ensure borderRadius is of type BorderRadius
     BorderRadius effectiveBorderRadius = borderRadius is BorderRadius
         ? borderRadius as BorderRadius
-        : BorderRadius.circular(8.0); // Default if null or not provided
+        : BorderRadius.circular(8.0); 
 
     return Container(
-      margin: margin, // Apply customizable margin
+      margin: margin, 
       child: Material(
-        color: color, // Button background color
-        borderRadius: effectiveBorderRadius, // Use the computed borderRadius
+        color: color, 
+        borderRadius: effectiveBorderRadius,
         child: InkWell(
           onTap: onPressed,
-          splashColor: splashColor?.withOpacity(0.3) ?? Colors.grey.withOpacity(0.3), // Splash effect
-          hoverColor: splashColor ?? Colors.grey, // Hover effect
-          highlightColor: highlightColor ?? Colors.grey, // Click effect
-          borderRadius: effectiveBorderRadius, // Use the computed borderRadius
+          splashColor: splashColor?.withOpacity(0.3) ?? Colors.grey.withOpacity(0.3), 
+          hoverColor: splashColor ?? Colors.grey,
+          highlightColor: highlightColor ?? Colors.grey, 
+          borderRadius: effectiveBorderRadius, 
           child: Container(
-            padding: padding ?? const EdgeInsets.symmetric(vertical: 15), // Apply customizable padding
+            padding: padding ?? const EdgeInsets.symmetric(vertical: 15), 
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              borderRadius: effectiveBorderRadius, // Apply the computed borderRadius
+              borderRadius: effectiveBorderRadius, 
               boxShadow: boxShadows ??
                   [
-                    // Use custom shadow or default
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1), // Light shadow
+                      color: Colors.black.withOpacity(0.1), 
                       blurRadius: 6,
-                      offset: Offset(2, 4), // Shadow offset
+                      offset: Offset(2, 4),
                     ),
                   ],
             ),
-            child: child, // Use child widget passed to the button
+            child: child, 
           ),
         ),
       ),

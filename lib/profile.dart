@@ -88,6 +88,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> with SingleTickerProv
   late Timer _timer;
   late int onResendCode;
   String? user;
+  bool? verificationPending;
 
   @override
   void initState() {
@@ -146,11 +147,15 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> with SingleTickerProv
   Future<void> _dbData() async {
     try {
       await storeDataInHive();
+      String? verified = await checkVerifiedCus(context);
       final data = await userDataFromHive();
       setState(() {
         user = data['user'];
         userData = data;
         _resetData();
+        if (verified == 'pending') {
+          verificationPending = true;
+        }
         firstLoading = false;
       });
     } catch (e) {
@@ -868,10 +873,9 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> with SingleTickerProv
                               },
                               child: Container()),
                           Container(
-                            //width: double.infinity,
+                            width: double.infinity,
                             margin: EdgeInsets.all(20),
-                            padding:
-                                _isEditing ? EdgeInsets.symmetric(horizontal: 100, vertical: 20) : EdgeInsets.all(20),
+                            padding: EdgeInsets.all(20),
                             decoration: BoxDecoration(
                                 color: Colors.grey[200],
                                 boxShadow: shadowBigColor,
@@ -973,22 +977,31 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> with SingleTickerProv
                                                   color: deepGreen,
                                                   fontSize: 16),
                                             )
-                                          : InkWell(
-                                              onTap: () {
-                                                Navigator.push(
-                                                    context, MaterialPageRoute(builder: (context) => VerifyCustomer()));
-                                              },
-                                              child: Text(
-                                                'Verify now?',
-                                                style: TextStyle(
-                                                    fontStyle: FontStyle.italic,
-                                                    fontWeight: FontWeight.bold,
-                                                    decoration: TextDecoration.underline,
-                                                    decorationColor: blue,
-                                                    color: blue,
-                                                    fontSize: 16),
-                                              ),
-                                            ),
+                                          : verificationPending != null && verificationPending!
+                                              ? const Text(
+                                                  'Verification in process',
+                                                  style: TextStyle(
+                                                      fontStyle: FontStyle.italic,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.orange,
+                                                      fontSize: 16),
+                                                )
+                                              : InkWell(
+                                                  onTap: () {
+                                                    Navigator.push(context,
+                                                        MaterialPageRoute(builder: (context) => VerifyCustomer()));
+                                                  },
+                                                  child: Text(
+                                                    'Verify now?',
+                                                    style: TextStyle(
+                                                        fontStyle: FontStyle.italic,
+                                                        fontWeight: FontWeight.bold,
+                                                        decoration: TextDecoration.underline,
+                                                        decorationColor: blue,
+                                                        color: blue,
+                                                        fontSize: 16),
+                                                  ),
+                                                ),
                                     ],
                                   ),
                                 if (!_isEditing)

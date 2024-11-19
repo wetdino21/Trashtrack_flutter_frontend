@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:trashtrack/API/api_postgre_service.dart';
-import 'package:trashtrack/contact_us.dart';
 import 'package:trashtrack/styles.dart';
-import 'package:flutter/gestures.dart';
-import 'package:trashtrack/terms_conditions.dart';
 
 class DeactivatedScreen extends StatelessWidget {
   const DeactivatedScreen({super.key});

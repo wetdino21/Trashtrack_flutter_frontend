@@ -3,7 +3,6 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:trashtrack/Customer/booking.dart';
 import 'package:trashtrack/Customer/verify.dart';
-import 'package:trashtrack/ZPractice.dart';
 import 'package:trashtrack/API/api_postgre_service.dart';
 import 'package:trashtrack/API/api_token.dart';
 import 'package:trashtrack/Hauler/booking_pickup_list.dart';
@@ -281,7 +280,6 @@ class _C_HomeScreenState extends State<C_HomeScreen> with SingleTickerProviderSt
                                   Center(
                                     child: Container(
                                       padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 30.0),
-                                     
                                       child: Button(
                                         color: deepPurple,
                                         boxShadows: shadowMidColor,
@@ -291,9 +289,11 @@ class _C_HomeScreenState extends State<C_HomeScreen> with SingleTickerProviderSt
                                           });
                                           //
                                           if (user == 'customer') {
-                                            bool? verified = await checkVerifiedCus(context);
-                                            if (verified == false) {
+                                            String? verified = await checkVerifiedCus(context);
+                                            if (verified == 'unverified') {
                                               showUnverifiedCusDialog(context);
+                                            } else if (verified == 'pending') {
+                                              showPendingVerifiedCusDialog(context);
                                             } else {
                                               String? bklimit = await checkBookingLimit(context);
                                               if (bklimit == 'max') {
@@ -464,7 +464,8 @@ void showUnverifiedCusDialog(BuildContext context) {
     builder: (BuildContext context) {
       return AlertDialog(
         backgroundColor: white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(15.0)), side: BorderSide(color: red, width: 0.5)),
         icon: Icon(Icons.gpp_bad, size: 50),
         iconColor: red,
         title: Text('Unverified Account', style: TextStyle(color: redSoft)),
@@ -484,13 +485,40 @@ void showUnverifiedCusDialog(BuildContext context) {
   );
 }
 
+void showPendingVerifiedCusDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: white,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(15.0)), side: BorderSide(color: red, width: 0.5)),
+        icon: Icon(Icons.gpp_bad, size: 50),
+        iconColor: red,
+        title: Text('Verification Process', style: TextStyle(color: redSoft)),
+        content: Text('You account verification was still in pending, please wait until it is done. \n\nThank You.',
+            style: TextStyle(color: blackSoft)),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text('Okay', style: TextStyle(color: deepGreen, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      );
+    },
+  );
+}
+
 void showBookLimitDialog(BuildContext context) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
         backgroundColor: white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(15.0)), side: BorderSide(color: red, width: 0.5)),
         icon: Icon(Icons.report, size: 50),
         iconColor: red,
         title: Text('Unable to request pickup', style: TextStyle(color: redSoft)),
@@ -500,7 +528,7 @@ void showBookLimitDialog(BuildContext context) {
             onPressed: () {
               Navigator.of(context).pop();
             },
-            child: Text('OK', style: TextStyle(color: blackSoft, fontWeight: FontWeight.bold)),
+            child: Text('Okay', style: TextStyle(color: blackSoft, fontWeight: FontWeight.bold)),
           ),
         ],
       );
@@ -514,7 +542,8 @@ void showUnpaidBillDialog(BuildContext context) {
     builder: (BuildContext context) {
       return AlertDialog(
         backgroundColor: white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(15.0)), side: BorderSide(color: red, width: 0.5)),
         icon: Icon(Icons.waving_hand, size: 50),
         iconColor: red,
         title: Text('Unable to request pickup', style: TextStyle(color: redSoft)),

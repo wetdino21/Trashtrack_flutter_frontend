@@ -1,25 +1,17 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:trashtrack/API/api_network.dart';
 
 import 'package:trashtrack/data_model.dart';
 import 'package:trashtrack/styles.dart';
-import 'dart:typed_data'; // for Uint8List
+import 'dart:typed_data'; 
 import 'package:trashtrack/user_hive_data.dart';
-// import 'package:trashtrack/websocket.dart';
-
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'dart:convert';
-
-//String baseUrl = globalUrl();
-//String? baseUrl = globalUrl().getBaseUrl();
 
 class C_CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final String title;
 
-  //C_CustomAppBar({required this.title});
   C_CustomAppBar({required this.title, Key? key}) : super(key: key);
 
   @override
@@ -30,19 +22,14 @@ class C_CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class C_CustomAppBarState extends State<C_CustomAppBar> {
-  final AudioService _audioService = AudioService(); //from modal
+  final AudioService _audioService = AudioService(); 
   String user = 'customer';
   Uint8List? imageBytes;
   UserModel? userModel;
   int totalNotif = 0;
   WebSocketChannel? channel;
 
-  //live notif
-  //late NotificationService notificationService;
-  List<String> notifications = []; // List to hold received notifications
-  // WebSocketChannel channel = WebSocketChannel.connect(
-  //   Uri.parse('ws://192.168.254.187:8080'),
-  // );
+  List<String> notifications = []; 
 
   @override
   void initState() {
@@ -54,13 +41,12 @@ class C_CustomAppBarState extends State<C_CustomAppBar> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    userModel = Provider.of<UserModel>(context); // Access provider here
+    userModel = Provider.of<UserModel>(context); 
 
     if (userModel!.notifCount != null) {
       totalNotif = userModel!.notifCount!;
     }
 
-    // connectWebSocket();
   }
 
   @override
@@ -77,7 +63,6 @@ class C_CustomAppBarState extends State<C_CustomAppBar> {
 
   Future<void> connectWebSocket() async {
     String baseUrl = globalUrl();
-    //String? baseUrl = globalUrl().getBaseUrl();
 
     String ipAddress = extractIpAddress(baseUrl);
     //192.168.254.187
@@ -91,12 +76,9 @@ class C_CustomAppBarState extends State<C_CustomAppBar> {
       });
 
       if (data['user'] == 'customer') {
-        //if customer then notif
-
         if (data['id'] != null) {
           channel = WebSocketChannel.connect(
             Uri.parse('ws://${ipAddress}:8080?userId=${data['id'].toString()}'),
-            //Uri.parse('ws://192.168.254.187:8080?userId=${data['id'].toString()}'),
           );
           channel!.stream.listen((message) {
             final notification = json.decode(message);
@@ -126,23 +108,6 @@ class C_CustomAppBarState extends State<C_CustomAppBar> {
     setState(() {
       imageBytes = data['profile'];
     });
-
-    // final box = await Hive.openBox('mybox');
-    // if (box.get('notif_count') == null) {
-    //   //showErrorSnackBar(context, '1111111111 ');
-    // } else {
-    //   setState(() {
-    //     totalNotif = box.get('notif_count');
-    //   });
-    // }
-    // final box = await Hive.openBox('mybox');
-    // if (box.get('notif_count') == null) {
-    //   showErrorSnackBar(context, '1111111111 ');
-    // } else {
-    //   setState(() {
-    //     totalNotif = box.get('notif_count');
-    //   });
-    // }
   }
 
   @override
@@ -165,14 +130,6 @@ class C_CustomAppBarState extends State<C_CustomAppBar> {
             message: 'Notification',
             child: Stack(
               children: [
-                // ListView.builder(
-                //   itemCount: notifications.length,
-                //   itemBuilder: (context, index) {
-                //     return ListTile(
-                //       title: Text(notifications[index]),
-                //     );
-                //   },
-                // ),
                 InkWell(
                   onTap: () {
                     Navigator.pushNamed(context, 'c_notification');

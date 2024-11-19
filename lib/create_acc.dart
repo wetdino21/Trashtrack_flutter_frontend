@@ -5,7 +5,6 @@ import 'package:trashtrack/API/api_email_service.dart';
 import 'package:flutter/services.dart';
 import 'package:trashtrack/API/api_address.dart';
 import 'dart:async';
-import 'package:trashtrack/home.dart';
 
 //google
 import 'package:trashtrack/API/api_google.dart';

@@ -1,18 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:trashtrack/data_model.dart';
-import 'package:trashtrack/login.dart';
 import 'package:trashtrack/styles.dart';
-import 'dart:async';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:trashtrack/API/api_email_service.dart';
 import 'package:trashtrack/API/api_postgre_service.dart';
-import 'package:trashtrack/login.dart';
-import 'package:trashtrack/styles.dart';
 
 // Reset Password Screen
 class ChangePassword extends StatefulWidget {

@@ -499,7 +499,7 @@ Future<String?> checkUnpaidBIll(BuildContext context) async {
 }
 
 // check verified customer
-Future<bool?> checkVerifiedCus(BuildContext context) async {
+Future<String?> checkVerifiedCus(BuildContext context) async {
   Map<String, String?> tokens = await getTokens();
   String? accessToken = tokens['access_token'];
   if (accessToken == null) {
@@ -516,9 +516,11 @@ Future<bool?> checkVerifiedCus(BuildContext context) async {
     );
 
     if (response.statusCode == 200) {
-      return true;
+      return 'verified';
+    } else if (response.statusCode == 201) {
+      return 'pending';
     } else if (response.statusCode == 429) {
-      return false;
+      return 'unverified';
     } else {
       if (response.statusCode == 401) {
         // Access token might be expired, attempt to refresh it
@@ -883,8 +885,6 @@ Future<Map<String, List<Map<String, dynamic>>>?> fetchCusBooking(BuildContext co
   );
 
   if (response.statusCode == 200) {
-    //print(response.body);
-    //return List<Map<String, dynamic>>.from(jsonDecode(response.body));
     Map<String, dynamic> data = jsonDecode(response.body);
 
     // Extract 'booking' and 'wasteTypes' from the response
@@ -893,24 +893,12 @@ Future<Map<String, List<Map<String, dynamic>>>?> fetchCusBooking(BuildContext co
     List<Map<String, dynamic>> bookingList2 = List<Map<String, dynamic>>.from(data['booking2']);
     List<Map<String, dynamic>> wasteTypeList2 = List<Map<String, dynamic>>.from(data['wasteTypes2']);
 
-    // Optionally: Combine them if needed or pass them individually
     return {
       'booking': bookingList,
       'wasteTypes': wasteTypeList,
       'booking2': bookingList2,
       'wasteTypes2': wasteTypeList2
     };
-    /////////
-    // //print(response.body);
-    // //return List<Map<String, dynamic>>.from(jsonDecode(response.body));
-    // Map<String, dynamic> data = jsonDecode(response.body);
-
-    // // Extract 'booking' and 'wasteTypes' from the response
-    // List<Map<String, dynamic>> bookingList = List<Map<String, dynamic>>.from(data['booking']);
-    // List<Map<String, dynamic>> wasteTypeList = List<Map<String, dynamic>>.from(data['wasteTypes']);
-
-    // // Optionally: Combine them if needed or pass them individually
-    // return {'booking': bookingList, 'wasteTypes': wasteTypeList};
   } else {
     if (response.statusCode == 401) {
       // Access token might be expired, attempt to refresh it
@@ -1180,6 +1168,55 @@ Future<String?> bookingReturn(BuildContext context, int bookId) async {
     return response.body;
   } catch (e) {
     print(e.toString());
+  }
+  return null;
+}
+
+//upload slip
+Future<String?> uploadScaleSlip(Uint8List? photoScaleSlip, int? bookID) async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+  if (accessToken == null) {
+    console('No access token available. User needs to log in.');
+    await deleteTokens(); // Logout user
+    return null;
+  }
+
+  try {
+    final response = await http.post(
+      Uri.parse('$baseUrl/upload_scale_slip'), // Update endpoint
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'photoSlip': photoScaleSlip != null ? base64Encode(photoScaleSlip) : null,
+        'bookingId': bookID,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return 'success';
+    } else {
+      if (response.statusCode == 401) {
+        // Access token might be expired, attempt to refresh it
+        console('Access token expired. Attempting to refresh...');
+        String? refreshMsg = await refreshAccessToken();
+        if (refreshMsg == null) {
+          return await uploadScaleSlip(photoScaleSlip, bookID);
+        }
+      } else if (response.statusCode == 403) {
+        // Access token is invalid. Logout
+        console('Access token invalid. Attempting to logout...');
+        await deleteTokens(); // Logout user
+      } else {
+        console('Error updating user: ${response.body}');
+      }
+    }
+    console('upload scale slip is not successful!');
+    return response.body;
+  } catch (e) {
+    console('Exception occurred: ${e.toString()}');
   }
   return null;
 }

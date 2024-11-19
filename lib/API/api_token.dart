@@ -300,7 +300,8 @@ void showExpiredSessionDialog(BuildContext context) {
     builder: (BuildContext context) {
       return AlertDialog(
         backgroundColor: white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(15.0)), side: BorderSide(color: red, width: 0.5)),
         icon: Icon(Icons.timer_off_outlined, size: 50),
         iconColor: red,
         title: Text('Session Expired', style: TextStyle(color: redSoft)),

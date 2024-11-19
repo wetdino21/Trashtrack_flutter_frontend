@@ -1,6 +1,5 @@
 import 'package:hive/hive.dart';
 import 'dart:typed_data';
-import 'package:flutter/material.dart';
 import 'package:trashtrack/Customer/api_cus_data.dart'; // For imageBytes if applicable
 import 'dart:convert';
 import 'package:trashtrack/styles.dart';

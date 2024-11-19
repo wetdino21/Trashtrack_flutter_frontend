@@ -61,7 +61,9 @@ class _C_ScheduleCardListState extends State<C_ScheduleCardList> {
       setState(() {
         user = data['user'];
       });
-    } catch (e) {}
+    } catch (e) {
+      console(e);
+    }
   }
 
   @override
@@ -69,7 +71,12 @@ class _C_ScheduleCardListState extends State<C_ScheduleCardList> {
     return Button(
       onPressed: () {
         if (user == 'customer') {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => BookingDetails(bookId: widget.bookId)));
+          Navigator.push(context, MaterialPageRoute(builder: (context) => BookingDetails(bookId: widget.bookId)))
+              .then((onValue) {
+            if (onValue == true) {
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainApp(selectedIndex: 2)));
+            }
+          });
         } else if (user == 'hauler') {
           if (widget.today != null) {
             Navigator.push(
@@ -752,8 +759,8 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
     );
 
     if (!_isEditing) {
-      //Navigator.of(context).pop();
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainApp(selectedIndex: 2)));
+      Navigator.of(context).pop(true);
+      //Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainApp(selectedIndex: 2)));
     } else if (_fullnameController.text == (bookingData!['bk_fullname']) &&
         _contactController.text == bookingData!['bk_contact'].substring(1) &&
         _selectedProvinceName == bookingData!['bk_province'] &&

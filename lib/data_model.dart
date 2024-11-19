@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'dart:typed_data';
-import 'package:flutter_cube/flutter_cube.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 class UserModel extends ChangeNotifier {

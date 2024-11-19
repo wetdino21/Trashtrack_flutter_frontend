@@ -5,7 +5,6 @@ import 'package:trashtrack/Customer/payment.dart';
 import 'package:trashtrack/schedule_list.dart';
 import 'package:trashtrack/API/api_postgre_service.dart';
 import 'package:trashtrack/data_model.dart';
-import 'package:trashtrack/mainApp.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:intl/intl.dart';
 
@@ -63,13 +62,13 @@ class _C_NotificationScreenState extends State<C_NotificationScreen> with Single
       isLoading = true;
     });
     try {
-      final data = await fetchCusNotifications();
+      final notifData = await fetchCusNotifications();
       if (!mounted) {
         return;
       }
-      if (data != null) {
+      if (notifData != null) {
         setState(() {
-          notifications = data;
+          notifications = notifData;
           isLoading = false;
         });
       } else {

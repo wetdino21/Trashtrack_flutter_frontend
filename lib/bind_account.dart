@@ -18,9 +18,6 @@ class BindWithGoogleScreen extends StatefulWidget {
 }
 
 class _BindWithGoogleScreenState extends State<BindWithGoogleScreen> {
-  bool _isObscured = true;
-  bool _isObscured2 = true;
-  final _formKey = GlobalKey<FormState>();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
@@ -35,7 +32,7 @@ class _BindWithGoogleScreenState extends State<BindWithGoogleScreen> {
   bool isGoogle = false;
   GoogleAccountDetails? _accountDetails;
 
-  bool _isGmailAccount = false;
+  //bool _isGmailAccount = false;
   UserModel? userModel;
 
   @override

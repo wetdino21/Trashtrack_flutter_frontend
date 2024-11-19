@@ -5,7 +5,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:trashtrack/API/api_postgre_service.dart';
-import 'package:trashtrack/mainApp.dart';
 import 'dart:io';
 import 'package:trashtrack/styles.dart';
 import 'package:image/image.dart' as img;
@@ -163,7 +162,7 @@ class _VerifyCustomerState extends State<VerifyCustomer> {
         SizedBox(height: 20),
         Center(
           child: Text(
-            'Change Profile Picture',
+            'Upload New Image',
             style: TextStyle(
               fontSize: 20,
               color: Colors.black,

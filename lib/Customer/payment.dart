@@ -97,16 +97,16 @@ class _C_PaymentScreenState extends State<C_PaymentScreen> with SingleTickerProv
       isLoading = true;
     });
     try {
-      final data = await fetchBill();
-      final data2 = await fetchPayment();
+      final billData = await fetchBill();
+      final paymentData = await fetchPayment();
       if (!mounted) {
         return;
       }
-      if (data != null) {
+      if (billData != null) {
         setState(() {
-          billList = data;
-          if (data2 != null) {
-            paymentList = data2;
+          billList = billData;
+          if (paymentData != null) {
+            paymentList = paymentData;
           }
 
           isLoading = false;
@@ -146,7 +146,6 @@ class _C_PaymentScreenState extends State<C_PaymentScreen> with SingleTickerProv
                         boxShadow: shadowTopColor,
                         borderRadius: BorderRadius.only(topRight: Radius.circular(15))),
                     height: MediaQuery.of(context).size.height * .75,
-                    //height: MediaQuery.of(context).size.height - kBottomNavigationBarHeight,
                     margin: EdgeInsets.symmetric(horizontal: 10),
                     child: PageView(
                       controller: _pageController,
@@ -671,16 +670,16 @@ class _PaymentDetailsState extends State<PaymentDetails> with SingleTickerProvid
       isBillLoading = true;
     });
     try {
-      final data = await fetchBillDetails(widget.gb_id);
-      final data2 = await fetchPaymentDetails(widget.gb_id);
+      final billData = await fetchBillDetails(widget.gb_id);
+      final paymentData = await fetchPaymentDetails(widget.gb_id);
       if (!mounted) {
         return;
       }
-      if (data != null) {
+      if (billData != null) {
         //data2 can be null
         setState(() {
-          billDetails = data;
-          paymentDetails = data2;
+          billDetails = billData;
+          paymentDetails = paymentData;
           //console(billDetails);
           //
           DateTime dbIssuedDate = DateTime.parse(billDetails!['gb_date_issued'] ?? '').toLocal();
@@ -1085,29 +1084,8 @@ class _PaymentDetailsState extends State<PaymentDetails> with SingleTickerProvid
                                                         });
 
                                                         await launchPaymentLinkSession(
-                                                          billDetails!['gb_id'],
-                                                        );
-                                                        // String? sessionId =
-                                                        //     await launchPaymentLinkSession(
-                                                        //   billDetails!['gb_id'],
-                                                        // );
-                                                        // //
-                                                        // if (sessionId != null) {
-                                                        //   Navigator.push(
-                                                        //       context,
-                                                        //       MaterialPageRoute(
-                                                        //           builder: (context) =>
-                                                        //               PaymentBacktoApp(
-                                                        //                   gb_id: widget
-                                                        //                       .gb_id))).then(
-                                                        //       (value) {
-                                                        //     if (value == true) {
-                                                        //       _fetchBillDataDetails();
-                                                        //     }
-                                                        //   });
-
-                                                        // }
-
+                                                            billDetails!['gb_id'], billDetails!['bk_id']);
+                                                       
                                                         Timer(Duration(seconds: 2), () {
                                                           setState(() {
                                                             isLoading = false;
@@ -1424,204 +1402,3 @@ void showDownloadDialog(BuildContext context) {
     },
   );
 }
-
-
-
-// class PaymentBacktoApp extends StatefulWidget {
-//   final int gb_id;
-//   const PaymentBacktoApp({super.key, required this.gb_id});
-
-//   @override
-//   State<PaymentBacktoApp> createState() => _PaymentBacktoAppState();
-// }
-
-// class _PaymentBacktoAppState extends State<PaymentBacktoApp>
-//     with WidgetsBindingObserver {
-//   @override
-//   void initState() {
-//     super.initState();
-//     WidgetsBinding.instance.addObserver(this);
-//     // _dbData();
-//   }
-
-//   @override
-//   void dispose() {
-//     print('disposeeee payment');
-//     WidgetsBinding.instance.removeObserver(this);
-//     super.dispose();
-//   }
-
-//   @override
-//   void didChangeAppLifecycleState(AppLifecycleState state) {
-//     super.didChangeAppLifecycleState(state);
-
-//     if (state == AppLifecycleState.resumed) {
-//       console('message1111111111111111111111111111111');
-//     } else {
-//       console('message222222222222222222222222222222222222');
-//     }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: deepGreen,
-//       appBar: AppBar(
-//         backgroundColor: deepGreen,
-//         foregroundColor: Colors.white,
-//         // leading: SizedBox(width: 0),
-//         // leadingWidth: 0,
-//       ),
-//       body: SingleChildScrollView(
-//         padding: EdgeInsets.all(16.0),
-//         child: Column(
-//           children: [
-//             PopScope(
-//                 canPop: false,
-//                 onPopInvokedWithResult: (didPop, result) async {
-//                   if (didPop) {
-//                     return;
-//                   }
-//                   Navigator.pop(context, true);
-//                   // Navigator.push(
-//                   //     context,
-//                   //     MaterialPageRoute(
-//                   //         builder: (context) =>
-//                   //             C_PaymentHistoryDetails(gb_id: widget.gb_id)));
-//                 },
-//                 child: Container()),
-//             Container(
-//               padding: EdgeInsets.all(16.0),
-//               decoration: BoxDecoration(
-//                 color: Colors.white,
-//                 borderRadius: BorderRadius.circular(10),
-//               ),
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   InkWell(
-//                     onTap: () {
-//                       Navigator.pop(context, true);
-//                     },
-//                     child: Container(
-//                       padding: EdgeInsets.all(10.0),
-//                       decoration: BoxDecoration(
-//                         color: Colors.white,
-//                         borderRadius: BorderRadius.circular(10),
-//                       ),
-//                       child: Column(
-//                         crossAxisAlignment: CrossAxisAlignment.center,
-//                         children: [
-//                           Center(
-//                             child: Text(
-//                               'Go Back to App',
-//                               style:
-//                                   TextStyle(color: Colors.grey, fontSize: 16.0),
-//                             ),
-//                           ),
-//                           Center(
-//                             child: Text(
-//                               'Okay',
-//                               style:
-//                                   TextStyle(color: Colors.grey, fontSize: 16.0),
-//                             ),
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//                   )
-//                 ],
-//               ),
-//             ),
-//             SizedBox(
-//               height: 20,
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-// Future<void> _downloadPdf(BuildContext context, int bill_Id) async {
-//   String baseUrl = globalUrl();
-//   try {
-//     // Check permission
-//     var status = await Permission.storage.status;
-//     if (!status.isGranted) {
-//       await Permission.storage.request();
-//     }
-
-//     var dio = Dio();
-
-//     Directory? downloadsDirectory =
-//         Directory('/storage/emulated/0/Download/trash');
-
-//     // Check if the directory exists
-//     if (!await downloadsDirectory.exists()) {
-//       downloadsDirectory = await getExternalStorageDirectory();
-//     }
-
-//     String formattedDate =
-//         DateFormat('MMMM dd, yyyy HH-mm-ss').format(DateTime.now());
-//     String savePath =
-//         "${downloadsDirectory!.path}/TrashTrack_Bill ($formattedDate).pdf";
-
-//     Map<String, String?> tokens = await getTokens();
-//     String? accessToken = tokens['access_token'];
-
-//     if (accessToken == null) {
-//       print('No access token available. User needs to log in.');
-//       await deleteTokens();
-//       return;
-//     }
-
-//     // Send a POST request to download the PDF file
-//     Response response = await dio.post(
-//       '$baseUrl/generate-pdf',
-//       options: Options(
-//         responseType: ResponseType.bytes, // Ensure you're getting bytes
-//         headers: {
-//           'Authorization': 'Bearer $accessToken',
-//           'Content-Type': 'application/json',
-//         },
-//       ),
-//       data: {
-//         'billId': bill_Id, // Ensure you pass the correct billId
-//       },
-//     );
-
-//     if (response.statusCode == 200) {
-//       showDownloadDialog(context);
-//       // Save the PDF bytes to the file
-//       await File(savePath).writeAsBytes(response.data);
-//       OpenFile.open(savePath);
-//       print(savePath);
-//     } else {
-//       // Handle specific HTTP response codes
-//       if (response.statusCode == 401) {
-//         // Access token might be expired, attempt to refresh it
-//         print('Access token expired. Attempting to refresh...');
-//         String? refreshMsg = await refreshAccessToken();
-//         if (refreshMsg == null) {
-//           return await _downloadPdf(context, bill_Id);
-//         } else {
-//           await deleteTokens(); // Logout user
-//           return;
-//         }
-//       } else if (response.statusCode == 403) {
-//         // Access token is invalid. Logout
-//         print('Access token invalid. Attempting to logout...');
-//         await deleteTokens(); // Logout user
-//       } else if (response.statusCode == 404) {
-//         showErrorSnackBar(context, 'PDF not found');
-//         return;
-//       }
-
-//       showErrorSnackBar(context, 'Try again Later.');
-//     }
-//   } catch (e) {
-//     print(e.toString());
-//     showErrorSnackBar(context, 'Try again Later.');
-//   }
-// }

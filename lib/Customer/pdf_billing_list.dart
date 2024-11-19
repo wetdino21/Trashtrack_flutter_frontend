@@ -1,10 +1,8 @@
-import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:trashtrack/Customer/api_cus_data.dart';
 import 'package:trashtrack/Customer/payment.dart';
 import 'package:trashtrack/API/api_postgre_service.dart';
 import 'package:trashtrack/data_model.dart';
@@ -73,16 +71,16 @@ class _BillingListState extends State<BillingList> with SingleTickerProviderStat
       isLoading = true;
     });
     try {
-      final data = await fetchAllPdfBills(widget.billId);
+      final pdfBilldata = await fetchAllPdfBills(widget.billId);
       //final data = await fetchPdf(widget.billId);
 
       if (!mounted) {
         return;
       }
-      if (data != null) {
+      if (pdfBilldata != null) {
         setState(() {
           //pdf = data;
-          pdfBills = data;
+          pdfBills = pdfBilldata;
           isLoading = false;
         });
       } else {

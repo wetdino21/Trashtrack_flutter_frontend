@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:trashtrack/contact_us.dart';
 import 'package:trashtrack/home.dart';
 import 'package:trashtrack/profile.dart';
 import 'package:trashtrack/settings.dart';
@@ -204,6 +205,19 @@ class _C_DrawerState extends State<C_Drawer> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => PrivacyPolicy()),
+                      );
+                    },
+                  ),
+                  // Contact Us
+                  ListTile(
+                    leading: _buildIcon(Icons.contacts),
+                    title: Text('Contact Us'),
+                    selectedColor: Colors.green,
+                    tileColor: selectedIndexs == 5 ? Colors.black12 : null,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ContactUsScreen()),
                       );
                     },
                   ),

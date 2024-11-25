@@ -15,7 +15,7 @@ import 'package:flutter/services.dart';
 import 'package:trashtrack/map.dart';
 import 'package:trashtrack/API/api_address.dart';
 import 'package:trashtrack/mainApp.dart';
-import 'package:trashtrack/Customer/api_cus_data.dart';
+import 'package:trashtrack/API/api_user_data.dart';
 import 'dart:async';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -2303,6 +2303,7 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
                   top: AppBar().preferredSize.height - 50,
                   right: 10,
                   child: Container(
+                    width: MediaQuery.of(context).size.width * 0.5,
                     decoration: BoxDecoration(
                       color: white,
                       borderRadius: BorderRadius.circular(10),
@@ -2337,8 +2338,8 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
                                 }
                               });
                             },
-                            child: Padding(
-                              padding: EdgeInsets.all(20),
+                            child: Container(
+                              padding: EdgeInsets.all(10),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
@@ -2364,7 +2365,7 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
                               });
                             },
                             child: Padding(
-                              padding: EdgeInsets.all(20),
+                              padding: EdgeInsets.all(10),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [

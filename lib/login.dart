@@ -213,7 +213,7 @@ class _LoginPageState extends State<LoginPage> {
                                       if (dbMessage == 'success') {
                                         Navigator.pushReplacementNamed(context, '/mainApp');
                                       } else if (dbMessage == '202') {
-                                        Navigator.pushNamed(context, 'deactivated');
+                                        Navigator.pushNamed(context, '/deactivated');
                                       } else if (dbMessage == '203') {
                                         Navigator.pushNamed(context, 'suspended');
                                       } else {

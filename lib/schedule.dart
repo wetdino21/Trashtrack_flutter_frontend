@@ -6,6 +6,7 @@ import 'package:trashtrack/API/api_postgre_service.dart';
 import 'package:trashtrack/Hauler/booking_pickup_list.dart';
 import 'package:trashtrack/home.dart';
 import 'package:trashtrack/styles.dart';
+import 'package:trashtrack/suspended.dart';
 import 'package:trashtrack/user_hive_data.dart';
 
 class C_ScheduleScreen extends StatefulWidget {
@@ -156,24 +157,43 @@ class _C_ScheduleScreenState extends State<C_ScheduleScreen> with SingleTickerPr
                           });
                           //
                           if (user == 'customer') {
-                            String? verified = await checkVerifiedCus(context);
-                            if (verified == 'unverified') {
-                              showUnverifiedCusDialog(context);
-                            } else if (verified == 'pending') {
-                              showPendingVerifiedCusDialog(context);
-                            } else {
-                              String? bklimit = await checkBookingLimit(context);
-                              if (bklimit == 'max') {
-                                showBookLimitDialog(context);
-                              } else if (bklimit == 'disabled') {
-                                showErrorSnackBar(context, 'We are not accepting booking right now!');
-                              } else if (bklimit == 'no limit') {
-                                showErrorSnackBar(context, 'No booking limit found');
-                              } else if (bklimit == 'success') {
+                            if (!mounted) return;
+                            String? bklimit = await checkBookingLimit(context);
+                            if (!mounted) return;
+                            if (bklimit == 'suspended') {
+                              if (!mounted) return;
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => SuspendedScreen(),
+                                ),
+                              );
+                            } else if (bklimit == 'max') {
+                              if (!mounted) return;
+                              showBookLimitDialog(context);
+                            } else if (bklimit == 'disabled') {
+                              if (!mounted) return;
+                              showErrorSnackBar(context, 'We are not accepting booking right now!');
+                            } else if (bklimit == 'no limit') {
+                              if (!mounted) return;
+                              showErrorSnackBar(context, 'No booking limit found');
+                            } else if (bklimit == 'success') {
+                              if (!mounted) return;
+                              String? verified = await checkVerifiedCus(context);
+                              if (verified == 'unverified') {
+                                if (!mounted) return;
+                                showUnverifiedCusDialog(context, verified!);
+                              } else if (verified == 'pending') {
+                                if (!mounted) return;
+                                showPendingVerifiedCusDialog(context);
+                              } else if (verified == 'verified') {
+                                if (!mounted) return;
                                 String? isUnpaidBIll = await checkUnpaidBIll(context);
                                 if (isUnpaidBIll == 'Unpaid') {
+                                  if (!mounted) return;
                                   showUnpaidBillDialog(context);
                                 } else if (isUnpaidBIll == 'success') {
+                                  if (!mounted) return;
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(

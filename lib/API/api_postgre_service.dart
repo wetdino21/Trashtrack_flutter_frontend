@@ -113,22 +113,6 @@ Future<String?> emailCheckforgotpass(String email) async {
   }
 }
 
-// //FETCH USER DATA
-// Future<Map<String, dynamic>?> fetchUserData(String email) async {
-//   final response = await http.post(
-//     Uri.parse('$baseUrl/fetch_user_data'),
-//     headers: {'Content-Type': 'application/json'},
-//     body: jsonEncode({'email': email}),
-//   );
-
-//   if (response.statusCode == 200) {
-//     return jsonDecode(response.body);
-//   } else {
-//     print('Failed to fetch user data: ${response.body}');
-//     return null;
-//   }
-// }
-
 Future<String?> createCustomer(BuildContext context, String email, String password, String fname, String mname,
     String lname, String contact, String? province, String? city, String? brgy, String street, String postal) async {
   final response = await http.post(
@@ -429,6 +413,8 @@ Future<String?> checkBookingLimit(BuildContext context) async {
       return 'no limit';
     } else if (response.statusCode == 409) {
       return 'disabled';
+    } else if (response.statusCode == 423) {
+      return 'suspended';
     } else {
       if (response.statusCode == 401) {
         // Access token might be expired, attempt to refresh it
@@ -519,6 +505,8 @@ Future<String?> checkVerifiedCus(BuildContext context) async {
       return 'verified';
     } else if (response.statusCode == 201) {
       return 'pending';
+    } else if (response.statusCode == 202) {
+      return 'rejected';
     } else if (response.statusCode == 429) {
       return 'unverified';
     } else {
@@ -592,6 +580,104 @@ Future<String?> submitAccountVerification(Uint8List? validID, Uint8List? selfie)
     console('Exception occurred: ${e.toString()}');
   }
   return null;
+}
+
+//submit account verification
+Future<String?> updateAccountVerification(Uint8List? validID, Uint8List? selfie) async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+  if (accessToken == null) {
+    console('No access token available. User needs to log in.');
+    await deleteTokens(); // Logout user
+    return null;
+  }
+
+  try {
+    final response = await http.post(
+      Uri.parse('$baseUrl/update_account_verification'), // Update endpoint
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'validID': validID != null ? base64Encode(validID) : null,
+        'selfie': selfie != null ? base64Encode(selfie) : null,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return 'success';
+    } else {
+      if (response.statusCode == 401) {
+        // Access token might be expired, attempt to refresh it
+        console('Access token expired. Attempting to refresh...');
+        String? refreshMsg = await refreshAccessToken();
+        if (refreshMsg == null) {
+          return await updateAccountVerification(validID, selfie);
+        }
+      } else if (response.statusCode == 403) {
+        // Access token is invalid. Logout
+        console('Access token invalid. Attempting to logout...');
+        await deleteTokens(); // Logout user
+      } else {
+        console('Error updating user: ${response.body}');
+      }
+    }
+    console('Update user is not successful!');
+    return response.body;
+  } catch (e) {
+    console('Exception occurred: ${e.toString()}');
+  }
+  return null;
+}
+
+// fetch customer verification
+Future<Map<String, dynamic>?> fetchAccVerification() async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+
+  if (accessToken == null) {
+    print('No access token available. User needs to log in.');
+    await deleteTokens();
+    return null;
+  }
+
+  try {
+    final response = await http.post(
+      Uri.parse('$baseUrl/fetch_account_verification'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      if (response.statusCode == 401) {
+        // Access token might be expired, attempt to refresh it
+        print('Access token expired. Attempting to refresh...');
+        String? refreshMsg = await refreshAccessToken();
+        if (refreshMsg == null) {
+          return await fetchAccVerification();
+        } else {
+          // Refresh token is invalid or expired, logout the user
+          await deleteTokens(); // Logout user
+          return null;
+        }
+      } else if (response.statusCode == 403) {
+        // Access token is invalid. logout
+        print('Access token invalid. Attempting to logout...');
+        await deleteTokens();
+      } else {
+        print('Response: ${response.body}');
+      }
+
+      console('${response.body} in fetching data');
+      return null;
+    }
+  } catch (e) {
+    print(e.toString());
+    return null;
+  }
 }
 
 //fetch booking limit
@@ -2484,7 +2570,7 @@ Future<List<Map<String, dynamic>>?> fetchAllPdfBills(int gb_id) async {
 //   }
 // }
 
-//fetch billing
+//fetch vehicles
 Future<List<Map<String, dynamic>>?> fetchVehicles() async {
   Map<String, String?> tokens = await getTokens();
   String? accessToken = tokens['access_token'];
@@ -2536,6 +2622,60 @@ Future<List<Map<String, dynamic>>?> fetchVehicles() async {
     }
   } catch (e) {
     print(e.toString());
+    return null;
+  }
+}
+
+//notification
+Future<String?> deleteNotification(int notif_id) async {
+  Map<String, String?> tokens = await getTokens();
+  String? accessToken = tokens['access_token'];
+
+  if (accessToken == null) {
+    print('No access token available. User needs to log in.');
+    await deleteTokens();
+    return null;
+  }
+
+  try {
+    final response = await http.post(Uri.parse('$baseUrl/delete_notification'),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'notif_id': notif_id,
+        }));
+
+    if (response.statusCode == 200) {
+      return 'success';
+    } else {
+      if (response.statusCode == 401) {
+        // Access token might be expired, attempt to refresh it
+        print('Access token expired. Attempting to refresh...');
+        String? refreshMsg = await refreshAccessToken();
+        if (refreshMsg == null) {
+          return await deleteNotification(notif_id);
+        } else {
+          // Refresh token is invalid or expired, logout the user
+          await deleteTokens(); // Logout user
+          return null;
+        }
+      } else if (response.statusCode == 403) {
+        // Access token is invalid. logout
+        print('Access token invalid. Attempting to logout...');
+        await deleteTokens(); // Logout user
+      } else if (response.statusCode == 404) {
+        print('No notification found');
+        return null;
+      }
+
+      //showErrorSnackBar(context, response.body);
+      print('Response: ${response.body}');
+      return null;
+    }
+  } catch (e) {
+    console(e.toString());
     return null;
   }
 }

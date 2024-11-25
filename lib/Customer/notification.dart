@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:trashtrack/Customer/api_cus_data.dart';
+import 'package:trashtrack/API/api_user_data.dart';
 import 'package:trashtrack/Customer/payment.dart';
 import 'package:trashtrack/schedule_list.dart';
 import 'package:trashtrack/API/api_postgre_service.dart';
@@ -20,6 +20,7 @@ class _C_NotificationScreenState extends State<C_NotificationScreen> with Single
   late Animation<Color?> _colorTween;
   late Animation<Color?> _colorTween2;
   UserModel? userModel;
+  bool loadingAction = false;
 
   @override
   void initState() {
@@ -131,40 +132,78 @@ class _C_NotificationScreenState extends State<C_NotificationScreen> with Single
                       final Color statusColor = status ? greySoft : Colors.green;
                       final Color boxColor = status ? white : deepPurple;
 
-                      return GestureDetector(
-                        onTap: () async {
-                          if (notification['notif_read'] == false) {
-                            await readNotif(notification['notif_id']);
-                            int newCount = userModel!.notifCount! - 1;
-                            userModel!.setUserData(newNotifCount: newCount);
+                      return Dismissible(
+                        key: Key(notification['notif_id'].toString()), // Use a unique key for each item
+                        direction: DismissDirection.endToStart, // Swipe to the left to show delete icon
+                        onDismissed: (direction) async {
+                          String? isdeleted = await deleteNotification(notification['notif_id']);
+                          if (isdeleted == 'success') {
+                            setState(() {
+                              notifications!.removeAt(index);
+                            });
+                            if (!mounted) return;
+                            showSuccessSnackBar(context, 'Notification deleted');
+                          } else {
+                            if (!mounted) return;
+                            showErrorSnackBar(context, 'Something went wrong please try again later.');
                           }
-
-                          DateTime dbdateIssue = DateTime.parse(notification['notif_created_at'] ?? '').toLocal();
-                          String formatdate = DateFormat('MMM dd, yyyy hh:mm a').format(dbdateIssue);
-
-                          Navigator.of(context)
-                              .push(
-                            MaterialPageRoute(
-                                builder: (context) => NotificationDetails(
-                                    bkId: notification['bk_id'],
-                                    gbId: notification['gb_id'],
-                                    isRead: notification['notif_read'],
-                                    message: notification['notif_message'],
-                                    date: formatdate)),
-                          )
-                              .then((value) {
-                            if (value == true) {
-                              _fetchNotifications();
-                            }
-                          });
                         },
-                        child: NotificationCard(
-                          notif_id: notification['notif_id'],
-                          dateTime: formatDateTime(notification['notif_created_at']),
-                          title: notification['notif_message'],
-                          status: showStatus,
-                          statusColor: statusColor,
-                          notifBoxColor: boxColor,
+
+                        background: Container(
+                          color: Colors.red, // Color when swiped
+                          alignment: Alignment.centerRight,
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.delete,
+                                color: white,
+                              ),
+                              Text(
+                                'Delete',
+                                style: TextStyle(color: white),
+                              )
+                            ],
+                          ),
+                        ),
+
+                        child: GestureDetector(
+                          onTap: () async {
+                            if (notification['notif_read'] == false) {
+                              await readNotif(notification['notif_id']);
+                              int newCount = userModel!.notifCount! - 1;
+                              userModel!.setUserData(newNotifCount: newCount);
+                            }
+
+                            DateTime dbdateIssue = DateTime.parse(notification['notif_created_at'] ?? '').toLocal();
+                            String formatdate = DateFormat('MMM dd, yyyy hh:mm a').format(dbdateIssue);
+
+                            Navigator.of(context)
+                                .push(
+                              MaterialPageRoute(
+                                  builder: (context) => NotificationDetails(
+                                      bkId: notification['bk_id'],
+                                      gbId: notification['gb_id'],
+                                      isRead: notification['notif_read'],
+                                      message: notification['notif_message'],
+                                      type: notification['notif_type'],
+                                      date: formatdate)),
+                            )
+                                .then((value) {
+                              if (value == true) {
+                                _fetchNotifications();
+                              }
+                            });
+                          },
+                          child: NotificationCard(
+                            notif_id: notification['notif_id'],
+                            dateTime: formatDateTime(notification['notif_created_at']),
+                            title: notification['notif_message'],
+                            status: showStatus,
+                            statusColor: statusColor,
+                            notifBoxColor: boxColor,
+                          ),
                         ),
                       );
                     },
@@ -232,47 +271,47 @@ class NotificationCard extends StatelessWidget {
 
 class NotificationDetails extends StatefulWidget {
   final String? message;
+  final String? type;
   final bool? isRead;
   final String? date;
   final int? bkId;
   final int? gbId;
 
-  NotificationDetails({this.message, this.isRead, this.date, this.bkId, this.gbId});
+  NotificationDetails({this.message, this.type, this.isRead, this.date, this.bkId, this.gbId});
 
   @override
   State<NotificationDetails> createState() => _NotificationDetailsState();
 }
 
 class _NotificationDetailsState extends State<NotificationDetails> {
-  String? status;
-  bool loading = false;
+  //bool loading = false;
 
-  @override
-  void initState() {
-    super.initState();
-    fetchBooking();
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   fetchBooking();
+  // }
 
-  void fetchBooking() async {
-    setState(() {
-      loading = true;
-    });
+  // void fetchBooking() async {
+  //   setState(() {
+  //     loading = true;
+  //   });
 
-    //
-    if (widget.bkId != null) {
-      String? dbStatus = await fetchBookingStatus(widget.bkId!);
-      if (dbStatus != null) {
-        setState(() {
-          status = dbStatus;
-        });
-      }
-    }
+  //   //
+  //   if (widget.bkId != null) {
+  //     String? dbStatus = await fetchBookingStatus(widget.bkId!);
+  //     if (dbStatus != null) {
+  //       setState(() {
+  //         status = dbStatus;
+  //       });
+  //     }
+  //   }
 
-    //
-    setState(() {
-      loading = false;
-    });
-  }
+  //   //
+  //   setState(() {
+  //     loading = false;
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -281,7 +320,6 @@ class _NotificationDetailsState extends State<NotificationDetails> {
         appBar: AppBar(
           backgroundColor: deepGreen,
           foregroundColor: Colors.white,
-          //title: Text(''),
         ),
         body: ListView(
           children: [
@@ -296,11 +334,6 @@ class _NotificationDetailsState extends State<NotificationDetails> {
                     return Navigator.pop(context);
                   }
                   Navigator.pop(context, true);
-                  // Navigator.pushAndRemoveUntil(
-                  //   context,
-                  //   MaterialPageRoute(builder: (context) => C_NotificationScreen()),
-                  //   ModalRoute.withName('/mainApp'), // Keeps the home route in the stack
-                  // );
                 },
                 child: Container()),
             Container(
@@ -319,15 +352,18 @@ class _NotificationDetailsState extends State<NotificationDetails> {
                     ],
                   ),
                   SizedBox(height: 5),
-                  // if (widget.bkId != null)
-                  //   ClipRRect(borderRadius: borderRadius15, child: Image.asset('assets/image/truck_arrival.jpg')),
-                  if (widget.bkId != null && status == 'Failed' && !loading)
+                  //pics
+                  if (widget.type == 'account verification')
+                    ClipRRect(
+                        borderRadius: borderRadius15, child: Image.asset('assets/image/account_verification.jpg')),
+                  if (widget.type == 'failed booking')
                     ClipRRect(borderRadius: borderRadius15, child: Image.asset('assets/image/reschedule.jpg')),
-                  if (widget.bkId != null && status != 'Failed' && !loading)
+                  if (widget.type == 'truck arrival')
                     ClipRRect(borderRadius: borderRadius15, child: Image.asset('assets/image/truck_arrival.jpg')),
-
-                  if (widget.gbId != null)
+                  if (widget.type == 'billed')
                     ClipRRect(borderRadius: borderRadius15, child: Image.asset('assets/image/bill_ready.jpg')),
+
+                  //message
                   Container(
                     padding: EdgeInsets.all(10),
                     child: Column(
@@ -339,7 +375,10 @@ class _NotificationDetailsState extends State<NotificationDetails> {
                     ),
                   ),
                   SizedBox(height: 20),
-                  if (widget.bkId != null && !loading)
+
+                  //BUTTONS
+                  //
+                  if (widget.type == 'failed booking' && widget.bkId != null)
                     InkWell(
                       onTap: () {
                         Navigator.push(
@@ -351,11 +390,28 @@ class _NotificationDetailsState extends State<NotificationDetails> {
                         padding: EdgeInsets.all(10),
                         decoration: BoxDecoration(
                             color: deepPurple, borderRadius: BorderRadius.circular(50), boxShadow: shadowLowColor),
-                        child: Text(status == 'Failed'? 'Reschedule now!':'Check booking!',
+                        child: Text('Reschedule now!',
                             style: TextStyle(color: white, fontSize: 24, fontWeight: FontWeight.bold)),
                       ),
                     ),
-                  if (widget.gbId != null)
+                  //
+                  if (widget.type == 'truck arrival' && widget.bkId != null)
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                            context, MaterialPageRoute(builder: (context) => BookingDetails(bookId: widget.bkId!)));
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        alignment: Alignment.center,
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                            color: deepPurple, borderRadius: BorderRadius.circular(50), boxShadow: shadowLowColor),
+                        child: Text('Check booking!',
+                            style: TextStyle(color: white, fontSize: 24, fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                  if (widget.type == 'billed' && widget.gbId != null)
                     InkWell(
                       onTap: () {
                         Navigator.push(

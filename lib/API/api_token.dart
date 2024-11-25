@@ -235,6 +235,10 @@ Future<String> onOpenApp(BuildContext context) async {
     );
     if (response.statusCode == 200 || response.statusCode == 201) {
       return '/mainApp';
+    } else if (response.statusCode == 202) {
+      return '/deactivated';
+    } else if (response.statusCode == 203) {
+      return '/suspended';
     } else {
       if (response.statusCode == 401) {
         print('Access token expired. Attempting to refresh...');

@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:trashtrack/API/api_email_service.dart';
 import 'package:trashtrack/API/api_postgre_service.dart';
-import 'package:trashtrack/Customer/verify.dart';
+import 'package:trashtrack/Customer/account_verification.dart';
 import 'package:trashtrack/data_model.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:flutter/services.dart';
@@ -987,9 +987,23 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> with SingleTickerProv
                                                       fontSize: 16),
                                                 )
                                               : InkWell(
-                                                  onTap: () {
-                                                    Navigator.push(context,
-                                                        MaterialPageRoute(builder: (context) => VerifyCustomer()));
+                                                  onTap: () async {
+                                                    setState(() {
+                                                      isLoading = true;
+                                                    });
+
+                                                    String? verified = await checkVerifiedCus(context);
+                                                    if (verified == 'unverified') {
+                                                      Navigator.push(context,
+                                                          MaterialPageRoute(builder: (context) => VerifyCustomer()));
+                                                    } else if (verified == 'rejected') {
+                                                      Navigator.push(context,
+                                                          MaterialPageRoute(builder: (context) => UpdateVerifyCus()));
+                                                    }
+
+                                                    setState(() {
+                                                      isLoading = false;
+                                                    });
                                                   },
                                                   child: Text(
                                                     'Verify now?',

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:trashtrack/contact_us.dart';
+import 'package:trashtrack/login.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:flutter/gestures.dart';
 import 'package:trashtrack/terms_conditions.dart';
@@ -17,6 +18,20 @@ class SuspendedScreen extends StatelessWidget {
       ),
       body: ListView(
         children: [
+          PopScope(
+              canPop: false,
+              onPopInvokedWithResult: (didPop, result) async {
+                if (didPop) {
+                  return;
+                }
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LoginPage(),
+                  ),
+                );
+              },
+              child: Container()),
           SizedBox(height: 20),
           Container(
             child: Column(
@@ -32,17 +47,15 @@ class SuspendedScreen extends StatelessWidget {
                       SizedBox(height: 20),
                       Text(
                         'Your Account is Suspended!',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 20),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: grey),
                       ),
                       Container(
-                        child: Icon(Icons.sentiment_very_dissatisfied,
-                            size: 100, color: darkRed),
+                        child: Icon(Icons.sentiment_very_dissatisfied, size: 100, color: redSoft),
                       ),
                       SizedBox(height: 30),
                       Text(
                         'We\'re sorry, but your account has been suspended. You cannot access your account at this time.',
-                        style: TextStyle(fontSize: 16),
+                        style: TextStyle(fontSize: 12),
                       ),
                       SizedBox(height: 20),
                       Column(
@@ -50,21 +63,18 @@ class SuspendedScreen extends StatelessWidget {
                         children: [
                           Text(
                             'Next Steps:',
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold),
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                           ),
                           SizedBox(height: 10),
                           Row(
-                            crossAxisAlignment: CrossAxisAlignment
-                                .start, // Aligns the icon and text properly
+                            crossAxisAlignment: CrossAxisAlignment.start, // Aligns the icon and text properly
                             children: [
                               Icon(Icons.circle, size: 8),
                               SizedBox(width: 8),
                               Expanded(
                                 child: RichText(
                                   text: TextSpan(
-                                    style: TextStyle(
-                                        fontSize: 16, color: Colors.black),
+                                    style: TextStyle(fontSize: 12, color: Colors.black),
                                     children: [
                                       TextSpan(text: 'Review our '),
                                       TextSpan(
@@ -76,10 +86,7 @@ class SuspendedScreen extends StatelessWidget {
                                         recognizer: TapGestureRecognizer()
                                           ..onTap = () {
                                             Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        TermsAndConditions()));
+                                                context, MaterialPageRoute(builder: (context) => TermsAndConditions()));
                                           },
                                       ),
                                       TextSpan(text: ' for more details.'),
@@ -91,16 +98,14 @@ class SuspendedScreen extends StatelessWidget {
                           ),
                           SizedBox(height: 10),
                           Row(
-                            crossAxisAlignment: CrossAxisAlignment
-                                .start, // Aligns the icon and text properly
+                            crossAxisAlignment: CrossAxisAlignment.start, // Aligns the icon and text properly
                             children: [
                               Icon(Icons.circle, size: 8),
                               SizedBox(width: 8),
                               Expanded(
                                 child: RichText(
                                   text: TextSpan(
-                                    style: TextStyle(
-                                        fontSize: 16, color: Colors.black),
+                                    style: TextStyle(fontSize: 12, color: Colors.black),
                                     children: [
                                       TextSpan(text: 'Contact our support team '),
                                       TextSpan(
@@ -112,10 +117,7 @@ class SuspendedScreen extends StatelessWidget {
                                         recognizer: TapGestureRecognizer()
                                           ..onTap = () {
                                             Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        ContactUsSCreen()));
+                                                context, MaterialPageRoute(builder: (context) => ContactUsScreen()));
                                           },
                                       ),
                                       TextSpan(text: ' if you believe this is an error.'),

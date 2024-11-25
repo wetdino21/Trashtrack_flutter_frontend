@@ -2,7 +2,7 @@ import 'package:hive/hive.dart';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:trashtrack/Customer/api_cus_data.dart';
+import 'package:trashtrack/API/api_user_data.dart';
 import 'dart:convert';
 import 'dart:io';
 

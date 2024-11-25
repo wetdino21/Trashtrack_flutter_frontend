@@ -20,7 +20,7 @@ Future<Map<String, dynamic>?> fetchCusData() async {
 
   try {
     final response = await http.post(
-      Uri.parse('$baseUrl/fetch_data'),
+      Uri.parse('$baseUrl/fetch_user_data'),
       headers: {
         'Authorization': 'Bearer $accessToken',
       },

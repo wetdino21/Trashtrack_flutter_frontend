@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:trashtrack/Customer/booking.dart';
-import 'package:trashtrack/Customer/verify.dart';
+import 'package:trashtrack/Customer/account_verification.dart';
 import 'package:trashtrack/API/api_postgre_service.dart';
 import 'package:trashtrack/API/api_token.dart';
 import 'package:trashtrack/Hauler/booking_pickup_list.dart';
 import 'package:trashtrack/data_model.dart';
 import 'package:trashtrack/styles.dart';
+import 'package:trashtrack/suspended.dart';
 
 import 'package:trashtrack/user_hive_data.dart';
 import 'package:flutter_cube/flutter_cube.dart';
@@ -211,57 +212,7 @@ class _C_HomeScreenState extends State<C_HomeScreen> with SingleTickerProviderSt
                                             flex: 8,
                                             child: Container(
                                               height: 200,
-                                              child:
-                                                  // Cube(
-                                                  //   onSceneCreated: (Scene scene) {
-                                                  //     _sceneCreationCompleter = Completer<void>();
-
-                                                  //     scene.world.add(_obj!);
-
-                                                  //     //await Future.delayed(Duration(milliseconds: 100));
-
-                                                  //     if (scene.world.children.contains(_obj)) {
-                                                  //       if (!mounted) return;
-                                                  //       setState(() {
-                                                  //         _isObjectLoaded = true;
-                                                  //         //load animation
-                                                  //         userModel!.setIsHome(false);
-                                                  //         print("Object fully loaded in the scene");
-                                                  //       });
-                                                  //     }
-                                                  //   },
-                                                  // )
-                                                  ///////////////////////////////////////////
-                                                  //     Cube(
-                                                  //   onSceneCreated: (Scene scene) {
-                                                  //     _sceneCreationCompleter = Completer<void>();
-
-                                                  //     // Add the object to the scene
-                                                  //     if (_obj != null) {
-                                                  //       scene.world.add(_obj!);
-
-                                                  //       // Use a delayed Future to wait for processing
-                                                  //       Future.delayed(Duration(milliseconds: 100), () {
-                                                  //         // Check if the completer has been completed
-                                                  //         if (_sceneCreationCompleter?.isCompleted ?? false) return;
-
-                                                  //         // Check if the object is still in the scene
-                                                  //         if (scene.world.children.contains(_obj)) {
-                                                  //           if (!mounted) return;
-                                                  //           setState(() {
-                                                  //             _isObjectLoaded = true; // Mark object as loaded
-                                                  //             userModel!.setIsHome(false); // Example action
-                                                  //             print("Object fully loaded in the scene");
-                                                  //           });
-                                                  //         }
-                                                  //       });
-                                                  //     } else {
-                                                  //       print("Object is not initialized yet.");
-                                                  //     }
-                                                  //   },
-                                                  // ),
-                                                  //  ///////////////////////////////////////////
-                                                  Cube(
+                                              child: Cube(
                                                 onSceneCreated: (Scene scene) {
                                                   scene.world.add(_obj!);
                                                 },
@@ -289,24 +240,43 @@ class _C_HomeScreenState extends State<C_HomeScreen> with SingleTickerProviderSt
                                           });
                                           //
                                           if (user == 'customer') {
-                                            String? verified = await checkVerifiedCus(context);
-                                            if (verified == 'unverified') {
-                                              showUnverifiedCusDialog(context);
-                                            } else if (verified == 'pending') {
-                                              showPendingVerifiedCusDialog(context);
-                                            } else {
-                                              String? bklimit = await checkBookingLimit(context);
-                                              if (bklimit == 'max') {
-                                                showBookLimitDialog(context);
-                                              } else if (bklimit == 'disabled') {
-                                                showErrorSnackBar(context, 'We are not accepting booking right now!');
-                                              } else if (bklimit == 'no limit') {
-                                                showErrorSnackBar(context, 'No booking limit found');
-                                              } else if (bklimit == 'success') {
+                                            if (!mounted) return;
+                                            String? bklimit = await checkBookingLimit(context);
+                                            if (!mounted) return;
+                                            if (bklimit == 'suspended') {
+                                              if (!mounted) return;
+                                              Navigator.pushReplacement(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => SuspendedScreen(),
+                                                ),
+                                              );
+                                            } else if (bklimit == 'max') {
+                                              if (!mounted) return;
+                                              showBookLimitDialog(context);
+                                            } else if (bklimit == 'disabled') {
+                                              if (!mounted) return;
+                                              showErrorSnackBar(context, 'We are not accepting booking right now!');
+                                            } else if (bklimit == 'no limit') {
+                                              if (!mounted) return;
+                                              showErrorSnackBar(context, 'No booking limit found');
+                                            } else if (bklimit == 'success') {
+                                              String? verified = await checkVerifiedCus(context);
+                                              if (!mounted) return;
+                                              if (verified == 'unverified' || verified == 'rejected') {
+                                                if (!mounted) return;
+                                                showUnverifiedCusDialog(context, verified!);
+                                              } else if (verified == 'pending') {
+                                                if (!mounted) return;
+                                                showPendingVerifiedCusDialog(context);
+                                              } else if (verified == 'verified') {
+                                                if (!mounted) return;
                                                 String? isUnpaidBIll = await checkUnpaidBIll(context);
                                                 if (isUnpaidBIll == 'Unpaid') {
+                                                  if (!mounted) return;
                                                   showUnpaidBillDialog(context);
                                                 } else if (isUnpaidBIll == 'success') {
+                                                  if (!mounted) return;
                                                   Navigator.push(
                                                     context,
                                                     MaterialPageRoute(
@@ -458,7 +428,7 @@ class StatisticBox extends StatelessWidget {
   }
 }
 
-void showUnverifiedCusDialog(BuildContext context) {
+void showUnverifiedCusDialog(BuildContext context, String status) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -475,7 +445,11 @@ void showUnverifiedCusDialog(BuildContext context) {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (context) => VerifyCustomer()));
+              if (status == 'rejected') {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => UpdateVerifyCus()));
+              } else {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => VerifyCustomer()));
+              }
             },
             child: Text('Verify now', style: TextStyle(color: deepGreen, fontWeight: FontWeight.bold)),
           ),

@@ -127,15 +127,15 @@ class _C_BottomNavBarState extends State<C_BottomNavBar> {
                   color: black,
                 )
               : SizedBox(height: 24),
-          Text(
-            label,
-            style: TextStyle(
-              //color: widget.currentIndex == index ? Colors.green : black,
-              color: black,
-              fontSize: 12,
-              fontWeight: FontWeight.bold
-            ),
-          )
+          if (index != widget.currentIndex)
+            Text(
+              label,
+              style: TextStyle(
+                  //color: widget.currentIndex == index ? Colors.green : black,
+                  color: black,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold),
+            )
         ],
       ),
       onPressed: () => _onItemTapped(index),

@@ -333,7 +333,7 @@ class SlidingFabLocation extends FloatingActionButtonLocation {
 
   @override
   Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry) {
-    final double fabY = scaffoldGeometry.scaffoldSize.height - scaffoldGeometry.contentTop + 10;
+    final double fabY = scaffoldGeometry.scaffoldSize.height - scaffoldGeometry.contentTop + 20;
     double width = MediaQuery.of(context).size.width;
     // double width =
     //     MediaQuery.of(context).size.width - MediaQuery.of(context).padding.left - MediaQuery.of(context).padding.right;

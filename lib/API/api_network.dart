@@ -34,6 +34,11 @@ globalUrl() {
   return 'http://192.168.254.187:3000';
 }
 
+// //emulator
+// globalUrl() {
+//   return 'http://10.0.2.2:3000';
+// }
+
 //// CTU network
 // globalUrl() {
 //   return 'http://172.16.14.83:3000';
@@ -157,147 +162,3 @@ class _DynamicNetworkState extends State<DynamicNetwork> {
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// globalUrl() async {
-//   var box = await Hive.openBox('networkBox');
-//   if (box.isNotEmpty) {
-//     if (await box.get('ipAddress') != null) {
-//       String network = await box.get('ipAddress');
-//       return 'http://${network}:3000';
-//     }
-//   } else {
-//     return null;
-//   }
-//   return null;
-//   // return 'http://192.168.254.187:3000';
-// }
-
-// //for storing network on open
-// class StoreNetwork extends StatefulWidget {
-//   @override
-//   _StoreNetworkState createState() => _StoreNetworkState();
-// }
-
-// class _StoreNetworkState extends State<StoreNetwork> {
-//   TextEditingController _networkController = TextEditingController();
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     _checkNetworkExist();
-//   }
-
-//   @override
-//   void dispose() {
-//     super.dispose();
-//     _networkController.dispose();
-//   }
-
-//   Future<void> _checkNetworkExist() async {
-//     var box = await Hive.openBox('networkBox');
-
-//     if (box.isNotEmpty) {
-//       if (await box.get('ipAddress') != null) {
-//         Navigator.push(
-//             context, MaterialPageRoute(builder: (context) => TokenCheck()));
-//       }
-//     }
-//     // else {
-//     //   // Fallback to login if something goes wrong
-//     //   Navigator.pushReplacementNamed(context, 'login');
-//     // }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: deepPurple,
-//       body: Center(
-//         child: Column(
-//           children: [
-//             Center(
-//               child: Image.asset('assets/truck.png'),
-//             ),
-//             SizedBox(height: 20),
-//             Text(
-//               'Type the PC SERVER NETWORK IP ADDRESS',
-//               style: TextStyle(fontSize: 15, color: white),
-//             ),
-//             Container(
-//               alignment: Alignment.center,
-//               margin: EdgeInsets.all(20),
-//               decoration: boxDecorationBig,
-//               child: Column(
-//                 children: [
-//                   TextField(
-//                     controller: _networkController,
-//                   ),
-//                 ],
-//               ),
-//             ),
-//             InkWell(
-//                 onTap: () async {
-//                   if (_networkController.text.isNotEmpty) {
-//                     var box = await Hive.openBox('networkBox');
-//                     await box.put('ipAddress', _networkController.text);
-
-//                     Navigator.push(context,
-//                         MaterialPageRoute(builder: (context) => TokenCheck()));
-//                   }
-//                 },
-//                 child: Container(
-//                     padding: EdgeInsets.all(10),
-//                     decoration: BoxDecoration(
-//                       borderRadius: borderRadius15,
-//                       color: deepGreen,
-//                     ),
-//                     child: Text('Set Network',
-//                         style: TextStyle(fontSize: 20, color: white)))),
-//           ],
-//         ), // Show a loading screen while checking the token
-//       ),
-//     );
-//   }
-// }

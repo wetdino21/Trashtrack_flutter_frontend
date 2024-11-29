@@ -24,15 +24,15 @@ globalAddressUrl() {
   return 'https://psgc.gitlab.io/api';
 }
 
-////my phone data
-// globalUrl() {
-//   return 'http://192.168.119.156:3000';
-// }
-
 //my pc
 globalUrl() {
   return 'http://192.168.254.187:3000';
 }
+
+////my phone data
+// globalUrl() {
+//   return 'http://192.168.119.156:3000';
+// }
 
 // //emulator
 // globalUrl() {
@@ -73,7 +73,7 @@ class NetworkglobalUrl {
   }
 }
 
-// //final url
+// //dynamic url
 //  globalUrl() {
 //   return networkURL;
 // }

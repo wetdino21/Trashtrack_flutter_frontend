@@ -26,7 +26,7 @@ class WastePricingInfo extends StatelessWidget {
               _sectionSubTitle("1.2 Type of Waste"),
               _sectionContent(
                   "The type of waste plays a significant role in determining the price. Different waste categories come with different disposal methods and processing requirements."),
-             _sectionTitle("2. Relevant Laws and Regulations"),
+              _sectionTitle("2. Relevant Laws and Regulations"),
               _sectionSubTitle("2.1 Republic Act No. 9003 (Ecological Solid Waste Management Act of 2000)"),
               _sectionContent(
                   "Republic Act No. 9003, also known as the Ecological Solid Waste Management Act of 2000, is the primary law that governs waste management in the Philippines, including Cebu. The Act mandates proper waste management practices, including segregation, recycling, and environmentally responsible disposal."),
@@ -43,6 +43,9 @@ class WastePricingInfo extends StatelessWidget {
               _sectionSubTitle("3.3 Recyclable Waste"),
               _sectionContent(
                   "Price Range: PHP 5–15 per kilogram (depending on market conditions). Recyclable materials like metals, plastics, and glass are more expensive to process and sort."),
+              _sectionSubTitle("3.4 Hazardous Waste"),
+              _sectionContent(
+                  "Price Range: PHP 20+/kg Hazardous materials need strict handling, storage, and disposal measures as regulated by the Department of Environment and Natural Resources (DENR)."),
               _sectionTitle("4. Why Waste Pricing is Important"),
               _sectionContent(
                   "The pricing for waste disposal is integral to ensuring the sustainability of waste management programs. By charging based on weight and type of waste, we encourage responsible waste generation and disposal practices."),
@@ -54,7 +57,7 @@ class WastePricingInfo extends StatelessWidget {
                   "Our pricing is based on the weight of the waste and the type of waste material, ensuring that customers are charged fairly for the waste they generate. By strictly following the guidelines of Republic Act No. 9003, we aim to create a transparent, efficient, and environmentally responsible waste management system that benefits both customers and the environment."),
               SizedBox(height: 30),
               _sectionContent(
-                  "For more detailed information, please refer to the full text of Republic Act No. 9003 and local Cebu ordinances."),
+                  "For more detailed information, please refer to the full documentation of the following: Republic Act No. 9003, local Cebu ordinances, and additional resources: \n\n- [Republic Act No. 9003](https://www.officialgazette.gov.ph/2001/01/26/republic-act-no-9003/), \n- [NSWMC Price of Recyclables](https://nswmc.emb.gov.ph/wp-content/uploads/2016/08/Price-of-Recyclables.pdf), and \n- [DENR Solid Waste Management Data](https://emb.gov.ph/solid-waste-management-data)."),
               SizedBox(height: 50),
             ],
           ),

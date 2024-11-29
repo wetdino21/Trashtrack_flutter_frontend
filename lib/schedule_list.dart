@@ -558,7 +558,7 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
   }
 
   // fetch latlong
-  Future<void> _searchLocation(String query) async {
+  Future<String?> _searchLocation(String query) async {
     final response = await http.get(
       Uri.parse('https://nominatim.openstreetmap.org/search?q=$query&format=json'),
     );
@@ -566,21 +566,49 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
     if (response.statusCode == 200) {
       setState(() {
         _locations = json.decode(response.body);
-        if (_locations.isEmpty) {
-          if (!mounted) return;
-          showErrorSnackBar(context, 'No pin location found.');
-        } else {
+      });
+
+      if (_locations.isEmpty) {
+        return 'failed';
+      } else {
+        setState(() {
           var location = _locations[0];
           selectedPoint = LatLng(double.parse(location['lat']), double.parse(location['lon']));
-          _mapController.move(selectedPoint!, 13.0);
+          _mapController.move(selectedPoint!, 13.0); // Move to current location
           _mapController.rotate(0.0);
-        }
-      });
+        });
+        return 'success';
+      }
     } else {
-      if (!mounted) return;
+      if (!mounted) return null;
       showErrorSnackBar(context, 'Unable to load pin location.');
     }
+    return 'failed';
   }
+
+  // Future<void> _searchLocation(String query) async {
+  //   final response = await http.get(
+  //     Uri.parse('https://nominatim.openstreetmap.org/search?q=$query&format=json'),
+  //   );
+
+  //   if (response.statusCode == 200) {
+  //     setState(() {
+  //       _locations = json.decode(response.body);
+  //       if (_locations.isEmpty) {
+  //         if (!mounted) return;
+  //         showErrorSnackBar(context, 'No pin location found.');
+  //       } else {
+  //         var location = _locations[0];
+  //         selectedPoint = LatLng(double.parse(location['lat']), double.parse(location['lon']));
+  //         _mapController.move(selectedPoint!, 13.0);
+  //         _mapController.rotate(0.0);
+  //       }
+  //     });
+  //   } else {
+  //     if (!mounted) return;
+  //     showErrorSnackBar(context, 'Unable to load pin location.');
+  //   }
+  // }
 
   void handleOnePoint(LatLng point) {
     setState(() {
@@ -1425,7 +1453,27 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
                                                                               //
                                                                               String loc =
                                                                                   '${_selectedProvinceName!} ${_selectedCityMunicipalityName!} ${_selectedBarangayName!}';
-                                                                              await _searchLocation(loc);
+                                                                              String? result =
+                                                                                  await _searchLocation(loc);
+                                                                              if (result != 'success') {
+                                                                                loc =
+                                                                                    '${_selectedProvinceName!} ${_selectedCityMunicipalityName!}';
+                                                                                String? result =
+                                                                                    await _searchLocation(loc);
+                                                                                if (result != 'success') {
+                                                                                  loc = _selectedProvinceName!;
+                                                                                  String? result =
+                                                                                      await _searchLocation(loc);
+                                                                                  if (result != 'success') {
+                                                                                    if (!mounted) return;
+                                                                                    showErrorSnackBar(context,
+                                                                                        'No pin location found.');
+                                                                                  }
+                                                                                }
+                                                                              }
+                                                                              // String loc =
+                                                                              //     '${_selectedProvinceName!} ${_selectedCityMunicipalityName!} ${_selectedBarangayName!}';
+                                                                              // await _searchLocation(loc);
                                                                               setState(() {
                                                                                 isLoadingLoc = false;
                                                                               });
@@ -1728,9 +1776,23 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
                                                   if (_selectedProvinceName != null &&
                                                       _selectedCityMunicipalityName != null &&
                                                       _selectedBarangayName != null) {
+                                                    //
                                                     String loc =
                                                         '${_selectedProvinceName!} ${_selectedCityMunicipalityName!} ${_selectedBarangayName!}';
-                                                    await _searchLocation(loc);
+                                                    String? result = await _searchLocation(loc);
+                                                    if (result != 'success') {
+                                                      loc =
+                                                          '${_selectedProvinceName!} ${_selectedCityMunicipalityName!}';
+                                                      String? result = await _searchLocation(loc);
+                                                      if (result != 'success') {
+                                                        loc = _selectedProvinceName!;
+                                                        String? result = await _searchLocation(loc);
+                                                        if (result != 'success') {
+                                                          if (!mounted) return;
+                                                          showErrorSnackBar(context, 'No pin location found.');
+                                                        }
+                                                      }
+                                                    }
                                                   }
                                                 }
 

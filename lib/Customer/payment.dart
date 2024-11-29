@@ -370,7 +370,7 @@ class _C_PaymentScreenState extends State<C_PaymentScreen> with SingleTickerProv
                                     itemCount: paymentList?.length ?? 0, // Simplified null check
                                     itemBuilder: (context, index) {
                                       final payment = paymentList?[index];
-
+            
                                       if (payment == null) {
                                         return SizedBox.shrink(); // Return an empty box if payment is null
                                       }

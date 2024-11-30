@@ -178,7 +178,6 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
             _bookLimit = bkLimitData;
           } else {
             console('Failed to load booking limit');
-            return;
           }
 
           //load day limit
@@ -186,7 +185,6 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
             _dayLimit = bkDayLimitData;
           } else {
             console('Failed to load day limit');
-            return;
           }
 
           // //load waste limit
@@ -219,8 +217,7 @@ class _RequestPickupScreenState extends State<RequestPickupScreen> with SingleTi
     if (bkDayLimitData != null) {
       _dayLimit = bkDayLimitData;
     } else {
-      console('Failed to load day limit');
-      return;
+      console('Failed to load day limit 1');
     }
   }
 

@@ -454,7 +454,6 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
             _bookLimit = bkLimitData;
           } else {
             console('Failed to load booking limit');
-            return;
           }
 
           //load day limit
@@ -462,7 +461,6 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
             _dayLimit = bkDayLimitData;
           } else {
             console('Failed to load day limit');
-            return;
           }
 
           isLoading = false;
@@ -491,7 +489,6 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
       _dayLimit = bkDayLimitData;
     } else {
       console('Failed to load day limit');
-      return;
     }
   }
 

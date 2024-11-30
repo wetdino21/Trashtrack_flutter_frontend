@@ -28,15 +28,6 @@ class ContactUsScreen extends StatelessWidget {
           children: [
             const SizedBox(height: 30),
             const Text(
-              'Our Company',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 10),
-            const Text(
               'TrashTrack',
               style: TextStyle(
                 fontSize: 24,
@@ -46,6 +37,24 @@ class ContactUsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 30),
             const Text(
+              'Need Help or Have Feedback?',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'If you have any issues, questions, or feedback about our services, please don’t hesitate to reach out. '
+              'We’re here to help and ensure you have the best experience with TrashTrack.',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 10),
+            const Text(
               'Contact Number',
               style: TextStyle(
                 fontSize: 20,
@@ -54,16 +63,24 @@ class ContactUsScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10),
-            const Text(
-              '0991 638 7667',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.white,
-              ),
+            Row(
+              children: [
+                Icon(
+                  Icons.phone,
+                  color: white,
+                ),
+                Text(
+                  ' 0991 638 7667',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 30),
             const Text(
-              'Email Address',
+              ' Email Address',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -71,13 +88,22 @@ class ContactUsScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10),
-            const Text(
-              'official.trashtrack@gmail.com',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.white,
-              ),
+            Row(
+              children: [
+                Icon(
+                  Icons.email,
+                  color: white,
+                ),
+                const Text(
+                  ' official.trashtrack@gmail.com',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
             ),
+            const SizedBox(height: 30),
           ],
         ),
       ),

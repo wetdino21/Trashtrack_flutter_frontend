@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:trashtrack/API/api_postgre_service.dart';
 import 'package:trashtrack/API/api_google.dart';
 import 'package:trashtrack/API/api_token.dart';
+import 'package:trashtrack/privacy_policy.dart';
 import 'package:trashtrack/styles.dart';
 
 class LoginPage extends StatefulWidget {
@@ -37,7 +38,7 @@ class _LoginPageState extends State<LoginPage> {
   void dispose() {
     _emailController.dispose();
     _passController.dispose();
-     console("disposeeee loginnnnnnnnn");
+    console("disposeeee loginnnnnnnnn");
     super.dispose();
   }
 
@@ -177,10 +178,11 @@ class _LoginPageState extends State<LoginPage> {
                                 Center(
                                   child: TextButton(
                                       onPressed: () {
-                                        Navigator.pushNamed(context, 'terms');
+                                        Navigator.push(
+                                            context, MaterialPageRoute(builder: (context) => const PrivacyPolicy()));
                                       },
                                       style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                                      child: Text('Terms and Conditions.',
+                                      child: Text('Privacy Policy.',
                                           style: TextStyle(
                                               color: Colors.green,
                                               decoration: TextDecoration.underline,

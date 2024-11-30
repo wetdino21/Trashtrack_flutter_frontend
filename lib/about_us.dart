@@ -69,7 +69,7 @@ class _C_AboutUsState extends State<C_AboutUs> {
                     children: [
                       _buildSectionTitle('Who We Are'),
                       _buildSectionContent(
-                          'We are a leading waste management solution, dedicated to providing efficient, reliable, and environmentally responsible waste collection services. Our mission is to make waste management easier for communities, businesses, and institutions by offering smart solutions to handle waste responsibly.'),
+                          'We are an emerging waste management solution, dedicated to providing efficient, reliable, and environmentally responsible waste collection services. Our mission is to make waste management easier for communities, businesses, and institutions by offering smart solutions to handle waste responsibly.'),
                       SizedBox(height: 20),
                       _buildSectionTitle('Our Vision'),
                       _buildSectionContent(

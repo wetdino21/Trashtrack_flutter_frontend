@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:trashtrack/API/api_postgre_service.dart';
+import 'package:trashtrack/privacy_policy.dart';
 import 'package:trashtrack/styles.dart';
 import 'package:trashtrack/API/api_email_service.dart';
 import 'package:flutter/services.dart';
@@ -373,7 +374,7 @@ class _CreateAccState extends State<CreateAcc> {
                               // _startTimer();
                             });
                           } else {
-                            showErrorSnackBar(context, 'You must accept the terms and conditions');
+                            showErrorSnackBar(context, 'You must accept the privacy policy');
                           }
                         }
                       }
@@ -432,7 +433,7 @@ class _CreateAccState extends State<CreateAcc> {
                             //_startTimer();
                           });
                         } else {
-                          showErrorSnackBar(context, 'You must accept the terms and conditions');
+                          showErrorSnackBar(context, 'You must accept the privacy policy');
                         }
                       }
                     }
@@ -450,7 +451,7 @@ class _CreateAccState extends State<CreateAcc> {
                     //     });
                     //   } else {
                     //     showErrorSnackBar(context,
-                    //         'You must accept the terms and conditions');
+                    //         'You must accept the privacy policy');
                     //   }
                     // }
                   }
@@ -1552,13 +1553,13 @@ class _CreateAccState extends State<CreateAcc> {
                             ),
                             TextButton(
                               onPressed: () {
-                                Navigator.pushNamed(context, 'terms');
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => const PrivacyPolicy()));
                               },
                               style: TextButton.styleFrom(
                                 padding: EdgeInsets.zero,
                               ),
                               child: Text(
-                                'terms and conditions.',
+                                'privacy policy.',
                                 style: TextStyle(
                                   color: Colors.green,
                                   decoration: TextDecoration.underline,
@@ -1633,7 +1634,7 @@ class _CreateAccState extends State<CreateAcc> {
                                         });
                                       }
                                     } else {
-                                      showErrorSnackBar(context, 'You must accept the terms and conditions');
+                                      showErrorSnackBar(context, 'You must accept the privacy policy');
                                     }
                                   }
                                 }

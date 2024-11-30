@@ -68,40 +68,35 @@ class _TermsAndConditionsState extends State<TermsAndConditions> {
                     children: [
                       _buildSectionTitle('Acceptance of Terms'),
                       _buildSectionContent(
-                          'By using our services, you agree to be bound by these terms and conditions. If you do not agree, please do not use our services.'),
+                          'By using our booking services, you agree to comply with these terms and conditions. If you do not agree, please refrain from using the service.'),
                       SizedBox(height: 20),
                       _buildSectionTitle('User Responsibilities'),
-                      _buildSectionContent('• Provide accurate and complete information during registration.\n'
-                          '• Comply with all local and federal laws regarding waste management and disposal.\n'
-                          '• Do not use our services for any unlawful or prohibited activities.'),
+                      _buildSectionContent('• Ensure all booking details provided are accurate.\n'
+                          '• Comply with local regulations regarding waste management.\n'
+                          '• Do not use the service for unlawful activities.'),
                       SizedBox(height: 20),
-                      _buildSectionTitle('Account Security'),
+                      _buildSectionTitle('Booking Policies'),
                       _buildSectionContent(
-                          'You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. Notify us immediately if you suspect any unauthorized access.'),
-                      SizedBox(height: 20),
-                      _buildSectionTitle('Service Limitations'),
-                      _buildSectionContent(
-                          'We reserve the right to modify or discontinue our services at any time without prior notice. We are not liable for any inconvenience or loss caused by such actions.'),
+                          '• Once a booking is submitted, it will be marked as pending. You may edit or cancel the booking at this stage.\n'
+                          '• Once the hauler accepts the booking and is on the way to your location, the booking can no longer be edited or canceled.\n'
+                          '• If the hauler has already accepted the booking and is on the way, cancellation will only be considered under special circumstances (such as emergencies), and a fee may apply.\n'
+                          '• A cancellation request can be made through customer support, subject to review.'),
                       SizedBox(height: 20),
                       _buildSectionTitle('Fees and Payments'),
                       _buildSectionContent(
-                          'All payments must be made in accordance with the rates provided. Failure to make timely payments may result in the suspension of your account or services.'),
-                      SizedBox(height: 20),
-                      _buildSectionTitle('Intellectual Property'),
-                      _buildSectionContent(
-                          'All content, logos, and trademarks on this platform are the property of Trashtrack. Unauthorized use of these assets is strictly prohibited.'),
+                          '• Payments are due after the waste has been weighed and the final bill has been generated. You can pay via PayMongo or cash on the spot.\n'
+                          '• Failure to make payment after the weight has been confirmed may result in the suspension of future bookings.\n'
+                          '• If you choose to pay via PayMongo, you will be redirected to the payment gateway.\n'
+                          '• Cash payments should be made directly to the hauler once the waste is weighed and the bill is issued.'),
                       SizedBox(height: 20),
                       _buildSectionTitle('Termination of Services'),
                       _buildSectionContent(
-                          'We reserve the right to terminate or suspend your account if you violate these terms. You may also choose to terminate your account at any time by contacting support.'),
+                          'We reserve the right to suspend or terminate services if these terms are violated. In cases of non-payment after waste weighing, access to further bookings may be restricted.'),
                       SizedBox(height: 20),
                       _buildSectionTitle('Changes to Terms'),
                       _buildSectionContent(
-                          'We may update these terms from time to time. Continued use of our services following such changes signifies your acceptance of the new terms.'),
+                          'We may update these terms from time to time. Continued use of our booking services following such changes signifies your acceptance of the revised terms.'),
                       SizedBox(height: 20),
-                      _buildSectionTitle('Contact Information'),
-                      _buildSectionContent(
-                          'For any questions regarding these terms, please contact our support team through the app or our website.'),
                     ],
                   ),
                 ),

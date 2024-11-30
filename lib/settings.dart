@@ -7,6 +7,7 @@ import 'package:trashtrack/bind_account.dart';
 import 'package:trashtrack/change_pass.dart';
 import 'package:trashtrack/data_model.dart';
 import 'package:trashtrack/styles.dart';
+import 'package:trashtrack/user_hive_data.dart';
 
 class C_SettingsScreen extends StatefulWidget {
   @override
@@ -16,11 +17,42 @@ class C_SettingsScreen extends StatefulWidget {
 class _C_SettingsScreenState extends State<C_SettingsScreen> {
   UserModel? userModel;
   bool loadingAction = false;
+  String? user;
+  Map<String, dynamic>? userData;
+
+  @override
+  void initState() {
+    super.initState();
+    _dbData();
+  }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     userModel = Provider.of<UserModel>(context); // Access provider here
+  }
+
+  Future<void> _dbData() async {
+    if (!mounted) return;
+    setState(() {
+      loadingAction = true;
+    });
+
+    try {
+      final data = await userDataFromHive();
+      if (!mounted) return;
+      setState(() {
+        userData = data;
+        user = data['user'];
+      });
+
+      if (!mounted) return;
+      setState(() {
+        loadingAction = false;
+      });
+    } catch (e) {
+      console(e.toString());
+    }
   }
 
   @override
@@ -69,45 +101,46 @@ class _C_SettingsScreenState extends State<C_SettingsScreen> {
                           }
                         },
                       ),
-                      ListTile(
-                        leading: _buildIcon(Icons.account_box),
-                        title: Text('Account Verification'),
-                        onTap: () async {
-                          setState(() {
-                            loadingAction = true;
-                          });
+                      if (user == 'customer')
+                        ListTile(
+                          leading: _buildIcon(Icons.account_box),
+                          title: Text('Account Verification'),
+                          onTap: () async {
+                            setState(() {
+                              loadingAction = true;
+                            });
 
-                          String? verify = await checkVerifiedCus(context);
-                          if (verify == 'verified') {
-                            if (!mounted) return;
-                            showSuccessSnackBar(context, 'Your account is already verified!');
-                          } else if (verify == 'pending') {
-                            if (!mounted) return;
-                            showSuccessSnackBar(context,
-                                'Your account verification is in progress. We will notify you once it' 's complete!');
-                          } else if (verify == 'unverified') {
-                            if (!mounted) return;
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => VerifyCustomer(),
-                              ),
-                            );
-                          } else if (verify == 'rejected') {
-                            if (!mounted) return;
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => UpdateVerifyCus(),
-                              ),
-                            );
-                          }
+                            String? verify = await checkVerifiedCus(context);
+                            if (verify == 'verified') {
+                              if (!mounted) return;
+                              showSuccessSnackBar(context, 'Your account is already verified!');
+                            } else if (verify == 'pending') {
+                              if (!mounted) return;
+                              showSuccessSnackBar(context,
+                                  'Your account verification is in progress. We will notify you once it' 's complete!');
+                            } else if (verify == 'unverified') {
+                              if (!mounted) return;
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => VerifyCustomer(),
+                                ),
+                              );
+                            } else if (verify == 'rejected') {
+                              if (!mounted) return;
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => UpdateVerifyCus(),
+                                ),
+                              );
+                            }
 
-                          setState(() {
-                            loadingAction = false;
-                          });
-                        },
-                      ),
+                            setState(() {
+                              loadingAction = false;
+                            });
+                          },
+                        ),
                       if (userModel != null)
                         ListTile(
                           leading: _buildIcon(Icons.link),
@@ -236,6 +269,7 @@ class _C_SettingsScreenState extends State<C_SettingsScreen> {
                 if (userModel!.auth == 'GOOGLE') {
                   _showNoPassConfirmDialog(context);
                 } else {
+                  Navigator.of(context).pop();
                   Navigator.push(
                     context,
                     MaterialPageRoute(

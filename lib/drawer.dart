@@ -156,19 +156,19 @@ class _C_DrawerState extends State<C_Drawer> {
                   //   },
                   // ),
 
-                  // Waste info
-                  ListTile(
-                    leading: _buildIcon(Icons.newspaper),
-                    title: Text('Service Guidelines'),
-                    selectedColor: Colors.green,
-                    tileColor: selectedIndexs == 2 ? Colors.black12 : null,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => ServiceGuidelines()),
-                      );
-                    },
-                  ),
+                  // // Waste info
+                  // ListTile(
+                  //   leading: _buildIcon(Icons.newspaper),
+                  //   title: Text('Service Guidelines'),
+                  //   selectedColor: Colors.green,
+                  //   tileColor: selectedIndexs == 2 ? Colors.black12 : null,
+                  //   onTap: () {
+                  //     Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(builder: (context) => ServiceGuidelines()),
+                  //     );
+                  //   },
+                  // ),
                   // About Us
                   ListTile(
                     leading: _buildIcon(Icons.account_circle),

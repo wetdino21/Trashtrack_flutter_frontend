@@ -395,7 +395,7 @@ class _NotificationDetailsState extends State<NotificationDetails> {
                       ),
                     ),
                   //
-                  if (widget.type == 'truck arrival' && widget.bkId != null)
+                  if ((widget.type == 'truck arrival' || widget.type == 'slip') && widget.bkId != null)
                     InkWell(
                       onTap: () {
                         Navigator.push(
@@ -411,7 +411,7 @@ class _NotificationDetailsState extends State<NotificationDetails> {
                             style: TextStyle(color: white, fontSize: 24, fontWeight: FontWeight.bold)),
                       ),
                     ),
-                  if (widget.type == 'billed' && widget.gbId != null)
+                  if ((widget.type == 'billed' || widget.type == 'payment') && widget.gbId != null)
                     InkWell(
                       onTap: () {
                         Navigator.push(

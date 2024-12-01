@@ -2344,7 +2344,7 @@ class _Booking_Pending_DetailsState extends State<Booking_Pending_Details> with 
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Icon(
-                                    bookingData!['bk_waste_scale_slip'] == null ? Icons.upload : Icons.wallpaper,
+                                    bookingData!['bk_waste_scale_slip'] == null ? Icons.upload : Icons.sticky_note_2,
                                     color: green,
                                   ),
                                   SizedBox(width: 5),

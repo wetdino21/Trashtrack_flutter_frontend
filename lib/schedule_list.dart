@@ -330,6 +330,7 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
   Color? boxColorTheme = Colors.teal;
   bool _showOptionsBox = false;
   List<dynamic> _locations = [];
+  Uint8List? dbSlipImage;
 
   @override
   void initState() {
@@ -447,6 +448,10 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
               _mapController.move(selectedPoint!, 13);
               _mapController.rotate(0.0);
             });
+
+            if (bookingData!['bk_waste_scale_slip'] != null) {
+              dbSlipImage = base64Decode(bookingData!['bk_waste_scale_slip']);
+            }
           }
 
           //load book limit
@@ -921,6 +926,54 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
     }
   }
 
+  Widget _imagePreview(BuildContext context, Uint8List? dbScaleSlip) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: deepPurple,
+        foregroundColor: white,
+        title: Text('Preview Scale Slip'),
+      ),
+      backgroundColor: deepPurple,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 20),
+                    Container(
+                      child: dbScaleSlip != null
+                          ? Image.memory(
+                              dbScaleSlip,
+                              fit: BoxFit.cover,
+                            )
+                          : Container(
+                              padding: EdgeInsets.all(20),
+                              decoration: BoxDecoration(color: deepPurple, borderRadius: BorderRadius.circular(100)),
+                              child: Icon(
+                                Icons.wallpaper,
+                                size: 100,
+                                color: Colors.white,
+                              ),
+                            ),
+                    ),
+                    SizedBox(height: 30),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          if (loadingAction) showLoadingAction(),
+        ],
+      ),
+    );
+  }
+
 //////////
   @override
   Widget build(BuildContext context) {
@@ -947,8 +1000,7 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
         title: Text(_isEditing ? 'Editing Booking Details' : 'Booking Details'),
-        // Declare a boolean variable to track the visibility of the options box
-
+        //
         actions: [
           if (bookingData != null)
             (bookingData!['bk_status'] == 'Pending' || bookingData!['bk_status'] == 'Failed') && !_isEditing
@@ -1033,7 +1085,21 @@ class _BookingDetailsState extends State<BookingDetails> with SingleTickerProvid
                 : SizedBox(
                     height: 30,
                   ),
-          SizedBox(width: 5),
+          if (dbSlipImage != null)
+            IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => _imagePreview(context, dbSlipImage)),
+                );
+              },
+              icon: CircleAvatar(
+                child: Icon(
+                  Icons.sticky_note_2,
+                  color: green,
+                ),
+              ),
+            ),
         ],
       ),
       body: GestureDetector(

@@ -77,9 +77,13 @@ class _VehicleScreenState extends State<VehicleScreen> with SingleTickerProvider
         setState(() {
           vehicleList = data2;
           // Find the vehicle where driver_id == emp_id
-          final matchedVehicle = vehicleList?.firstWhere((vehicle) => vehicle['driver_id'] == emp_id);
+          //final matchedVehicle = vehicleList?.firstWhere((vehicle) => vehicle['driver_id'] == emp_id);
+          final matchedVehicle = vehicleList?.firstWhere(
+            (vehicle) => vehicle['driver_id'] == emp_id,
+            orElse: () => {}, // Return an empty map instead of null
+          );
 
-          if (matchedVehicle != null) {
+          if (matchedVehicle != null && matchedVehicle.isNotEmpty) {
             vehicleList!.remove(matchedVehicle);
             currentVehicle = matchedVehicle;
             plate = currentVehicle!['v_plate'];
@@ -96,7 +100,6 @@ class _VehicleScreenState extends State<VehicleScreen> with SingleTickerProvider
       }
 
       setState(() {
-        console('1111111111111111');
         isLoading = false;
       });
     } catch (e) {
@@ -104,6 +107,10 @@ class _VehicleScreenState extends State<VehicleScreen> with SingleTickerProvider
       // setState(() {
       //   isLoading = true;
       // });
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 

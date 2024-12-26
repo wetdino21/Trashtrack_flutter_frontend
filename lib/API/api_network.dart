@@ -74,7 +74,7 @@ class NetworkglobalUrl {
 }
 
 // //dynamic url
-//  globalUrl() {
+// globalUrl() {
 //   return networkURL;
 // }
 

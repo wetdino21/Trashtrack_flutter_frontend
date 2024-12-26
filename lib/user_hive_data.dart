@@ -37,6 +37,8 @@ Future<void> storeDataInHive() async {
       final String? user = data['user'];
 
       final int? id = data['${prefix}id'];
+      final String? cus_type = data['${prefix}type'];
+      final String? comp_name = data['${prefix}comp_name'];
       final String? fname = data['${prefix}fname'];
       final String? mname = data['${prefix}mname'];
       final String? lname = data['${prefix}lname'];
@@ -76,6 +78,8 @@ Future<void> storeDataInHive() async {
       await box.put('profile', imageBytes);
       await box.put('address', address);
       await box.put('verified', verified);
+      await box.put('cus_type', cus_type);
+      await box.put('comp_name', comp_name);
 
       if (user == 'customer') {
         //notification count
@@ -157,6 +161,8 @@ Future<Map<String, dynamic>> userDataFromHive() async {
     'profile': box.get('profile'),
     'address': box.get('address'),
     'verified': box.get('verified'),
+    'cus_type': box.get('cus_type'),
+    'comp_name': box.get('comp_name'),
     'notif_count': box.get('notif_count'),
   };
   // Optionally, print a message or handle UI updates

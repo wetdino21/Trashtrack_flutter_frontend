@@ -35,7 +35,6 @@ Future<GoogleAccountDetails?> handleGoogleSignUp(BuildContext context) async {
     GoogleSignInAccount? user = await _googleSignIn.signIn();
 
     if (user != null) {
-
       // Extract user info
       String fullname = user.displayName == null ? '' : user.displayName!;
       String email = user.email;
@@ -139,6 +138,8 @@ Future<void> createGoogleAccount(
   String brgy,
   String street,
   String postal,
+  String type,
+  String compName,
 ) async {
   final response = await http.post(
     Uri.parse('$baseUrl/signup_google'),
@@ -155,6 +156,8 @@ Future<void> createGoogleAccount(
       'brgy': brgy,
       'street': street,
       'postal': postal,
+      'type': type,
+      'compName': compName,
     }),
   );
 
@@ -238,7 +241,7 @@ Future<String> loginWithGoogle(BuildContext context, String email) async {
         print('Login successfully');
         return 'success'; // No error
       }
-     
+
       print('Login successfully');
       return 'hauler'; // No error
     } else if (response.statusCode == 202) {

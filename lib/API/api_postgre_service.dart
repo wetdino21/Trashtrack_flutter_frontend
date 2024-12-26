@@ -113,8 +113,22 @@ Future<String?> emailCheckforgotpass(String email) async {
   }
 }
 
-Future<String?> createCustomer(BuildContext context, String email, String password, String fname, String mname,
-    String lname, String contact, String? province, String? city, String? brgy, String street, String postal) async {
+Future<String?> createCustomer(
+  BuildContext context,
+  String email,
+  String password,
+  String fname,
+  String mname,
+  String lname,
+  String contact,
+  String? province,
+  String? city,
+  String? brgy,
+  String street,
+  String postal,
+  String type,
+  String compName,
+) async {
   final response = await http.post(
     Uri.parse('$baseUrl/signup'),
     headers: {'Content-Type': 'application/json'},
@@ -130,6 +144,8 @@ Future<String?> createCustomer(BuildContext context, String email, String passwo
       'brgy': brgy,
       'street': street,
       'postal': postal,
+      'type': type,
+      'compName': compName,
     }),
   );
 

@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
       //initialRoute: initialRoute,
       home: TokenCheck(), // final firt route
       //home: DynamicNetwork(), // for testing with network
-      
+
       routes: {
         '/mainApp': (context) => MainApp(),
         '/logout': (context) => LoginPage(),
@@ -94,6 +94,7 @@ class _TokenCheckState extends State<TokenCheck> {
       Navigator.pushReplacementNamed(context, initialRoute);
     } else {
       // Fallback to login if something goes wrong
+      if (!mounted) return;
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => LoginPage(action: 'login')),

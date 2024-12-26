@@ -159,6 +159,7 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> with SingleTickerProv
         firstLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         errorMessage = e.toString();
       });
@@ -1437,8 +1438,10 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> with SingleTickerProv
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
+                                      if (user == 'customer' && userData?['cus_type'] == 'company')
+                                        _labelField(label: 'Company Name', value: userData?['comp_name'] ?? ''),
                                       _labelField(
-                                          label: 'Full Name',
+                                          label: (user == 'customer' && userData?['cus_type'] == 'company')? 'Representative Full Name' : 'Full Name',
                                           value:
                                               '${userData?['fname'] ?? ''} ${userData?['mname'] ?? ''} ${userData?['lname'] ?? ''}'),
                                       _labelField(label: 'Email', value: userData?['email'] ?? ''),
@@ -1449,6 +1452,8 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> with SingleTickerProv
                                           value: user == 'hauler'
                                               ? '${userData?['address'] ?? ''}'
                                               : '${userData?['street'] ?? ''}, ${userData?['brgy'] ?? ''}, ${userData?['city'] ?? ''}, ${userData?['province'] ?? ''}, ${userData?['postal'] ?? ''}'),
+                                      if (user == 'customer')
+                                        _labelField(label: 'Account Type', value: userData?['cus_type'] ?? ''),
                                       _labelField(label: 'Status', value: userData?['status'] ?? ''),
                                       // _labelField(
                                       //     label: 'Type',

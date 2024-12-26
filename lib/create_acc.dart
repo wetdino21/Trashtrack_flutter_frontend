@@ -18,6 +18,7 @@ class CreateAcc extends StatefulWidget {
 class _CreateAccState extends State<CreateAcc> {
   int _currentStep = 1;
 
+  final TextEditingController _compNameController = TextEditingController();
   final TextEditingController _fnameController = TextEditingController();
   final TextEditingController _mnameController = TextEditingController();
   final TextEditingController _lnameController = TextEditingController();
@@ -53,6 +54,8 @@ class _CreateAccState extends State<CreateAcc> {
   String emailvalidator = '';
   String passvalidator = '';
   String confpassvalidator = '';
+  String typevalue = 'personal';
+  String compnamevalidator = '';
   String fnamevalidator = '';
   String mnamevalidator = '';
   String lnamevalidator = '';
@@ -138,45 +141,7 @@ class _CreateAccState extends State<CreateAcc> {
     }
   }
 
-  // Future<void> _loadProvinces() async {
-  //   try {
-  //     final provinces = await fetchProvinces();
-  //     setState(() {
-  //       _provinces = provinces;
-  //     });
-  //   } catch (e) {
-  //     print('Error fetching provinces: $e');
-  //   }
-  // }
-
-  // Future<void> _loadCitiesMunicipalities(String provinceCode) async {
-  //   try {
-  //     final citiesMunicipalities =
-  //         await fetchCitiesMunicipalities(provinceCode);
-  //     setState(() {
-  //       _citiesMunicipalities = citiesMunicipalities;
-  //       _barangays = []; // Clear barangays when a new city is selected
-  //       _selectedCityMunicipalityName = null;
-  //       _selectedBarangayName = null;
-  //     });
-  //   } catch (e) {
-  //     print('Error fetching cities/municipalities: $e');
-  //   }
-  // }
-
-  // Future<void> _loadBarangays(String cityMunicipalityCode) async {
-  //   try {
-  //     final barangays = await fetchBarangays(cityMunicipalityCode);
-  //     setState(() {
-  //       _barangays = barangays;
-  //       _selectedBarangayName = null;
-  //     });
-  //   } catch (e) {
-  //     print('Error fetching barangays: $e');
-  //   }
-  // }
-
-//email
+//timer email
   void _startTimer() {
     //_timer.cancel();
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
@@ -349,7 +314,8 @@ class _CreateAccState extends State<CreateAcc> {
                           (_selectedCityMunicipalityName == null || cityvalidator.isNotEmpty) ||
                           (_selectedBarangayName == null || brgyvalidator.isNotEmpty) ||
                           (_streetController.text.isEmpty || streetvalidator.isNotEmpty) ||
-                          (_postalController.text.isEmpty || postalvalidator.isNotEmpty)) {
+                          (_postalController.text.isEmpty || postalvalidator.isNotEmpty) ||
+                          (typevalue == 'company' && _compNameController.text.isEmpty)) {
                         setState(() {
                           fnamevalidator = _validateFname(_fnameController.text);
                           mnamevalidator = _validateMname(_mnameController.text);
@@ -360,6 +326,7 @@ class _CreateAccState extends State<CreateAcc> {
                           brgyvalidator = _validateBrgy(_selectedBarangayName);
                           streetvalidator = _validateStreet(_streetController.text);
                           postalvalidator = _validatePostalCode(_postalController.text);
+                          compnamevalidator = _validateCompName(_compNameController.text);
                         });
                       } else {
                         // If no errors, proceed with incrementing the step
@@ -402,6 +369,7 @@ class _CreateAccState extends State<CreateAcc> {
                     brgyvalidator = _validateBrgy(_selectedBarangayName);
                     streetvalidator = _validateStreet(_streetController.text);
                     postalvalidator = _validatePostalCode(_postalController.text);
+                    compnamevalidator = _validateCompName(_compNameController.text);
                   });
 
                   if ((_fnameController.text.isEmpty || fnamevalidator.isNotEmpty) ||
@@ -412,7 +380,8 @@ class _CreateAccState extends State<CreateAcc> {
                       (_selectedCityMunicipalityName == null || cityvalidator.isNotEmpty) ||
                       (_selectedBarangayName == null || brgyvalidator.isNotEmpty) ||
                       (_streetController.text.isEmpty || streetvalidator.isNotEmpty) ||
-                      (_postalController.text.isEmpty || postalvalidator.isNotEmpty)) {
+                      (_postalController.text.isEmpty || postalvalidator.isNotEmpty) ||
+                      (typevalue == 'company' && _compNameController.text.isEmpty)) {
                   } else if (_contactController.text.isNotEmpty) {
                     String? dbContactMsg = await contactCheck(_contactController.text);
                     // Show any existing error message
@@ -526,6 +495,20 @@ class _CreateAccState extends State<CreateAcc> {
     final hasNumber = RegExp(r'[0-9]').hasMatch(value);
     if (!hasLetter || !hasNumber) {
       return 'Password must contain both letters and numbers';
+    }
+    return '';
+  }
+
+  String _validateType(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please select account type';
+    }
+    return '';
+  }
+
+  String _validateCompName(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter your company name';
     }
     return '';
   }
@@ -902,23 +885,6 @@ class _CreateAccState extends State<CreateAcc> {
                         TextButton(
                           onPressed: () {
                             _backToSignIn();
-                            // if (_emailController.text.isNotEmpty ||
-                            //     _passController.text.isNotEmpty ||
-                            //     _repassController.text.isNotEmpty ||
-                            //     _fnameController.text.isNotEmpty ||
-                            //     _mnameController.text.isNotEmpty ||
-                            //     _lnameController.text.isNotEmpty ||
-                            //     _fnameController.text.isNotEmpty ||
-                            //     _contactController.text.isNotEmpty ||
-                            //     _selectedProvinceName != null ||
-                            //     _selectedCityMunicipalityName != null ||
-                            //     _selectedBarangayName != null ||
-                            //     _streetController.text.isNotEmpty ||
-                            //     _postalController.text.isNotEmpty) {
-                            //   _showSignInConfirmationDialog(context);
-                            // } else {
-                            //   Navigator.pushNamed(context, 'login');
-                            // }
                           },
                           style: TextButton.styleFrom(
                             padding: EdgeInsets.zero,
@@ -1169,20 +1135,68 @@ class _CreateAccState extends State<CreateAcc> {
                     decoration: BoxDecoration(
                         color: Colors.white, borderRadius: BorderRadius.circular(15.0), boxShadow: shadowBigColor),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Center(
-                            child: Text(
-                          'Personal Information',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: greytitleColor),
-                        )),
-                        const SizedBox(height: 20),
+                          child: Text(
+                            'Personal Information',
+                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: greytitleColor),
+                          ),
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              ' Account Type',
+                              style: TextStyle(fontSize: 16, color: greytitleColor),
+                            ),
+                            SizedBox(height: 10),
+                            DropdownButton<String>(
+                              padding: const EdgeInsets.only(left: 5),
+                              value: typevalue,
+                              items: const [
+                                DropdownMenuItem(
+                                  value: "personal",
+                                  child: Text("Personal"),
+                                ),
+                                DropdownMenuItem(
+                                  value: "company",
+                                  child: Text("Company"),
+                                ),
+                              ],
+                              onChanged: (value) {
+                                setState(() {
+                                  typevalue = value!;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                        if (typevalue == 'company')
+                          _buildTextField(
+                            controller: _compNameController,
+                            hintText: 'Company Name',
+                            icon: Icons.person,
+                            onChanged: (value) {
+                              setState(() {
+                                compnamevalidator = _validateCompName(value);
+                              });
+                            },
+                          ),
+                        if (typevalue == 'company') _validator(compnamevalidator),
+                        const SizedBox(height: 10),
+                        if (typevalue == 'company')
+                          Text(
+                            ' Representative',
+                            style: TextStyle(fontSize: 16, color: greytitleColor, fontWeight: FontWeight.bold),
+                          ),
                         _buildTextField(
                           controller: _fnameController,
                           hintText: 'First Name',
                           icon: Icons.person,
                           onChanged: (value) {
                             setState(() {
-                              fnamevalidator = _validateFname(value); // Trigger validation on text change
+                              fnamevalidator = _validateFname(value);
                             });
                           },
                         ),
@@ -1446,65 +1460,6 @@ class _CreateAccState extends State<CreateAcc> {
                               style: TextStyle(color: Colors.red),
                             ),
                         const SizedBox(height: 20),
-                        // const SizedBox(height: 15),
-                        // // Dropdown for Province
-                        // _buildDropdown(
-                        //   selectedValue: _selectedProvince,
-                        //   items: _provinces,
-                        //   hintText: 'Province',
-                        //   icon: Icons.location_city,
-                        //   onChanged: (value) {
-                        //     setState(() {
-                        //       _selectedProvince = value;
-                        //       provincevalidator = _validateProvince(value);
-                        //       final selectedProvince = _provinces
-                        //           .firstWhere((item) => item['code'] == value);
-                        //       _selectedProvinceName = selectedProvince['name'];
-                        //     });
-                        //     _loadCitiesMunicipalities(value!);
-                        //   },
-                        // ),
-                        // _validator(provincevalidator),
-                        // SizedBox(height: 15),
-                        // // Dropdown for City/Municipality
-                        // _buildDropdown(
-                        //   selectedValue: _selectedCityMunicipality,
-                        //   items: _citiesMunicipalities,
-                        //   hintText: 'City/Municipality',
-                        //   icon: Icons.apartment,
-                        //   onChanged: (value) {
-                        //     setState(() {
-                        //       _selectedCityMunicipality = value;
-                        //       cityvalidator = _validateCity(value);
-                        //       final selectedCity = _citiesMunicipalities
-                        //           .firstWhere((item) => item['code'] == value);
-                        //       _selectedCityMunicipalityName =
-                        //           selectedCity['name'];
-                        //     });
-                        //     _loadBarangays(value!);
-                        //   },
-                        // ),
-                        // _validator(cityvalidator),
-                        // SizedBox(height: 15),
-                        // // Dropdown for Barangay
-                        // _buildDropdown(
-                        //   selectedValue: _selectedBarangay,
-                        //   items: _barangays,
-                        //   hintText: 'Barangay',
-                        //   icon: Icons.maps_home_work,
-                        //   onChanged: (value) {
-                        //     setState(() {
-                        //       _selectedBarangay = value;
-                        //       brgyvalidator = _validateBrgy(value);
-                        //       final selectedBarangay = _barangays
-                        //           .firstWhere((item) => item['code'] == value);
-                        //       _selectedBarangayName = selectedBarangay['name'];
-                        //       print(_selectedBarangayName);
-                        //     });
-                        //   },
-                        // ),
-                        // _validator(brgyvalidator),
-                        // const SizedBox(height: 15),
                         _buildTextField(
                           controller: _streetController,
                           hintText: 'Street Name, Building, House No.',
@@ -1587,7 +1542,8 @@ class _CreateAccState extends State<CreateAcc> {
                                   (_selectedCityMunicipalityName == null || cityvalidator.isNotEmpty) ||
                                   (_selectedBarangayName == null || brgyvalidator.isNotEmpty) ||
                                   (_streetController.text.isEmpty || streetvalidator.isNotEmpty) ||
-                                  (_postalController.text.isEmpty || postalvalidator.isNotEmpty)) {
+                                  (_postalController.text.isEmpty || postalvalidator.isNotEmpty) ||
+                                  (typevalue == 'company' && _compNameController.text.isEmpty)) {
                                 setState(() {
                                   fnamevalidator = _validateFname(_fnameController.text);
                                   mnamevalidator = _validateMname(_mnameController.text);
@@ -1598,6 +1554,7 @@ class _CreateAccState extends State<CreateAcc> {
                                   brgyvalidator = _validateBrgy(_selectedBarangayName);
                                   streetvalidator = _validateStreet(_streetController.text);
                                   postalvalidator = _validatePostalCode(_postalController.text);
+                                  compnamevalidator = _validateCompName(_compNameController.text);
                                 });
                               } else if (_contactController.text.isNotEmpty) {
                                 String? dbContactMsg = await contactCheck(_contactController.text);
@@ -1623,7 +1580,9 @@ class _CreateAccState extends State<CreateAcc> {
                                             _selectedCityMunicipalityName!,
                                             _selectedBarangayName!,
                                             _streetController.text,
-                                            _postalController.text);
+                                            _postalController.text,
+                                            typevalue,
+                                            typevalue == 'personal' ? "" : _compNameController.text);
                                       } else {
                                         setState(() {
                                           if (emailChanged == true) {
@@ -1875,7 +1834,9 @@ class _CreateAccState extends State<CreateAcc> {
                                 _selectedCityMunicipalityName,
                                 _selectedBarangayName,
                                 _streetController.text,
-                                _postalController.text);
+                                _postalController.text,
+                                typevalue,
+                                typevalue == 'personal' ? "" : _compNameController.text);
                             if (createMessage != null) {
                               showErrorSnackBar(context, createMessage);
                             } else {
@@ -1945,35 +1906,15 @@ class _CreateAccState extends State<CreateAcc> {
               obscureText: obscureText,
               keyboardType: keyboardType,
               decoration: InputDecoration(
-                // labelText:
-                //     hintText, // This will move the hint text to the upper left when focused
-                // floatingLabelBehavior: FloatingLabelBehavior.auto,
-                // labelStyle: TextStyle(color: Colors.grey),
                 hintText: hintText,
                 hintStyle: TextStyle(color: Colors.grey[300]),
-                // prefixIcon: Icon(icon, color: Colors.green),
                 suffixIcon: suffixIcon,
                 filled: true,
                 fillColor: Colors.white,
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
-                // enabledBorder: OutlineInputBorder(
-                //   borderRadius: BorderRadius.circular(10), // Rounded corners
-                //   borderSide: const BorderSide(color: Colors.grey, width: 3.0),
-                // ),
-                // focusedBorder: OutlineInputBorder(
-                //   borderRadius: BorderRadius.circular(10), // Rounded corners
-                //   borderSide: const BorderSide(color: Colors.green, width: 5.0),
-                // ),
               ),
               inputFormatters: inputFormatters,
-              //validator: validator,
               onChanged: onChanged,
-              // onChanged: (value) {
-              //   // Trigger validation on text change
-              //   setState(() {
-              //     _formKey.currentState?.validate();
-              //   });
-              // },
             ),
           ),
         ],
@@ -1991,10 +1932,7 @@ class _CreateAccState extends State<CreateAcc> {
         children: [
           Text(
             ' ' + 'Contact Number',
-            style: TextStyle(
-                fontSize: 16,
-                //4fontWeight: FontWeight.bold,
-                color: Colors.grey[700]),
+            style: TextStyle(fontSize: 16, color: Colors.grey[700]),
           ),
           Container(
             decoration: BoxDecoration(boxShadow: shadowColor),
@@ -2010,11 +1948,6 @@ class _CreateAccState extends State<CreateAcc> {
                     Text('+63', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 16)),
                   ],
                 ),
-                //prefixIcon: Icon(Icons.abc),
-                // labelText:
-                //     'Contact Number', // This will move the hint text to the upper left when focused
-                // floatingLabelBehavior: FloatingLabelBehavior.auto,
-                // labelStyle: TextStyle(color: Colors.grey),
                 hintText: 'Contact Number',
                 hintStyle: TextStyle(color: Colors.grey[300]),
                 filled: true,
@@ -2022,27 +1955,9 @@ class _CreateAccState extends State<CreateAcc> {
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10), // Rounded corners
                     borderSide: BorderSide.none),
-                // enabledBorder: OutlineInputBorder(
-                //   borderRadius: BorderRadius.circular(10), // Rounded corners
-                //   borderSide: const BorderSide(color: Colors.grey, width: 3.0),
-                // ),
-                // focusedBorder: OutlineInputBorder(
-                //   borderRadius: BorderRadius.circular(10), // Rounded corners
-                //   borderSide: const BorderSide(color: Colors.green, width: 5.0),
-                // ),
               ),
               keyboardType: TextInputType.number,
               inputFormatters: inputFormatters,
-              // validator: (value) {
-              //   if (value == null || value.isEmpty) {
-              //     return 'Please enter your contact number';
-              //   }
-              //   final contactNumber = value.replaceFirst(RegExp(r'^0'), '');
-              //   if (contactNumber.length != 10 || !contactNumber.startsWith('9')) {
-              //     return 'Invalid Phone Number';
-              //   }
-              //   return null;
-              // },
               onChanged: (value) {
                 if (value.length > 10) {
                   _contactController.text = value.substring(0, 10);
@@ -2066,13 +1981,11 @@ class _CreateAccState extends State<CreateAcc> {
     required String hintText,
     required IconData icon,
     required ValueChanged<String?> onChanged,
-    //required FormFieldValidator<String> validator,
   }) {
     return Container(
       decoration: BoxDecoration(boxShadow: shadowColor),
       child: DropdownButtonFormField<String>(
         value: selectedValue,
-        //hint: Text(hintText, style: TextStyle(color: Colors.grey)),
         icon: Icon(Icons.arrow_drop_down, color: Colors.grey),
         decoration: InputDecoration(
           labelText: hintText, // This will move the hint text to the upper left when focused
@@ -2082,14 +1995,6 @@ class _CreateAccState extends State<CreateAcc> {
           fillColor: Colors.white,
           prefixIcon: Icon(icon, color: Colors.green),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
-          // enabledBorder: OutlineInputBorder(
-          //   borderRadius: BorderRadius.circular(10),
-          //   borderSide: const BorderSide(color: Colors.grey, width: 3.0),
-          // ),
-          // focusedBorder: OutlineInputBorder(
-          //   borderRadius: BorderRadius.circular(10),
-          //   borderSide: const BorderSide(color: Colors.green, width: 5.0),
-          // ),
         ),
         items: items.map<DropdownMenuItem<String>>((item) {
           return DropdownMenuItem<String>(

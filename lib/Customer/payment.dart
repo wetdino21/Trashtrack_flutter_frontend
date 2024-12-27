@@ -105,17 +105,14 @@ class _C_PaymentScreenState extends State<C_PaymentScreen> with SingleTickerProv
       if (billData != null) {
         setState(() {
           billList = billData;
-          if (paymentData != null) {
-            paymentList = paymentData;
-          }
-
-          isLoading = false;
-        });
-      } else {
-        setState(() {
-          isLoading = false;
         });
       }
+      if (paymentData != null) {
+        setState(() {
+          paymentList = paymentData;
+        });
+      }
+      isLoading = false;
     } catch (e) {
       if (!mounted) return;
       print(e.toString());
@@ -370,7 +367,7 @@ class _C_PaymentScreenState extends State<C_PaymentScreen> with SingleTickerProv
                                     itemCount: paymentList?.length ?? 0, // Simplified null check
                                     itemBuilder: (context, index) {
                                       final payment = paymentList?[index];
-            
+
                                       if (payment == null) {
                                         return SizedBox.shrink(); // Return an empty box if payment is null
                                       }
@@ -1085,7 +1082,7 @@ class _PaymentDetailsState extends State<PaymentDetails> with SingleTickerProvid
 
                                                         await launchPaymentLinkSession(
                                                             billDetails!['gb_id'], billDetails!['bk_id']);
-                                                       
+
                                                         Timer(Duration(seconds: 2), () {
                                                           setState(() {
                                                             isLoading = false;

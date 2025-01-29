@@ -1,8 +1,37 @@
-# trashtrack
+# Setup trashtrack Guidelines (Mobile)
 
+-----------------------------------------------
+Setup Database
+  Download & Install PostgreSQL
+     - Go to the official site: https://www.postgresql.org/download/windows
+     - Click "Download the Installer" → Choose the latest version.
+     - Run the installer and follow these steps:
+     - Select Components: Install PostgreSQL Server, pgAdmin, and Command Line Tools.
+     - Set Password: Choose a strong password for the PostgreSQL superuser (postgres).
+     - Port: Default is 5432 (leave it as is).
 
-## Getting Started
+  Create an Empty Database
+     - Open pgAdmin or psql CLI.
+     - Run this SQL command to create a new database: CREATE DATABASE trashtrack;
 
+  Navigate to PostgreSQL bin Directory
+     - Open Command Prompt (cmd) and run:
+        cd "C:\Program Files\PostgreSQL\16\bin"
+
+  Restore the Database using pg_restore
+     - Run the following command:
+        pg_restore -c -U postgres -W -F t -d <empty database> <Downloaded-Database-Path>
+        Example: 
+        pg_restore -c -U postgres -W -F t -d trashtrack C:\Users\bacal\Downloads\trashtrack.tar
+
+  Explanation of Flags:
+    -c → Drops existing objects before restoring (cleans the database).
+    -U postgres → Uses the postgres user.
+    -W → Prompts for the password.
+    -F t → Specifies that the backup is in tar format.
+    -d trashtrack → Restores the backup into the trashtrack database.
+
+-----------------------------------------------
 SetUp Backend 
     Node.js
         - Download and Install Node.js
@@ -28,6 +57,7 @@ SetUp Backend
     Lastly, run the server in VS Code terminal (cd backend) type:
         node server.js
 
+-----------------------------------------------
 SetUp Frontend
     Install the trashtrack.apk directly to your physical device.
         - open the trashtrack app, then type the IP address that your mobile phone and PC/Laptop(backend server was running), (You can find the IP address in CMD then type: ipconfig).
@@ -69,8 +99,8 @@ SetUp Frontend
         if running through android emulator
             - open trashtrack app
             - type IP address: 10.0.2.2
-
-
+            
+-----------------------------------------------
 Setup Payment
     for security purposes, you can create your own account in PAYMONGO
         - open the official website of PAYMONGO (https://www.paymongo.com/) and create your account

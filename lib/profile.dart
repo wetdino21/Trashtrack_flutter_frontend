@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:trashtrack/API/api_email_service.dart';
@@ -319,9 +320,18 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> with SingleTickerProv
     );
 
     if (pickedFile != null) {
-      setState(() {
-        imageFile = pickedFile;
-      });
+      bool isFace = await _detectFace(pickedFile);
+      if (isFace) {
+        setState(() {
+          imageFile = pickedFile;
+        });
+        showSuccessSnackBar(context, 'Face Detected!');
+      } else {
+        showErrorSnackBar(context, 'No Face Detected!');
+      }
+      // setState(() {
+      //   imageFile = pickedFile;
+      // });
       //  print('Image selected: ${pickedFile.path}');
     } else {
       print('No image selected.');
@@ -339,9 +349,16 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> with SingleTickerProv
     );
 
     if (pickedFile != null) {
-      setState(() {
-        imageFile = pickedFile;
-      });
+      bool isFace = await _detectFace(pickedFile);
+      if (isFace) {
+        setState(() {
+          imageFile = pickedFile;
+        });
+        showSuccessSnackBar(context, 'Face Detected!');
+      } else {
+        showErrorSnackBar(context, 'No Face Detected!');
+      }
+
       // print('Image selected: ${pickedFile.path}');
     } else {
       print('No image selected.');
@@ -789,6 +806,25 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> with SingleTickerProv
       } else {
         Navigator.pop(context);
       }
+    }
+  }
+
+  //face detector instance
+  final FaceDetector _faceDetector = FaceDetector(
+    options: FaceDetectorOptions(performanceMode: FaceDetectorMode.accurate),
+  );
+
+  // Detect face in the given image
+  Future<bool> _detectFace(XFile xfile) async {
+    final imageFile = File(xfile.path);
+    final inputImage = InputImage.fromFile(imageFile);
+
+    try {
+      final faces = await _faceDetector.processImage(inputImage);
+      return faces.isNotEmpty; // Return true if faces are detected
+    } catch (e) {
+      print("Error detecting face: $e");
+      return false; // Return false if an error occurs or no face is detected
     }
   }
 
@@ -1441,7 +1477,9 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> with SingleTickerProv
                                       if (user == 'customer' && userData?['cus_type'] == 'company')
                                         _labelField(label: 'Company Name', value: userData?['comp_name'] ?? ''),
                                       _labelField(
-                                          label: (user == 'customer' && userData?['cus_type'] == 'company')? 'Representative Full Name' : 'Full Name',
+                                          label: (user == 'customer' && userData?['cus_type'] == 'company')
+                                              ? 'Representative Full Name'
+                                              : 'Full Name',
                                           value:
                                               '${userData?['fname'] ?? ''} ${userData?['mname'] ?? ''} ${userData?['lname'] ?? ''}'),
                                       _labelField(label: 'Email', value: userData?['email'] ?? ''),
@@ -2087,8 +2125,6 @@ class _C_ProfileScreenState extends State<C_ProfileScreen> with SingleTickerProv
     );
   }
 }
-
-
 
 // class EditProfileScreen extends StatelessWidget {
 //   @override

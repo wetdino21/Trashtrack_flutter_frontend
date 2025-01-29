@@ -566,7 +566,7 @@ class _UpdateVerifyCusState extends State<UpdateVerifyCus> {
 
     if (pickedFile != null) {
       if (!isImageID) {
-        bool isFace = await _detectFace(pickedFile);
+       bool isFace =  await _detectFace(pickedFile);
         if (!isFace) {
           setState(() {
             _faceDetected = false;

@@ -24,14 +24,14 @@ globalAddressUrl() {
   return 'https://psgc.gitlab.io/api';
 }
 
-//my pc
-globalUrl() {
-  return 'http://192.168.254.187:3000';
-}
-
-////my phone data
+// //my pc
 // globalUrl() {
-//   return 'http://192.168.119.156:3000';
+//   return 'http://192.168.254.187:3000';
+// }
+
+// //my phone data
+// globalUrl() {
+//   return 'http://192.168.121.156:3000';
 // }
 
 // //emulator
@@ -39,9 +39,9 @@ globalUrl() {
 //   return 'http://10.0.2.2:3000';
 // }
 
-//// CTU network
+// // CTU network
 // globalUrl() {
-//   return 'http://172.16.14.83:3000';
+//   return 'http://172.16.37.195:3000';
 // }
 
 // // ngrok network
@@ -73,10 +73,10 @@ class NetworkglobalUrl {
   }
 }
 
-// //dynamic url
-// globalUrl() {
-//   return networkURL;
-// }
+//dynamic url
+globalUrl() {
+  return networkURL;
+}
 
 //for storing network on open
 class DynamicNetwork extends StatefulWidget {

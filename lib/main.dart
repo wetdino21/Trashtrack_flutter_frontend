@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:trashtrack/ZZZZZPractice.dart';
 import 'package:trashtrack/appbar.dart';
 import 'package:trashtrack/API/api_network.dart';
 import 'package:trashtrack/data_model.dart';
@@ -47,8 +48,9 @@ class MyApp extends StatelessWidget {
       navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       //initialRoute: initialRoute,
-      home: TokenCheck(), // final firt route
-      //home: DynamicNetwork(), // for testing with network
+      //home: TokenCheck(), // final firt route
+      home: DynamicNetwork(), // for testing with network
+      //home: Practice(),
 
       routes: {
         '/mainApp': (context) => MainApp(),

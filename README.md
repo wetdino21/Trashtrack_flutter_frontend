@@ -1,9 +1,12 @@
-Preview
-![Preview](assets/mobile_preview1.png)
-![Preview](assets/mobile_preview2.png)
-![Preview](assets/mobile_preview3.png)
-![Preview](assets/we_preview1.png)
-![Preview](assets/we_preview2.png)
+Mobile Preview
+![Preview](assets/mobile_preview1.jpg)
+![Preview](assets/mobile_preview2.jpg)
+![Preview](assets/mobile_preview3.jpg)
+
+Web Preview
+![Preview](assets/web_preview1.png)
+![Preview](assets/web_preview2.png)
+![Preview](assets/web_preview3.png)
 
 # Setup trashtrack Guidelines (Mobile)
 

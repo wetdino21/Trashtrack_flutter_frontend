@@ -1,7 +1,9 @@
 Mobile Preview
-![Preview](assets/mobile_preview1.jpg)
-![Preview](assets/mobile_preview2.jpg)
-![Preview](assets/mobile_preview3.jpg)
+<p align="center">
+  <img src="assets/mobile_preview1.jpg" width="30%" />
+  <img src="assets/mobile_preview2.jpg" width="30%" />
+  <img src="assets/mobile_preview3.jpg" width="30%" />
+</p>
 
 Web Preview
 ![Preview](assets/web_preview1.png)

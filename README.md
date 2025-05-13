@@ -1,7 +1,9 @@
 Preview
-![Preview](assets/preview1.png)
-![Preview](assets/preview1.png)
-![Preview](assets/preview1.png)
+![Preview](assets/mobile_preview1.png)
+![Preview](assets/mobile_preview2.png)
+![Preview](assets/mobile_preview3.png)
+![Preview](assets/we_preview1.png)
+![Preview](assets/we_preview2.png)
 
 # Setup trashtrack Guidelines (Mobile)
 
